@@ -1,3 +1,3 @@
 library live_cells;
 
-export 'value_cell.dart';
+export 'src/value_cell.dart';
