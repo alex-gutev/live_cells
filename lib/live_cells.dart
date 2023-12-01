@@ -6,3 +6,4 @@ export 'src/equality/neq_cell.dart';
 export 'src/equality/cell_equality.dart';
 export 'src/mutable_cell/notifier_cell.dart';
 export 'src/mutable_cell/store_cell.dart';
+export 'src/mutable_cell/mutable_cell.dart';
