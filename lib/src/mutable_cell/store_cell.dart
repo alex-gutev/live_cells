@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../common/notifier_cell.dart';
+import '../base/notifier_cell.dart';
 
 /// Value cell which stores the computed value of another listenable in memory.
 ///

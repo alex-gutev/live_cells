@@ -4,7 +4,7 @@ export 'src/value_cell.dart';
 export 'src/equality/eq_cell.dart';
 export 'src/equality/neq_cell.dart';
 export 'src/equality/cell_equality.dart';
-export 'src/common/notifier_cell.dart';
+export 'src/base/notifier_cell.dart';
 export 'src/mutable_cell/store_cell.dart';
 export 'src/mutable_cell/mutable_cell.dart';
 export 'src/compute_cell/compute_cell.dart';

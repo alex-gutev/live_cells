@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:live_cells/src/common/cell_change_notifier.dart';
 
 import '../equality/cell_equality.dart';
 import '../value_cell.dart';
+import 'cell_change_notifier.dart';
 
 /// A [ValueCell] that stores its own value and manages its own listeners
 ///
