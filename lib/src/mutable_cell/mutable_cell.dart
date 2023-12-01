@@ -5,6 +5,6 @@ class MutableCell<T> extends NotifierCell<T> {
   MutableCell(super.value);
 
   set value(T value) {
-    notifier.value = value;
+    super.value = value;
   }
 }

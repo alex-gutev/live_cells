@@ -11,7 +11,11 @@ import 'notifier_cell.dart';
 /// the values of the argument cells have not changed.
 class StoreCell<T> extends NotifierCell<T> {
   /// Create a [StoreCell] which observes and saves the value of [valueCell]
-  StoreCell(this.valueCell) : super(valueCell.value) {
+  StoreCell(this.valueCell) : super(valueCell.value);
+
+  @override
+  void init() {
+    super.init();
     valueCell.addListener(_onChangeValue);
   }
 
@@ -28,6 +32,6 @@ class StoreCell<T> extends NotifierCell<T> {
 
   /// Value change listener for [valueCell]
   void _onChangeValue() {
-    notifier.value = valueCell.value;
+    value = valueCell.value;
   }
 }

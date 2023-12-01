@@ -21,10 +21,4 @@ abstract class ValueCell<T> implements ValueListenable<T> {
   /// The observers of the returned [ValueCell] are notified when either the value of this cell
   /// or [other] changes.
   ValueCell<bool> neq<U>(ValueCell<U> other);
-
-  /// Signals that the cell will no longer be used
-  ///
-  /// This method should only be overridden if the cell requires special
-  /// cleanup logic.
-  void dispose() {}
 }
