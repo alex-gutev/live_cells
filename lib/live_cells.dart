@@ -8,3 +8,4 @@ export 'src/mutable_cell/notifier_cell.dart';
 export 'src/mutable_cell/store_cell.dart';
 export 'src/mutable_cell/mutable_cell.dart';
 export 'src/compute_cell/compute_cell.dart';
+export 'src/compute_cell/compute_extension.dart';
