@@ -1,10 +1,11 @@
-import 'notifier_cell.dart';
-import '../value_cell.dart';
+import 'package:flutter/foundation.dart';
 
-/// Value cell which stores the computed value of another cell in memory.
+import 'notifier_cell.dart';
+
+/// Value cell which stores the computed value of another listenable in memory.
 ///
-/// The value of the observed cell is stored in memory, and the listeners of the
-/// [StoreCell] are only called if the value of the observed cell has changed.
+/// The value of the listenable is stored in memory, and the listeners of the
+/// [StoreCell] are only called if the value of the listenable has changed.
 ///
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
@@ -23,7 +24,7 @@ class StoreCell<T> extends NotifierCell<T> {
   /// Private
 
   /// The observed cell
-  final ValueCell<T> valueCell;
+  final ValueListenable<T> valueCell;
 
   /// Value change listener for [valueCell]
   void _onChangeValue() {
