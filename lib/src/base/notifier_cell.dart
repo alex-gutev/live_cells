@@ -21,7 +21,10 @@ abstract class NotifierCell<T> extends ValueCell<T> with CellEquality<T> {
   ///
   /// **NOTE:** This method may be called after the [value] property is accessed
   @protected
-  void init() {}
+  void init() {
+    _notifier = CellChangeNotifier();
+    _isInitialized = true;
+  }
 
   /// Teardown the cell object.
   ///
@@ -29,18 +32,17 @@ abstract class NotifierCell<T> extends ValueCell<T> with CellEquality<T> {
   /// [Listenables], or acquired resources this method should be overridden
   /// to include any teardown or cleanup logic.
   @protected
-  void dispose() {}
+  void dispose() {
+    _notifier.dispose();
+    _isInitialized = false;
+  }
 
   @override
   T get value => _value;
 
   @override
   void addListener(VoidCallback listener) {
-    if (_isDisposed) {
-      _notifier = CellChangeNotifier();
-    }
-
-    if (!_notifier.isActive) {
+    if (!_isInitialized) {
       init();
     }
 
@@ -52,9 +54,6 @@ abstract class NotifierCell<T> extends ValueCell<T> with CellEquality<T> {
     _notifier.removeListener(listener);
 
     if (!_notifier.isActive) {
-      _notifier.dispose();
-      _isDisposed = true;
-
       dispose();
     }
   }
@@ -64,17 +63,17 @@ abstract class NotifierCell<T> extends ValueCell<T> with CellEquality<T> {
   /// The cell's value
   T _value;
 
-  /// Has dispose been called on [_notifier]?
-  var _isDisposed = false;
+  /// Has [_notifier] been initialized?
+  var _isInitialized = false;
 
   /// The [ChangeNotifier] responsible for managing the listeners.
-  var _notifier = CellChangeNotifier();
+  late CellChangeNotifier _notifier;
 
   @protected
   set value(T value) {
     _value = value;
 
-    if (!_isDisposed) {
+    if (_isInitialized) {
       _notifier.notifyListeners();
     }
   }
