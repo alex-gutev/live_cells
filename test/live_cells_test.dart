@@ -87,4 +87,122 @@ void main() {
       verifyNever(listener.onChange());
     });
   });
+
+  group('Equality Comparisons', () {
+    test('ConstantCell\'s are eq if they have equal values', () {
+      final a = ConstantCell(1);
+      final b = ConstantCell(1);
+
+      expect(a.eq(b).value, equals(true));
+    });
+
+    test('ConstantCell\'s are not eq if they have unequal values', () {
+      final a = ConstantCell(1);
+      final b = ConstantCell(2);
+
+      expect(a.eq(b).value, equals(false));
+    });
+
+    test('ConstantCell\'s are neq if they have unequal values', () {
+      final a = ConstantCell(3);
+      final b = ConstantCell(4);
+
+      expect(a.neq(b).value, equals(true));
+    });
+
+    test('ConstantCell\'s are not neq if they have equal values', () {
+      final a = ConstantCell(3);
+      final b = ConstantCell(3);
+
+      expect(a.neq(b).value, equals(false));
+    });
+
+    test('EqCell is reevaluated when 1st argument cell value changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      a.value = 4;
+
+      expect(a.eq(b).value, equals(true));
+    });
+
+    test('EqCell is reevaluated when 2nd argument cell values changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      b.value = 3;
+
+      expect(a.eq(b).value, equals(true));
+    });
+
+    test('EqCell listeners notified when 1st argument cell values changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      final eq = a.eq(b);
+      final listener = MockListener();
+
+      eq.addListener(listener.onChange);
+      a.value = 4;
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('EqCell listeners notified when 2nd argument cell values changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      final eq = a.eq(b);
+      final listener = MockListener();
+
+      eq.addListener(listener.onChange);
+      b.value = 3;
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('NeqCell is reevaluated when 1st argument cell value changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      a.value = 4;
+
+      expect(a.neq(b).value, equals(false));
+    });
+
+    test('NeqCell is reevaluated when 2nd argument cell values changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      b.value = 3;
+
+      expect(a.neq(b).value, equals(false));
+    });
+
+    test('NeqCell listeners notified when 1st argument cell values changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      final neq = a.neq(b);
+      final listener = MockListener();
+
+      neq.addListener(listener.onChange);
+      a.value = 4;
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('NeqCell listeners notified when 2nd argument cell values changes', () {
+      final a = MutableCell(3);
+      final b = MutableCell(4);
+
+      final neq = a.eq(b);
+      final listener = MockListener();
+
+      neq.addListener(listener.onChange);
+      b.value = 3;
+
+      verify(listener.onChange()).called(1);
+    });
+  });
 }
