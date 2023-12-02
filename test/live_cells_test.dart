@@ -76,5 +76,15 @@ void main() {
 
       verify(listener.onChange()).called(1);
     });
+
+    test('MutableCell listener not called if new value is equal to old value', () {
+      final cell = MutableCell(56);
+      final listener = MockListener();
+
+      cell.addListener(listener.onChange);
+      cell.value = 56;
+
+      verifyNever(listener.onChange());
+    });
   });
 }
