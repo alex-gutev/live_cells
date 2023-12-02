@@ -205,4 +205,147 @@ void main() {
       verify(listener.onChange()).called(1);
     });
   });
+
+  group('ComputeCell', () {
+    test('ComputeCell function applied on ConstantCell value', () {
+      final a = ConstantCell(1);
+      final b = a.apply((value) => value + 1);
+
+      expect(b.value, equals(2));
+    });
+
+    test('ComputeCell reevaluated when value of argument cell changes', () {
+      final a = MutableCell(1);
+      final b = a.apply((value) => value + 1);
+
+      a.value = 5;
+
+      expect(b.value, equals(6));
+    });
+
+    test('N-ary ComputeCell reevaluated when value of 1st argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ComputeCell(
+          compute: () => a.value + b.value,
+          arguments: [a,b]
+      );
+
+      a.value = 5;
+
+      expect(c.value, equals(7));
+    });
+
+    test('N-ary ComputeCell reevaluated when value of 2nd argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ComputeCell(
+          compute: () => a.value + b.value,
+          arguments: [a,b]
+      );
+
+      b.value = 8;
+
+      expect(c.value, equals(9));
+    });
+
+    test('ComputeCell listeners notified when value of 1st argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ComputeCell(
+          compute: () => a.value + b.value,
+          arguments: [a,b]
+      );
+
+      final listener = MockListener();
+      c.addListener(listener.onChange);
+
+      a.value = 8;
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('ComputeCell listeners notified when value of 2nd argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ComputeCell(
+          compute: () => a.value + b.value,
+          arguments: [a,b]
+      );
+
+      final listener = MockListener();
+      c.addListener(listener.onChange);
+
+      b.value = 8;
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('ComputeCell listeners notified for each change of value of argument cell', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ComputeCell(
+          compute: () => a.value + b.value,
+          arguments: [a,b]
+      );
+
+      final listener = MockListener();
+      c.addListener(listener.onChange);
+
+      b.value = 8;
+      a.value = 10;
+      b.value = 100;
+
+      verify(listener.onChange()).called(3);
+    });
+
+    test('ComputeCell listener not called after it is removed', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ComputeCell(
+          compute: () => a.value + b.value,
+          arguments: [a,b]
+      );
+
+      final listener = MockListener();
+
+      c.addListener(listener.onChange);
+      a.value = 8;
+
+      c.removeListener(listener.onChange);
+      b.value = 10;
+      a.value = 100;
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('All ComputeCell listeners called when value changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ComputeCell(
+          compute: () => a.value + b.value,
+          arguments: [a,b]
+      );
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      c.addListener(listener1.onChange);
+      a.value = 8;
+
+      c.addListener(listener2.onChange);
+      b.value = 10;
+      a.value = 100;
+
+      verify(listener1.onChange()).called(3);
+      verify(listener2.onChange()).called(2);
+    });
+  });
 }
