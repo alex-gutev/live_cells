@@ -61,6 +61,10 @@ abstract class NotifierCell<T> extends ValueCell<T> with CellEquality<T> {
   /// Private
 
   /// The cell's value
+  ///
+  /// The listeners of the cell are notified only when the value is replaced
+  /// with a value that is not equal to the old value as evaluated by the
+  /// equality operator ==.
   T _value;
 
   /// Has [_notifier] been initialized?
@@ -71,6 +75,10 @@ abstract class NotifierCell<T> extends ValueCell<T> with CellEquality<T> {
 
   @protected
   set value(T value) {
+    if (_value == value) {
+      return;
+    }
+
     _value = value;
 
     if (_isInitialized) {
