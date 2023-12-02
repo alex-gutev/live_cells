@@ -26,7 +26,7 @@ abstract class DependentCell<T> extends ValueCell<T> {
   /// [dependencies] is the list of all the argument cells on which the value
   /// of this cell depends.
   DependentCell(List<Listenable> dependencies) :
-    dependencies = dependencies.singleOrNull ?? Listenable?.merge(dependencies);
+    dependencies = dependencies.singleOrNull ?? Listenable.merge(dependencies);
 
   /// Create a cell, of which the value depends on a single argument cells.
   ///
