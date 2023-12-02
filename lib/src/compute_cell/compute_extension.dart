@@ -11,6 +11,6 @@ extension ComputeExtension<T> on ValueCell<T> {
   ValueCell<U> apply<U>(U Function(T value) fn) =>
       ComputeCell(
           compute: () => fn(value),
-          arguments: this
+          arguments: [this]
       );
 }
