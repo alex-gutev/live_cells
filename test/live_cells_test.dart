@@ -365,4 +365,93 @@ void main() {
       verify(listener2.onChange()).called(2);
     });
   });
+
+  group('StoreCell', () {
+    test('StoreCell takes value of argument cell', () {
+      final a = MutableCell('hello');
+      final store = StoreCell(a);
+
+      expect(store.value, equals('hello'));
+    });
+
+    test('StoreCell takes latest value of argument cell', () {
+      final a = MutableCell('hello');
+      final store = StoreCell(a);
+
+      final listener = MockListener();
+
+      a.value = 'bye';
+      store.addListener(listener.onChange);
+
+      expect(store.value, equals('bye'));
+    });
+
+    test('StoreCell listeners notified when argument cell value changes', () {
+      final a = MutableCell('hello');
+      final store = StoreCell(a);
+
+      final listener = MockListener();
+
+      store.addListener(listener.onChange);
+      a.value = 'bye';
+      a.value = 'goodbye';
+
+      verify(listener.onChange()).called(2);
+    });
+
+    test('All StoreCell listeners notified when argument cell value changes', () {
+      final a = MutableCell('hello');
+      final store = StoreCell(a);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      store.addListener(listener1.onChange);
+      a.value = 'bye';
+
+      store.addListener(listener2.onChange);
+      a.value = 'goodbye';
+
+      verify(listener1.onChange()).called(2);
+      verify(listener2.onChange()).called(1);
+    });
+
+    test('StoreCell listener not called after it is removed', () {
+      final a = MutableCell('hello');
+      final store = StoreCell(a);
+
+      final listener = MockListener();
+
+      store.addListener(listener.onChange);
+      a.value = 'bye';
+
+      store.removeListener(listener.onChange);
+      a.value = 'goodbye';
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('StoreCell listeners not called when argument cell value does not change', () {
+      final a = MutableCell(2);
+      final b = a.apply((value) => value.isEven);
+      final store = StoreCell(b);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      b.addListener(listener1.onChange);
+      store.addListener(listener2.onChange);
+
+      a.value = 4;
+      a.value = 6;
+      a.value = 8;
+
+      verify(listener1.onChange()).called(3);
+      verifyNever(listener2.onChange());
+
+      a.value = 11;
+
+      verify(listener2.onChange()).called(1);
+    });
+  });
 }
