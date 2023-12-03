@@ -86,6 +86,23 @@ void main() {
 
       verifyNever(listener.onChange());
     });
+
+    test('All MutableCell listeners called when value changes', () {
+      final cell = MutableCell(3);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      cell.addListener(listener1.onChange);
+      cell.value = 5;
+
+      cell.addListener(listener2.onChange);
+      cell.value = 8;
+      cell.value = 12;
+
+      verify(listener1.onChange()).called(3);
+      verify(listener2.onChange()).called(2);
+    });
   });
 
   group('Equality Comparisons', () {
