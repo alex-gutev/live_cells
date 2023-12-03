@@ -9,6 +9,34 @@ class Listener {
 
 class MockListener extends Mock implements Listener {}
 
+abstract class TestResource {
+  void init();
+  void dispose();
+}
+
+class MockResource extends Mock implements TestResource {
+  void init();
+  void dispose();
+}
+
+class TestManagedCell<T> extends NotifierCell<T> {
+  final TestResource _resouce;
+
+  TestManagedCell(this._resouce, super.value);
+  
+  @override
+  void init() {
+    super.init();
+    _resouce.init();
+  }
+  
+  @override
+  void dispose() {
+    super.dispose();
+    _resouce.dispose();
+  }
+}
+
 void main() {
   group('ConstantCell', () {
     test('Integer ConstantCell.value equals value given in constructor', () {
@@ -452,6 +480,77 @@ void main() {
       a.value = 11;
 
       verify(listener2.onChange()).called(1);
+    });
+  });
+
+  group('Cell initialization and cleanup', () {
+    test('init() not called if no listeners added', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+      
+      verifyNever(resource.init());
+    });
+
+    test('init() called once when adding first listener', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      verify(resource.init()).called(1);
+    });
+
+    test('dispose() not called when not all listeners removed', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      cell.removeListener(listener1.onChange);
+
+      verifyNever(resource.dispose());
+    });
+
+    test('dispose() called when all listeners removed', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      cell.removeListener(listener1.onChange);
+      cell.removeListener(listener2.onChange);
+
+      verify(resource.dispose()).called(1);
+    });
+
+    test('init() called again when adding new listener after all listeners removed', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      cell.removeListener(listener1.onChange);
+      cell.removeListener(listener2.onChange);
+
+      cell.addListener(listener1.onChange);
+
+      verify(resource.init()).called(2);
     });
   });
 }
