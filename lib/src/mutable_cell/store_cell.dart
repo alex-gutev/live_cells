@@ -17,6 +17,7 @@ class StoreCell<T> extends NotifierCell<T> {
   void init() {
     super.init();
     valueCell.addListener(_onChangeValue);
+    value = valueCell.value;
   }
 
   @override
