@@ -9,6 +9,12 @@ class Listener {
 
 class MockListener extends Mock implements Listener {}
 
+abstract class TestCellValue {
+  void gotValue(value);
+}
+
+class MockTestCellValue extends Mock implements TestCellValue {}
+
 abstract class TestResource {
   void init();
   void dispose();
@@ -130,6 +136,18 @@ void main() {
 
       verify(listener1.onChange()).called(3);
       verify(listener2.onChange()).called(2);
+    });
+
+    test('MutableCell.value updated when listener called', () {
+      final cell = MutableCell('hello');
+      final value = MockTestCellValue();
+
+      cell.addListener(() {
+        value.gotValue(cell.value);
+      });
+
+      cell.value = 'bye';
+      verify(value.gotValue('bye'));
     });
   });
 
@@ -480,6 +498,20 @@ void main() {
       a.value = 11;
 
       verify(listener2.onChange()).called(1);
+    });
+
+    test('StoreCell.value updated when listener called', () {
+      final cell = MutableCell('hello');
+      final store = StoreCell(cell);
+
+      final value = MockTestCellValue();
+
+      store.addListener(() {
+        value.gotValue(store.value);
+      });
+
+      cell.value = 'bye';
+      verify(value.gotValue('bye'));
     });
   });
 
