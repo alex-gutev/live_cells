@@ -23,10 +23,7 @@ abstract class NotifierCell<T> extends ManagedCell<T> with CellEquality<T>, Cell
     }
 
     _value = value;
-
-    if (isInitialized) {
-      notifyListeners();
-    }
+    notifyListeners();
   }
 
   /// Private

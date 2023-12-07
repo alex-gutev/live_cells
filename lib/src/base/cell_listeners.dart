@@ -40,12 +40,11 @@ mixin CellListeners<T> on ManagedCell<T> {
   }
 
   /// Notify the listeners of the cell that the value has changed.
-  ///
-  /// **NOTE:*** This method should only be called if [isInitialized] is true.
   @protected
   void notifyListeners() {
-    assert(_isInitialized, 'notifyListeners() called when cell is not initialized.');
-    _notifier.notifyListeners();
+    if (_isInitialized) {
+      _notifier.notifyListeners();
+    }
   }
 
   /// Private
