@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:live_cells/live_cells.dart';
@@ -11,6 +13,7 @@ class MockListener extends Mock implements Listener {}
 
 abstract class TestCellValue {
   void gotValue(value);
+  void hasValue(value);
 }
 
 class MockTestCellValue extends Mock implements TestCellValue {}
@@ -583,6 +586,141 @@ void main() {
       cell.addListener(listener1.onChange);
 
       verify(resource.init()).called(2);
+    });
+  });
+
+  group('FutureCell', () {
+    test('FutureCell listeners called when Future value is ready', () async {
+      final completer = Completer<int>();
+      final cell = FutureCell(completer.future);
+
+      final listener = MockListener();
+      cell.addListener(listener.onChange);
+
+      completer.complete(100);
+
+      await untilCalled(listener.onChange()).timeout(Duration(seconds: 10), onTimeout: () {
+        fail('listener not called after 10 seconds');
+      });
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('FutureCell listeners called when Future value is ready before construction', () async {
+      final future = Future.value(200);
+      final cell = FutureCell(future);
+
+      final listener = MockListener();
+      cell.addListener(listener.onChange);
+
+      await untilCalled(listener.onChange()).timeout(Duration(seconds: 10), onTimeout: () {
+        fail('listener not called after 10 seconds');
+      });
+
+      verify(listener.onChange()).called(1);
+    });
+
+    test('FutureCell.value is set to Future value', () async {
+      final future = Future.value(10);
+      final cell = FutureCell(future);
+
+      final value = MockTestCellValue();
+      cell.addListener(() {
+        value.hasValue(cell.hasValue);
+        value.gotValue(cell.value);
+      });
+
+      await untilCalled(value.hasValue(any))
+          .timeout(Duration(seconds: 10), onTimeout: () {
+            fail('Listener not called after 10 seconds');
+      });
+
+      verify(value.hasValue(true)).called(1);
+      verify(value.gotValue(10)).called(1);
+    });
+
+    test('FutureCell.value is set when Future value is ready', () async {
+      final completer = Completer<int>();
+      final cell = FutureCell(completer.future);
+
+      final value = MockTestCellValue();
+      cell.addListener(() {
+        value.hasValue(cell.hasValue);
+        value.gotValue(cell.value);
+      });
+
+      completer.complete(100);
+
+      await untilCalled(value.hasValue(any))
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        fail('Listener not called after 10 seconds');
+      });
+
+      verify(value.hasValue(true)).called(1);
+      verify(value.gotValue(100)).called(1);
+    });
+
+    test('All FutureCell listeners called when future is ready', () async {
+      final completer = Completer<int>();
+      final cell = FutureCell(completer.future);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      completer.complete(500);
+
+      await untilCalled(listener1.onChange()).timeout(Duration(seconds: 10), onTimeout: () {
+        fail('listener not called after 10 seconds');
+      });
+
+      verify(listener1.onChange()).called(1);
+      verify(listener2.onChange()).called(1);
+    });
+
+    test('FutureCell listener not called after it is removed', () async {
+      final completer = Completer<int>();
+      final cell = FutureCell(completer.future);
+
+      final listener1 = MockListener();
+      final listener2 = MockListener();
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      cell.removeListener(listener2.onChange);
+
+      completer.complete(600);
+
+      await untilCalled(listener1.onChange()).timeout(Duration(seconds: 10), onTimeout: () {
+        fail('listener not called after 10 seconds');
+      });
+
+      verify(listener1.onChange()).called(1);
+      verifyNever(listener2.onChange());
+    });
+
+    test('FutureCell.value = defaultValue until future is complete', () async {
+      final future = Future.value('bye');
+      final cell = FutureCell(future, defaultValue: 'hello');
+
+      expect(cell.value, equals('hello'));
+    });
+
+    test('Nullable type FutureCell.value = null until complete', () async {
+      final future = Future.value('bye');
+      final cell = FutureCell<String?>(future);
+
+      expect(cell.value, equals(null));
+    });
+
+    test('FutureCell.value throws NoCellValueError until complete if no default value given', () async {
+      final future = Future.value('bye');
+      final cell = FutureCell(future);
+
+      expect(() => cell.value, throwsA(isA<NoCellValueError>()));
     });
   });
 }
