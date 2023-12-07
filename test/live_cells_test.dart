@@ -723,4 +723,30 @@ void main() {
       expect(() => cell.value, throwsA(isA<NoCellValueError>()));
     });
   });
+
+  group('StreamCell', () {
+    test('StreamCell.value is set to all values in stream in order', () async {
+      final stream = Stream.fromIterable([1, 2, 3]);
+      final cell = StreamCell(stream);
+
+      final value = MockTestCellValue();
+      cell.addListener(() {
+        value.hasValue(cell.hasValue);
+        value.gotValue(cell.value);
+      });
+
+      await untilCalled(value.gotValue(3))
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        fail('Listener not called (for final stream value) after 10 seconds');
+      });
+
+      verify(value.hasValue(true)).called(3);
+
+      verifyInOrder([
+        value.gotValue(1),
+        value.gotValue(2),
+        value.gotValue(3)
+      ]);
+    });
+  });
 }
