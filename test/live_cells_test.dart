@@ -5,18 +5,65 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_cells/live_cells.dart';
 import 'package:mockito/mockito.dart';
 
-class Listener {
-  void onChange() {}
+/// Mock class interface for recording whether a listener was called
+abstract class SimpleListener {
+  /// Method added as listener function
+  void onChange();
 }
 
-class MockListener extends Mock implements Listener {}
-
-abstract class TestCellValue {
+/// Mock class interface for recording the value of a cell at the time a listener was called
+abstract class ValueListener extends SimpleListener {
+  /// Mock method called by listener to record cell value
   void gotValue(value);
+}
+
+/// Like [ValueListener] but also provides interface for recording whether a [FutureCell] has a valu
+abstract class AsyncValueListener extends ValueListener {
+  /// Mock method called by listener to record [hasValue] property
   void hasValue(value);
 }
 
-class MockTestCellValue extends Mock implements TestCellValue {}
+/// Mock class implementing [SimpleListener]
+///
+/// Usage:
+///
+///   - Add [onChange] method as a listener of a cell
+///   - verify(instance.onChange())
+class MockSimpleListener extends Mock implements SimpleListener {}
+
+/// Mock class implementing [ValueListener]
+///
+/// Usage:
+///
+///   - Add [onChange] method as a listener of a cell
+///   - verify(instance.gotValue(expected))
+class MockValueListener extends ValueListener with Mock {
+  final ValueCell cell;
+
+  MockValueListener(this.cell);
+
+  void onChange() {
+    gotValue(cell.value);
+  }
+}
+
+/// Mock class implementing [AsyncValueListener]
+///
+/// Usage:
+///
+///   - Add [onChange] method as a listener of a cell
+///   - verify(instance.gotValue(expected))
+///   - verify(instance.hasValue(expected))
+class MockAsyncValueListener extends AsyncValueListener with Mock {
+  final FutureCell cell;
+
+  MockAsyncValueListener(this.cell);
+
+  void onChange() {
+    hasValue(cell.hasValue);
+    gotValue(cell.value);
+  }
+}
 
 abstract class TestResource {
   void init();
@@ -81,7 +128,7 @@ void main() {
 
     test('Setting MutableCell.value calls cell listeners', () {
       final cell = MutableCell(15);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       cell.addListener(listener.onChange);
       cell.value = 23;
@@ -91,7 +138,7 @@ void main() {
 
     test('Setting MutableCell.value twice calls cell listeners twice', () {
       final cell = MutableCell(15);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       cell.addListener(listener.onChange);
 
@@ -103,7 +150,7 @@ void main() {
 
     test('MutableCell listener not called after it is removed', () {
       final cell = MutableCell(15);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       cell.addListener(listener.onChange);
       cell.value = 23;
@@ -116,7 +163,7 @@ void main() {
 
     test('MutableCell listener not called if new value is equal to old value', () {
       final cell = MutableCell(56);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       cell.addListener(listener.onChange);
       cell.value = 56;
@@ -127,8 +174,8 @@ void main() {
     test('All MutableCell listeners called when value changes', () {
       final cell = MutableCell(3);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       cell.addListener(listener1.onChange);
       cell.value = 5;
@@ -143,14 +190,12 @@ void main() {
 
     test('MutableCell.value updated when listener called', () {
       final cell = MutableCell('hello');
-      final value = MockTestCellValue();
+      final listener = MockValueListener(cell);
 
-      cell.addListener(() {
-        value.gotValue(cell.value);
-      });
+      cell.addListener(listener.onChange);
 
       cell.value = 'bye';
-      verify(value.gotValue('bye'));
+      verify(listener.gotValue('bye'));
     });
   });
 
@@ -206,7 +251,7 @@ void main() {
       final b = MutableCell(4);
 
       final eq = a.eq(b);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       eq.addListener(listener.onChange);
       a.value = 4;
@@ -219,7 +264,7 @@ void main() {
       final b = MutableCell(4);
 
       final eq = a.eq(b);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       eq.addListener(listener.onChange);
       b.value = 3;
@@ -250,7 +295,7 @@ void main() {
       final b = MutableCell(4);
 
       final neq = a.neq(b);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       neq.addListener(listener.onChange);
       a.value = 4;
@@ -263,7 +308,7 @@ void main() {
       final b = MutableCell(4);
 
       final neq = a.eq(b);
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       neq.addListener(listener.onChange);
       b.value = 3;
@@ -326,7 +371,7 @@ void main() {
           arguments: [a,b]
       );
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
       c.addListener(listener.onChange);
 
       a.value = 8;
@@ -343,7 +388,7 @@ void main() {
           arguments: [a,b]
       );
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
       c.addListener(listener.onChange);
 
       b.value = 8;
@@ -360,7 +405,7 @@ void main() {
           arguments: [a,b]
       );
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
       c.addListener(listener.onChange);
 
       b.value = 8;
@@ -379,7 +424,7 @@ void main() {
           arguments: [a,b]
       );
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       c.addListener(listener.onChange);
       a.value = 8;
@@ -400,8 +445,8 @@ void main() {
           arguments: [a,b]
       );
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       c.addListener(listener1.onChange);
       a.value = 8;
@@ -427,7 +472,7 @@ void main() {
       final a = MutableCell('hello');
       final store = StoreCell(a);
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       a.value = 'bye';
       store.addListener(listener.onChange);
@@ -439,7 +484,7 @@ void main() {
       final a = MutableCell('hello');
       final store = StoreCell(a);
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       store.addListener(listener.onChange);
       a.value = 'bye';
@@ -452,8 +497,8 @@ void main() {
       final a = MutableCell('hello');
       final store = StoreCell(a);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       store.addListener(listener1.onChange);
       a.value = 'bye';
@@ -469,7 +514,7 @@ void main() {
       final a = MutableCell('hello');
       final store = StoreCell(a);
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
 
       store.addListener(listener.onChange);
       a.value = 'bye';
@@ -485,8 +530,8 @@ void main() {
       final b = a.apply((value) => value.isEven);
       final store = StoreCell(b);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       b.addListener(listener1.onChange);
       store.addListener(listener2.onChange);
@@ -507,14 +552,12 @@ void main() {
       final cell = MutableCell('hello');
       final store = StoreCell(cell);
 
-      final value = MockTestCellValue();
+      final listener = MockValueListener(store);
 
-      store.addListener(() {
-        value.gotValue(store.value);
-      });
+      store.addListener(listener.onChange);
 
       cell.value = 'bye';
-      verify(value.gotValue('bye'));
+      verify(listener.gotValue('bye'));
     });
   });
 
@@ -530,8 +573,8 @@ void main() {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       cell.addListener(listener1.onChange);
       cell.addListener(listener2.onChange);
@@ -543,8 +586,8 @@ void main() {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       cell.addListener(listener1.onChange);
       cell.addListener(listener2.onChange);
@@ -558,8 +601,8 @@ void main() {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       cell.addListener(listener1.onChange);
       cell.addListener(listener2.onChange);
@@ -574,8 +617,8 @@ void main() {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       cell.addListener(listener1.onChange);
       cell.addListener(listener2.onChange);
@@ -594,7 +637,7 @@ void main() {
       final completer = Completer<int>();
       final cell = FutureCell.fromFuture(completer.future);
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
       cell.addListener(listener.onChange);
 
       completer.complete(100);
@@ -610,7 +653,7 @@ void main() {
       final future = Future.value(200);
       final cell = FutureCell.fromFuture(future);
 
-      final listener = MockListener();
+      final listener = MockSimpleListener();
       cell.addListener(listener.onChange);
 
       await untilCalled(listener.onChange()).timeout(Duration(seconds: 10), onTimeout: () {
@@ -624,48 +667,42 @@ void main() {
       final future = Future.value(10);
       final cell = FutureCell.fromFuture(future);
 
-      final value = MockTestCellValue();
-      cell.addListener(() {
-        value.hasValue(cell.hasValue);
-        value.gotValue(cell.value);
-      });
+      final listener = MockAsyncValueListener(cell);
+      cell.addListener(listener.onChange);
 
-      await untilCalled(value.hasValue(any))
+      await untilCalled(listener.hasValue(any))
           .timeout(Duration(seconds: 10), onTimeout: () {
             fail('Listener not called after 10 seconds');
       });
 
-      verify(value.hasValue(true)).called(1);
-      verify(value.gotValue(10)).called(1);
+      verify(listener.hasValue(true)).called(1);
+      verify(listener.gotValue(10)).called(1);
     });
 
     test('FutureCell.value is set when Future value is ready', () async {
       final completer = Completer<int>();
       final cell = FutureCell.fromFuture(completer.future);
 
-      final value = MockTestCellValue();
-      cell.addListener(() {
-        value.hasValue(cell.hasValue);
-        value.gotValue(cell.value);
-      });
+      final listener = MockAsyncValueListener(cell);
+      cell.addListener(listener.onChange);
 
       completer.complete(100);
 
-      await untilCalled(value.hasValue(any))
+      await untilCalled(listener.hasValue(any))
           .timeout(Duration(seconds: 10), onTimeout: () {
         fail('Listener not called after 10 seconds');
       });
 
-      verify(value.hasValue(true)).called(1);
-      verify(value.gotValue(100)).called(1);
+      verify(listener.hasValue(true)).called(1);
+      verify(listener.gotValue(100)).called(1);
     });
 
     test('All FutureCell listeners called when future is ready', () async {
       final completer = Completer<int>();
       final cell = FutureCell.fromFuture(completer.future);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       cell.addListener(listener1.onChange);
       cell.addListener(listener2.onChange);
@@ -684,8 +721,8 @@ void main() {
       final completer = Completer<int>();
       final cell = FutureCell.fromFuture(completer.future);
 
-      final listener1 = MockListener();
-      final listener2 = MockListener();
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
 
       cell.addListener(listener1.onChange);
       cell.addListener(listener2.onChange);
@@ -729,23 +766,20 @@ void main() {
       final stream = Stream.fromIterable([1, 2, 3]);
       final cell = StreamCell(stream);
 
-      final value = MockTestCellValue();
-      cell.addListener(() {
-        value.hasValue(cell.hasValue);
-        value.gotValue(cell.value);
-      });
+      final listener = MockAsyncValueListener(cell);
+      cell.addListener(listener.onChange);
 
-      await untilCalled(value.gotValue(3))
+      await untilCalled(listener.gotValue(3))
           .timeout(Duration(seconds: 10), onTimeout: () {
         fail('Listener not called (for final stream value) after 10 seconds');
       });
 
-      verify(value.hasValue(true)).called(3);
+      verify(listener.hasValue(true)).called(3);
 
       verifyInOrder([
-        value.gotValue(1),
-        value.gotValue(2),
-        value.gotValue(3)
+        listener.gotValue(1),
+        listener.gotValue(2),
+        listener.gotValue(3)
       ]);
     });
   });
