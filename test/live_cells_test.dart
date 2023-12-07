@@ -592,7 +592,7 @@ void main() {
   group('FutureCell', () {
     test('FutureCell listeners called when Future value is ready', () async {
       final completer = Completer<int>();
-      final cell = FutureCell(completer.future);
+      final cell = FutureCell.fromFuture(completer.future);
 
       final listener = MockListener();
       cell.addListener(listener.onChange);
@@ -608,7 +608,7 @@ void main() {
 
     test('FutureCell listeners called when Future value is ready before construction', () async {
       final future = Future.value(200);
-      final cell = FutureCell(future);
+      final cell = FutureCell.fromFuture(future);
 
       final listener = MockListener();
       cell.addListener(listener.onChange);
@@ -622,7 +622,7 @@ void main() {
 
     test('FutureCell.value is set to Future value', () async {
       final future = Future.value(10);
-      final cell = FutureCell(future);
+      final cell = FutureCell.fromFuture(future);
 
       final value = MockTestCellValue();
       cell.addListener(() {
@@ -641,7 +641,7 @@ void main() {
 
     test('FutureCell.value is set when Future value is ready', () async {
       final completer = Completer<int>();
-      final cell = FutureCell(completer.future);
+      final cell = FutureCell.fromFuture(completer.future);
 
       final value = MockTestCellValue();
       cell.addListener(() {
@@ -662,7 +662,7 @@ void main() {
 
     test('All FutureCell listeners called when future is ready', () async {
       final completer = Completer<int>();
-      final cell = FutureCell(completer.future);
+      final cell = FutureCell.fromFuture(completer.future);
 
       final listener1 = MockListener();
       final listener2 = MockListener();
@@ -682,7 +682,7 @@ void main() {
 
     test('FutureCell listener not called after it is removed', () async {
       final completer = Completer<int>();
-      final cell = FutureCell(completer.future);
+      final cell = FutureCell.fromFuture(completer.future);
 
       final listener1 = MockListener();
       final listener2 = MockListener();
@@ -704,21 +704,21 @@ void main() {
 
     test('FutureCell.value = defaultValue until future is complete', () async {
       final future = Future.value('bye');
-      final cell = FutureCell(future, defaultValue: 'hello');
+      final cell = FutureCell.fromFuture(future, defaultValue: 'hello');
 
       expect(cell.value, equals('hello'));
     });
 
     test('Nullable type FutureCell.value = null until complete', () async {
       final future = Future.value('bye');
-      final cell = FutureCell<String?>(future);
+      final cell = FutureCell<String?>.fromFuture(future);
 
       expect(cell.value, equals(null));
     });
 
     test('FutureCell.value throws NoCellValueError until complete if no default value given', () async {
       final future = Future.value('bye');
-      final cell = FutureCell(future);
+      final cell = FutureCell.fromFuture(future);
 
       expect(() => cell.value, throwsA(isA<NoCellValueError>()));
     });
