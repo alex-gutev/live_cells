@@ -782,5 +782,92 @@ void main() {
         listener.gotValue(3)
       ]);
     });
+
+    test('All StreamCell listeners called on each value change', () async {
+      final stream = Stream.fromIterable([1, 2, 3]);
+      final cell = StreamCell(stream);
+
+      final listener1 = MockAsyncValueListener(cell);
+      final listener2 = MockAsyncValueListener(cell);
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      await untilCalled(listener1.gotValue(3))
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        fail('Listener not called (for final stream value) after 10 seconds');
+      });
+
+      verify(listener1.hasValue(true)).called(3);
+      verify(listener2.hasValue(true)).called(3);
+
+      verifyInOrder([
+        listener1.gotValue(1),
+        listener1.gotValue(2),
+        listener1.gotValue(3)
+      ]);
+
+      verifyInOrder([
+        listener2.gotValue(1),
+        listener2.gotValue(2),
+        listener2.gotValue(3)
+      ]);
+    });
+
+    test('StreamCell.value works with broadcast stream', () async {
+      final controller = StreamController<int>.broadcast();
+      final cell = StreamCell(controller.stream);
+
+      final listener = MockAsyncValueListener(cell);
+      cell.addListener(listener.onChange);
+
+      controller.add(1);
+      controller.add(2);
+
+      await untilCalled(listener.gotValue(2))
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        fail('Listener not called (for final stream value) after 10 seconds');
+      });
+
+      verify(listener.hasValue(true)).called(2);
+
+      verifyInOrder([
+        listener.gotValue(1),
+        listener.gotValue(2),
+      ]);
+
+      verifyNoMoreInteractions(listener);
+
+      controller.add(3);
+
+      await untilCalled(listener.gotValue(3))
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        fail('Listener not called (for final stream value) after 10 seconds');
+      });
+
+      verify(listener.gotValue(3));
+
+      controller.close();
+    });
+
+    test('StreamCell listener not called after it is removed', () async {
+      final stream = Stream.fromIterable([1, 2, 3]);
+      final cell = StreamCell(stream);
+
+      final listener1 = MockAsyncValueListener(cell);
+      final listener2 = MockAsyncValueListener(cell);
+
+      cell.addListener(listener1.onChange);
+      cell.addListener(listener2.onChange);
+
+      cell.removeListener(listener2.onChange);
+
+      await untilCalled(listener1.gotValue(3))
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        fail('Listener not called (for final stream value) after 10 seconds');
+      });
+
+      verifyNever(listener2.gotValue(any));
+    });
   });
 }
