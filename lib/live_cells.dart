@@ -10,6 +10,4 @@ export 'src/mutable_cell/store_cell.dart';
 export 'src/mutable_cell/mutable_cell.dart';
 export 'src/compute_cell/compute_cell.dart';
 export 'src/compute_cell/compute_extension.dart';
-export 'src/async_cell/future_cell.dart';
 export 'src/async_cell/delay_cell.dart';
-export 'src/async_cell/stream_cell.dart';
