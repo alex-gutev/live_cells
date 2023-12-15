@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 
 import '../value_cell.dart';
 
-typedef CellWidgetFunction<T> = Widget Function(T);
-
 /// Provides functionality for creating [Widgets[ from ValueCells
 extension WidgetExtension<T> on ValueCell<T> {
   /// Create a [Widget] which depends on the cell's value.
