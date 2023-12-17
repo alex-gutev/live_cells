@@ -1,6 +1,5 @@
-import 'package:live_cells/live_cells.dart';
-
 import '../value_cell.dart';
+import 'compute_cell.dart';
 
 /// Utility methods for creating new cells by applying functions on their values.
 extension ComputeExtension<T> on ValueCell<T> {

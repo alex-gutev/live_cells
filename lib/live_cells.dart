@@ -1,11 +1,6 @@
 library live_cells;
 
 export 'src/value_cell.dart';
-export 'src/constant_cell.dart';
-export 'src/equality/eq_cell.dart';
-export 'src/equality/neq_cell.dart';
-export 'src/equality/cell_equality.dart';
-export 'src/base/dependent_cell.dart';
 export 'src/base/managed_cell.dart';
 export 'src/base/cell_listeners.dart';
 export 'src/base/notifier_cell.dart';

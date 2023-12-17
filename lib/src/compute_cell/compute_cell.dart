@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../base/dependent_cell.dart';
-import '../equality/cell_equality.dart';
+import '../value_cell.dart';
 
 /// A cell, of which the value is computed by a user provided function.
 class ComputeCell<T> extends DependentCell<T> with CellEquality<T> {

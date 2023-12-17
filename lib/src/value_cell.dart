@@ -1,9 +1,22 @@
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
+
+part 'constant_cell.dart';
+part 'base/dependent_cell.dart';
+part 'equality/cell_equality.dart';
+part 'equality/eq_cell.dart';
+part 'equality/neq_cell.dart';
 
 /// Base value cell interface.
 ///
 /// Extends the [ValueListenable] interface with equality operators.
 abstract class ValueCell<T> implements ValueListenable<T> {
+  ValueCell();
+
+  /// Create a value cell with a constant value
+  factory ValueCell.value(T value) => ConstantCell(value);
+
   /// Returns a new [ValueCell] which compares the value of this cell to another cell for equality.
   ///
   /// The returned [ValueCell] has a value of true when this cell and [other] have the same

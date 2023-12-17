@@ -1,7 +1,4 @@
-import 'dart:ui';
-
-import 'equality/cell_equality.dart';
-import 'value_cell.dart';
+part of 'value_cell.dart';
 
 /// A cell with a constant value.
 ///

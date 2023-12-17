@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-import '../equality/cell_equality.dart';
 import '../value_cell.dart';
 import 'cell_listeners.dart';
 import 'managed_cell.dart';

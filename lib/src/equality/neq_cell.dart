@@ -1,8 +1,4 @@
-import 'package:flutter/foundation.dart';
-
-import '../base/dependent_cell.dart';
-import '../value_cell.dart';
-import 'eq_cell.dart';
+part of '../value_cell.dart';
 
 /// A cell which evaluates to true when the values of two cells are not equal under `==`.
 ///
