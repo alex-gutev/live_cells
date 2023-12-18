@@ -443,14 +443,14 @@ void main() {
   group('StoreCell', () {
     test('StoreCell takes value of argument cell', () {
       final a = MutableCell('hello');
-      final store = StoreCell(a);
+      final store = a.store();
 
       expect(store.value, equals('hello'));
     });
 
     test('StoreCell takes latest value of argument cell', () {
       final a = MutableCell('hello');
-      final store = StoreCell(a);
+      final store = a.store();
 
       final listener = MockSimpleListener();
 
@@ -462,7 +462,7 @@ void main() {
 
     test('StoreCell listeners notified when argument cell value changes', () {
       final a = MutableCell('hello');
-      final store = StoreCell(a);
+      final store = a.store();
 
       final listener = MockSimpleListener();
 
@@ -475,7 +475,7 @@ void main() {
 
     test('All StoreCell listeners notified when argument cell value changes', () {
       final a = MutableCell('hello');
-      final store = StoreCell(a);
+      final store = a.store();
 
       final listener1 = MockSimpleListener();
       final listener2 = MockSimpleListener();
@@ -492,7 +492,7 @@ void main() {
 
     test('StoreCell listener not called after it is removed', () {
       final a = MutableCell('hello');
-      final store = StoreCell(a);
+      final store = a.store();
 
       final listener = MockSimpleListener();
 
@@ -508,7 +508,7 @@ void main() {
     test('StoreCell listeners not called when argument cell value does not change', () {
       final a = MutableCell(2);
       final b = a.apply((value) => value.isEven);
-      final store = StoreCell(b);
+      final store = b.store();
 
       final listener1 = MockSimpleListener();
       final listener2 = MockSimpleListener();
@@ -530,7 +530,7 @@ void main() {
 
     test('StoreCell.value updated when listener called', () {
       final cell = MutableCell('hello');
-      final store = StoreCell(cell);
+      final store = cell.store();
 
       final listener = MockValueListener(store);
 
