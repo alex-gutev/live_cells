@@ -363,56 +363,51 @@ no listeners. If the value of this cell is displayed in a widget, the counter mi
 from a value greater than `0` or the counting could be complete before the widget has even rendered,
 depending on where the cell is constructed.
 
-Here's a better example using `init` and `dispose` to start the counter after the first listener
-is added and "pause" the counter when there are no more listeners.
+Here's a better example that uses `init` and `dispose` to start and stop a timer, for incrementing
+the value:
 
 ```dart
+import 'dart:async';
+
+import 'package:live_cells/live_cells.dart';
+
 class CountCell extends NotifierCell<int> {
   final int end;
   final Duration interval;
 
-  var _counting = false;
-  
+  Timer? _timer;
+
   CountCell(this.end, {
     this.interval = const Duration(seconds: 1)
-  }) : super(0) {
-    unawaited(_startCounter());
-  }
+  }) : super(0);
 
   @override
   void init() {
     super.init();
 
-    _counting = true;
-    unawaited(_startCounter());
+    _timer = Timer.periodic(interval,_timerTick);
   }
 
   @override
   void dispose() {
-    _counting = false;
+    _timer?.cancel();
+    _timer = null;
+
     super.dispose();
   }
   
-  Future<void> _startCounter() async {
-    while (value < end) {
-      await Future.delayed(interval);
-      
-      if (!_counting) {
-        break;
-      }
-      
-      value++;
+  void _timerTick(Timer timer) {
+    if (value >= end) {
+      timer.cancel();
+      _timer = null;
     }
+    
+    value++;
   }
 }
 ```
 
-**NOTE**: In this case the `_counting` variable, and the accompanying implementation of `dispose`,
-is unnecessary since `isInitialized` can be used  to check if the cell has been initialized, that 
-is whether it has at least one listener, however it's included in this example to demonstrate
-the usage of `init` and `dispose`.
-
-If your implementing a subclass of `NotifierCell` which depends on the value of another cell, you
+If you're implementing a subclass of `NotifierCell` which depends on the value of another cell, you
 will add a listener to the cell in the `init` method and remove the listener in the `dispose`
 method.
 
