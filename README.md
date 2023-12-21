@@ -17,7 +17,7 @@ and more flexible.
 ## Features
 
 This package provides a `ValueCell` interface which offers the following benefits 
-over `ChangeNotifier`/`ValueNotifier`:
+over `ChangeNotifier` / `ValueNotifier`:
 
 + Implementing a `ValueListenable` which is an expression of other `ValueListenable`'s, e.g. `a + b`,
   can be done in a functional manner without manually adding and removing listeners using
