@@ -423,3 +423,5 @@ method.
 
 If you discover any issues or have any feature requests, please open an issue on the package's Github
 repository.
+
+Take a look at the `example` directory for more complete examples of how to use this library.
