@@ -39,7 +39,7 @@ which depends on the cell's value. This is done using the `toWidget` method:
 ```dart
 final cell = ValueCell.value(1);
 
-return cell.toWidget((context, value, _) => Text("Cell value: $value"));
+return cell.toWidget((context, value, _) => Text('Cell value: $value'));
 ```
 
 The benefit of using `toWidget` as opposed to accessing `value` directly is that the returned
@@ -142,9 +142,10 @@ Cells can also depend on multiple argument cells, for example every `ValueCell` 
 equal to another value. Example:
 
 ```dart
-final cell = MutableCell(2);
+final a = MutableCell(2);
+final b = MutableCell(1);
 
-return cell.eq(1).toWidget((context, value, _) => {
+return a.eq(b).toWidget((context, value, _) => {
   if (value) {
     return Text('Is equal to one');
   }
