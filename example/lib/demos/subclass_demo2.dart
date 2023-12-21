@@ -31,7 +31,6 @@ class CountCell extends NotifierCell<int> {
   void _timerTick(Timer timer) {
     if (value >= end) {
       timer.cancel();
-      _timer = null;
     }
     else {
       value++;
