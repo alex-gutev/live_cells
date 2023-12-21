@@ -56,9 +56,9 @@ Widget is rebuilt whenever the value of the cell changes.
 
 ### Mutable Cells
 
-So far the value of a cell cannot be changed after it is created. A `MutableCell` is a `ValueCell`
-of which the `value` property can be set as well as read. When the value of the cell is set, all widgets
-that depend on the value of the cell, created using `toWidget`, are rebuilt with the new value.
+A `MutableCell` is a `ValueCell`of which the `value` property can be set as well as read. When the 
+value of the cell is set, all widgets that depend on the value of the cell, created using `toWidget`,
+are rebuilt with the new value.
 
 ```dart
 import 'package:live_cells/live_cells.dart';
@@ -98,8 +98,8 @@ This is intentional. More on this later.
 
 ### Computational Cells
 
-The code you've seen till this point isn't very different from what you'd see if you were using `ValueNotifier`
-from the `provider` package, so why use `live_cells` at all? In this section you'll see where live cells
+The code you've seen till this point isn't very different from what you'd see if you were using
+`ValueNotifier`, so why use live cells at all? In this section you'll see where live cells
 excels.
 
 A computational cell is a cell that depends on the value of one or more argument cells. Whenever the values
@@ -147,8 +147,8 @@ class _ApplyMethodExampleState extends State<ApplyMethodExample> {
 ```
 
 Cells can also depend on multiple argument cells, for example every `ValueCell` implements the methods
-`eq` and `neq` which create a new cell which compares whether the value of the cell is equal or not
-equal to another value. Example:
+`eq` and `neq` which create a new cell that compares whether the value of the cell is equal or not
+equal to the value of another cell. Example:
 
 ```dart
 final a = MutableCell(2);
@@ -156,10 +156,10 @@ final b = MutableCell(1);
 
 return a.eq(b).toWidget((context, value, _) => {
   if (value) {
-    return Text('Is equal to one');
+    return Text('Cells are equal');
   }
   else {
-    return Text('Not equal to one');
+    return Text('Cells are not equal');
   }
 });
 ```
@@ -178,10 +178,10 @@ final sum = ComputeCell(
 ```
 
 The value of `sum` is the sum of the values of cells `a` and `b`. Note the `compute` function does
-not take any arguments, unlike when using `apply`. Instead you have to access the values of the cells
-directly using  the `value` property inside the `compute` function. Additionally you have to include
-every argument cell in the `arguments` list so that the cell knows when its value should be 
-recomputed.
+not take any arguments, unlike when using `apply`. Instead the values of the cells have to be 
+accessed directly using  the `value` property inside the `compute` function. Additionally every 
+argument cell has to be included in the `arguments` list so that the cell knows when its value 
+should be recomputed.
 
 **Note**:
 
@@ -215,14 +215,14 @@ later the stored value is retrieved rather than recomputing the value.
 
 ## Widgets Library
 
-Besides the `ValueCell` interface, containined in the `live_cells` library, this package also 
+Besides the `ValueCell` interface provided by the `live_cells` library, this package also 
 provides a second library `live_cell_widgets` which address another shortcoming in Flutter which is
 the requirement for "controller" objects.
 
 Quite a few widgets in Flutter require a "controller" for some or all of their functionality, the
-most notable being `TextField` which requires a `TextEditingController`. Controller objects are
-problematic because they step out of the reactive paradigm adopted by Flutter making them
-difficult or clunky to use.
+most notable being `TextField` which requires a `TextEditingController` to be able to set its
+content. Controller objects are problematic because they step out of the reactive paradigm adopted 
+by Flutter making them difficult or clunky to use.
 
 The `live_cell_widgets` library provides wrappers around commonly used widgets which replace
 controller objects with cell objects.
@@ -279,11 +279,10 @@ cell-based interface to all widgets which take a controller object.
 Occasionally you may need to write your own `ValueCell` subclasses. A common situation is if you
 have a specific computation that you want to apply to different cells throughout your code.
 
-The `ValueCell` interface is an extension of the `ValueListenable` interface, which provides the
-equality comparison methods `eq` and `neq` for comparing whether two cells are equal and not equal
-respectively. These methods both return a `ValueCell` of which the value is the result of the
-comparison. The `CellEquality` mixin implements these methods using the `==` and `!=` operators 
-for a given type.
+The `ValueCell` interface extends the `ValueListenable` interface with the methods `eq` and `neq` 
+for comparing whether two cells are equal and not equal respectively. These methods  both return a 
+`ValueCell` of which the value is the result of the comparison. The `CellEquality` mixin implements 
+these methods using the `==` and `!=` operators for a given type.
 
 To implement a cell which performs a computation which is dependent on the values of one or more
 argument cells, you should extend `DependentCell`. This class already implements `addListener` and 
@@ -350,7 +349,7 @@ The above example is an implementation of a cell of which the value starts at `0
 by one every second. If the value in this cell is displayed in a widget using `toWidget` you'd see
 the widget display a new value every second.
 
-**NOTE***: The constructor of `NotifierCell` must be called to give the cell an initial value.
+**NOTE**: The constructor of `NotifierCell` must be called to give the cell an initial value.
 In this case the cell is given an initial value of `0` using `super(0)`.
 
 ### Resource Management
@@ -361,8 +360,8 @@ in any of these examples. This package takes a slightly different approach. The 
 manual resource management implement the `ManagedCell` interface, which is `NotifierCell` extends.
 
 `ManagedCell` provides an `init` method where resources should be acquired and a `dispose` method
-where resources should be released. The `init` method is called when the first listener is added 
-to the cell and `dispose` is called when the last listener is removed. The `init` method may be
+where resources should be released. The `init` method is called before the first listener is added 
+to the cell and `dispose` is called after the last listener is removed. The `init` method may be
 called again after `dispose` if a new listener is added after the last one is removed. Therefore
 implementations of `ManagedCell` should be written in such a way that the cell can be reused after
 `dispose` is called.
@@ -395,7 +394,7 @@ class CountCell extends NotifierCell<int> {
   void init() {
     super.init();
 
-    _timer = Timer.periodic(interval,_timerTick);
+    _timer = Timer.periodic(interval, _timerTick);
   }
 
   @override
@@ -409,7 +408,6 @@ class CountCell extends NotifierCell<int> {
   void _timerTick(Timer timer) {
     if (value >= end) {
       timer.cancel();
-      _timer = null;
     }
     
     value++;
@@ -418,11 +416,10 @@ class CountCell extends NotifierCell<int> {
 ```
 
 If you're implementing a subclass of `NotifierCell` which depends on the value of another cell, you
-will add a listener to the cell in the `init` method and remove the listener in the `dispose`
+should add a listener to the cell in the `init` method and remove the listener in the `dispose`
 method.
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+If you discover any issues or have any feature requests, please open an issue on the package's Github
+repository.
