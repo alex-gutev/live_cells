@@ -11,13 +11,22 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
-This package aims to replace `ChangeNotifier`, `ValueListenable`, `ValueNotifier`,
-`Consumer`, `Selector`, etc. from the `provider` package with a unified `ValueCell`
-interface that is simpler to use and more flexible.
+This package provides a replacement for `ChangeNotifier` and `ValueNotifier` that is simpler to use
+and more flexible.
 
 ## Features
 
-The `ValueCell` interface offers the following benefits over `ChangeNotifier`/`ValueNotifier`:
+This package provides a `ValueCell` interface which offers the following benefits 
+over `ChangeNotifier`/`ValueNotifier`:
+
++ Implementing a `ValueListenable` which is an expression of other `ValueListenable`'s, e.g. `a + b`,
+  can be done in a functional manner without manually adding and removing listeners using
+  `addListener`, `removeListener`.
++ Simpler resource management, no need to call `dispose`.
++ (Still in early stages) A library of widgets which replaces "controller" objects with 
+  `ValueListenable`'s. This allows for a style of programming which fits in with the reactive
+  paradigm of flutter.
+  
 
 ## Usage
 
