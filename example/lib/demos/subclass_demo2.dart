@@ -38,44 +38,40 @@ class CountCell extends NotifierCell<int> {
   }
 }
 
-class SubclassDemo2 extends StatefulWidget {
-  @override
-  State<SubclassDemo2> createState() => _SubclassDemo2State();
-}
-
-class _SubclassDemo2State extends State<SubclassDemo2> {
-  final counter = CountCell(10, interval: const Duration(seconds: 1));
-
+class SubclassDemo2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ValueCell Subclass Demo 2'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Demonstration of subclass of ValueCell using resource management methods',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold
+    return CellBuilder(
+      create: () => CountCell(10, interval: const Duration(seconds: 1)),
+      builder: (context, counter, _) => Scaffold(
+        appBar: AppBar(
+          title: const Text('ValueCell Subclass Demo 2'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Demonstration of subclass of ValueCell using resource management methods',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text('Counting to 10'),
-              const SizedBox(height: 10),
-              counter.toWidget((context, value, _) => Text(
-                '$value',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20
-                )
-              ))
-            ],
+                const SizedBox(height: 10),
+                Text('Counting to 10'),
+                const SizedBox(height: 10),
+                counter.toWidget((context, value, _) => Text(
+                  '$value',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20
+                  )
+                ))
+              ],
+            ),
           ),
         ),
       ),
