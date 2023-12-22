@@ -19,6 +19,7 @@ class DelayCell<T> extends NotifierCell<T> {
   void init() {
     super.init();
     valueCell.addListener(_onChangeValue);
+    value = valueCell.value;
   }
 
   @override
@@ -38,7 +39,9 @@ class DelayCell<T> extends NotifierCell<T> {
   Future<void> _onChangeValue() async {
     final newValue = valueCell.value;
 
-    await Future.delayed(delay);
-    value = newValue;
+    if (value != newValue) {
+      await Future.delayed(delay);
+      value = newValue;
+    }
   }
 }
