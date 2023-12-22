@@ -1,4 +1,4 @@
-part of '../value_cell.dart';
+part of '../base/value_cell.dart';
 
 /// Adds implementations of [ValueCell.eq] and [ValueCell.neq]
 mixin CellEquality<T> on ValueCell<T> {

@@ -1,4 +1,4 @@
-part of '../value_cell.dart';
+part of 'value_cell.dart';
 
 /// A cell of which the value is dependent on the value of one or more dependency cells.
 /// 

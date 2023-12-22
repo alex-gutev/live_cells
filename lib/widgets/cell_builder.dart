@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../value_cell.dart';
+import '../base/value_cell.dart';
 
 /// Cell creation function.
 ///

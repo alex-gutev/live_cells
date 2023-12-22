@@ -1,13 +1,13 @@
 library live_cells;
 
-export 'src/value_cell.dart';
-export 'src/base/managed_cell.dart';
-export 'src/base/cell_listeners.dart';
-export 'src/base/notifier_cell.dart';
-export 'src/mutable_cell/store_cell.dart';
-export 'src/mutable_cell/mutable_cell.dart';
-export 'src/compute_cell/compute_cell.dart';
-export 'src/compute_cell/compute_extension.dart';
-export 'src/async_cell/delay_cell.dart';
-export 'src/widgets/widget_extension.dart';
-export 'src/widgets/cell_builder.dart';
+export 'base/value_cell.dart';
+export 'base/managed_cell.dart';
+export 'base/cell_listeners.dart';
+export 'base/notifier_cell.dart';
+export 'mutable_cell/store_cell.dart';
+export 'mutable_cell/mutable_cell.dart';
+export 'compute_cell/compute_cell.dart';
+export 'compute_cell/compute_extension.dart';
+export 'async_cell/delay_cell.dart';
+export 'widgets/widget_extension.dart';
+export 'widgets/cell_builder.dart';
