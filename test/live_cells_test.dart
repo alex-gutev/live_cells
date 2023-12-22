@@ -611,4 +611,87 @@ void main() {
       verify(resource.init()).called(2);
     });
   });
+
+  group('DelayCell', () {
+    test('DelayCell.value equals initial value of cell when not changed', () {
+      final cell = MutableCell(2);
+      final delay = DelayCell(const Duration(milliseconds: 1), cell);
+
+      expect(delay.value, equals(2));
+    });
+
+    test('DelayCell takes latest value of argument cell', () {
+      final cell = MutableCell(10);
+      final delay = DelayCell(const Duration(milliseconds: 1), cell);
+
+      final listener = MockSimpleListener();
+      cell.value = 20;
+
+      delay.addListener(listener);
+
+      expect(delay.value, equals(20));
+    });
+
+    test('DelayCell.value is updated after setting argument cell value', () async {
+      final cell = MutableCell(1);
+      final delay = DelayCell(const Duration(milliseconds: 1), cell);
+
+      final listener = MockValueListener(delay);
+      delay.addListener(listener);
+
+      cell.value = 2;
+
+      await untilCalled(listener.gotValue(2)).timeout(const Duration(seconds: 1), onTimeout: () {
+        fail('DelayCell.value not updated');
+      });
+    });
+
+    test('DelayCell.value listeners called for every argument cell value change', () async {
+      final cell = MutableCell(1);
+      final delay = DelayCell(const Duration(milliseconds: 1), cell);
+
+      final listener = MockValueListener(delay);
+      delay.addListener(listener);
+
+      cell.value = 2;
+      cell.value = 5;
+
+      await untilCalled(listener.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
+        fail('DelayCell.value not updated');
+      });
+
+      verify(listener.gotValue(any)).called(2);
+    });
+
+    test('DelayCell.value listener not called after it is removed', () async {
+      final cell = MutableCell(1);
+      final delay = DelayCell(const Duration(milliseconds: 1), cell);
+
+      final listener1 = MockValueListener(delay);
+      final listener2 = MockValueListener(delay);
+
+      delay.addListener(listener1);
+      delay.addListener(listener2);
+
+      cell.value = 2;
+
+      await untilCalled(listener1.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
+        fail('DelayCell.value not updated');
+      });
+
+      await untilCalled(listener2.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
+        fail('DelayCell.value not updated');
+      });
+
+      delay.removeListener(listener1);
+      cell.value = 5;
+
+      await untilCalled(listener2.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
+        fail('DelayCell.value not updated');
+      });
+
+      verify(listener1.gotValue(any)).called(1);
+      verify(listener2.gotValue(any)).called(2);
+    });
+  });
 }
