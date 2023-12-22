@@ -322,7 +322,7 @@ for comparing whether two cells are equal and not equal respectively. These meth
 `ValueCell` of which the value is the result of the comparison. The `CellEquality` mixin implements 
 these methods using the `==` and `!=` operators for a given type.
 
-To implement a cell which performs a computation which is dependent on the values of one or more
+To implement a cell that performs a computation which is dependent on the values of one or more
 argument cells, you should extend `DependentCell`. This class already implements `addListener` and 
 `removeListener`, and provides a constructor which takes a list of the argument cells on which the
 value of the cell depends. You're only required to implement the `value` property accessor in which 
