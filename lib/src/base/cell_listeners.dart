@@ -43,7 +43,7 @@ mixin CellListeners<T> on ManagedCell<T> {
   @protected
   void notifyListeners() {
     if (_isInitialized) {
-      _notifier.notifyListeners();
+      _notifier.notify();
     }
   }
 

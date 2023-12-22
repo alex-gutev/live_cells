@@ -4,6 +4,7 @@ import '../base/notifier_cell.dart';
 class MutableCell<T> extends NotifierCell<T> {
   MutableCell(super.value);
 
+  @override
   set value(T value) {
     super.value = value;
   }

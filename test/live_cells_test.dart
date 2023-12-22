@@ -40,6 +40,7 @@ class MockValueListener extends ValueListener with Mock {
 
   MockValueListener(this.cell);
 
+  @override
   void call() {
     gotValue(cell.value);
   }
@@ -51,7 +52,9 @@ abstract class TestResource {
 }
 
 class MockResource extends Mock implements TestResource {
+  @override
   void init();
+  @override
   void dispose();
 }
 

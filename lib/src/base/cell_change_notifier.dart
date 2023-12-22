@@ -4,4 +4,9 @@ import 'package:flutter/cupertino.dart';
 class CellChangeNotifier extends ChangeNotifier {
   /// Public alias for [ChangeNotifier.hasListeners]
   bool get isActive => hasListeners;
+
+  /// Public alias for [ChangeNotifier.notify]
+  void notify() {
+    notifyListeners();
+  }
 }
