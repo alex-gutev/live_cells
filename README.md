@@ -248,7 +248,7 @@ The "factorial" cell is created in the `create` function and passed in the secon
 when the `CellBuilder` widget is initialized.
 
 **NOTE**: `CellBuilder` does not rebuild its child widgets, i.e. it does not call the `builder`
-function, when the value of the cell returned by `create` changes. It's purpose is to manage the
+function, when the value of the cell returned by `create` changes. Its purpose is to manage the
 creation of cells not to listen to changes in their values.
 
 ## Widgets Library
