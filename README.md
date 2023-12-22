@@ -215,13 +215,13 @@ later the stored value is retrieved rather than recomputing the value.
 
 **NOTE**:
 
-For this to be effective the cell a reference to the cell returned by `store()` has to be kept in 
+For this to be effective a reference to the cell returned by `store()` has to be kept in 
 between builds of a widget. Typically you'd put the instance in a `final` member of the "state" class
 of a `StatefulWidget`. However this can get a bit cumbersome if the cell depends on other cells which
 are also `final` members.
 
-The `CellBuilder` class is a widget which manages the creation of the cell so that you don't have to
-use a `Stateful` widget just to keep a reference to a cell. The constructor takes a `create` function
+The `CellBuilder` class is a widget which manages the creation of a cell so that you don't have to
+use a `StatefulWidget` just to keep a reference to a cell. The constructor takes a `create` function
 which is called to create the cell and a `builder` function which is called with the cell returned by
 `create` to build the widget.
 
@@ -248,7 +248,7 @@ The "factorial" cell is created in the `create` function and passed in the secon
 when the `CellBuilder` widget is initialized.
 
 **NOTE**: `CellBuilder` does not rebuild its child widgets, i.e. it does not call the `builder`
-function when the value of the cell returned by `create` changes. It's purpose is to manage the
+function, when the value of the cell returned by `create` changes. It's purpose is to manage the
 creation of cells not to listen to changes in their values.
 
 ## Widgets Library
