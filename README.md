@@ -42,7 +42,7 @@ final cell = ValueCell.value(1);
 print(cell.value); // Prints 1
 ```
 
-Generally you wouldn't want to access the value of a cell directly but you would create a widget
+Generally you don't want to access the value of a cell directly but you would create a widget
 which depends on the cell's value. This is done using the `toWidget` method:
 
 ```dart
@@ -99,8 +99,8 @@ This is intentional. More on this later.
 ### Computational Cells
 
 The code you've seen till this point isn't very different from what you'd see if you were using
-`ValueNotifier`, so why use live cells at all? In this section you'll see where live cells
-excels.
+`ValueNotifier`, so why use live cells at all? In this section you'll see where the live cells
+package excels.
 
 A computational cell is a cell that depends on the value of one or more argument cells. Whenever the values
 of the argument cells change the value of the computational cell is recomputed and any widgets which
@@ -196,9 +196,9 @@ method can be used to create a cell which stores the value of the computational 
 Example:
 
 ```dart
-final a = MutableCell(10);
+final n = MutableCell(10);
 
-final factorial = a.apply((n) {
+final factorial = n.apply((n) {
   var result = 1;
 
   for (var i = 2; i <= n; i++) {
@@ -209,20 +209,58 @@ final factorial = a.apply((n) {
 }).store();
 ```
 
-The value of the `factorial` cell, which computes the factorial of cell `a`, is only computed once
-when the value of `a` changes and the result is stored so that when the `value` property is accessed
+The value of the `factorial` cell, which computes the factorial of cell `n`, is only computed once
+when the value of `n` changes and the result is stored so that when the `value` property is accessed
 later the stored value is retrieved rather than recomputing the value.
+
+**NOTE**:
+
+For this to be effective the cell a reference to the cell returned by `store()` has to be kept in 
+between builds of a widget. Typically you'd put the instance in a `final` member of the "state" class
+of a `StatefulWidget`. However this can get a bit cumbersome if the cell depends on other cells which
+are also `final` members.
+
+The `CellBuilder` class is a widget which manages the creation of the cell so that you don't have to
+use a `Stateful` widget just to keep a reference to a cell. The constructor takes a `create` function
+which is called to create the cell and a `builder` function which is called with the cell returned by
+`create` to build the widget.
+
+Example:
+
+```dart
+CellBuilder(
+  create: () => n.apply((n) {
+    var result = 1;
+    
+    for (var i = 2; i <= n; i++) {
+      result *= i;
+    }
+    
+    return result;
+  }).store(),
+
+  builder: (context, factorial, _) => factorial.toWidget(...)
+);
+```
+
+The "factorial" cell is created in the `create` function and passed in the second argument to the
+`builder` function where it is converted to a widget. The `create` function is only called once
+when the `CellBuilder` widget is initialized.
+
+**NOTE**: `CellBuilder` does not rebuild its child widgets, i.e. it does not call the `builder`
+function when the value of the cell returned by `create` changes. It's purpose is to manage the
+creation of cells not to listen to changes in their values.
 
 ## Widgets Library
 
 Besides the `ValueCell` interface provided by the `live_cells` library, this package also 
-provides a second library `live_cell_widgets` which address another shortcoming in Flutter which is
+provides a second library `live_cell_widgets` that addresses another shortcoming in Flutter which is
 the requirement for "controller" objects.
 
 Quite a few widgets in Flutter require a "controller" for some or all of their functionality, the
 most notable being `TextField` which requires a `TextEditingController` to be able to set its
-content. Controller objects are problematic because they step out of the reactive paradigm adopted 
-by Flutter making them difficult or clunky to use.
+content. Controller objects are problematic because they adopt an imperative paradigm rather than
+the reactive paradigm adopted by Flutter making them difficult and clunky to use.
 
 The `live_cell_widgets` library provides wrappers around commonly used widgets which replace
 controller objects with cell objects.
@@ -307,7 +345,7 @@ class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
 ```
 
 The above `ValueCell` subclass implements a cell of which the value is the value of an argument cell
-clamped between a minimum and maximum which are also passed in argument cells.
+clamped between a minimum and maximum which are also supplied in argument cells.
 
 **NOTE**: The argument cell containing the value to be clamped as well as the cells containing the
 minimum and maximum are all passed to the constructor of `DependentCell` so that the listeners
@@ -319,7 +357,7 @@ or just a bare `Listenable` can be used instead.
 If your cell needs to store its value rather than computing it on demand, as in the `ClampCell`
 example, you will need to subclass `NotifierCell`. This class provides implementations of
 `addListener`, `removeListener` and the `get value` property accessor. This class also provides a
-protected `set value` property accessor for setting and storing the cell's value. When the value of
+protected `set value` property accessor for setting the cell's value. When the value of
 the cell is set via `set value` the listeners of the cell are called if the new value is not equal
 to the previous value.
 
