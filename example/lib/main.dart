@@ -74,7 +74,7 @@ class MyHomePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
+            const Text(
               'Choose an example:',
               textAlign: TextAlign.center,
             ),

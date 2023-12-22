@@ -24,7 +24,7 @@ class _MutableCellDemoState extends State<MutableCellDemo> {
               const Text(
                 "Demonstration show how changing a cell's value rebuilds all widgets dependent on the cell",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold
                 ),
               ),

@@ -38,18 +38,18 @@ class _StoreCellDemoState extends State<StoreCellDemo> {
                 const Text(
                   'Demonstration of cells which store the value of cell in memory',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontWeight: FontWeight.bold
                   ),
                 ),
                 const SizedBox(height: 10),
                 Row(
                     children: [
-                      Text('N:'),
+                      const Text('N:'),
                       const SizedBox(width: 5),
                       Expanded(
                         child: TextField(
-                          keyboardType: TextInputType.numberWithOptions(signed: true),
+                          keyboardType: const TextInputType.numberWithOptions(signed: true),
                           onChanged: (value) {
                             n.value = int.tryParse(value) ?? 0;
                           },

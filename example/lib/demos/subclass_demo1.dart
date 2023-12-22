@@ -44,7 +44,7 @@ class _SubclassDemo1State extends State<SubclassDemo1> {
               const Text(
                 'Demonstration of subclass of ValueCell',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold
                 ),
               ),
@@ -55,12 +55,12 @@ class _SubclassDemo1State extends State<SubclassDemo1> {
                   a.toWidget((context, value, _) => Text('A: $value')),
                   const SizedBox(width: 5),
                   ElevatedButton(
-                    child: Icon(CupertinoIcons.minus),
+                    child: const Icon(CupertinoIcons.minus),
                     onPressed: () => a.value--,
                   ),
                   const SizedBox(width: 5),
                   ElevatedButton(
-                    child: Icon(CupertinoIcons.add),
+                    child: const Icon(CupertinoIcons.add),
                     onPressed: () => a.value++,
                   ),
                 ],

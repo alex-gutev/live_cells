@@ -56,12 +56,12 @@ class SubclassDemo2 extends StatelessWidget {
                 const Text(
                   'Demonstration of subclass of ValueCell using resource management methods',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontWeight: FontWeight.bold
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text('Counting to 10'),
+                const Text('Counting to 10'),
                 const SizedBox(height: 10),
                 counter.toWidget((context, value, _) => Text(
                   '$value',

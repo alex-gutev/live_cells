@@ -25,7 +25,7 @@ class _CellTextFieldDemoState extends State<CellTextFieldDemo> {
               const Text(
                 'Demonstration of CellTextField widget which binds its value to a cell.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold
                 ),
               ),

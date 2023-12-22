@@ -24,7 +24,7 @@ class _ComputeCellDemo2State extends State<ComputeCellDemo2> {
               const Text(
                 'Demonstration of cells which compute a value dependent on the value of another cell',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold
                 ),
               ),

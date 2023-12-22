@@ -26,7 +26,7 @@ class _EqualityCellDemoState extends State<EqualityCellDemo> {
               const Text(
                 'Demonstration of equality comparison cells',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold
                 ),
               ),
@@ -37,12 +37,12 @@ class _EqualityCellDemoState extends State<EqualityCellDemo> {
                   a.toWidget((context, value, _) => Text('A: $value')),
                   const SizedBox(width: 5),
                   ElevatedButton(
-                    child: Icon(CupertinoIcons.minus),
+                    child: const Icon(CupertinoIcons.minus),
                     onPressed: () => a.value--,
                   ),
                   const SizedBox(width: 5),
                   ElevatedButton(
-                    child: Icon(CupertinoIcons.add),
+                    child: const Icon(CupertinoIcons.add),
                     onPressed: () => a.value++,
                   ),
                 ],
@@ -53,12 +53,12 @@ class _EqualityCellDemoState extends State<EqualityCellDemo> {
                   b.toWidget((context, value, _) => Text('B: $value')),
                   const SizedBox(width: 5),
                   ElevatedButton(
-                    child: Icon(CupertinoIcons.minus),
+                    child: const Icon(CupertinoIcons.minus),
                     onPressed: () => b.value--,
                   ),
                   const SizedBox(width: 5),
                   ElevatedButton(
-                    child: Icon(CupertinoIcons.add),
+                    child: const Icon(CupertinoIcons.add),
                     onPressed: () => b.value++,
                   ),
                 ],
@@ -66,10 +66,10 @@ class _EqualityCellDemoState extends State<EqualityCellDemo> {
               const SizedBox(height: 10),
               a.eq(b).toWidget((context, isEq, _) {
                 if (isEq) {
-                  return Text('A is equal to B');
+                  return const Text('A is equal to B');
                 }
 
-                return Text('A is not equal to B');
+                return const Text('A is not equal to B');
               })
             ],
           ),
