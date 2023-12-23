@@ -5,3 +5,7 @@
 ## 0.1.1
 
 * Fix package directory structure
+
+## 0.1.2
+
+* Fix dart doc issues
