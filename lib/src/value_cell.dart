@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:collection/collection.dart';
 
 part 'constant_cell.dart';
-part 'dependent_cell.dart';
-part '../equality/cell_equality.dart';
-part '../equality/eq_cell.dart';
-part '../equality/neq_cell.dart';
+part 'base/dependent_cell.dart';
+part 'equality/cell_equality.dart';
+part 'equality/eq_cell.dart';
+part 'equality/neq_cell.dart';
 
 /// Base value cell interface.
 ///

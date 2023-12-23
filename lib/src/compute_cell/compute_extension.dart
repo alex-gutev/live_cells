@@ -1,4 +1,4 @@
-import '../base/value_cell.dart';
+import '../value_cell.dart';
 import 'compute_cell.dart';
 
 /// Utility methods for creating new cells by applying functions on their values.

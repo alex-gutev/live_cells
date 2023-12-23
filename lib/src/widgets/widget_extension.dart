@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../base/value_cell.dart';
+import '../value_cell.dart';
 
 /// Provides functionality for creating [Widgets[ from ValueCells
 extension WidgetExtension<T> on ValueCell<T> {

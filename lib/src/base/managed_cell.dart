@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import 'value_cell.dart';
+import '../value_cell.dart';
 
 /// Provides an interface for managing resources within cells
 ///
