@@ -10,10 +10,7 @@ class _ComputeCellDemo3State extends State<ComputeCellDemo3> {
   final a = MutableCell(0);
   final b = MutableCell(0);
   
-  late final sum = ComputeCell(
-      compute: () => a.value + b.value, 
-      arguments: [a,b]
-  );
+  late final sum = [a, b].computeCell(() => a.value + b.value);
   
   @override
   Widget build(BuildContext context) {

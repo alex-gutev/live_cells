@@ -321,10 +321,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = ComputeCell(
-          compute: () => a.value + b.value,
-          arguments: [a,b]
-      );
+      final c = [a,b].computeCell(() => a.value + b.value);
 
       a.value = 5;
 
@@ -335,10 +332,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = ComputeCell(
-          compute: () => a.value + b.value,
-          arguments: [a,b]
-      );
+      final c = [a,b].computeCell(() => a.value + b.value);
 
       b.value = 8;
 
@@ -349,10 +343,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = ComputeCell(
-          compute: () => a.value + b.value,
-          arguments: [a,b]
-      );
+      final c = [a,b].computeCell(() => a.value + b.value);
 
       final listener = MockSimpleListener();
       c.addListener(listener);
@@ -366,10 +357,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = ComputeCell(
-          compute: () => a.value + b.value,
-          arguments: [a,b]
-      );
+      final c = [a,b].computeCell(() => a.value + b.value);
 
       final listener = MockSimpleListener();
       c.addListener(listener);
@@ -383,10 +371,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = ComputeCell(
-          compute: () => a.value + b.value,
-          arguments: [a,b]
-      );
+      final c = [a,b].computeCell(() => a.value + b.value);
 
       final listener = MockSimpleListener();
       c.addListener(listener);
@@ -402,10 +387,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = ComputeCell(
-          compute: () => a.value + b.value,
-          arguments: [a,b]
-      );
+      final c = [a,b].computeCell(() => a.value + b.value);
 
       final listener = MockSimpleListener();
 
@@ -423,10 +405,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = ComputeCell(
-          compute: () => a.value + b.value,
-          arguments: [a,b]
-      );
+      final c = [a,b].computeCell(() => a.value + b.value);
 
       final listener1 = MockSimpleListener();
       final listener2 = MockSimpleListener();
