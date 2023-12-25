@@ -523,6 +523,212 @@ void main() {
     });
   });
 
+  group('NumericExtension', () {
+    test('a + b creates ValueCell which is equal to the sum of a and b', () {
+      final a = ValueCell.value(5);
+      final b = ValueCell.value(6);
+
+      final c = a + b;
+
+      expect(c.value, equals(11));
+    });
+
+    test('a - b creates ValueCell which is equal to the difference of a and b', () {
+      final a = ValueCell.value(13);
+      final b = ValueCell.value(20);
+
+      final c = a - b;
+
+      expect(c.value, equals(-7));
+    });
+
+    test('a * b creates ValueCell which is equal to the product of a and b', () {
+      final a = ValueCell.value(10);
+      final b = ValueCell.value(8);
+
+      final c = a * b;
+
+      expect(c.value, equals(80));
+    });
+
+    test('a / b creates ValueCell which is equal to the quotient of a and b', () {
+      final a = ValueCell.value(7);
+      final b = ValueCell.value(2);
+
+      final c = a / b;
+
+      expect(c.value, equals(3.5));
+    });
+
+    test('a ~/ b creates ValueCell which is equal to the truncated quotient of a and b', () {
+      final a = ValueCell.value(7);
+      final b = ValueCell.value(2);
+
+      final c = a ~/ b;
+
+      expect(c.value, equals(3));
+    });
+
+    test('a % b creates ValueCell which is equal to the modulo of a / b', () {
+      final a = ValueCell.value(17);
+      final b = ValueCell.value(3);
+
+      final c = a % b;
+
+      expect(c.value, equals(2));
+    });
+
+
+    test('a.remainder(b) creates ValueCell which is equal to the remainder of a / b', () {
+      final a = ValueCell.value(7);
+      final b = ValueCell.value(2);
+
+      final c = a.remainder(b);
+
+      expect(c.value, equals(1));
+    });
+
+    test('a < b creates ValueCell which equals true if a is less than b', () {
+      final a = ValueCell.value(3);
+      final b = ValueCell.value(8);
+
+      final lt = a < b;
+      final gt = b < a;
+
+      expect(lt.value, isTrue);
+      expect(gt.value, isFalse);
+    });
+
+    test('a <= b creates ValueCell which equals true if a is less than b', () {
+      final a = ValueCell.value(3);
+      final b = ValueCell.value(8);
+
+      final lt = a <= b;
+      final gt = b <= a;
+
+      expect(lt.value, isTrue);
+      expect(gt.value, isFalse);
+    });
+
+    test('a <= b creates ValueCell which equals true if a is equal to b', () {
+      final a = ValueCell.value(5);
+      final b = ValueCell.value(5);
+
+      final lt = a <= b;
+      final gt = b <= a;
+
+      expect(lt.value, isTrue);
+      expect(gt.value, isTrue);
+    });
+
+    test('a > b creates ValueCell which equals true if a is greater than b', () {
+      final a = ValueCell.value(3);
+      final b = ValueCell.value(8);
+
+      final lt = a > b;
+      final gt = b > a;
+
+      expect(lt.value, isFalse);
+      expect(gt.value, isTrue);
+    });
+
+    test('a >= b creates ValueCell which equals true if a is greater than b', () {
+      final a = ValueCell.value(3);
+      final b = ValueCell.value(8);
+
+      final lt = a >= b;
+      final gt = b >= a;
+
+      expect(lt.value, isFalse);
+      expect(gt.value, isTrue);
+    });
+
+    test('a >= b creates ValueCell which equals true if a is equal to b', () {
+      final a = ValueCell.value(5);
+      final b = ValueCell.value(5);
+
+      final lt = a <= b;
+      final gt = b <= a;
+
+      expect(lt.value, isTrue);
+      expect(gt.value, isTrue);
+    });
+
+    test('a.isNaN creates ValueCell which equals true if a is NaN', () {
+      final a = ValueCell.value(0);
+      final c = a / a;
+      final d = c.isNaN;
+
+      expect(d.value, isTrue);
+    });
+
+    test('a.isNaN creates ValueCell which equals false if a is not NaN', () {
+      final a = ValueCell.value(2);
+      final c = a / a;
+      final d = c.isNaN;
+
+      expect(d.value, isFalse);
+    });
+
+    test('a.isFinite creates ValueCell which equals true if a is finite', () {
+      final a = ValueCell.value(3);
+      final c = a / a;
+      final d = c.isFinite;
+
+      expect(d.value, isTrue);
+    });
+
+    test('a.isFinite creates ValueCell which equals false if a is not finite', () {
+      final a = ValueCell.value(3);
+      final b = ValueCell.value(0);
+      final c = a / b;
+      final d = c.isFinite;
+
+      expect(d.value, isFalse);
+    });
+
+    test('a.isInfinite creates ValueCell which equals false if a is finite', () {
+      final a = ValueCell.value(3);
+      final c = a / a;
+      final d = c.isInfinite;
+
+      expect(d.value, isFalse);
+    });
+
+    test('a.isInfinite creates ValueCell which equals true if a is not finite', () {
+      final a = ValueCell.value(3);
+      final b = ValueCell.value(0);
+      final c = a / b;
+      final d = c.isInfinite;
+
+      expect(d.value, isTrue);
+    });
+
+    test('a.abs() creates ValueCell which is equal to absolute value of a', () {
+      final a = ValueCell.value(-3);
+
+      expect(a.abs().value, equals(3));
+    });
+
+    test('a.sign creates ValueCell which is equal to 1 if a > 0', () {
+      final a = ValueCell.value(3);
+
+      expect(a.sign.value, equals(1));
+    });
+
+    test('a.sign creates ValueCell which is equal to -1 if a < 0', () {
+      final a = ValueCell.value(-3);
+
+      expect(a.sign.value, equals(-1));
+    });
+
+    test('a.sign creates ValueCell which is equal to 0 if a == 0', () {
+      final a = ValueCell.value(0);
+
+      expect(a.sign.value, equals(0));
+    });
+  });
+
   group('Cell initialization and cleanup', () {
     test('init() not called if no listeners added', () {
       final resource = MockResource();
