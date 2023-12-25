@@ -395,7 +395,7 @@ In this case the cell is given an initial value of `0` using `super(0)`.
 In Flutter resources are typically acquired in a constructor or *init* method and are released by
 calling a *dispose* method. You'll notice that there are no calls to *dispose* anywhere
 in any of these examples. This package takes a slightly different approach. The cells which require
-manual resource management implement the `ManagedCell` interface, which is `NotifierCell` extends.
+manual resource management implement the `ManagedCell` interface, which `NotifierCell` extends.
 
 `ManagedCell` provides an `init` method where resources should be acquired and a `dispose` method
 where resources should be released. The `init` method is called before the first listener is added 
