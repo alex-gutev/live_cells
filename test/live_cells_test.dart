@@ -525,8 +525,8 @@ void main() {
 
   group('NumericExtension', () {
     test('a + b creates ValueCell which is equal to the sum of a and b', () {
-      final a = ValueCell.value(5);
-      final b = ValueCell.value(6);
+      final a = 5.cell;
+      final b = 6.cell;
 
       final c = a + b;
 
@@ -534,8 +534,8 @@ void main() {
     });
 
     test('a - b creates ValueCell which is equal to the difference of a and b', () {
-      final a = ValueCell.value(13);
-      final b = ValueCell.value(20);
+      final a = 13.cell;
+      final b = 20.cell;
 
       final c = a - b;
 
@@ -543,8 +543,8 @@ void main() {
     });
 
     test('a * b creates ValueCell which is equal to the product of a and b', () {
-      final a = ValueCell.value(10);
-      final b = ValueCell.value(8);
+      final a = 10.cell;
+      final b = 8.cell;
 
       final c = a * b;
 
@@ -552,8 +552,8 @@ void main() {
     });
 
     test('a / b creates ValueCell which is equal to the quotient of a and b', () {
-      final a = ValueCell.value(7);
-      final b = ValueCell.value(2);
+      final a = 7.cell;
+      final b = 2.cell;
 
       final c = a / b;
 
@@ -561,8 +561,8 @@ void main() {
     });
 
     test('a ~/ b creates ValueCell which is equal to the truncated quotient of a and b', () {
-      final a = ValueCell.value(7);
-      final b = ValueCell.value(2);
+      final a = 7.cell;
+      final b = 2.cell;
 
       final c = a ~/ b;
 
@@ -570,8 +570,8 @@ void main() {
     });
 
     test('a % b creates ValueCell which is equal to the modulo of a / b', () {
-      final a = ValueCell.value(17);
-      final b = ValueCell.value(3);
+      final a = 17.cell;
+      final b = 3.cell;
 
       final c = a % b;
 
@@ -580,8 +580,8 @@ void main() {
 
 
     test('a.remainder(b) creates ValueCell which is equal to the remainder of a / b', () {
-      final a = ValueCell.value(7);
-      final b = ValueCell.value(2);
+      final a = 7.cell;
+      final b = 2.cell;
 
       final c = a.remainder(b);
 
@@ -589,8 +589,8 @@ void main() {
     });
 
     test('a < b creates ValueCell which equals true if a is less than b', () {
-      final a = ValueCell.value(3);
-      final b = ValueCell.value(8);
+      final a = 3.cell;
+      final b = 8.cell;
 
       final lt = a < b;
       final gt = b < a;
@@ -600,8 +600,8 @@ void main() {
     });
 
     test('a <= b creates ValueCell which equals true if a is less than b', () {
-      final a = ValueCell.value(3);
-      final b = ValueCell.value(8);
+      final a = 3.cell;
+      final b = 8.cell;
 
       final lt = a <= b;
       final gt = b <= a;
@@ -611,8 +611,8 @@ void main() {
     });
 
     test('a <= b creates ValueCell which equals true if a is equal to b', () {
-      final a = ValueCell.value(5);
-      final b = ValueCell.value(5);
+      final a = 5.cell;
+      final b = 5.cell;
 
       final lt = a <= b;
       final gt = b <= a;
@@ -622,8 +622,8 @@ void main() {
     });
 
     test('a > b creates ValueCell which equals true if a is greater than b', () {
-      final a = ValueCell.value(3);
-      final b = ValueCell.value(8);
+      final a = 3.cell;
+      final b = 8.cell;
 
       final lt = a > b;
       final gt = b > a;
@@ -633,8 +633,8 @@ void main() {
     });
 
     test('a >= b creates ValueCell which equals true if a is greater than b', () {
-      final a = ValueCell.value(3);
-      final b = ValueCell.value(8);
+      final a = 3.cell;
+      final b = 8.cell;
 
       final lt = a >= b;
       final gt = b >= a;
@@ -644,8 +644,8 @@ void main() {
     });
 
     test('a >= b creates ValueCell which equals true if a is equal to b', () {
-      final a = ValueCell.value(5);
-      final b = ValueCell.value(5);
+      final a = 5.cell;
+      final b = 5.cell;
 
       final lt = a <= b;
       final gt = b <= a;
@@ -655,7 +655,7 @@ void main() {
     });
 
     test('a.isNaN creates ValueCell which equals true if a is NaN', () {
-      final a = ValueCell.value(0);
+      final a = 0.cell;
       final c = a / a;
       final d = c.isNaN;
 
@@ -663,7 +663,7 @@ void main() {
     });
 
     test('a.isNaN creates ValueCell which equals false if a is not NaN', () {
-      final a = ValueCell.value(2);
+      final a = 2.cell;
       final c = a / a;
       final d = c.isNaN;
 
@@ -671,7 +671,7 @@ void main() {
     });
 
     test('a.isFinite creates ValueCell which equals true if a is finite', () {
-      final a = ValueCell.value(3);
+      final a = 3.cell;
       final c = a / a;
       final d = c.isFinite;
 
@@ -679,8 +679,8 @@ void main() {
     });
 
     test('a.isFinite creates ValueCell which equals false if a is not finite', () {
-      final a = ValueCell.value(3);
-      final b = ValueCell.value(0);
+      final a = 3.cell;
+      final b = 0.cell;
       final c = a / b;
       final d = c.isFinite;
 
@@ -688,7 +688,7 @@ void main() {
     });
 
     test('a.isInfinite creates ValueCell which equals false if a is finite', () {
-      final a = ValueCell.value(3);
+      final a = 3.cell;
       final c = a / a;
       final d = c.isInfinite;
 
@@ -696,8 +696,8 @@ void main() {
     });
 
     test('a.isInfinite creates ValueCell which equals true if a is not finite', () {
-      final a = ValueCell.value(3);
-      final b = ValueCell.value(0);
+      final a = 3.cell;
+      final b = 0.cell;
       final c = a / b;
       final d = c.isInfinite;
 
@@ -711,7 +711,7 @@ void main() {
     });
 
     test('a.sign creates ValueCell which is equal to 1 if a > 0', () {
-      final a = ValueCell.value(3);
+      final a = 3.cell;
 
       expect(a.sign.value, equals(1));
     });
@@ -723,7 +723,7 @@ void main() {
     });
 
     test('a.sign creates ValueCell which is equal to 0 if a == 0', () {
-      final a = ValueCell.value(0);
+      final a = 0.cell;
 
       expect(a.sign.value, equals(0));
     });
