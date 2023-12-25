@@ -11,6 +11,7 @@ export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
 export 'src/compute_cell/compute_cell.dart' show ComputeCell;
 export 'src/compute_cell/compute_extension.dart'
     show ComputeExtension, ListComputeExtension;
+export 'src/extensions/numeric_extension.dart' show NumericExtension;
 export 'src/async_cell/delay_cell.dart' show DelayCell;
 export 'src/widgets/widget_extension.dart' show WidgetExtension;
 export 'src/widgets/cell_builder.dart'
