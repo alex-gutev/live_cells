@@ -717,6 +717,77 @@ void main() {
     });
   });
 
+  group('Cell update consistency', () {
+    test('All observer methods called in correct order', () {
+      final cell = MutableCell(10);
+      final observer = MockSimpleObserver();
+
+      cell.addObserver(observer);
+      cell.value = 15;
+
+      verifyInOrder([
+        observer.willUpdate(),
+        observer.update()
+      ]);
+
+      verifyNoMoreInteractions(observer);
+    });
+
+    test('No intermediate values are recorded when using multi argument cells', () {
+      final a = MutableCell(0);
+      final sum = a + 1.cell;
+      final prod = a * 8.cell;
+      final result = sum + prod;
+
+      final observer = MockValueObserver(result);
+      result.addObserver(observer);
+
+      a.value = 2;
+      a.value = 6;
+
+      verifyInOrder([
+        observer.gotValue((2 + 1) + (2 * 8)),
+        observer.gotValue((6 + 1) + (6 * 8))
+      ]);
+    });
+
+    test('No intermediate values are produced when using StoreCells', () {
+      final a = MutableCell(0);
+      final sum = (a + 1.cell).store();
+      final prod = (a * 8.cell).store();
+      final result = sum + prod;
+
+      final observer = MockValueObserver(result);
+      result.addObserver(observer);
+
+      a.value = 2;
+      a.value = 6;
+
+      verifyInOrder([
+        observer.gotValue((2 + 1) + (2 * 8)),
+        observer.gotValue((6 + 1) + (6 * 8)),
+      ]);
+    });
+
+    test('No intermediate values are produced when using StoreCells and branches are unequal', () {
+      final a = MutableCell(0);
+      final sum = ((a + 1.cell).store() + 10.cell).store();
+      final prod = (a * 8.cell).store();
+      final result = (sum + prod).store();
+
+      final observer = MockValueObserver(result);
+      result.addObserver(observer);
+
+      a.value = 2;
+      a.value = 6;
+
+      verifyInOrder([
+        observer.gotValue((2 + 1 + 10) + (2 * 8)),
+        observer.gotValue((6 + 1 + 10) + (6 * 8)),
+      ]);
+    });
+  });
+
   group('Cell initialization and cleanup', () {
     test('init() not called if no observers added', () {
       final resource = MockResource();
