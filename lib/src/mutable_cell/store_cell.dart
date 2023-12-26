@@ -30,7 +30,14 @@ class StoreCell<T> extends NotifierCell<T> implements CellObserver {
   }
 
   @override
-  T get value => _stale ? valueCell.value : super.value;
+  T get value {
+    if (_stale) {
+      setValue(valueCell.value);
+      _stale = false;
+    }
+
+    return super.value;
+  }
 
   /// Private
 
@@ -55,15 +62,6 @@ class StoreCell<T> extends NotifierCell<T> implements CellObserver {
       setValue(newValue);
       notifyUpdate();
     }
-    else {
-      notifyWillNotUpdate();
-    }
-  }
-  
-  @override
-  void willNotUpdate() {
-    _stale = false;
-    notifyWillNotUpdate();
   }
 }
 

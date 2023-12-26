@@ -17,11 +17,4 @@ abstract class CellObserver {
   /// The [ValueCell.value] property of the observed cell will now hold the
   /// cell's new value.
   void update();
-
-  /// The observed will not change its value.
-  ///
-  /// This method is called if the observed cell was marked for changes (that
-  /// is [willUpdate] was called) but its new value is the same as its
-  /// previous value.
-  void willNotUpdate();
 }

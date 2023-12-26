@@ -76,22 +76,6 @@ mixin CellListeners<T> on ManagedCell<T> {
     }
   }
 
-  /// Notify the observers of the cell that the cell's value will not change.
-  ///
-  /// This should be called after it is determined that the cell's value will
-  /// not change, following a call to [notifyWillChange].
-  @protected
-  void notifyWillNotUpdate() {
-    for (final observer in _observers.keys) {
-      try {
-        observer.willNotUpdate();
-      }
-      catch (e, st) {
-        print('Error in CellObserver.cancelUpdate: $e - $st');
-      }
-    }
-  }
-
   /// Private
 
   /// Map of cell observers
