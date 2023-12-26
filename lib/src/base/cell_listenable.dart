@@ -20,6 +20,12 @@ class _CellListenable<T> extends ValueListenable<T> {
   /// The cell of which to observe the value.
   final ValueCell<T> cell;
 
+  @override
+  bool operator ==(other) => other is _CellListenable && cell == other.cell;
+
+  @override
+  int get hashCode => cell.hashCode;
+
   /// The cell's value
   @override
   T get value => cell.value;
@@ -56,6 +62,7 @@ class _ListenerCellObserverAdapter extends CellObserver {
 
   _ListenerCellObserverAdapter(this.listener);
 
+  @override
   bool operator ==(other) {
     return other is _ListenerCellObserverAdapter && listener == other.listener;
   }

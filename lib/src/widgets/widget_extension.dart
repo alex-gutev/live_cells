@@ -21,7 +21,6 @@ extension WidgetExtension<T> on ValueCell<T> {
     Widget? child
   }) {
     return ValueListenableBuilder(
-        key: ObjectKey(this),
         valueListenable: listenable,
         builder: builder,
         child: child
