@@ -1,6 +1,6 @@
 name: live_cells
 description: A better way to manage state in Flutter applications
-version: 0.1.2
+version: 0.2.0
 repository: https://github.com/alex-gutev/live_cells
 issue_tracker: https://github.com/alex-gutev/live_cells/issues
 
