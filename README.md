@@ -339,8 +339,8 @@ To subclass `ValueCell`, the following methods have to be implemented:
 * The `addObserver` and `removeObserver` methods to add and remove observers, respectively.
 * The equality comparison methods `eq` and `neq`.
 
-The `CellEquality` mixin implements the equality comparison methods using the `==` and `!=`
-operators for a given type.
+The `CellEquality` mixin provides implementations of the equality comparison methods using the
+`==` and `!=` operators for a given type.
 
 To implement a cell that performs a computation which is dependent on the values of one or more
 argument cells, you should extend `DependentCell`. This class already implements `addObserver` and 
