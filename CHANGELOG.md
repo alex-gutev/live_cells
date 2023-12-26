@@ -12,6 +12,8 @@
 
 ## 0.2.0
 
+New features:
+
 * Stronger guarantees that a `StoreCell` will not hold an outdated value
 * Shorthand `.cell` constructor for creating constant value cells
 * Shorthand `List.computeCell` constructor for creating multi-argument computational cells
