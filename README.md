@@ -473,6 +473,13 @@ If you're implementing a subclass of `NotifierCell` which depends on the value o
 should add an observer to the cell in the `init` method and remove the observer in the `dispose`
 method.
 
+### ValueListenable Interface
+
+The `ValueCell` class provides a `listenable` property which provides an object that exposes the cell's
+value via the `ValueListenable` interface. Listeners added to the `ValueListenable` will be called
+whenever the value of the cell changes. This allows you to use a `ValueCell` where a `ValueListenable`
+is expected.
+
 ## Additional information
 
 If you discover any issues or have any feature requests, please open an issue on the package's Github
