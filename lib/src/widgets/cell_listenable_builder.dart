@@ -29,7 +29,7 @@ class CellListenableBuilder<T> extends StatefulWidget {
 
 class _CellListenableBuilderState<T> extends State<CellListenableBuilder<T>> implements CellObserver {
   /// Cell value
-  late final T _value;
+  late T _value;
 
   @override
   void initState() {
