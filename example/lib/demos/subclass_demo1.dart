@@ -1,14 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
 class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
-  final ValueListenable<T> argValue;
-  final ValueListenable<T> argMin;
-  final ValueListenable<T> argMax;
+  final ValueCell<T> argValue;
+  final ValueCell<T> argMin;
+  final ValueCell<T> argMax;
 
   ClampCell(this.argValue, this.argMin, this.argMax) :
         super([argValue, argMin, argMax]);

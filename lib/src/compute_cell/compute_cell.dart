@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import '../value_cell.dart';
 
 /// A cell, of which the value is computed by a user provided function.
@@ -10,7 +8,7 @@ class ComputeCell<T> extends DependentCell<T> with CellEquality<T> {
   /// the [value] of the cell is accessed. It should return the cell's value.
   ///
   /// [arguments] is a list of argument cells on which the value of the cell
-  /// depends. The listeners of this cell are notified whenever the values of
+  /// depends. The observers of this cell are notified whenever the values of
   /// the argument cells change.
   ///
   /// Example:
@@ -27,7 +25,7 @@ class ComputeCell<T> extends DependentCell<T> with CellEquality<T> {
   /// ```
   ComputeCell({
     required this.compute,
-    required List<Listenable> arguments
+    required List<ValueCell> arguments
   }) : super(arguments);
 
   @override

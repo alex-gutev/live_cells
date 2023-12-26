@@ -3,45 +3,33 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_cells/live_cells.dart';
 import 'package:mockito/mockito.dart';
 
-/// Mock class interface for recording whether a listener was called
-abstract class SimpleListener {
-  /// Method added as listener function
-  void call();
-}
-
-/// Mock class interface for recording the value of a cell at the time a listener was called
-abstract class ValueListener extends SimpleListener {
+/// Mock class interface for recording the value of a cell at the time an observer was called
+abstract class ValueObserver {
   /// Mock method called by listener to record cell value
   void gotValue(value);
 }
 
-/// Like [ValueListener] but also provides interface for recording whether a [FutureCell] has a valu
-abstract class AsyncValueListener extends ValueListener {
-  /// Mock method called by listener to record [hasValue] property
-  void hasValue(value);
-}
-
-/// Mock class implementing [SimpleListener]
+/// Mock class implementing [CellObserver]
 ///
 /// Usage:
 ///
-///   - Add instance as a listener of a cell
-///   - verify(instance())
-class MockSimpleListener extends Mock implements SimpleListener {}
+///   - Add instance as an observer of a cell
+///   - verify(instance.update())
+class MockSimpleObserver extends Mock implements CellObserver {}
 
-/// Mock class implementing [ValueListener]
+/// Mock class implementing [ValueObserver]
 ///
 /// Usage:
 ///
 ///   - Add instance as a listener of a cell
 ///   - verify(instance.gotValue(expected))
-class MockValueListener extends ValueListener with Mock {
+class MockValueObserver extends MockSimpleObserver implements ValueObserver {
   final ValueCell cell;
 
-  MockValueListener(this.cell);
+  MockValueObserver(this.cell);
 
   @override
-  void call() {
+  void update() {
     gotValue(cell.value);
   }
 }
@@ -111,74 +99,74 @@ void main() {
 
     test('Setting MutableCell.value calls cell listeners', () {
       final cell = MutableCell(15);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      cell.addListener(listener);
+      cell.addObserver(observer);
       cell.value = 23;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
     test('Setting MutableCell.value twice calls cell listeners twice', () {
       final cell = MutableCell(15);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      cell.addListener(listener);
+      cell.addObserver(observer);
 
       cell.value = 23;
       cell.value = 101;
 
-      verify(listener()).called(2);
+      verify(observer.update()).called(2);
     });
 
-    test('MutableCell listener not called after it is removed', () {
+    test('MutableCell observer not called after it is removed', () {
       final cell = MutableCell(15);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      cell.addListener(listener);
+      cell.addObserver(observer);
       cell.value = 23;
 
-      cell.removeListener(listener);
+      cell.removeObserver(observer);
       cell.value = 101;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
-    test('MutableCell listener not called if new value is equal to old value', () {
+    test('MutableCell observer not called if new value is equal to old value', () {
       final cell = MutableCell(56);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      cell.addListener(listener);
+      cell.addObserver(observer);
       cell.value = 56;
 
-      verifyNever(listener());
+      verifyNever(observer.update());
     });
 
-    test('All MutableCell listeners called when value changes', () {
+    test('All MutableCell observers called when value changes', () {
       final cell = MutableCell(3);
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      cell.addListener(listener1);
+      cell.addObserver(observer1);
       cell.value = 5;
 
-      cell.addListener(listener2);
+      cell.addObserver(observer2);
       cell.value = 8;
       cell.value = 12;
 
-      verify(listener1()).called(3);
-      verify(listener2()).called(2);
+      verify(observer1.update()).called(3);
+      verify(observer2.update()).called(2);
     });
 
-    test('MutableCell.value updated when listener called', () {
+    test('MutableCell.value updated when observer called', () {
       final cell = MutableCell('hello');
-      final listener = MockValueListener(cell);
+      final observer = MockValueObserver(cell);
 
-      cell.addListener(listener);
+      cell.addObserver(observer);
 
       cell.value = 'bye';
-      verify(listener.gotValue('bye'));
+      verify(observer.gotValue('bye'));
     });
   });
 
@@ -229,30 +217,30 @@ void main() {
       expect(a.eq(b).value, equals(true));
     });
 
-    test('EqCell listeners notified when 1st argument cell values changes', () {
+    test('EqCell observers notified when 1st argument cell values changes', () {
       final a = MutableCell(3);
       final b = MutableCell(4);
 
       final eq = a.eq(b);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      eq.addListener(listener);
+      eq.addObserver(observer);
       a.value = 4;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
-    test('EqCell listeners notified when 2nd argument cell values changes', () {
+    test('EqCell observers notified when 2nd argument cell values changes', () {
       final a = MutableCell(3);
       final b = MutableCell(4);
 
       final eq = a.eq(b);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      eq.addListener(listener);
+      eq.addObserver(observer);
       b.value = 3;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
     test('NeqCell is reevaluated when 1st argument cell value changes', () {
@@ -273,30 +261,30 @@ void main() {
       expect(a.neq(b).value, equals(false));
     });
 
-    test('NeqCell listeners notified when 1st argument cell values changes', () {
+    test('NeqCell observers notified when 1st argument cell values changes', () {
       final a = MutableCell(3);
       final b = MutableCell(4);
 
       final neq = a.neq(b);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      neq.addListener(listener);
+      neq.addObserver(observer);
       a.value = 4;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
-    test('NeqCell listeners notified when 2nd argument cell values changes', () {
+    test('NeqCell observers notified when 2nd argument cell values changes', () {
       final a = MutableCell(3);
       final b = MutableCell(4);
 
       final neq = a.eq(b);
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      neq.addListener(listener);
+      neq.addObserver(observer);
       b.value = 3;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
   });
 
@@ -339,86 +327,86 @@ void main() {
       expect(c.value, equals(9));
     });
 
-    test('ComputeCell listeners notified when value of 1st argument cell changes', () {
+    test('ComputeCell observers notified when value of 1st argument cell changes', () {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
       final c = [a,b].computeCell(() => a.value + b.value);
 
-      final listener = MockSimpleListener();
-      c.addListener(listener);
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
 
       a.value = 8;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
-    test('ComputeCell listeners notified when value of 2nd argument cell changes', () {
+    test('ComputeCell observers notified when value of 2nd argument cell changes', () {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
       final c = [a,b].computeCell(() => a.value + b.value);
 
-      final listener = MockSimpleListener();
-      c.addListener(listener);
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
 
       b.value = 8;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
-    test('ComputeCell listeners notified for each change of value of argument cell', () {
+    test('ComputeCell observers notified for each change of value of argument cell', () {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
       final c = [a,b].computeCell(() => a.value + b.value);
 
-      final listener = MockSimpleListener();
-      c.addListener(listener);
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
 
       b.value = 8;
       a.value = 10;
       b.value = 100;
 
-      verify(listener()).called(3);
+      verify(observer.update()).called(3);
     });
 
-    test('ComputeCell listener not called after it is removed', () {
+    test('ComputeCell observer not called after it is removed', () {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
       final c = [a,b].computeCell(() => a.value + b.value);
 
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      c.addListener(listener);
+      c.addObserver(observer);
       a.value = 8;
 
-      c.removeListener(listener);
+      c.removeObserver(observer);
       b.value = 10;
       a.value = 100;
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
-    test('All ComputeCell listeners called when value changes', () {
+    test('All ComputeCell observers called when value changes', () {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
       final c = [a,b].computeCell(() => a.value + b.value);
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      c.addListener(listener1);
+      c.addObserver(observer1);
       a.value = 8;
 
-      c.addListener(listener2);
+      c.addObserver(observer2);
       b.value = 10;
       a.value = 100;
 
-      verify(listener1()).called(3);
-      verify(listener2()).called(2);
+      verify(observer1.update()).called(3);
+      verify(observer2.update()).called(2);
     });
   });
 
@@ -434,92 +422,92 @@ void main() {
       final a = MutableCell('hello');
       final store = a.store();
 
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
       a.value = 'bye';
-      store.addListener(listener);
+      store.addObserver(observer);
 
       expect(store.value, equals('bye'));
     });
 
-    test('StoreCell listeners notified when argument cell value changes', () {
+    test('StoreCell observers notified when argument cell value changes', () {
       final a = MutableCell('hello');
       final store = a.store();
 
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      store.addListener(listener);
+      store.addObserver(observer);
       a.value = 'bye';
       a.value = 'goodbye';
 
-      verify(listener()).called(2);
+      verify(observer.update()).called(2);
     });
 
-    test('All StoreCell listeners notified when argument cell value changes', () {
+    test('All StoreCell observers notified when argument cell value changes', () {
       final a = MutableCell('hello');
       final store = a.store();
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      store.addListener(listener1);
+      store.addObserver(observer1);
       a.value = 'bye';
 
-      store.addListener(listener2);
+      store.addObserver(observer2);
       a.value = 'goodbye';
 
-      verify(listener1()).called(2);
-      verify(listener2()).called(1);
+      verify(observer1.update()).called(2);
+      verify(observer2.update()).called(1);
     });
 
-    test('StoreCell listener not called after it is removed', () {
+    test('StoreCell observer not called after it is removed', () {
       final a = MutableCell('hello');
       final store = a.store();
 
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
 
-      store.addListener(listener);
+      store.addObserver(observer);
       a.value = 'bye';
 
-      store.removeListener(listener);
+      store.removeObserver(observer);
       a.value = 'goodbye';
 
-      verify(listener()).called(1);
+      verify(observer.update()).called(1);
     });
 
-    test('StoreCell listeners not called when argument cell value does not change', () {
+    test('StoreCell observers not called when argument cell value does not change', () {
       final a = MutableCell(2);
       final b = a.apply((value) => value.isEven);
       final store = b.store();
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      b.addListener(listener1);
-      store.addListener(listener2);
+      b.addObserver(observer1);
+      store.addObserver(observer2);
 
       a.value = 4;
       a.value = 6;
       a.value = 8;
 
-      verify(listener1()).called(3);
-      verifyNever(listener2());
+      verify(observer1.update()).called(3);
+      verifyNever(observer2.update());
 
       a.value = 11;
 
-      verify(listener2()).called(1);
+      verify(observer2.update()).called(1);
     });
 
-    test('StoreCell.value updated when listener called', () {
+    test('StoreCell.value updated when observer called', () {
       final cell = MutableCell('hello');
       final store = cell.store();
 
-      final listener = MockValueListener(store);
+      final observer = MockValueObserver(store);
 
-      store.addListener(listener);
+      store.addObserver(observer);
 
       cell.value = 'bye';
-      verify(listener.gotValue('bye'));
+      verify(observer.gotValue('bye'));
     });
   });
 
@@ -730,71 +718,71 @@ void main() {
   });
 
   group('Cell initialization and cleanup', () {
-    test('init() not called if no listeners added', () {
+    test('init() not called if no observers added', () {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
       
       verifyNever(resource.init());
     });
 
-    test('init() called once when adding first listener', () {
+    test('init() called once when adding first observer', () {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      cell.addListener(listener1);
-      cell.addListener(listener2);
+      cell.addObserver(observer1);
+      cell.addObserver(observer2);
 
       verify(resource.init()).called(1);
     });
 
-    test('dispose() not called when not all listeners removed', () {
+    test('dispose() not called when not all observers removed', () {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      cell.addListener(listener1);
-      cell.addListener(listener2);
+      cell.addObserver(observer1);
+      cell.addObserver(observer2);
 
-      cell.removeListener(listener1);
+      cell.removeObserver(observer1);
 
       verifyNever(resource.dispose());
     });
 
-    test('dispose() called when all listeners removed', () {
+    test('dispose() called when all observers removed', () {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      cell.addListener(listener1);
-      cell.addListener(listener2);
+      cell.addObserver(observer1);
+      cell.addObserver(observer2);
 
-      cell.removeListener(listener1);
-      cell.removeListener(listener2);
+      cell.removeObserver(observer1);
+      cell.removeObserver(observer2);
 
       verify(resource.dispose()).called(1);
     });
 
-    test('init() called again when adding new listener after all listeners removed', () {
+    test('init() called again when adding new observer after all observers removed', () {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
 
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
 
-      cell.addListener(listener1);
-      cell.addListener(listener2);
+      cell.addObserver(observer1);
+      cell.addObserver(observer2);
 
-      cell.removeListener(listener1);
-      cell.removeListener(listener2);
+      cell.removeObserver(observer1);
+      cell.removeObserver(observer2);
 
-      cell.addListener(listener1);
+      cell.addObserver(observer1);
 
       verify(resource.init()).called(2);
     });
@@ -812,10 +800,10 @@ void main() {
       final cell = MutableCell(10);
       final delay = DelayCell(const Duration(milliseconds: 1), cell);
 
-      final listener = MockSimpleListener();
+      final observer = MockSimpleObserver();
       cell.value = 20;
 
-      delay.addListener(listener);
+      delay.addObserver(observer);
 
       expect(delay.value, equals(20));
     });
@@ -824,62 +812,62 @@ void main() {
       final cell = MutableCell(1);
       final delay = DelayCell(const Duration(milliseconds: 1), cell);
 
-      final listener = MockValueListener(delay);
-      delay.addListener(listener);
+      final observer = MockValueObserver(delay);
+      delay.addObserver(observer);
 
       cell.value = 2;
 
-      await untilCalled(listener.gotValue(2)).timeout(const Duration(seconds: 1), onTimeout: () {
+      await untilCalled(observer.gotValue(2)).timeout(const Duration(seconds: 1), onTimeout: () {
         fail('DelayCell.value not updated');
       });
     });
 
-    test('DelayCell.value listeners called for every argument cell value change', () async {
+    test('DelayCell.value observers called for every argument cell value change', () async {
       final cell = MutableCell(1);
       final delay = DelayCell(const Duration(milliseconds: 1), cell);
 
-      final listener = MockValueListener(delay);
-      delay.addListener(listener);
+      final observer = MockValueObserver(delay);
+      delay.addObserver(observer);
 
       cell.value = 2;
       cell.value = 5;
 
-      await untilCalled(listener.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
+      await untilCalled(observer.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
         fail('DelayCell.value not updated');
       });
 
-      verify(listener.gotValue(any)).called(2);
+      verify(observer.gotValue(any)).called(2);
     });
 
-    test('DelayCell.value listener not called after it is removed', () async {
+    test('DelayCell.value observer not called after it is removed', () async {
       final cell = MutableCell(1);
       final delay = DelayCell(const Duration(milliseconds: 1), cell);
 
-      final listener1 = MockValueListener(delay);
-      final listener2 = MockValueListener(delay);
+      final observer1 = MockValueObserver(delay);
+      final observer2 = MockValueObserver(delay);
 
-      delay.addListener(listener1);
-      delay.addListener(listener2);
+      delay.addObserver(observer1);
+      delay.addObserver(observer2);
 
       cell.value = 2;
 
-      await untilCalled(listener1.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
+      await untilCalled(observer1.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
         fail('DelayCell.value not updated');
       });
 
-      await untilCalled(listener2.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
+      await untilCalled(observer2.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
         fail('DelayCell.value not updated');
       });
 
-      delay.removeListener(listener1);
+      delay.removeObserver(observer1);
       cell.value = 5;
 
-      await untilCalled(listener2.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
+      await untilCalled(observer2.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
         fail('DelayCell.value not updated');
       });
 
-      verify(listener1.gotValue(any)).called(1);
-      verify(listener2.gotValue(any)).called(2);
+      verify(observer1.gotValue(any)).called(1);
+      verify(observer2.gotValue(any)).called(2);
     });
   });
 }

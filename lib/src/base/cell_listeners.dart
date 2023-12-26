@@ -1,57 +1,103 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 
-import 'cell_change_notifier.dart';
+import '../../live_cells.dart';
+import 'cell_observer.dart';
 import 'managed_cell.dart';
 
-/// Provides functionality for adding, removing and notifying listeners of a cell
+/// Provides functionality for adding, removing and notifying observers of a cell
 ///
-/// This mixin provides implementations of the [addListener] and [removeListener]
-/// methods of the [ValueListenable] interface.
+/// This mixin provides implementations of the [addObserver] and [removeObserver]
+/// methods of the [ValueCell] interface.
 ///
 /// The [init] and [dispose] methods of [ManagedCell] are called respectively
-/// when the first listener is added, and the last listener is removed.
+/// when the first observer is added, and the last observer is removed.
 mixin CellListeners<T> on ManagedCell<T> {
   /// Has the cell been initialized
   @protected
-  bool get isInitialized => _isInitialized;
+  bool get isInitialized => _observers.isNotEmpty;
 
   @override
-  void addListener(VoidCallback listener) {
-    if (!_isInitialized) {
-      _notifier = CellChangeNotifier();
-      _isInitialized = true;
-
+  void addObserver(CellObserver observer) {
+    if (!isInitialized) {
       init();
     }
 
-    _notifier.addListener(listener);
+    _observers.update(observer, (count) => count + 1, ifAbsent: () => 1);
   }
 
   @override
-  void removeListener(VoidCallback listener) {
-    _notifier.removeListener(listener);
+  void removeObserver(CellObserver observer) {
+    final count = _observers[observer];
 
-    if (!_notifier.isActive) {
-      dispose();
+    if (count != null) {
+      if (count > 1) {
+        _observers[observer] = count - 1;
+      }
+      else {
+        _observers.remove(observer);
 
-      _notifier.dispose();
-      _isInitialized = false;
+        if (!isInitialized) {
+          dispose();
+        }
+      }
     }
   }
 
-  /// Notify the listeners of the cell that the value has changed.
+  /// Notify the observers of the cell that the cell's value will change.
+  ///
+  /// This should be called before the value of the cell has actually changed.
   @protected
-  void notifyListeners() {
-    if (_isInitialized) {
-      _notifier.notify();
+  void notifyWillUpdate() {
+    for (final observer in _observers.keys) {
+      try {
+        observer.willUpdate();
+      }
+      catch (e, st) {
+        print('Error in CellObserver.preUpdate: $e - $st');
+      }
+    }
+  }
+
+  /// Notify the observers of the cell that the cell's value has changed.
+  ///
+  /// This should be called after the value of the cell has changed to a new
+  /// value following a [notifyWillChange] call.
+  @protected
+  void notifyUpdate() {
+    for (final observer in _observers.keys) {
+      try {
+        observer.update();
+      }
+      catch (e, st) {
+        print('Error in CellObserver.update: $e - $st');
+      }
+    }
+  }
+
+  /// Notify the observers of the cell that the cell's value will not change.
+  ///
+  /// This should be called after it is determined that the cell's value will
+  /// not change, following a call to [notifyWillChange].
+  @protected
+  void notifyWillNotUpdate() {
+    for (final observer in _observers.keys) {
+      try {
+        observer.willNotUpdate();
+      }
+      catch (e, st) {
+        print('Error in CellObserver.cancelUpdate: $e - $st');
+      }
     }
   }
 
   /// Private
 
-  /// Has [_notifier] been initialized?
-  var _isInitialized = false;
-
-  /// The [ChangeNotifier] responsible for managing the listeners.
-  late CellChangeNotifier _notifier;
+  /// Map of cell observers
+  ///
+  /// The map is indexed by the observer object with the corresponding values
+  /// storing a count of how many times [addObserver] was called for a given
+  /// observer.
+  final Map<CellObserver, int> _observers = HashMap();
 }

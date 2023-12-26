@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../base/cell_listenable.dart';
 import '../mutable_cell/mutable_cell.dart';
 
 /// A text field widget, similar to [TextField], with content controlled by a [ValueCell].
@@ -139,19 +140,23 @@ class _CellTextFieldState extends State<CellTextField> {
   final _controller = TextEditingController();
   var _suppressUpdate = false;
 
+  CellListenable<String>? _contentListenable;
+
   @override
   void initState() {
     super.initState();
 
     _onChangeCellContent();
-    widget.content.addListener(_onChangeCellContent);
+
+    _contentListenable = widget.content.toListenable();
+    _contentListenable!.addListener(_onChangeCellContent);
 
     _controller.addListener(_onTextChange);
   }
 
   @override
   void dispose() {
-    widget.content.removeListener(_onChangeCellContent);
+    _contentListenable?.dispose();
     _controller.dispose();
 
     super.dispose();
@@ -162,10 +167,11 @@ class _CellTextFieldState extends State<CellTextField> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.content != oldWidget.content) {
-      oldWidget.content.removeListener(_onChangeCellContent);
+      _contentListenable?.dispose();
+      _contentListenable = widget.content.toListenable();
 
       _onChangeCellContent();
-      widget.content.addListener(_onChangeCellContent);
+      _contentListenable?.addListener(_onChangeCellContent);
     }
   }
 

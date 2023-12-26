@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import 'cell_listenable_builder.dart';
 import '../value_cell.dart';
 
 /// Provides functionality for creating [Widgets[ from ValueCells
@@ -19,10 +20,10 @@ extension WidgetExtension<T> on ValueCell<T> {
   Widget toWidget(ValueWidgetBuilder<T> builder, {
     Widget? child
   }) {
-    return ValueListenableBuilder(
-      valueListenable: this,
-      builder: builder,
-      child: child,
+    return CellListenableBuilder(
+        cell: this,
+        builder: builder,
+        child: child
     );
   }
 }

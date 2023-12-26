@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import '../value_cell.dart';
 import 'compute_cell.dart';
 
@@ -18,7 +16,7 @@ extension ComputeExtension<T> on ValueCell<T> {
 
 /// Extends [List] with a method for creating a [ComputeCell] with the argument
 /// cells given in the list.
-extension ListComputeExtension<T extends Listenable> on List<T> {
+extension ListComputeExtension<T extends ValueCell> on List<T> {
   /// Create a [ComputeCell] with compute function [fn] and argument cell list [this].
   ///
   /// A [ValueCell] is returned of which the value is the result returned by [fn].

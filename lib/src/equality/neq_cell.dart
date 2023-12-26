@@ -18,6 +18,6 @@ class NeqCell<T,U> extends DependentCell<bool> {
 
   /// Private
 
-  final ValueListenable<T> _cellA;
-  final ValueListenable<U> _cellB;
+  final ValueCell<T> _cellA;
+  final ValueCell<U> _cellB;
 }
