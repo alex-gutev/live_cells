@@ -375,7 +375,7 @@ If your cell needs to store its value rather than computing it on demand or init
 you will need to subclass `NotifierCell`. This class provides implementations of `addObserver`,
 `removeObserver` and the `get value` property accessor. This class also provides a protected
 `set value` property accessor for setting the cell's value. When the value of the cell is set via 
-`set value` the observers of the cell are called if the new value is not equal to the previous value.
+`set value` the observers of the cell are notified, if the new value is not equal to the previous value.
 
 Example:
 
