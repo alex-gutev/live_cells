@@ -3,6 +3,7 @@ import 'package:example/demos/cell_text_field_demo.dart';
 import 'package:example/demos/compute_cell_demo1.dart';
 import 'package:example/demos/compute_cell_demo2.dart';
 import 'package:example/demos/compute_cell_demo3.dart';
+import 'package:example/demos/compute_cell_demo4.dart';
 import 'package:example/demos/equality_cell_demo.dart';
 import 'package:example/demos/mutable_cell_demo.dart';
 import 'package:example/demos/store_cell_demo.dart';
@@ -131,6 +132,14 @@ class MyHomePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => ComputeCellDemo3()
+                          ));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Computational Cells 4'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ComputeCellDemo4()
                           ));
                         },
                       ),
