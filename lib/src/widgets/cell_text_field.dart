@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -140,23 +141,19 @@ class _CellTextFieldState extends State<CellTextField> {
   final _controller = TextEditingController();
   var _suppressUpdate = false;
 
-  CellListenable<String>? _contentListenable;
-
   @override
   void initState() {
     super.initState();
 
     _onChangeCellContent();
-
-    _contentListenable = widget.content.toListenable();
-    _contentListenable!.addListener(_onChangeCellContent);
+    widget.content.listenable.addListener(_onChangeCellContent);
 
     _controller.addListener(_onTextChange);
   }
 
   @override
   void dispose() {
-    _contentListenable?.dispose();
+    widget.content.listenable.removeListener(_onChangeCellContent);
     _controller.dispose();
 
     super.dispose();
@@ -167,11 +164,10 @@ class _CellTextFieldState extends State<CellTextField> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.content != oldWidget.content) {
-      _contentListenable?.dispose();
-      _contentListenable = widget.content.toListenable();
+      oldWidget.content.listenable.removeListener(_onChangeCellContent);
 
       _onChangeCellContent();
-      _contentListenable?.addListener(_onChangeCellContent);
+      widget.content.listenable.addListener(_onChangeCellContent);
     }
   }
 

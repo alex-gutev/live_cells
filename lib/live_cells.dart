@@ -4,7 +4,7 @@ export 'src/value_cell.dart'
     show ValueCell, ConstantCell, DependentCell, CellEquality, EqCell, NeqCell;
 
 export 'src/base/cell_observer.dart' show CellObserver;
-export 'src/base/cell_listenable.dart' show CellListenable, CellListenableExtension;
+export 'src/base/cell_listenable.dart' show CellListenableExtension;
 
 export 'src/base/managed_cell.dart' show ManagedCell;
 export 'src/base/cell_listeners.dart' show CellListeners;
