@@ -189,7 +189,7 @@ the argument cells.
 **Note**: The value computation function does not take any arguments, unlike when using `apply`.
 Instead the values of the cells have to be accessed directly using  the `value` property inside the 
 computation function. Additionally every argument cell has to be included in the list so that the 
-cell knows when its value should be recomputed.
+computational cell knows when its value should be recomputed.
 
 An extension is provided for `ValueCell`'s containing `num` values which overloads the arithmetic
 and relational operators to return computational that perform the operation defined by the operator. 
