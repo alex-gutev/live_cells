@@ -19,7 +19,7 @@ and more flexible.
 This package provides a `ValueCell` interface which offers the following benefits 
 over `ChangeNotifier` / `ValueNotifier`:
 
-+ Implementing a `ValueListenable` which is an expression of other `ValueListenable`'s, e.g. `a + b`,
++ Implementing a `ValueCell` which is an expression of other `ValueCell`'s, e.g. `a + b`,
   can be done in a functional manner without manually adding and removing listeners using
   `addListener`, `removeListener`.
 + Simpler resource management, no need to call `dispose`.
@@ -32,7 +32,7 @@ over `ChangeNotifier` / `ValueNotifier`:
 
 ### Basics
 
-The basis of this package is the `ValueCell` interface, which is an extension of the `ValueListenable` interface.
+The basis of this package is the `ValueCell` interface.
 
 Every `ValueCell` has a value which can be accessed by the `value` property:
 
@@ -164,31 +164,40 @@ return a.eq(b).toWidget((context, value, _) => {
 });
 ```
 
-A computational cell which depends on multiple argument cells can be created with the `ComputeCell`
-constructor:
+A computational cell which depends on multiple argument cells can be created by using the
+`List.computeCell` method.
 
 ```dart
 final a = MutableCell(1);
 final b = MutableCell(2);
 
-final sum = ComputeCell(
-    compute: () => a.value + b.value,
-    arguments: [a,b]
-);
+final sum = [a, b].computeCell(() => a.value + b.value);
+
 ```
 
-The value of `sum` is the sum of the values of cells `a` and `b`. Note the `compute` function does
-not take any arguments, unlike when using `apply`. Instead the values of the cells have to be 
-accessed directly using  the `value` property inside the `compute` function. Additionally every 
-argument cell has to be included in the `arguments` list so that the cell knows when its value 
-should be recomputed.
+The argument cells, `a` and `b` in this case, are specified in a list and the value computation
+function is given to the `computeCell` method, which in this case computes the sum of the values of
+the argument cells.
+
+**Note**: The value computation function does not take any arguments, unlike when using `apply`.
+Instead the values of the cells have to be accessed directly using  the `value` property inside the 
+computation function. Additionally every argument cell has to be included in the list so that the 
+cell knows when its value should be recomputed.
+
+An extension is provided for `ValueCell`'s containing `num` values which overloads the arithmetic
+and relational operators to return computational that perform the operation defined by the operator. 
+For example the `sum` cell above can be defined using the following:
+
+```dart
+final sum = a + b;
+```
 
 **Note**:
 
-Computational cells, whether created by the `apply` method or with the `ComputeCell` constructor
-do not store their values. Instead the value of a computational cell is computed on demand whenever its
-`value` property is accessed. If the property is accessed multiple times, the value of the cell is 
-computed multiple times.
+Computational cells, whether created by the `apply` or `computeCell` methods do not store their
+values. Instead the value of a computational cell is computed on demand whenever its `value` 
+property is accessed. If the property is accessed multiple times, the value of the cell is computed
+multiple times.
 
 For those cases where this is undesirable, such as when the computation is expensive, the `store`
 method can be used to create a cell which stores the value of the computational cell.
@@ -317,14 +326,18 @@ cell-based interface to all widgets which take a controller object.
 Occasionally you may need to write your own `ValueCell` subclasses. A common situation is if you
 have a specific computation that you want to apply to different cells throughout your code.
 
-The `ValueCell` interface extends the `ValueListenable` interface with the methods `eq` and `neq` 
-for comparing whether two cells are equal and not equal respectively. These methods  both return a 
-`ValueCell` of which the value is the result of the comparison. The `CellEquality` mixin implements 
-these methods using the `==` and `!=` operators for a given type.
+To subclass `ValueCell`, the following methods have to be implemented:
+
+* The `get value` property accessor to return the cell's value.
+* The `addObserver` and `removeObserver` methods to add and remove observers, respectively.
+* The equality comparison methods `eq` and `neq`.
+
+The `CellEquality` mixin implements the equality comparison methods using the `==` and `!=`
+operators for a given type.
 
 To implement a cell that performs a computation which is dependent on the values of one or more
-argument cells, you should extend `DependentCell`. This class already implements `addListener` and 
-`removeListener`, and provides a constructor which takes a list of the argument cells on which the
+argument cells, you should extend `DependentCell`. This class already implements `addObserver` and 
+`removeObserver`, and provides a constructor which takes a list of the argument cells on which the
 value of the cell depends. You're only required to implement the `value` property accessor in which 
 the value of the cell is computed.
 
@@ -348,18 +361,14 @@ The above `ValueCell` subclass implements a cell of which the value is the value
 clamped between a minimum and maximum which are also supplied in argument cells.
 
 **NOTE**: The argument cell containing the value to be clamped as well as the cells containing the
-minimum and maximum are all passed to the constructor of `DependentCell` so that the listeners
+minimum and maximum are all passed to the constructor of `DependentCell` so that the observers
 of the `ClampCell` are called whenever the value of one of the argument cells changes.
 
-Also note the argument cells do not have to be instances of `ValueCell` but a `ValueListenable`,
-or just a bare `Listenable` can be used instead.
-
-If your cell needs to store its value rather than computing it on demand, as in the `ClampCell`
-example, you will need to subclass `NotifierCell`. This class provides implementations of
-`addListener`, `removeListener` and the `get value` property accessor. This class also provides a
-protected `set value` property accessor for setting the cell's value. When the value of
-the cell is set via `set value` the listeners of the cell are called if the new value is not equal
-to the previous value.
+If your cell needs to store its value rather than computing it on demand or initiate value changes 
+you will need to subclass `NotifierCell`. This class provides implementations of `addObserver`,
+`removeObserver` and the `get value` property accessor. This class also provides a protected
+`set value` property accessor for setting the cell's value. When the value of the cell is set via 
+`set value` the observers of the cell are called if the new value is not equal to the previous value.
 
 Example:
 
@@ -398,15 +407,15 @@ in any of these examples. This package takes a slightly different approach. The 
 manual resource management implement the `ManagedCell` interface, which `NotifierCell` extends.
 
 `ManagedCell` provides an `init` method where resources should be acquired and a `dispose` method
-where resources should be released. The `init` method is called before the first listener is added 
-to the cell and `dispose` is called after the last listener is removed. The `init` method may be
-called again after `dispose` if a new listener is added after the last one is removed. Therefore
+where resources should be released. The `init` method is called before the first observer is added 
+to the cell and `dispose` is called after the last observer is removed. The `init` method may be
+called again after `dispose` if a new observer is added after the last one is removed. Therefore
 implementations of `ManagedCell` should be written in such a way that the cell can be reused after
 `dispose` is called.
 
 You will have noticed that the implementation of `CountCell` in the previous example has a serious
 flaw. It starts counting immediately when it is created and continues counting even when there are
-no listeners. If the value of this cell is displayed in a widget, the counter might appear to start
+no observers. If the value of this cell is displayed in a widget, the counter might appear to start
 from a value greater than `0` or the counting could be complete before the widget has even rendered,
 depending on where the cell is constructed.
 
@@ -454,7 +463,7 @@ class CountCell extends NotifierCell<int> {
 ```
 
 If you're implementing a subclass of `NotifierCell` which depends on the value of another cell, you
-should add a listener to the cell in the `init` method and remove the listener in the `dispose`
+should add an observer to the cell in the `init` method and remove the observer in the `dispose`
 method.
 
 ## Additional information
