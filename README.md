@@ -192,7 +192,7 @@ computation function. Additionally every argument cell has to be included in the
 computational cell knows when its value should be recomputed.
 
 An extension is provided for `ValueCell`'s containing `num` values which overloads the arithmetic
-and relational operators to return computational that perform the operation defined by the operator. 
+and relational operators to return computational cells that perform the operation defined by the operator. 
 For example the `sum` cell above can be defined using the following:
 
 ```dart
