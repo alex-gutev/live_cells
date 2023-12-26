@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
-import '../../live_cells.dart';
 import 'cell_observer.dart';
 import 'managed_cell.dart';
 
@@ -55,7 +54,9 @@ mixin CellListeners<T> on ManagedCell<T> {
         observer.willUpdate();
       }
       catch (e, st) {
-        print('Error in CellObserver.preUpdate: $e - $st');
+        if (kDebugMode) {
+          print('Error in CellObserver.preUpdate: $e - $st');
+        }
       }
     }
   }
@@ -71,7 +72,9 @@ mixin CellListeners<T> on ManagedCell<T> {
         observer.update();
       }
       catch (e, st) {
-        print('Error in CellObserver.update: $e - $st');
+        if (kDebugMode) {
+          print('Error in CellObserver.update: $e - $st');
+        }
       }
     }
   }

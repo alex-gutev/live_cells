@@ -76,10 +76,6 @@ class _ListenerCellObserverAdapter extends CellObserver {
   }
 
   @override
-  void willNotUpdate() {
-  }
-
-  @override
   void willUpdate() {
   }
 }

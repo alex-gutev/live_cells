@@ -47,10 +47,6 @@ class DelayCell<T> extends NotifierCell<T> implements CellObserver {
   }
 
   @override
-  void willNotUpdate() {
-  }
-
-  @override
   void willUpdate() {
   }
 }
