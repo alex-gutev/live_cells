@@ -23,8 +23,8 @@ class SubclassDemo1 extends StatefulWidget {
 
 class _SubclassDemo1State extends State<SubclassDemo1> {
   final a = MutableCell(5);
-  final aMax = ValueCell.value(10);
-  final aMin = ValueCell.value(2);
+  final aMax = 10.cell;
+  final aMin = 2.cell;
 
   late final clamped = ClampCell(a, aMin, aMax);
 
