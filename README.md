@@ -54,6 +54,13 @@ return cell.toWidget((context, value, _) => Text('Cell value: $value'));
 The benefit of using `toWidget` as opposed to accessing `value` directly is that the returned
 Widget is rebuilt whenever the value of the cell changes.
 
+*Cells holding a constant value can also be obtained with the `.cell` property of `num` and `String`
+values:*
+
+```dart
+final cell = 1.cell;
+```
+
 ### Mutable Cells
 
 A `MutableCell` is a `ValueCell`of which the `value` property can be set as well as read. When the 
