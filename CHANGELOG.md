@@ -25,3 +25,7 @@ Breaking changes:
 * `ValueCell.addListener` and `ValueCell.removeListener` are replaced with `addObserver` and `removeObserver`
 * New `CellObserver` interface for observing changes to the values of cells
 * `ValueCell.listenable` property provided to use `ValueCell` as a `ValueListenable`
+
+## 0.2.1
+
+* Fix issues with examples in README

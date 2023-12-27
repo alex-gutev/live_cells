@@ -24,7 +24,7 @@ over `ChangeNotifier` / `ValueNotifier`:
   `addListener`, `removeListener`.
 + Simpler resource management, no need to call `dispose`.
 + (Still in early stages) A library of widgets which replaces "controller" objects with 
-  `ValueListenable`'s. This allows for a style of programming which fits in with the reactive
+  `ValueCell`'s. This allows for a style of programming which fits in with the reactive
   paradigm of flutter.
   
 
@@ -352,9 +352,9 @@ Example:
 
 ```dart
 class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
-  final ValueListenable<T> argValue;
-  final ValueListenable<T> argMin;
-  final ValueListenable<T> argMax;
+  final ValueCell<T> argValue;
+  final ValueCell<T> argMin;
+  final ValueCell<T> argMax;
   
   ClampCell(this.argValue, this.argMin, this.argMax) :
     super([argValue, argMin, argMax]);
