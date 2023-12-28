@@ -71,11 +71,11 @@ class _ListenerCellObserverAdapter extends CellObserver {
   int get hashCode => listener.hashCode;
   
   @override
-  void update() {
+  void update(ValueCell cell) {
     listener();
   }
 
   @override
-  void willUpdate() {
+  void willUpdate(ValueCell cell) {
   }
 }

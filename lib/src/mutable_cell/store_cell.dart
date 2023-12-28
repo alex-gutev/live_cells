@@ -48,13 +48,13 @@ class StoreCell<T> extends NotifierCell<T> implements CellObserver {
   var _stale = false;
   
   @override
-  void willUpdate() {
+  void willUpdate(ValueCell cell) {
     _stale = true;
     notifyWillUpdate();
   }
 
   @override
-  void update() {
+  void update(ValueCell cell) {
     _stale = false;
     final newValue = valueCell.value;
     
