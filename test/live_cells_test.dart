@@ -192,6 +192,28 @@ void main() {
       cell.value = 'bye';
       verify(observer.gotValue('bye'));
     });
+
+    test('All cell values updates using MutableCell.batch', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+      final op = MutableCell('');
+
+      final sum = a + b;
+      final msg = [a, b, op, sum].computeCell(
+              () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
+      );
+
+      final observer = MockSimpleObserver();
+      msg.addObserver(observer);
+
+      MutableCell.batch(() {
+        a.value = 1;
+        b.value = 2;
+        op.value = '+';
+      });
+
+      expect(msg.value, '1 + 2 = 3');
+    });
   });
 
   group('Equality Comparisons', () {
@@ -803,6 +825,68 @@ void main() {
         observer.gotValue((2 + 1 + 10) + (2 * 8)),
         observer.gotValue((6 + 1 + 10) + (6 * 8)),
       ]);
+    });
+
+    test('No intermediate values are produced when using MutableCell.batch', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+      final op = MutableCell('');
+
+      final sum = a + b;
+      final msg = [a, b, op, sum].computeCell(
+              () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
+      );
+
+      final observer = MockValueObserver(msg);
+      msg.addObserver(observer);
+
+      MutableCell.batch(() {
+        a.value = 1;
+        b.value = 2;
+        op.value = '+';
+      });
+
+      MutableCell.batch(() {
+        a.value = 5;
+        b.value = 6;
+        op.value = 'plus';
+      });
+
+      expect(observer.values, equals([
+        '1 + 2 = 3',
+        '5 plus 6 = 11'
+      ]));
+    });
+
+    test('No intermediate values are produced when using MutableCell.batch and StoreCells', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+      final op = MutableCell('');
+
+      final sum = (a + b).store();
+      final msg = [a, b, op, sum].computeCell(
+              () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
+      );
+
+      final observer = MockValueObserver(msg);
+      msg.addObserver(observer);
+
+      MutableCell.batch(() {
+        a.value = 1;
+        b.value = 2;
+        op.value = '+';
+      });
+
+      MutableCell.batch(() {
+        a.value = 5;
+        b.value = 6;
+        op.value = 'plus';
+      });
+
+      expect(observer.values, equals([
+        '1 + 2 = 3',
+        '5 plus 6 = 11'
+      ]));
     });
   });
 
