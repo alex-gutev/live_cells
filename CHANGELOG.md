@@ -29,3 +29,8 @@ Breaking changes:
 ## 0.2.1
 
 * Fix issues with examples in README
+
+## 0.2.2
+
+* Fix issue with List.computeCell method
+* Fix issues with unit tests
