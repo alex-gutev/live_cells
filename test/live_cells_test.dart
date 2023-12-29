@@ -888,10 +888,8 @@ void main() {
 
       cell.value = 30;
 
-      verifyInOrder([
-        listener1(),
-        listener2()
-      ]);
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
     });
 
     test('Listeners not called after they are removed', () {
