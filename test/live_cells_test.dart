@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:live_cells/live_cells.dart';
@@ -26,11 +27,20 @@ class MockSimpleObserver extends Mock implements CellObserver {}
 class MockValueObserver extends MockSimpleObserver implements ValueObserver {
   final ValueCell cell;
 
+  /// List of values obtained (duplicates are removed)
+  final values = [];
+
   MockValueObserver(this.cell);
 
   @override
   void update() {
-    gotValue(cell.value);
+    final value = cell.value;
+
+    if (values.lastOrNull != value) {
+      values.add(value);
+    }
+
+    gotValue(value);
   }
 }
 
@@ -759,10 +769,7 @@ void main() {
       a.value = 2;
       a.value = 6;
 
-      verifyInOrder([
-        observer.gotValue((2 + 1) + (2 * 8)),
-        observer.gotValue((6 + 1) + (6 * 8))
-      ]);
+      expect(observer.values, equals([(2 + 1) + (2 * 8), (6 + 1) + (6 * 8)]));
     });
 
     test('No intermediate values are produced when using StoreCells', () {
@@ -777,10 +784,7 @@ void main() {
       a.value = 2;
       a.value = 6;
 
-      verifyInOrder([
-        observer.gotValue((2 + 1) + (2 * 8)),
-        observer.gotValue((6 + 1) + (6 * 8)),
-      ]);
+      expect(observer.values, equals([(2 + 1) + (2 * 8), (6 + 1) + (6 * 8)]));
     });
 
     test('No intermediate values are produced when using StoreCells and branches are unequal', () {
