@@ -23,5 +23,5 @@ extension ListComputeExtension on List {
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ValueCell<U> computeCell<U>(U Function() fn) =>
-      ComputeCell(compute: fn, arguments: this.cast<ValueCell>());
+      ComputeCell(compute: fn, arguments: cast<ValueCell>());
 }
