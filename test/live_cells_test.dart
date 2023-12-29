@@ -25,15 +25,11 @@ class MockSimpleObserver extends Mock implements CellObserver {}
 ///   - Add instance as a listener of a cell
 ///   - verify(instance.gotValue(expected))
 class MockValueObserver extends MockSimpleObserver implements ValueObserver {
-  final ValueCell cell;
-
   /// List of values obtained (duplicates are removed)
   final values = [];
 
-  MockValueObserver(this.cell);
-
   @override
-  void update() {
+  void update(ValueCell cell) {
     final value = cell.value;
 
     if (values.lastOrNull != value) {
@@ -128,7 +124,7 @@ void main() {
       cell.addObserver(observer);
       cell.value = 23;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(cell)).called(1);
     });
 
     test('Setting MutableCell.value twice calls cell listeners twice', () {
@@ -140,7 +136,7 @@ void main() {
       cell.value = 23;
       cell.value = 101;
 
-      verify(observer.update()).called(2);
+      verify(observer.update(cell)).called(2);
     });
 
     test('MutableCell observer not called after it is removed', () {
@@ -153,7 +149,7 @@ void main() {
       cell.removeObserver(observer);
       cell.value = 101;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(cell)).called(1);
     });
 
     test('MutableCell observer not called if new value is equal to old value', () {
@@ -163,7 +159,7 @@ void main() {
       cell.addObserver(observer);
       cell.value = 56;
 
-      verifyNever(observer.update());
+      verifyNever(observer.update(cell));
     });
 
     test('All MutableCell observers called when value changes', () {
@@ -179,13 +175,13 @@ void main() {
       cell.value = 8;
       cell.value = 12;
 
-      verify(observer1.update()).called(3);
-      verify(observer2.update()).called(2);
+      verify(observer1.update(cell)).called(3);
+      verify(observer2.update(cell)).called(2);
     });
 
     test('MutableCell.value updated when observer called', () {
       final cell = MutableCell('hello');
-      final observer = MockValueObserver(cell);
+      final observer = MockValueObserver();
 
       cell.addObserver(observer);
 
@@ -273,7 +269,7 @@ void main() {
       eq.addObserver(observer);
       a.value = 4;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(eq)).called(1);
     });
 
     test('EqCell observers notified when 2nd argument cell values changes', () {
@@ -286,7 +282,7 @@ void main() {
       eq.addObserver(observer);
       b.value = 3;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(eq)).called(1);
     });
 
     test('NeqCell is reevaluated when 1st argument cell value changes', () {
@@ -317,7 +313,7 @@ void main() {
       neq.addObserver(observer);
       a.value = 4;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(neq)).called(1);
     });
 
     test('NeqCell observers notified when 2nd argument cell values changes', () {
@@ -330,7 +326,7 @@ void main() {
       neq.addObserver(observer);
       b.value = 3;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(neq)).called(1);
     });
   });
 
@@ -384,7 +380,7 @@ void main() {
 
       a.value = 8;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(c)).called(1);
     });
 
     test('ComputeCell observers notified when value of 2nd argument cell changes', () {
@@ -398,7 +394,7 @@ void main() {
 
       b.value = 8;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(c)).called(1);
     });
 
     test('ComputeCell observers notified for each change of value of argument cell', () {
@@ -414,7 +410,7 @@ void main() {
       a.value = 10;
       b.value = 100;
 
-      verify(observer.update()).called(3);
+      verify(observer.update(c)).called(3);
     });
 
     test('ComputeCell observer not called after it is removed', () {
@@ -432,7 +428,7 @@ void main() {
       b.value = 10;
       a.value = 100;
 
-      verify(observer.update()).called(1);
+      verify(observer.update(c)).called(1);
     });
 
     test('All ComputeCell observers called when value changes', () {
@@ -451,8 +447,8 @@ void main() {
       b.value = 10;
       a.value = 100;
 
-      verify(observer1.update()).called(3);
-      verify(observer2.update()).called(2);
+      verify(observer1.update(c)).called(3);
+      verify(observer2.update(c)).called(2);
     });
   });
 
@@ -486,7 +482,7 @@ void main() {
       a.value = 'bye';
       a.value = 'goodbye';
 
-      verify(observer.update()).called(2);
+      verify(observer.update(store)).called(2);
     });
 
     test('All StoreCell observers notified when argument cell value changes', () {
@@ -502,8 +498,8 @@ void main() {
       store.addObserver(observer2);
       a.value = 'goodbye';
 
-      verify(observer1.update()).called(2);
-      verify(observer2.update()).called(1);
+      verify(observer1.update(store)).called(2);
+      verify(observer2.update(store)).called(1);
     });
 
     test('StoreCell observer not called after it is removed', () {
@@ -518,7 +514,7 @@ void main() {
       store.removeObserver(observer);
       a.value = 'goodbye';
 
-      verify(observer.update()).called(1);
+      verify(observer.update(store)).called(1);
     });
 
     test('StoreCell observers not called when argument cell value does not change', () {
@@ -536,19 +532,19 @@ void main() {
       a.value = 6;
       a.value = 8;
 
-      verify(observer1.update()).called(3);
-      verifyNever(observer2.update());
+      verify(observer1.update(b)).called(3);
+      verifyNever(observer2.update(store));
 
       a.value = 11;
 
-      verify(observer2.update()).called(1);
+      verify(observer2.update(store)).called(1);
     });
 
     test('StoreCell.value updated when observer called', () {
       final cell = MutableCell('hello');
       final store = cell.store();
 
-      final observer = MockValueObserver(store);
+      final observer = MockValueObserver();
 
       store.addObserver(observer);
 
@@ -772,8 +768,8 @@ void main() {
       cell.value = 15;
 
       verifyInOrder([
-        observer.willUpdate(),
-        observer.update()
+        observer.willUpdate(cell),
+        observer.update(cell)
       ]);
 
       verifyNoMoreInteractions(observer);
@@ -785,7 +781,7 @@ void main() {
       final prod = a * 8.cell;
       final result = sum + prod;
 
-      final observer = MockValueObserver(result);
+      final observer = MockValueObserver();
       result.addObserver(observer);
 
       a.value = 2;
@@ -800,7 +796,7 @@ void main() {
       final prod = (a * 8.cell).store();
       final result = sum + prod;
 
-      final observer = MockValueObserver(result);
+      final observer = MockValueObserver();
       result.addObserver(observer);
 
       a.value = 2;
@@ -815,7 +811,7 @@ void main() {
       final prod = (a * 8.cell).store();
       final result = (sum + prod).store();
 
-      final observer = MockValueObserver(result);
+      final observer = MockValueObserver();
       result.addObserver(observer);
 
       a.value = 2;
@@ -837,7 +833,7 @@ void main() {
               () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
       );
 
-      final observer = MockValueObserver(msg);
+      final observer = MockValueObserver();
       msg.addObserver(observer);
 
       MutableCell.batch(() {
@@ -868,7 +864,7 @@ void main() {
               () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
       );
 
-      final observer = MockValueObserver(msg);
+      final observer = MockValueObserver();
       msg.addObserver(observer);
 
       MutableCell.batch(() {
@@ -1062,7 +1058,7 @@ void main() {
       final cell = MutableCell(1);
       final delay = DelayCell(const Duration(milliseconds: 1), cell);
 
-      final observer = MockValueObserver(delay);
+      final observer = MockValueObserver();
       delay.addObserver(observer);
 
       cell.value = 2;
@@ -1076,7 +1072,7 @@ void main() {
       final cell = MutableCell(1);
       final delay = DelayCell(const Duration(milliseconds: 1), cell);
 
-      final observer = MockValueObserver(delay);
+      final observer = MockValueObserver();
       delay.addObserver(observer);
 
       cell.value = 2;
@@ -1093,8 +1089,8 @@ void main() {
       final cell = MutableCell(1);
       final delay = DelayCell(const Duration(milliseconds: 1), cell);
 
-      final observer1 = MockValueObserver(delay);
-      final observer2 = MockValueObserver(delay);
+      final observer1 = MockValueObserver();
+      final observer2 = MockValueObserver();
 
       delay.addObserver(observer1);
       delay.addObserver(observer2);

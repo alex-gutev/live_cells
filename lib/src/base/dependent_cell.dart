@@ -23,14 +23,42 @@ abstract class DependentCell<T> extends ValueCell<T> {
   @override
   void addObserver(CellObserver observer) {
     for (final dependency in arguments) {
-      dependency.addObserver(observer);
+      dependency.addObserver(_CellObserverWrapper(this, observer));
     }
   }
 
   @override
   void removeObserver(CellObserver observer) {
     for (final dependency in arguments) {
-      dependency.removeObserver(observer);
+      dependency.removeObserver(_CellObserverWrapper(this, observer));
     }
+  }
+}
+
+/// A [CellObserver] wrapper which changes the cell passed to the interface methods.
+class _CellObserverWrapper extends CellObserver {
+  /// The cell to pass to the [update] and [willUpdate] methods.
+  final ValueCell observedCell;
+
+  /// The actual observe to call
+  final CellObserver observer;
+
+  _CellObserverWrapper(this.observedCell, this.observer);
+
+  @override
+  bool operator ==(Object other) =>
+      other is _CellObserverWrapper && other.observer == observer;
+
+  @override
+  int get hashCode => observer.hashCode;
+
+  @override
+  void update(ValueCell cell) {
+    observer.update(observedCell);
+  }
+
+  @override
+  void willUpdate(ValueCell cell) {
+    observer.willUpdate(observedCell);
   }
 }

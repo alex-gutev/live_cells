@@ -37,7 +37,7 @@ class DelayCell<T> extends NotifierCell<T> implements CellObserver {
   final ValueCell<T> valueCell;
 
   @override
-  void update() async {
+  void update(ValueCell cell) async {
     final newValue = valueCell.value;
 
     if (value != newValue) {
@@ -47,6 +47,6 @@ class DelayCell<T> extends NotifierCell<T> implements CellObserver {
   }
 
   @override
-  void willUpdate() {
+  void willUpdate(ValueCell cell) {
   }
 }

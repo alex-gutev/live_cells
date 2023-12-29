@@ -51,7 +51,7 @@ mixin CellListeners<T> on ManagedCell<T> {
   void notifyWillUpdate() {
     for (final observer in _observers.keys) {
       try {
-        observer.willUpdate();
+        observer.willUpdate(this);
       }
       catch (e, st) {
         if (kDebugMode) {
@@ -69,7 +69,7 @@ mixin CellListeners<T> on ManagedCell<T> {
   void notifyUpdate() {
     for (final observer in _observers.keys) {
       try {
-        observer.update();
+        observer.update(this);
       }
       catch (e, st) {
         if (kDebugMode) {
