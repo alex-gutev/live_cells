@@ -16,12 +16,12 @@ extension ComputeExtension<T> on ValueCell<T> {
 
 /// Extends [List] with a method for creating a [ComputeCell] with the argument
 /// cells given in the list.
-extension ListComputeExtension<T extends ValueCell> on List<T> {
+extension ListComputeExtension on List {
   /// Create a [ComputeCell] with compute function [fn] and argument cell list [this].
   ///
   /// A [ValueCell] is returned of which the value is the result returned by [fn].
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ValueCell<U> computeCell<U>(U Function() fn) =>
-      ComputeCell(compute: fn, arguments: this);
+      ComputeCell(compute: fn, arguments: this.cast<ValueCell>());
 }
