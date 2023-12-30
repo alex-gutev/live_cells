@@ -1,23 +1,41 @@
+import 'package:flutter/foundation.dart';
+
 import '../base/notifier_cell.dart';
+import '../value_cell.dart';
 
-/// A [ValueCell] of which the [value] property can be set explicitly.
-class MutableCell<T> extends NotifierCell<T> {
-  MutableCell(super.value);
+/// Interface for a [ValueCell] of which the [value] property can be set explicitly
+abstract class MutableCell<T> extends ValueCell<T> {
+  /// Create a mutable cell with its value initialized to [value]
+  factory MutableCell(T value) => _MutableCellImpl(value);
 
-  @override
-  set value(T value) {
-    if (_batched) {
-      if (value != this.value) {
-        notifyWillUpdate();
-        setValue(value);
+  /// Set the value of the cell.
+  ///
+  /// Unless [isBatchUpdate] is true, the observers of the cell should be
+  /// notified by calling the methods of [CellObserver] in the following order:
+  ///
+  /// 1. [CellObserver.willUpdate()]
+  /// 2. Set value of cell
+  /// 3. [CellObserver.update()]
+  set value(T value);
 
-        _batchList.add(this);
-      }
-    }
-    else {
-      super.value = value;
-    }
-  }
+  /// Is a batch update of cells currently in progress, *see [MutableCell.batch]*.
+  @protected
+  static bool get isBatchUpdate => _batched;
+
+  /// Notify the observers of the cell that the cell's value will change.
+  ///
+  /// This is called before the value of the cell has been set during a batch
+  /// update, *see [MutableCell.batch]*.
+  @protected
+  void notifyWillUpdate();
+
+  /// Notify the observers of the cell that the cell's value has change.
+  ///
+  /// This is called after the value of a batch update of cells,
+  /// *see [MutableCell.batch]*. At this point the value of the [value] property
+  /// will have been set to the new value of the cell.
+  @protected
+  void notifyUpdate();
 
   /// Set the value of multiple [MutableCell]'s simultaneously.
   ///
@@ -55,5 +73,24 @@ class MutableCell<T> extends NotifierCell<T> {
 
     _batched = false;
     _batchList.clear();
+  }
+}
+
+class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T> {
+  _MutableCellImpl(super.value);
+
+  @override
+  set value(T value) {
+    if (MutableCell._batched) {
+      if (value != this.value) {
+        notifyWillUpdate();
+        setValue(value);
+
+        MutableCell._batchList.add(this);
+      }
+    }
+    else {
+      super.value = value;
+    }
   }
 }
