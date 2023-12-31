@@ -11,6 +11,7 @@ export 'src/base/cell_listeners.dart' show CellListeners;
 export 'src/base/notifier_cell.dart' show NotifierCell;
 export 'src/mutable_cell/store_cell.dart' show StoreCell, StoreCellExtension;
 export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
+export 'src/mutable_cell/mutable_dependent_cell.dart' show MutableDependentCell;
 export 'src/compute_cell/compute_cell.dart' show ComputeCell;
 export 'src/compute_cell/compute_extension.dart'
     show ComputeExtension, ListComputeExtension;
