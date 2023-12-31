@@ -34,3 +34,7 @@ Breaking changes:
 
 * Fix issue with List.computeCell method
 * Fix issues with unit tests
+
+## 0.2.3
+
+* Fix issue with `CellTextField`
