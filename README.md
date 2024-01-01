@@ -418,9 +418,8 @@ state between various "controller" objects, `ChangeNotifier`'s and widget `State
 
 **NOTE**:
 
-The reverse computation functions of mutable computational cells are called in a batch cell update.
-This means that if the values of multiple cells are assigned in the function, the actual recomputation
-of the cell values is done after the reverse computation function returns.
+The values assigned to cells in a reverse computation function of a mutable computational cell are
+batched and with the actual assignment only being done after the function returns.
 
 For example:
 
@@ -438,10 +437,7 @@ final sum = [a, b].mutableComputeCell(() => a.value + b.value, (sum) {
 final product = a * b;
 ```
 
-When setting the value of `sum` to `10`, the value of cells `a` and `b` is set to `5`, however
-the value of cell `product` is only recomputed after the values of both `a` and `b` have been set.
-
-That is when executing the following:
+When executing the following:
 
 ```dart
 print(product.value) // Prints 2
@@ -449,9 +445,9 @@ sum.value = 10;
 print(product.value) // Prints 25
 ```
 
-the value of `product` is only recomputed when the reverse computation function of `sum` returns. In
-effect, this means that the value of `product` changes directly from `2` to `25` without producing
-any intermediate values after the value of `a` is set and before the value of `b` is set.
+The value of `product` is recomputed only after the reverse computation function returns. As a result,
+`product.value` changes directly from `2` to `25` without any intermediate values being produced between
+the assignments to cells `a` and `b`.
 
 ## Advanced
 
