@@ -10,12 +10,9 @@ class CellTextFieldDemo2 extends StatefulWidget {
 class _CellTextFieldDemo2State extends State<CellTextFieldDemo2> {
   final a = MutableCell(0);
 
-  late final content = [a].mutableComputeCell(
-          () => a.value.toString(),
-          (content) {
-            a.value = int.tryParse(content) ?? 0;
-          }
-  );
+  late final content = [a].mutableComputeCell(() => a.value.toString(), (content) {
+    a.value = int.tryParse(content) ?? 0;
+  });
 
   late final square = a * a;
 
@@ -42,7 +39,7 @@ class _CellTextFieldDemo2State extends State<CellTextFieldDemo2> {
               const Text('Enter a number:'),
               CellTextField(
                 content: content,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.numberWithOptions(decimal: false),
               ),
               const SizedBox(height: 10),
               a.toWidget((context, value, _) => Text('The square of ${a.value} is:')),
