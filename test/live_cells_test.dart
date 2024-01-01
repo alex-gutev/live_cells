@@ -1037,10 +1037,9 @@ void main() {
   group('MutableComputeCell', () {
     test('MutableComputeCell.value computed on construction', () {
       final a = MutableCell(1);
-      final b = MutableComputeCell(
-        arguments: [a],
-        compute: () => a.value + 1,
-        reverseCompute: (b) {
+      final b = [a].mutableComputeCell(
+        () => a.value + 1,
+        (b) {
           a.value = b - 1;
         }
       );
@@ -1050,10 +1049,9 @@ void main() {
 
     test('MutableComputeCell.value recomputed when value of argument cell changes', () {
       final a = MutableCell(1);
-      final b = MutableComputeCell(
-          arguments: [a],
-          compute: () => a.value + 1,
-          reverseCompute: (b) {
+      final b = [a].mutableComputeCell(
+          () => a.value + 1,
+          (b) {
             a.value = b - 1;
           }
       );
@@ -1068,10 +1066,9 @@ void main() {
 
     test('MutableComputeCell.value recomputed when value of argument cell changes', () {
       final a = MutableCell(1);
-      final b = MutableComputeCell(
-          arguments: [a],
-          compute: () => a.value + 1,
-          reverseCompute: (b) {
+      final b = [a].mutableComputeCell(
+          () => a.value + 1,
+          (b) {
             a.value = b - 1;
           }
       );
@@ -1088,10 +1085,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1111,10 +1107,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1134,10 +1129,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1158,10 +1152,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1187,10 +1180,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1209,10 +1201,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1239,10 +1230,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1270,10 +1260,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;
@@ -1309,10 +1298,9 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = MutableComputeCell(
-          arguments: [a, b],
-          compute: () => a.value + b.value,
-          reverseCompute: (c) {
+      final c = [a, b].mutableComputeCell(
+          () => a.value + b.value,
+          (c) {
             final half = c / 2;
 
             a.value = half;

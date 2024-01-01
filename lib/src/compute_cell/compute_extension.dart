@@ -1,3 +1,6 @@
+import 'package:live_cells/src/compute_cell/mutable_compute_cell.dart';
+
+import '../mutable_cell/mutable_cell.dart';
 import '../value_cell.dart';
 import 'compute_cell.dart';
 
@@ -24,4 +27,26 @@ extension ListComputeExtension on List {
   /// again to compute the new value of the cell.
   ValueCell<U> computeCell<U>(U Function() fn) =>
       ComputeCell(compute: fn, arguments: cast<ValueCell>());
+
+  /// Create a [MutableComputeCell] with given compute and reverse compute functions, and argument cell list [this].
+  ///
+  /// The [compute] function is called with no arguments whenever
+  /// the value of at least one cell in [this] changes. It should return
+  /// the cell's value.
+  ///
+  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// set, with the new value passed as an argument to the function. It should
+  /// set the values of the argument cells accordingly such that calling [compute]
+  /// again will produce the same value that was passed to [reverseCompute].
+  ///
+  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// that the values of the argument cells are set simultaneously.
+  ///
+  /// **NOTE:** Every element of [this] should be a [MutableCell].
+  MutableCell<U> mutableComputeCell<U>(U Function() compute, void Function(U) reverse) =>
+      MutableComputeCell(
+          compute: compute,
+          reverseCompute: reverse,
+          arguments: cast<MutableCell>()
+      );
 }
