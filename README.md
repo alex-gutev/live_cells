@@ -419,7 +419,7 @@ state between various "controller" objects, `ChangeNotifier`'s and widget `State
 **NOTE**:
 
 The values assigned to cells in a reverse computation function of a mutable computational cell are
-batched and with the actual assignment only being done after the function returns.
+batched, with the actual assignment only being done after the function returns.
 
 For example:
 
