@@ -15,6 +15,7 @@ export 'src/mutable_cell/mutable_dependent_cell.dart' show MutableDependentCell;
 export 'src/compute_cell/compute_cell.dart' show ComputeCell;
 export 'src/compute_cell/compute_extension.dart'
     show ComputeExtension, ListComputeExtension;
+export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
 export 'src/extensions/numeric_extension.dart' show NumericExtension;
 export 'src/extensions/values_extension.dart'
     show NumValueCellExtension, StringValueCellExtension;
