@@ -326,6 +326,133 @@ the empty string.
 Currently only a wrapper for `TextField` is provided. The aim for future release is to provide a 
 cell-based interface to all widgets which take a controller object.
 
+### Mutable Computational Cells
+
+A mutable computational cell is like the computational cells seen earlier, in that its value is a
+function of one or more argument cells, however it's value can also be set directly by setting
+the `value` property.
+
+When the `value` property of a mutable computational cell is set directly, the values of the argument
+cells are set such that the same value will be produced, as the value that was set, when the value
+of the computational cell is recomputed.
+
+The simplest way to create a computational cell is using the `List.mutableComputeCell` extension 
+method. This method takes two arguments:
+
+1. The cell computation function which computes the value of the cell as a function of the argument
+   cells given in the list.
+2. The *reverse computation* function which sets the value of the argument cells given the value that
+   was assigned to the `value` property.
+
+The following is an example of a mutable computational cell of which the computation function converts
+an integer, given in an argument cell, to a string and the reverse computation function parse an
+integer from the string value and assigns it to the argument cell.
+
+```dart
+final a = MutableCell(0);
+
+final cell = [a].mutableComputeCell(() => a.value.toString(), (value) {
+  a.value = int.tryParse(value) ?? 0;
+});
+```
+
+**NOTE**: The value of `cell.value` is passed as an argument to the reverse computation function in 
+which, the value of `a` is set.
+
+The above example can be used alongside `CellTextField` to create a text field for integer input only.
+
+```dart
+class IntTextFieldExample extends StatefulWidget {
+  @override
+  State<IntTextFieldExample> createState() => _IntTextFieldExampleState();
+}
+
+class _IntTextFieldExampleState extends State<IntTextFieldExample> {
+  final a = MutableCell(0);
+
+  late final content = [a].mutableComputeCell(() => a.value.toString(), (content) {
+    a.value = int.tryParse(content) ?? 0;
+  });
+
+  late final square = a * a;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('Enter a number:'),
+          CellTextField(
+            content: content,
+            keyboardType: TextInputType.numberWithOptions(decimal: false),
+          ),
+          const SizedBox(height: 10),
+          a.toWidget((context, value, _) => Text('The square of ${a.value} is:')),
+          const SizedBox(height: 5),
+          square.toWidget((context, value, child) => Text('${square.value}')),
+          ElevatedButton(
+            onPressed: () => a.value = 0,
+            child: const Text('Clear')
+          )
+        ],
+      ),
+    );
+  }
+}
+```
+
+In the above example, the *content* cell of the `CellTextField` is set to a mutable computation cell,
+of which the computation function converts the value of cell `a` to a string. When the value of 
+`content` is set, when the user enters text in the text field, the reverse computation function is called
+which parses an integer from the value of `content` (the value entered in the text field) and sets the
+value of `a` to the parsed integer value. 
+
+The value of cell `a` is then further used to construct `Text` widgets which display its value and the
+square of its value. Whenever the text in the text field is changed, the widgets are rebuilt 
+automatically. 
+
+This was all achieved without "controller" objects, event handlers or calls to `setState`. Instead
+you can focus directly on implementing your application logic without worrying about synchronizing
+state between various "controller" objects, `ChangeNotifier`'s and widget `State` objects.
+
+**NOTE**:
+
+The reverse computation functions of mutable computational cells are called in a batch cell update.
+This means that if the values of multiple cells are assigned in the function, the actual recomputation
+of the cell values is done after the reverse computation function returns.
+
+For example:
+
+```dart
+final a = MutableCell(1.0);
+final b = MutableCell(2.0);
+
+final sum = [a, b].mutableComputeCell(() => a.value + b.value, (sum) {
+  final half = sum / 2;
+  
+  a.value = half;
+  b.value = half;
+});
+
+final product = a * b;
+```
+
+When setting the value of `sum` to `10`, the value of cells `a` and `b` is set to `5`, however
+the value of cell `product` is only recomputed after the values of both `a` and `b` have been set.
+
+That is when executing the following:
+
+```dart
+print(product.value) // Prints 2
+sum.value = 10;
+print(product.value) // Prints 25
+```
+
+the value of `product` is only recomputed when the reverse computation function of `sum` returns. In
+effect, this means that the value of `product` changes directly from `2` to `25` without producing
+any intermediate values after the value of `a` is set and before the value of `b` is set.
+
 ## Advanced
 
 ### Writing your own cells
