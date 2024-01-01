@@ -44,9 +44,24 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// Instead the observers of the modified cells are only notified when [fn]
   /// returns.
   static void batch(void Function() fn) {
-    _beginBatch();
-    fn();
-    _endBatch();
+    if (_batched) {
+      fn();
+    }
+    else {
+      _beginBatch();
+      fn();
+      _endBatch();
+    }
+  }
+
+  /// Add a cell to the batch update list.
+  ///
+  /// This method should be called by subclasses of [MutableCell] when
+  /// [value] is being set while [isBatchUpdate] is true. The observers of [cell]
+  /// are notified, by [notifyUpdate] after the batch update is complete.
+  @protected
+  static void addToBatch(MutableCell cell) {
+    _batchList.add(cell);
   }
 
   /// Private
