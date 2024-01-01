@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
@@ -64,23 +64,43 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   }
 
   set value(T value) {
+    if (_value == value) {
+      return;
+    }
+
+    _reverse = true;
+
     notifyWillUpdate();
     _value = value;
-    notifyUpdate();
 
-    unawaited(Future.delayed(Duration.zero, () {
-      MutableCell.batch(() {
-        reverseCompute(value);
-      });
-    }));
+    // TODO: Handle potential exceptions in reverseCompute
+
+    MutableCell.batch(() {
+      reverseCompute(value);
+    });
+
+    if (MutableCell.isBatchUpdate) {
+      MutableCell.addToBatch(this);
+    }
+    else {
+      notifyUpdate();
+    }
+
+    _reverse = false;
   }
 
   /// Private
 
   late T _value;
 
-  /// Should the cell's value be recomputed.
+  /// Is a reverse computation being performed?
+  var _reverse = false;
+
+  /// Should the cell's value be recomputed?
   var _stale = false;
+
+  /// Set of argument cells from which observer events should be suppressed
+  final Set<ValueCell> _suppressedArgs = HashSet();
 
   @override
   void init() {
@@ -102,21 +122,29 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
 
   @override
   void update(ValueCell cell) {
-    if (_stale) {
-      _stale = false;
+    if (_suppressedArgs.contains(cell)) {
+      _suppressedArgs.remove(cell);
+      return;
+    }
 
-      final newValue = compute();
+    _stale = false;
 
-      if (newValue != _value) {
-        _value = newValue;
-        notifyUpdate();
-      }
+    final newValue = compute();
+
+    if (newValue != _value) {
+      _value = newValue;
+      notifyUpdate();
     }
   }
 
   @override
   void willUpdate(ValueCell cell) {
-    _stale = true;
-    notifyWillUpdate();
+    if (_reverse) {
+      _suppressedArgs.add(cell);
+    }
+    else {
+      _stale = true;
+      notifyWillUpdate();
+    }
   }
 }
