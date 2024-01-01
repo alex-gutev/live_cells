@@ -63,6 +63,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
     return _value;
   }
 
+  @override
   set value(T value) {
     if (_value == value) {
       return;
