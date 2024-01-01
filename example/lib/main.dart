@@ -1,5 +1,6 @@
 import 'package:example/demos/basics_demo.dart';
 import 'package:example/demos/cell_text_field_demo.dart';
+import 'package:example/demos/cell_text_field_demo2.dart';
 import 'package:example/demos/compute_cell_demo1.dart';
 import 'package:example/demos/compute_cell_demo2.dart';
 import 'package:example/demos/compute_cell_demo3.dart';
@@ -156,6 +157,14 @@ class MyHomePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => CellTextFieldDemo()
+                          ));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('CellTextField 2'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => CellTextFieldDemo2()
                           ));
                         },
                       ),
