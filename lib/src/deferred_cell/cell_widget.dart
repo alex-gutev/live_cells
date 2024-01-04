@@ -64,6 +64,8 @@ part of 'deferred_cell.dart';
 ///    If they are referenced outside a cell creation function, only the method
 ///    [ValueCell.toWidget] may be called.
 abstract class CellWidget extends StatelessWidget {
+  CellWidget({super.key});
+
   /// Build the user interface represented by this widget.
   Widget buildChild(BuildContext context);
 

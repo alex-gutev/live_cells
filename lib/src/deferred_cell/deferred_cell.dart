@@ -52,14 +52,12 @@ class DeferredCell<T> implements ValueCell<T> {
     return _getCell().removeObserver(observer);
   }
 
-  @override
   Widget toWidget(ValueWidgetBuilder<T> builder, {
     Widget? child
   }) {
-    return Builder(builder: (context) => ValueListenableBuilder(
-        valueListenable: _getCell().listenable,
-        builder: builder,
-        child: child
+    return Builder(builder: (context) => _getCell().toWidget(
+      builder,
+      child: child
     ));
   }
 
@@ -82,7 +80,6 @@ class DeferredCell<T> implements ValueCell<T> {
       }
 
       _initCell(createCell());
-      print('Cell initialized $_cell');
     }
 
     return _cell;
