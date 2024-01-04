@@ -4,10 +4,10 @@ import 'package:live_cells/live_cells.dart';
 class ComputeCellDemo3 extends CellWidget {
   @override
   Widget buildChild(BuildContext context) {
-    final a = mutableDefer(() => MutableCell(0));
-    final b = mutableDefer(() => MutableCell(0));
+    final a = cell(() => MutableCell(0));
+    final b = cell(() => MutableCell(0));
 
-    final sum = defer(() => [a, b].computeCell(() => a.value + b.value));
+    final sum = cell(() => [a, b].computeCell(() => a.value + b.value));
 
     return Scaffold(
       appBar: AppBar(

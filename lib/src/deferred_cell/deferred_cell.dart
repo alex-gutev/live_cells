@@ -19,7 +19,7 @@ typedef CreateCell<T extends ValueCell> = T Function();
 ///
 /// **NOTE**: Calling any [ValueCell] method on this class, besides [eq], [neq]
 /// and [toWidget] will trigger the creation of the cell.
-class DeferredCell<T> implements ValueCell<T> {
+class DeferredCell<T> implements MutableCell<T> {
   /// Function which returns a fresh instance of the cell being deferred.
   final CreateCell<ValueCell<T>> createCell;
 
@@ -31,6 +31,13 @@ class DeferredCell<T> implements ValueCell<T> {
 
   @override
   T get value => _getCell().value;
+
+  @override
+  set value(T value) {
+    final cell = _getCell() as MutableCell<T>;
+
+    cell.value = value;
+  }
 
   @override
   void addObserver(CellObserver observer) {
@@ -76,7 +83,7 @@ class DeferredCell<T> implements ValueCell<T> {
   ValueCell<T> _getCell() {
     if (!_initialized) {
       if (_stopInit) {
-        throw Exception('DeferredCell referenced before initialization.');
+        throw StateError('DeferredCell referenced before initialization.');
       }
 
       _initCell(createCell());
@@ -90,29 +97,16 @@ class DeferredCell<T> implements ValueCell<T> {
     _cell = cell;
     _initialized = true;
   }
-}
-
-/// A [DeferredCell] which wraps a [MutableCell].
-class MutableDeferredCell<T> extends DeferredCell<T> implements MutableCell<T> {
-  MutableDeferredCell(super.createCell);
-
-  @override
-  set value(T value) {
-    _getMutableCell().value = value;
-  }
 
   @override
   void notifyUpdate() {
-    _getMutableCell().notifyUpdate();
+    final cell = _getCell() as MutableCell<T>;
+    cell.notifyUpdate();
   }
 
   @override
   void notifyWillUpdate() {
-    _getMutableCell().notifyWillUpdate();
-  }
-
-  MutableCell<T> _getMutableCell() {
-    final cell = _getCell();
-    return cell as MutableCell<T>;
+    final cell = _getCell() as MutableCell<T>;
+    cell.notifyWillUpdate();
   }
 }

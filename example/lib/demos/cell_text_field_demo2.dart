@@ -5,16 +5,16 @@ import 'package:live_cells/live_cells.dart';
 class CellTextFieldDemo2 extends CellWidget {
   @override
   Widget buildChild(BuildContext context) {
-    final a = mutableDefer(() => MutableCell(0));
+    final a = cell(() => MutableCell(0));
 
-    final content = mutableDefer(() => [a].mutableComputeCell(
+    final content = cell(() => [a].mutableComputeCell(
             () => a.value.toString(),
             (content) {
               a.value = int.tryParse(content) ?? 0;
             }
     ));
 
-    final square = defer(() => a * a);
+    final square = cell(() => a * a);
 
     return Scaffold(
       appBar: AppBar(

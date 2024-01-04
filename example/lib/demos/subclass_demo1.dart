@@ -19,11 +19,11 @@ class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
 class SubclassDemo1 extends CellWidget {
   @override
   Widget buildChild(BuildContext context) {
-    final a = mutableDefer(() => MutableCell(5));
+    final a = cell(() => MutableCell(5));
     final aMax = 10.cell;
     final aMin = 2.cell;
 
-    final clamped = defer(() => ClampCell(a, aMin, aMax));
+    final clamped = cell(() => ClampCell(a, aMin, aMax));
 
     return Scaffold(
       appBar: AppBar(

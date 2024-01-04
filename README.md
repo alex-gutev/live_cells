@@ -243,15 +243,13 @@ must be stored either in an object which is passed to the widgets in which they 
 member variables of a `StatelessWidget`. However, this can get a bit cumbersome which is where 
 `CellWidget` comes in handy.
 
-`CellWidget` is a `Widget` base class, like `StatelessWidget`, which provides to methods `defer` and
-`mutableDefer` which can be used to retrieve `ValueCell` instances that are persisted between builds
-of the widget.
+`CellWidget` is a `Widget` base class, like `StatelessWidget`, which provides the method `cell()`
+for retrieving a `ValueCell` instance that is persisted between builds of the widget.
 
-Subclasses of `CellWidget` implement the `buildChild` method (instead of `build`) and retrieve 
-instances to cells using `defer` or `mutableDefer` for mutable cells. Both `defer` and `mutableDefer`,
-take a cell creation function which is called during the first build of the widget to create the cell
-instance. Calls to `defer` and `mutableDefer` during subsequent builds return the same instance returned
-by the corresponding cell creation function during the first build.
+Subclasses of `CellWidget` implement the `buildChild()` method (instead of `build()`) and retrieve 
+instances to cells using `cell()`, which takes a cell creation function that is called during the 
+first build of the widget to create the cell instance. Calls to `cell()` during subsequent builds
+return the same instance returned by the corresponding cell creation function during the first build.
 
 This is best explained with an example.
 
@@ -259,9 +257,9 @@ This is best explained with an example.
 class Example extends CellWidget {
   @override
   Widget buildChild(BuildContext context) {
-    final n = mutableDefer(() => MutableCell(0));
+    final n = cell(() => MutableCell(0));
 
-    final factorial = defer(() => n.apply((n) {
+    final factorial = cell(() => n.apply((n) {
       var result = 1;
 
       for (var i = 2; i <= n; i++) {
@@ -297,13 +295,13 @@ class Example extends CellWidget {
 }
 ```
 
-In the example above `mutableDefer` is used to create a mutable cell, which will serve as the input,
+In the example above `cell()` is used to create a mutable cell, which serves as the input,
 that is assigned to `n`. The `MutableCell` is created during the first build and the same instance 
-is returned in all subsequent builds of the widget. Similarly, `defer` is used to create the computational
-cell for computing the factorial, which is then assigned to `factorial`. The `store` method is used
-to create a *store cell* so that the factorial is not recomputed when the cell's `value` is accessed 
-more than once. As with the mutable cell `n` the *factorial* cell is created during the first build
-of the widget, with the same instance returned in all subsequent builds.
+is returned in all subsequent builds of the widget. Similarly, the computational
+cell that computes the factorial is created using `cell()`, which is then assigned to `factorial`.
+The `store` method is used to create a *store cell* so that the factorial is not recomputed when the
+cell's `value` is accessed more than once. As with the mutable cell `n` the *factorial* cell is 
+created during the first build of the widget, with the same instance returned in all subsequent builds.
 
 ## Widgets Library
 
@@ -403,16 +401,16 @@ The above example can be used alongside `CellTextField` to create a text field f
 class IntTextFieldExample extends CellWidget {
   @override
   Widget buildChild(BuildContext context) {
-    final a = mutableDefer(() => MutableCell(0));
+    final a = cell(() => MutableCell(0));
 
-    final content = mutableDefer(() => [a].mutableComputeCell(
+    final content = cell(() => [a].mutableComputeCell(
             () => a.value.toString(),
             (content) {
               a.value = int.tryParse(content) ?? 0;
             }
     ));
 
-    final square = defer(() => a * a);
+    final square = cell(() => a * a);
 
     return Center(
       child: Column(

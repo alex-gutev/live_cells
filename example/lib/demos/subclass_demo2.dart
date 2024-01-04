@@ -41,7 +41,7 @@ class CountCell extends NotifierCell<int> {
 class SubclassDemo2 extends CellWidget {
   @override
   Widget buildChild(BuildContext context) {
-    final counter = defer(() => CountCell(10, interval: const Duration(seconds: 1)));
+    final counter = cell(() => CountCell(10, interval: const Duration(seconds: 1)));
 
     return Scaffold(
       appBar: AppBar(

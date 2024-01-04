@@ -4,9 +4,9 @@ import 'package:live_cells/live_cells.dart';
 class StoreCellDemo extends CellWidget {
   @override
   Widget buildChild(BuildContext context) {
-    final n = mutableDefer(() => MutableCell(0));
+    final n = cell(() => MutableCell(0));
 
-    final factorial = defer(() => n.apply((n) {
+    final factorial = cell(() => n.apply((n) {
       var result = 1;
 
       // This should only be printed once per change of value of n
