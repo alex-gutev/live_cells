@@ -400,22 +400,20 @@ which, the value of `a` is set.
 The above example can be used alongside `CellTextField` to create a text field for integer input only.
 
 ```dart
-class IntTextFieldExample extends StatefulWidget {
+class IntTextFieldExample extends CellWidget {
   @override
-  State<IntTextFieldExample> createState() => _IntTextFieldExampleState();
-}
+  Widget buildChild(BuildContext context) {
+    final a = mutableDefer(() => MutableCell(0));
 
-class _IntTextFieldExampleState extends State<IntTextFieldExample> {
-  final a = MutableCell(0);
+    final content = mutableDefer(() => [a].mutableComputeCell(
+            () => a.value.toString(),
+            (content) {
+          a.value = int.tryParse(content) ?? 0;
+        }
+    ));
 
-  late final content = [a].mutableComputeCell(() => a.value.toString(), (content) {
-    a.value = int.tryParse(content) ?? 0;
-  });
+    final square = defer(() => a * a);
 
-  late final square = a * a;
-
-  @override
-  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -430,8 +428,8 @@ class _IntTextFieldExampleState extends State<IntTextFieldExample> {
           const SizedBox(height: 5),
           square.toWidget((context, value, child) => Text('${square.value}')),
           ElevatedButton(
-            onPressed: () => a.value = 0,
-            child: const Text('Clear')
+              onPressed: () => a.value = 0,
+              child: const Text('Clear')
           )
         ],
       ),
