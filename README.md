@@ -408,8 +408,8 @@ class IntTextFieldExample extends CellWidget {
     final content = mutableDefer(() => [a].mutableComputeCell(
             () => a.value.toString(),
             (content) {
-          a.value = int.tryParse(content) ?? 0;
-        }
+              a.value = int.tryParse(content) ?? 0;
+            }
     ));
 
     final square = defer(() => a * a);
