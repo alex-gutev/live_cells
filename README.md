@@ -232,40 +232,78 @@ later the stored value is retrieved rather than recomputing the value.
 **NOTE**:
 
 For this to be effective a reference to the cell returned by `store()` has to be kept in 
-between builds of a widget. Typically you'd put the instance in a `final` member of the "state" class
-of a `StatefulWidget`. However this can get a bit cumbersome if the cell depends on other cells which
-are also `final` members.
+between builds of a widget. Typically you'd put the instance in a member variable of the `State` class
+of a `StatefulWidget`.
 
-The `CellBuilder` class is a widget which manages the creation of a cell so that you don't have to
-use a `StatefulWidget` just to keep a reference to a cell. The constructor takes a `create` function
-which is called to create the cell and a `builder` function which is called with the cell returned by
-`create` to build the widget.
+### CellWidget
 
-Example:
+`ValueCell`'s are objects which maintain a state that needs to be persisted between builds of a widget.
+This means they cannot be stored in local variables or member variables of a `StatelessWidget`. They 
+must be stored either in an object which is passed to the widgets in which they are used, or in
+member variables of a `StatelessWidget`. However, this can get a bit cumbersome which is where 
+`CellWidget` comes in handy.
+
+`CellWidget` is a `Widget` base class, like `StatelessWidget`, which provides to methods `defer` and
+`mutableDefer` which can be used to retrieve `ValueCell` instances that are persisted between builds
+of the widget.
+
+Subclasses of `CellWidget` implement the `buildChild` method (instead of `build`) and retrieve 
+instances to cells using `defer` or `mutableDefer` for mutable cells. Both `defer` and `mutableDefer`,
+take a cell creation function which is called during the first build of the widget to create the cell
+instance. Calls to `defer` and `mutableDefer` during subsequent builds return the same instance returned
+by the corresponding cell creation function during the first build.
+
+This is best explained with an example.
 
 ```dart
-CellBuilder(
-  create: () => n.apply((n) {
-    var result = 1;
-    
-    for (var i = 2; i <= n; i++) {
-      result *= i;
-    }
-    
-    return result;
-  }).store(),
+class Example extends CellWidget {
+  @override
+  Widget buildChild(BuildContext context) {
+    final n = mutableDefer(() => MutableCell(0));
 
-  builder: (context, factorial, _) => factorial.toWidget(...)
-);
+    final factorial = defer(() => n.apply((n) {
+      var result = 1;
+
+      for (var i = 2; i <= n; i++) {
+        result *= i;
+      }
+
+      return result;
+    }).store());
+
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        Row(
+            children: [
+              const Text('N:'),
+              const SizedBox(width: 5),
+              Expanded(
+                child: TextField(
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
+                  onChanged: (value) {
+                    n.value = int.tryParse(value) ?? 0;
+                  },
+                ),
+              )
+            ]
+        ),
+        const SizedBox(height: 10),
+        factorial.toWidget((context, fact, _) => Text('N! = $fact')),
+        factorial.toWidget((context, fact, child) => Text('The factorial of N is $fact'))
+      ],
+    );
+  }
+}
 ```
 
-The "factorial" cell is created in the `create` function and passed in the second argument to the
-`builder` function where it is converted to a widget. The `create` function is only called once
-when the `CellBuilder` widget is initialized.
-
-**NOTE**: `CellBuilder` does not rebuild its child widgets, i.e. it does not call the `builder`
-function, when the value of the cell returned by `create` changes. Its purpose is to manage the
-creation of cells not to listen to changes in their values.
+In the example above `mutableDefer` is used to create a mutable cell, which will serve as the input,
+that is assigned to `n`. The `MutableCell` is created during the first build and the same instance 
+is returned in all subsequent builds of the widget. Similarly, `defer` is used to create the computational
+cell for computing the factorial, which is then assigned to `factorial`. The `store` method is used
+to create a *store cell* so that the factorial is not recomputed when the cell's `value` is accessed 
+more than once. As with the mutable cell `n` the *factorial* cell is created during the first build
+of the widget, with the same instance returned in all subsequent builds.
 
 ## Widgets Library
 
