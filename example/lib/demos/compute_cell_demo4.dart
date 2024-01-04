@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
-class ComputeCellDemo4 extends StatefulWidget {
+class ComputeCellDemo4 extends CellWidget {
   @override
-  State<ComputeCellDemo4> createState() => _ComputeCellDemo4State();
-}
+  Widget buildChild(BuildContext context) {
+    final a = mutableDefer(() => MutableCell(0));
+    final b = mutableDefer(() => MutableCell(0));
 
-class _ComputeCellDemo4State extends State<ComputeCellDemo4> {
-  final a = MutableCell(0);
-  final b = MutableCell(0);
+    final sum = defer(() => a + b);
 
-  late final sum = a + b;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Computational Cells 4'),

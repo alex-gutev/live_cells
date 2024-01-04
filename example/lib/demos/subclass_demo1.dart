@@ -16,20 +16,15 @@ class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
   T get value => min(argMax.value, max(argMin.value, argValue.value));
 }
 
-class SubclassDemo1 extends StatefulWidget {
+class SubclassDemo1 extends CellWidget {
   @override
-  State<SubclassDemo1> createState() => _SubclassDemo1State();
-}
+  Widget buildChild(BuildContext context) {
+    final a = mutableDefer(() => MutableCell(5));
+    final aMax = 10.cell;
+    final aMin = 2.cell;
 
-class _SubclassDemo1State extends State<SubclassDemo1> {
-  final a = MutableCell(5);
-  final aMax = 10.cell;
-  final aMin = 2.cell;
+    final clamped = defer(() => ClampCell(a, aMin, aMax));
 
-  late final clamped = ClampCell(a, aMin, aMax);
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ValueCell Subclass Demo 1'),

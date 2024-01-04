@@ -2,22 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class CellTextFieldDemo2 extends StatefulWidget {
+class CellTextFieldDemo2 extends CellWidget {
   @override
-  State<CellTextFieldDemo2> createState() => _CellTextFieldDemo2State();
-}
+  Widget buildChild(BuildContext context) {
+    final a = mutableDefer(() => MutableCell(0));
 
-class _CellTextFieldDemo2State extends State<CellTextFieldDemo2> {
-  final a = MutableCell(0);
+    final content = mutableDefer(() => [a].mutableComputeCell(
+            () => a.value.toString(),
+            (content) {
+              a.value = int.tryParse(content) ?? 0;
+            }
+    ));
 
-  late final content = [a].mutableComputeCell(() => a.value.toString(), (content) {
-    a.value = int.tryParse(content) ?? 0;
-  });
+    final square = defer(() => a * a);
 
-  late final square = a * a;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('CellTextField Demo 2'),

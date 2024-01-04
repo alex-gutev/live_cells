@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
-class ComputeCellDemo3 extends StatefulWidget {
+class ComputeCellDemo3 extends CellWidget {
   @override
-  State<ComputeCellDemo3> createState() => _ComputeCellDemo3State();
-}
+  Widget buildChild(BuildContext context) {
+    final a = mutableDefer(() => MutableCell(0));
+    final b = mutableDefer(() => MutableCell(0));
 
-class _ComputeCellDemo3State extends State<ComputeCellDemo3> {
-  final a = MutableCell(0);
-  final b = MutableCell(0);
-  
-  late final sum = [a, b].computeCell(() => a.value + b.value);
-  
-  @override
-  Widget build(BuildContext context) {
+    final sum = defer(() => [a, b].computeCell(() => a.value + b.value));
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Computational Cells 3'),
@@ -33,18 +28,18 @@ class _ComputeCellDemo3State extends State<ComputeCellDemo3> {
               ),
               const SizedBox(height: 10),
               Row(
-                children: [
-                  const Text('A:'),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: TextField(
-                      keyboardType: const TextInputType.numberWithOptions(signed: true),
-                      onChanged: (value) {
-                        a.value = int.tryParse(value) ?? 0;
-                      },
-                    ),
-                  )
-                ]
+                  children: [
+                    const Text('A:'),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: TextField(
+                        keyboardType: const TextInputType.numberWithOptions(signed: true),
+                        onChanged: (value) {
+                          a.value = int.tryParse(value) ?? 0;
+                        },
+                      ),
+                    )
+                  ]
               ),
               Row(
                 children: [

@@ -38,40 +38,39 @@ class CountCell extends NotifierCell<int> {
   }
 }
 
-class SubclassDemo2 extends StatelessWidget {
+class SubclassDemo2 extends CellWidget {
   @override
-  Widget build(BuildContext context) {
-    return CellBuilder(
-      create: () => CountCell(10, interval: const Duration(seconds: 1)),
-      builder: (context, counter, _) => Scaffold(
-        appBar: AppBar(
-          title: const Text('ValueCell Subclass Demo 2'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Demonstration of subclass of ValueCell using resource management methods',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold
-                  ),
+  Widget buildChild(BuildContext context) {
+    final counter = defer(() => CountCell(10, interval: const Duration(seconds: 1)));
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ValueCell Subclass Demo 2'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Demonstration of subclass of ValueCell using resource management methods',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold
                 ),
-                const SizedBox(height: 10),
-                const Text('Counting to 10'),
-                const SizedBox(height: 10),
-                counter.toWidget((context, value, _) => Text(
+              ),
+              const SizedBox(height: 10),
+              const Text('Counting to 10'),
+              const SizedBox(height: 10),
+              counter.toWidget((context, value, _) => Text(
                   '$value',
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20
                   )
-                ))
-              ],
-            ),
+              ))
+            ],
           ),
         ),
       ),
