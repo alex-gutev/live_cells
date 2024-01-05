@@ -50,7 +50,7 @@ class CellSwitch extends StatefulWidget {
   const CellSwitch({
     super.key,
     required this.value,
-    required this.enabled,
+    this.enabled = true,
     this.activeColor,
     this.activeTrackColor,
     this.inactiveThumbColor,
