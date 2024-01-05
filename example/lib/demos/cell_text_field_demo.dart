@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 
-class CellTextFieldDemo extends StatefulWidget {
+class CellTextFieldDemo extends CellWidget {
   @override
-  State<CellTextFieldDemo> createState() => _CellTextFieldDemoState();
-}
+  Widget buildChild(BuildContext context) {
+    final name = cell(() => MutableCell(''));
 
-class _CellTextFieldDemoState extends State<CellTextFieldDemo> {
-  final name = MutableCell('');
-  
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('CellTextField Demo'),
