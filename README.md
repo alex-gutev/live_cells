@@ -251,7 +251,7 @@ instances to cells using `cell()`, which takes a cell creation function that is 
 first build of the widget to create the cell instance. Calls to `cell()` during subsequent builds
 return the same instance returned by the corresponding cell creation function during the first build.
 
-This is best explained with an example.
+This is best explained with an example:
 
 ```dart
 class Example extends CellWidget {
@@ -325,16 +325,11 @@ field is changed to reflect the value of the cell.
 Here's a simple example:
 
 ```dart
-class CellTextFieldExample extends StatefulWidget {
+class CellTextFieldExample extends CellWidget {
   @override
-  State<CellTextFieldExample> createState() => _CellTextFieldExampleState();
-}
+  Widget buildChild(BuildContext context) {
+    final name = cell(() => MutableCell(''));
 
-class _CellTextFieldExampleState extends State<CellTextFieldExample> {
-  final name = MutableCell('');
-
-  @override
-  Widget build(BuildContext context) {
     return Column(
       children: [
         Text('Enter your name:'),
@@ -353,7 +348,7 @@ class _CellTextFieldExampleState extends State<CellTextFieldExample> {
 Notice the `CellTextField` widget takes a `content` parameter, which is the content cell. This
 must be a `MutableCell` in order for its value to be set by the widget.
 
-A widget which depends on the content cell is created using `toWidget` in order to display
+A widget that depends on the content cell is created using `toWidget` in order to display
 the value entered in the text field in a `Text` widget.
 
 The "Clear" button clears the text field when pressed by setting the value of the content cell to 
