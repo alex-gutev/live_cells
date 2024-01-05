@@ -2,9 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
+/// A slider widget, similar to [Slider], of which the value is controlled by a [ValueCell].
+///
+/// The slider value is controlled by a [MutableCell] which is passed on
+/// construction. When the value of the cell changes, the slider position is
+/// updated to reflect the value of the cell. Similarly when the slider is moved
+/// by the user, the value of the cell is updated to reflect the slider position.
 class CellSlider extends StatefulWidget {
+  /// Slider value cell
   final MutableCell<double> value;
+
+  /// Is the widget enabled for user input?
   final bool enabled;
+
+  /// Fields from [Slider]
 
   final ValueChanged<double>? onChangeStart;
   final ValueChanged<double>? onChangeEnd;
@@ -24,6 +35,18 @@ class CellSlider extends StatefulWidget {
   final FocusNode? focusNode;
   final bool autofocus;
 
+  /// Create a CellSlider
+  ///
+  /// The only required parameter is [value], which is a [MutableCell] to which
+  /// the slider value is bound. When the cell's value changes the slider position
+  /// is updated to reflect the value of the cell, and similarly when the slider
+  /// is moved by the user, the cell's value is updated to reflect the slider
+  /// position.
+  ///
+  /// The [enabled] parameter controls whether the widget is enabled for user
+  /// input (true) or disabled (false).
+  ///
+  /// The remaining parameters are the same is in the [Slider] constructor.
   const CellSlider({
     super.key,
     required this.value,
