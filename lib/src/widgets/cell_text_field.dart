@@ -29,6 +29,8 @@ class CellTextField extends StatefulWidget {
   final StrutStyle? strutStyle;
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
+  final TextDirection? textDirection;
+  final bool readOnly;
   final bool? showCursor;
   final bool autofocus;
   final String obscuringCharacter;
@@ -83,13 +85,15 @@ class CellTextField extends StatefulWidget {
     super.key,
     required this.content,
     this.node,
-    this.decoration,
+    this.decoration = const InputDecoration(),
     this.keyboardType,
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
     this.style, this.strutStyle,
     this.textAlign = TextAlign.start,
     this.textAlignVertical,
+    this.textDirection,
+    this.readOnly = false,
     this.showCursor,
     this.autofocus = false,
     this.obscuringCharacter = '•',
@@ -182,6 +186,8 @@ class _CellTextFieldState extends State<CellTextField> {
       strutStyle: widget.strutStyle,
       textAlign: widget.textAlign,
       textAlignVertical: widget.textAlignVertical,
+      textDirection: widget.textDirection,
+      readOnly: widget.readOnly,
       showCursor: widget.showCursor,
       autofocus: widget.autofocus,
       obscuringCharacter: widget.obscuringCharacter,
