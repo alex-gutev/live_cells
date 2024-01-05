@@ -77,8 +77,8 @@ class CellTextField extends StatefulWidget {
   /// The only required parameter is [content] which is a [MutableCell] to which
   /// the content of the text field is bound. Whenever the cell's value changes
   /// the content is updated to reflect the cell value, and similarly when
-  /// the cell's value changes, the content of the text field is updated to
-  /// reflect the value of the cell.
+  /// the content of the text field is changed, the cell's value is updated to
+  /// reflect content.
   ///
   /// The remaining parameters are the same as in the constructor of [TextField].
   const CellTextField({
