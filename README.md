@@ -478,6 +478,29 @@ The value of `product` is recomputed only after the reverse computation function
 `product.value` changes directly from `2` to `25` without any intermediate values being produced between
 the assignments to cells `a` and `b`.
 
+### Batch Updates
+
+The values of multiple mutable cells can be set simultaneously using `MutableCell.batch`, just like
+in the reverse computation function of a mutable computational cell.
+
+```dart
+final a = MutableCell(1);
+final b = MutableCell(2);
+
+final c = a + b;
+
+MutableCell.batch(() {
+  a = 5;
+  b = 8;
+});
+```
+
+In the above example, the observers of cell's `a` and `b` are only notified after both their values
+are set. As a result the value of `c` changes from its initial value of `3` (`1 + 2`) directly to 
+`13` (`5` + `8`). If `MutableCell.batch` was not used, the value of `c` would be recomputed once
+after `a` is set to `5` and then again after `b` is set to `8`. As a result the value of `c` would
+change from `3` to `7` (`5` + `2`) and then to `8`.
+
 ## Advanced
 
 ### Writing your own cells
