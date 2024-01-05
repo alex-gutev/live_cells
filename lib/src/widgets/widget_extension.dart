@@ -44,5 +44,18 @@ extension ComputeWidgetExtension on List {
   ///
   /// The widget is defined by the function [builder], which is called to build
   /// the widget whenever the value of one of the cells in [this] is changed.
+  ///
+  /// Example:
+  ///
+  /// ````dart
+  /// final a = MutableCell(0);
+  /// final b = MutableCell(1);
+  /// final sum = a + b;
+  ///
+  /// ...
+  ///
+  /// final widget =
+  ///    [a, b, sum].computeWidget(() => Text('${a.value} + ${b.value} = ${sum.value}'))
+  /// ````
   Widget computeWidget(Widget Function() builder) => computeCell(builder).widget();
 }
