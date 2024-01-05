@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
+import 'package:live_cells/live_cells.dart';
 
 import '../base/cell_listenable.dart';
 import '../value_cell.dart';
 
-/// Provides functionality for creating [Widgets[ from ValueCells
+/// Provides functionality for creating [Widget]'s from [ValueCell]'s
 extension WidgetExtension<T> on ValueCell<T> {
   /// Create a [Widget] which depends on the cell's value.
   ///
@@ -26,4 +27,22 @@ extension WidgetExtension<T> on ValueCell<T> {
         child: child
     );
   }
+}
+
+/// Provides the [widget] method for directly creating a [Widget] from a [ValueCell] which holds a [Widget].
+extension WidgetCellExtension on ValueCell<Widget> {
+  /// Create a [Widget] out of the cell's value.
+  ///
+  /// The returned widget is automatically rebuilt whenever the cell's value
+  /// changes.
+  Widget widget() => toWidget((_, value, __) => value);
+}
+
+/// Extends [List] with a method for creating a [Widget] which is dependent on one or more [ValueCell]'s.
+extension ComputeWidgetExtension on List {
+  /// Create a [Widget] which is dependent on the [ValueCell]'s in [this].
+  ///
+  /// The widget is defined by the function [builder], which is called to build
+  /// the widget whenever the value of one of the cells in [this] is changed.
+  Widget computeWidget(Widget Function() builder) => computeCell(builder).widget();
 }
