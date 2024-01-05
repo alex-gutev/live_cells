@@ -3,7 +3,7 @@ import 'package:live_cells/live_cells.dart';
 
 /// A [ListTile] with a [CellRadio], akin to [RadioListTile].
 ///
-/// See [CellRadio] for a more detail explanation.
+/// See [CellRadio] for a more detailed explanation.
 class CellRadioListTile<T> extends StatefulWidget {
   /// Radio group value
   final MutableCell<T?> groupValue;
