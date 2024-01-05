@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
-/// A checkbox widget, similar to [Checkbox], of which the value is controlled by a [ValueCell].
+/// A [Checkbox] widget with the checkbox state controlled by a [ValueCell].
 ///
 /// The checkbox state is controlled by a [MutableCell] which is passed on
 /// construction. When the value of the cell changes, the checkbox state is
@@ -35,10 +35,8 @@ class CellCheckbox extends StatefulWidget {
 
   /// Create a CellCheckbox
   ///
-  /// The only required parameter is [value], which is a [MutableCell] to which
-  /// the checkbox state is bound. When the cell's value changes the checkbox state
-  /// is updated to reflect the value of the cell, and similarly when the checbkbox
-  /// state changes, the cell's value is updated to reflect the new state.
+  /// The only required parameter is [value] which is a [MutableCell] holding
+  /// the checkbox state.
   ///
   /// The [enabled] parameter controls whether the widget is enabled for user
   /// input (true) or disabled (false).
