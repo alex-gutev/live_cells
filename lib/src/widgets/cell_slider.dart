@@ -14,7 +14,7 @@ class CellSlider extends StatefulWidget {
   /// Is the widget enabled for user input?
   final bool enabled;
 
-  /// Fields from [Slider]
+  // Fields from [Slider]
 
   final ValueChanged<double>? onChangeStart;
   final ValueChanged<double>? onChangeEnd;

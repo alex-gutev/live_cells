@@ -15,7 +15,7 @@ class CellCheckbox extends StatefulWidget {
   /// Is the widget enabled for user input?
   final bool enabled;
 
-  /// Fields from [Checkbox]
+  // Fields from [Checkbox]
 
   final bool tristate;
   final MouseCursor? mouseCursor;

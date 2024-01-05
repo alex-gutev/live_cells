@@ -15,7 +15,7 @@ class CellRadio<T> extends StatefulWidget {
   /// Is the widget enabled for user input?
   final bool enabled;
 
-  /// Fields from [Radio]
+  // Fields from [Radio]
 
   final T value;
 

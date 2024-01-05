@@ -12,7 +12,7 @@ class CellCheckboxListTile extends StatefulWidget {
   /// Is the widget enabled for user input?
   final bool enabled;
 
-  /// Fields from [Checkbox]
+  // Fields from [CheckboxListTile]
 
   final bool tristate;
   final Color? activeColor;
@@ -44,7 +44,7 @@ class CellCheckboxListTile extends StatefulWidget {
   /// The [enabled] parameter controls whether the widget is enabled for user
   /// input (true) or disabled (false).
   ///
-  /// The remaining parameters are the same is in the [Checkbox] constructor.
+  /// The remaining parameters are the same is in the [CheckboxListTile] constructor.
   const CellCheckboxListTile({
     super.key,
     required this.value,

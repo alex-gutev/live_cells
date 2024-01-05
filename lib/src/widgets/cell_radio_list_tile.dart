@@ -11,7 +11,7 @@ class CellRadioListTile<T> extends StatefulWidget {
   /// Is the widget enabled for user input?
   final bool enabled;
 
-  /// Fields from [RadioListTile]
+  // Fields from [RadioListTile]
 
   final T value;
 
