@@ -2,6 +2,7 @@ import 'package:example/demos/basics_demo.dart';
 import 'package:example/demos/cell_checkbox_demo.dart';
 import 'package:example/demos/cell_radio_demo.dart';
 import 'package:example/demos/cell_slider_demo.dart';
+import 'package:example/demos/cell_switch_demo.dart';
 import 'package:example/demos/cell_text_field_demo.dart';
 import 'package:example/demos/cell_text_field_demo2.dart';
 import 'package:example/demos/compute_cell_demo1.dart';
@@ -184,6 +185,14 @@ class MyHomePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => CellCheckboxDemo()
+                          ));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('CellSwitch'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => CellSwitchDemo()
                           ));
                         },
                       ),
