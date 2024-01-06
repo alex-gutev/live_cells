@@ -884,6 +884,72 @@ void main() {
         '5 plus 6 = 11'
       ]));
     });
+
+    test('All StoreCell observers called correct number of times', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+      final sum = (a + b).store();
+
+      final c = (a + sum).store();
+      final d = sum + 2.cell;
+
+      final observerC = MockSimpleObserver();
+      final observerD = MockSimpleObserver();
+
+      c.addObserver(observerC);
+      d.addObserver(observerD);
+
+      MutableCell.batch(() {
+        a.value = 2;
+        b.value = 3;
+      });
+
+      MutableCell.batch(() {
+        a.value = 3;
+        b.value = 2;
+      });
+
+      MutableCell.batch(() {
+        a.value = 10;
+        b.value = 20;
+      });
+
+      verify(observerC.update(c)).called(3);
+      verify(observerD.update(d)).called(2);
+    });
+
+    test('Correct values produced with StoreCell across all observer cells', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+      final sum = (a + b).store();
+
+      final c = a + sum;
+      final d = sum + 2.cell;
+
+      final observerC = MockValueObserver();
+      final observerD = MockValueObserver();
+
+      c.addObserver(observerC);
+      d.addObserver(observerD);
+
+      MutableCell.batch(() {
+        a.value = 2;
+        b.value = 3;
+      });
+
+      MutableCell.batch(() {
+        a.value = 3;
+        b.value = 2;
+      });
+
+      MutableCell.batch(() {
+        a.value = 10;
+        b.value = 20;
+      });
+
+      expect(observerC.values, equals([7, 8, 40]));
+      expect(observerD.values, equals([7, 32]));
+    });
   });
 
   group('Cell initialization and cleanup', () {
