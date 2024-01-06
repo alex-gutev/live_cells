@@ -8,7 +8,7 @@ import 'package:live_cells/live_cells.dart';
 /// updated to reflect the value of the cell. Similarly when the state of the
 /// checkbox state is changed by the user, the value of the cell is updated to
 /// reflect the state.
-class CellCheckbox extends StatefulWidget {
+class CellCheckbox extends StatelessWidget {
   /// Checkbox state
   final MutableCell<bool?> value;
 
@@ -64,44 +64,28 @@ class CellCheckbox extends StatefulWidget {
   });
 
   @override
-  State<CellCheckbox> createState() => _CellCheckboxState();
-}
-
-class _CellCheckboxState extends State<CellCheckbox> {
-  var _suppressUpdate = false;
-
-  @override
   Widget build(BuildContext context) {
-    return widget.value.toWidget((_, value, __) => Checkbox(
-      value: value,
-      onChanged: widget.enabled ? _onChanged : null,
-      tristate: widget.tristate,
-      mouseCursor: widget.mouseCursor,
-      activeColor: widget.activeColor,
-      fillColor: widget.fillColor,
-      checkColor: widget.checkColor,
-      focusColor: widget.focusColor,
-      hoverColor: widget.hoverColor,
-      overlayColor: widget.overlayColor,
-      splashRadius: widget.splashRadius,
-      materialTapTargetSize: widget.materialTapTargetSize,
-      visualDensity: widget.visualDensity,
-      focusNode: widget.focusNode,
-      autofocus: widget.autoFocus,
-      shape: widget.shape,
-      side: widget.side
-    ));
-  }
+    return value.toWidget((_, state, __) => Checkbox(
+      value: state,
+      onChanged: enabled 
+          ? (state) => value.value = state
+          : null,
 
-  void _onChanged(bool? value) {
-    if (!_suppressUpdate) {
-      try {
-        _suppressUpdate = true;
-        widget.value.value = value;
-      }
-      finally {
-        _suppressUpdate = false;
-      }
-    }
+      tristate: tristate,
+      mouseCursor: mouseCursor,
+      activeColor: activeColor,
+      fillColor: fillColor,
+      checkColor: checkColor,
+      focusColor: focusColor,
+      hoverColor: hoverColor,
+      overlayColor: overlayColor,
+      splashRadius: splashRadius,
+      materialTapTargetSize: materialTapTargetSize,
+      visualDensity: visualDensity,
+      focusNode: focusNode,
+      autofocus: autoFocus,
+      shape: shape,
+      side: side
+    ));
   }
 }

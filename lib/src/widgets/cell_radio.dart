@@ -8,7 +8,7 @@ import 'package:live_cells/live_cells.dart';
 /// updated to reflect the value of the cell. Similarly when the radio button is
 /// selected by the user, the value of the group value cell is set to
 /// the [value] associated with the widget.
-class CellRadio<T> extends StatefulWidget {
+class CellRadio<T> extends StatelessWidget {
   /// Radio group value
   final MutableCell<T?> groupValue;
 
@@ -63,43 +63,26 @@ class CellRadio<T> extends StatefulWidget {
   });
 
   @override
-  State<CellRadio<T>> createState() => _CellRadioState<T>();
-}
-
-class _CellRadioState<T> extends State<CellRadio<T>> {
-  var _suppressUpdate = false;
-
-  @override
   Widget build(BuildContext context) {
-    return widget.groupValue.toWidget((_, groupValue, __) => Radio(
-      value: widget.value,
+    return groupValue.toWidget((_, groupValue, __) => Radio(
+      value: value,
       groupValue: groupValue,
-      onChanged: widget.enabled ? _onChanged : null,
+      onChanged: enabled
+          ? (T? value) => this.groupValue.value = value
+          : null,
 
-      mouseCursor: widget.mouseCursor,
-      toggleable: widget.toggleable,
-      activeColor: widget.activeColor,
-      fillColor: widget.fillColor,
-      focusColor: widget.focusColor,
-      hoverColor: widget.hoverColor,
-      overlayColor: widget.overlayColor,
-      splashRadius: widget.splashRadius,
-      materialTapTargetSize: widget.materialTapTargetSize,
-      visualDensity: widget.visualDensity,
-      focusNode: widget.focusNode,
-      autofocus: widget.autoFocus,
+      mouseCursor: mouseCursor,
+      toggleable: toggleable,
+      activeColor: activeColor,
+      fillColor: fillColor,
+      focusColor: focusColor,
+      hoverColor: hoverColor,
+      overlayColor: overlayColor,
+      splashRadius: splashRadius,
+      materialTapTargetSize: materialTapTargetSize,
+      visualDensity: visualDensity,
+      focusNode: focusNode,
+      autofocus: autoFocus,
     ));
-  }
-
-  void _onChanged(T? value) {
-    if (!_suppressUpdate) {
-      try {
-        _suppressUpdate = true;
-        widget.groupValue.value = value;
-      }
-      finally {
-        _suppressUpdate = false;
-      }
-    }
   }
 }

@@ -9,7 +9,7 @@ import 'package:live_cells/live_cells.dart';
 /// updated to reflect the value of the cell. Similarly when the switch is
 /// toggled by the user, the value of the state cell is updated to reflect
 /// the switch state.
-class CellSwitch extends StatefulWidget {
+class CellSwitch extends StatelessWidget {
   /// Switch state cell
   final MutableCell<bool> value;
 
@@ -73,48 +73,32 @@ class CellSwitch extends StatefulWidget {
   });
 
   @override
-  State<CellSwitch> createState() => _CellSwitchState();
-}
-
-class _CellSwitchState extends State<CellSwitch> {
-  var _suppress = false;
-  
-  @override
   Widget build(BuildContext context) {
-    return widget.value.toWidget((context, value, child) => Switch(
-      value: value,
-      onChanged: widget.enabled ? _onChanged : null,
-      activeColor: widget.activeColor,
-      activeTrackColor: widget.activeTrackColor,
-      inactiveThumbColor: widget.inactiveThumbColor,
-      inactiveTrackColor: widget.inactiveTrackColor,
-      activeThumbImage: widget.activeThumbImage,
-      onActiveThumbImageError: widget.onActiveThumbImageError,
-      inactiveThumbImage: widget.inactiveThumbImage,
-      onInactiveThumbImageError: widget.onActiveThumbImageError,
-      thumbColor: widget.thumbColor,
-      trackColor: widget.trackColor,
-      materialTapTargetSize: widget.materialTapTargetSize,
-      dragStartBehavior: widget.dragStartBehavior,
-      mouseCursor: widget.mouseCursor,
-      focusColor: widget.focusColor,
-      hoverColor: widget.hoverColor,
-      focusNode: widget.focusNode,
-      overlayColor: widget.overlayColor,
-      splashRadius: widget.splashRadius,
-      autofocus: widget.autofocus,
+    return value.toWidget((context, state, child) => Switch(
+      value: state,
+      onChanged: enabled
+          ? (state) => value.value = state
+          : null,
+
+      activeColor: activeColor,
+      activeTrackColor: activeTrackColor,
+      inactiveThumbColor: inactiveThumbColor,
+      inactiveTrackColor: inactiveTrackColor,
+      activeThumbImage: activeThumbImage,
+      onActiveThumbImageError: onActiveThumbImageError,
+      inactiveThumbImage: inactiveThumbImage,
+      onInactiveThumbImageError: onActiveThumbImageError,
+      thumbColor: thumbColor,
+      trackColor: trackColor,
+      materialTapTargetSize: materialTapTargetSize,
+      dragStartBehavior: dragStartBehavior,
+      mouseCursor: mouseCursor,
+      focusColor: focusColor,
+      hoverColor: hoverColor,
+      focusNode: focusNode,
+      overlayColor: overlayColor,
+      splashRadius: splashRadius,
+      autofocus: autofocus,
     ));
-  }
-  
-  void _onChanged(bool value) {
-    if (!_suppress) {
-      try {
-        _suppress = true;
-        widget.value.value = value;
-      }
-      finally {
-        _suppress = false;
-      }
-    }
   }
 }

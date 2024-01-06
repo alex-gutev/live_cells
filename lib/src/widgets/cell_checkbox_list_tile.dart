@@ -5,7 +5,7 @@ import 'package:live_cells/live_cells.dart';
 /// A [ListTile] with a [CellCheckbox], akin to [CheckboxListTile].
 ///
 /// See [CellCheckbox] for a more detailed explanation.
-class CellCheckboxListTile extends StatefulWidget {
+class CellCheckboxListTile extends StatelessWidget {
   /// Checkbox state
   final MutableCell<bool?> value;
 
@@ -72,50 +72,34 @@ class CellCheckboxListTile extends StatefulWidget {
   });
 
   @override
-  State<CellCheckboxListTile> createState() => _CellCheckboxListTileState();
-}
-
-class _CellCheckboxListTileState extends State<CellCheckboxListTile> {
-  var _suppressUpdate = false;
-
-  @override
   Widget build(BuildContext context) {
-    return widget.value.toWidget((_, value, __) => CheckboxListTile(
-      value: value,
-      onChanged: widget.enabled ? _onChanged : null,
-      tristate: widget.tristate,
-      activeColor: widget.activeColor,
-      checkColor: widget.checkColor,
-      visualDensity: widget.visualDensity,
-      focusNode: widget.focusNode,
-      autofocus: widget.autoFocus,
-      checkboxShape: widget.checkboxShape,
-      side: widget.side,
+    return value.toWidget((_, state, __) => CheckboxListTile(
+      value: state,
+      onChanged: enabled
+          ? (state) => value.value = state
+          : null,
 
-      title: widget.title,
-      subtitle: widget.subtitle,
-      isThreeLine: widget.isThreeLine,
-      dense: widget.dense,
-      secondary: widget.secondary,
-      selected: widget.selected,
-      controlAffinity: widget.controlAffinity,
-      contentPadding: widget.contentPadding,
-      shape: widget.shape,
-      tileColor: widget.tileColor,
-      selectedTileColor: widget.selectedTileColor,
-      enableFeedback: widget.enableFeedback,
+      tristate: tristate,
+      activeColor: activeColor,
+      checkColor: checkColor,
+      visualDensity: visualDensity,
+      focusNode: focusNode,
+      autofocus: autoFocus,
+      checkboxShape: checkboxShape,
+      side: side,
+
+      title: title,
+      subtitle: subtitle,
+      isThreeLine: isThreeLine,
+      dense: dense,
+      secondary: secondary,
+      selected: selected,
+      controlAffinity: controlAffinity,
+      contentPadding: contentPadding,
+      shape: shape,
+      tileColor: tileColor,
+      selectedTileColor: selectedTileColor,
+      enableFeedback: enableFeedback,
     ));
-  }
-
-  void _onChanged(bool? value) {
-    if (!_suppressUpdate) {
-      try {
-        _suppressUpdate = true;
-        widget.value.value = value;
-      }
-      finally {
-        _suppressUpdate = false;
-      }
-    }
   }
 }

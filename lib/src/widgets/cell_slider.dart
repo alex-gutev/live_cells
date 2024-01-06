@@ -7,7 +7,7 @@ import 'package:live_cells/live_cells.dart';
 /// construction. When the value of the cell changes, the slider position is
 /// updated to reflect the value of the cell. Similarly when the slider is moved
 /// by the user, the value of the cell is updated to reflect the slider position.
-class CellSlider extends StatefulWidget {
+class CellSlider extends StatelessWidget {
   /// Slider value cell
   final MutableCell<double> value;
 
@@ -66,43 +66,26 @@ class CellSlider extends StatefulWidget {
   });
 
   @override
-  State<CellSlider> createState() => _CellSliderState();
-}
-
-class _CellSliderState extends State<CellSlider> {
-  var _suppressUpdate = false;
-
-  @override
   Widget build(BuildContext context) {
-    return widget.value.toWidget((context, value, _) => Slider(
+    return value.toWidget((context, value, _) => Slider(
       value: value,
-      onChanged: widget.enabled ? _onChanged : null,
+      onChanged: enabled
+          ? (value) => this.value.value = value
+          : null,
 
-      onChangeStart: widget.onChangeStart,
-      onChangeEnd: widget.onChangeEnd,
-      min: widget.min,
-      max: widget.max,
-      divisions: widget.divisions,
-      label: widget.label,
-      activeColor: widget.activeColor,
-      inactiveColor: widget.inactiveColor,
-      thumbColor: widget.thumbColor,
-      mouseCursor: widget.mouseCursor,
-      semanticFormatterCallback: widget.semanticFormatterCallback,
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
+      onChangeStart: onChangeStart,
+      onChangeEnd: onChangeEnd,
+      min: min,
+      max: max,
+      divisions: divisions,
+      label: label,
+      activeColor: activeColor,
+      inactiveColor: inactiveColor,
+      thumbColor: thumbColor,
+      mouseCursor: mouseCursor,
+      semanticFormatterCallback: semanticFormatterCallback,
+      focusNode: focusNode,
+      autofocus: autofocus,
     ));
-  }
-
-  void _onChanged(double value) {
-    if (!_suppressUpdate) {
-      try {
-        _suppressUpdate = true;
-        widget.value.value = value;
-      }
-      finally {
-        _suppressUpdate = false;
-      }
-    }
   }
 }

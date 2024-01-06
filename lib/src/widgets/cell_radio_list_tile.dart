@@ -4,7 +4,7 @@ import 'package:live_cells/live_cells.dart';
 /// A [ListTile] with a [CellRadio], akin to [RadioListTile].
 ///
 /// See [CellRadio] for a more detailed explanation.
-class CellRadioListTile<T> extends StatefulWidget {
+class CellRadioListTile<T> extends StatelessWidget {
   /// Radio group value
   final MutableCell<T?> groupValue;
 
@@ -71,49 +71,32 @@ class CellRadioListTile<T> extends StatefulWidget {
   });
 
   @override
-  State<CellRadioListTile<T>> createState() => _CellRadioListTileState<T>();
-}
-
-class _CellRadioListTileState<T> extends State<CellRadioListTile<T>> {
-  var _suppressUpdate = false;
-
-  @override
   Widget build(BuildContext context) {
-    return widget.groupValue.toWidget((_, groupValue, __) => RadioListTile(
-      value: widget.value,
+    return groupValue.toWidget((_, groupValue, __) => RadioListTile(
+      value: value,
       groupValue: groupValue,
-      onChanged: widget.enabled ? _onChanged : null,
+      onChanged: enabled
+          ? (T? value) => this.groupValue.value = value
+          : null,
 
-      activeColor: widget.activeColor,
-      toggleable: widget.toggleable,
-      visualDensity: widget.visualDensity,
-      focusNode: widget.focusNode,
-      autofocus: widget.autoFocus,
+      activeColor: activeColor,
+      toggleable: toggleable,
+      visualDensity: visualDensity,
+      focusNode: focusNode,
+      autofocus: autoFocus,
 
-      title: widget.title,
-      subtitle: widget.subtitle,
-      isThreeLine: widget.isThreeLine,
-      dense: widget.dense,
-      secondary: widget.secondary,
-      selected: widget.selected,
-      controlAffinity: widget.controlAffinity,
-      contentPadding: widget.contentPadding,
-      shape: widget.shape,
-      tileColor: widget.tileColor,
-      selectedTileColor: widget.selectedTileColor,
-      enableFeedback: widget.enableFeedback,
+      title: title,
+      subtitle: subtitle,
+      isThreeLine: isThreeLine,
+      dense: dense,
+      secondary: secondary,
+      selected: selected,
+      controlAffinity: controlAffinity,
+      contentPadding: contentPadding,
+      shape: shape,
+      tileColor: tileColor,
+      selectedTileColor: selectedTileColor,
+      enableFeedback: enableFeedback,
     ));
-  }
-
-  void _onChanged(T? value) {
-    if (!_suppressUpdate) {
-      try {
-        _suppressUpdate = true;
-        widget.groupValue.value = value;
-      }
-      finally {
-        _suppressUpdate = false;
-      }
-    }
   }
 }

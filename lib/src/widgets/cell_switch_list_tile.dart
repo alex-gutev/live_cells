@@ -5,7 +5,7 @@ import 'package:live_cells/live_cells.dart';
 /// A [ListTile] with a [CellSwitch], akin to [SwitchListTile].
 ///
 /// See [CellSwitch] for a more detailed explanation.
-class CellSwitchListTile extends StatefulWidget {
+class CellSwitchListTile extends StatelessWidget {
   /// Switch state cell
   final MutableCell<bool> value;
 
@@ -74,51 +74,35 @@ class CellSwitchListTile extends StatefulWidget {
   });
 
   @override
-  State<CellSwitchListTile> createState() => _CellSwitchListTileState();
-}
-
-class _CellSwitchListTileState extends State<CellSwitchListTile> {
-  var _suppress = false;
-
-  @override
   Widget build(BuildContext context) {
-    return widget.value.toWidget((context, value, child) => SwitchListTile(
-      value: value,
-      onChanged: widget.enabled ? _onChanged : null,
-      activeColor: widget.activeColor,
-      activeTrackColor: widget.activeTrackColor,
-      inactiveThumbColor: widget.inactiveThumbColor,
-      inactiveTrackColor: widget.inactiveTrackColor,
-      activeThumbImage: widget.activeThumbImage,
-      inactiveThumbImage: widget.inactiveThumbImage,
-      hoverColor: widget.hoverColor,
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
+    return value.toWidget((context, state, child) => SwitchListTile(
+      value: state,
+      onChanged: enabled
+          ? (state) => value.value = state
+          : null,
 
-      title: widget.title,
-      subtitle: widget.subtitle,
-      isThreeLine: widget.isThreeLine,
-      dense: widget.dense,
-      secondary: widget.secondary,
-      selected: widget.selected,
-      controlAffinity: widget.controlAffinity,
-      contentPadding: widget.contentPadding,
-      shape: widget.shape,
-      tileColor: widget.tileColor,
-      selectedTileColor: widget.selectedTileColor,
-      enableFeedback: widget.enableFeedback,
+      activeColor: activeColor,
+      activeTrackColor: activeTrackColor,
+      inactiveThumbColor: inactiveThumbColor,
+      inactiveTrackColor: inactiveTrackColor,
+      activeThumbImage: activeThumbImage,
+      inactiveThumbImage: inactiveThumbImage,
+      hoverColor: hoverColor,
+      focusNode: focusNode,
+      autofocus: autofocus,
+
+      title: title,
+      subtitle: subtitle,
+      isThreeLine: isThreeLine,
+      dense: dense,
+      secondary: secondary,
+      selected: selected,
+      controlAffinity: controlAffinity,
+      contentPadding: contentPadding,
+      shape: shape,
+      tileColor: tileColor,
+      selectedTileColor: selectedTileColor,
+      enableFeedback: enableFeedback,
     ));
-  }
-
-  void _onChanged(bool value) {
-    if (!_suppress) {
-      try {
-        _suppress = true;
-        widget.value.value = value;
-      }
-      finally {
-        _suppress = false;
-      }
-    }
   }
 }
