@@ -44,23 +44,36 @@ class StoreCell<T> extends NotifierCell<T> implements CellObserver {
   /// The observed cell
   final ValueCell<T> valueCell;
 
+  /// Is the cell in the process of updating its value?
+  var _updating = false;
+
   /// Is the saved value outdated?
   var _stale = false;
+
+  /// Previous cell value at the start of current update cycle
+  T? _oldValue;
   
   @override
   void willUpdate(ValueCell cell) {
-    _stale = true;
-    notifyWillUpdate();
+    if (!_updating) {
+      _updating = true;
+      _stale = true;
+      _oldValue = super.value;
+
+      notifyWillUpdate();
+    }
   }
 
   @override
   void update(ValueCell cell) {
-    _stale = false;
-    final newValue = valueCell.value;
-    
-    if (newValue != value) {
-      setValue(newValue);
-      notifyUpdate();
+    if (_updating) {
+      if (value != _oldValue) {
+        notifyUpdate();
+      }
+
+      _stale = false;
+      _updating = false;
+      _oldValue = null;
     }
   }
 }
