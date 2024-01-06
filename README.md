@@ -303,7 +303,7 @@ The `store` method is used to create a *store cell* so that the factorial is not
 cell's `value` is accessed more than once. As with the mutable cell `n` the *factorial* cell is 
 created during the first build of the widget, with the same instance returned in all subsequent builds.
 
-The above example also introduces the [ComputeWidgetExtension.computeWidget] method which is used
+The above example also introduces the `ComputeWidgetExtension.computeWidget` method which is used
 to create a widget that is dependent on the values of multiple cells. Like `computeCell` the cells
 on which the widget depends are specified in a list and their values are accessed directly by their
 `value` properties within the widget builder function.
