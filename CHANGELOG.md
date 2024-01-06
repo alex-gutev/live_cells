@@ -38,3 +38,27 @@ Breaking changes:
 ## 0.2.3
 
 * Fix issue with `CellTextField`
+
+## 0.3.0
+
+New features:
+
+* Mutable computational cells
+* Batch updates
+* `CellWidget` base class for creating widgets make use of cells
+* `CellWidgetBuilder` for creating `CellWidget`'s without subclassing
+* New widgets in widgets library:
+  * `CellCheckbox`
+  * `CellCheckboxListTile`
+  * `CellRadio`
+  * `CellRadioListTile`
+  * `CellSlider`
+  * `CellSwitch`
+  * `CellSwitchListTile`
+* Shorthand `List.computeWidget` method for creating widgets which depend on multiple cells
+
+Breaking changes:
+
+* `MutableCell` is now an interface with a factory constructor
+* `CellObserver` interface methods now take *observed cell* as arguments
+* Removed `CellBuilder`
