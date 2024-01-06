@@ -59,7 +59,7 @@ part of 'deferred_cell.dart';
 ///    thosed used with [Builder] or [ValueListenableBuilder].
 /// 3. The cell returned by [cell] may only be referenced within a cell creation
 ///    function, used with [cell]. The only exception is converting the cell to
-///    a widget using [ValueCell.toWidget].
+///    a widget using [ValueCell.toWidget] or [ComputeWidgetExtension.computeWidget].
 abstract class CellWidget extends StatelessWidget {
   CellWidget({super.key});
 
@@ -98,7 +98,8 @@ abstract class CellWidget extends StatelessWidget {
   /// The returned [DeferredCell] will function as though its the cell returned
   /// by [create]. However, the [DeferredCell] may only be referenced within
   /// a cell creation function of [cell]. Outside of a cell creation function it
-  /// may only be used to call the [ValueCell.toWidget] method.
+  /// may only be used with the [ValueCell.toWidget] and
+  /// [ComputeWidgetExtension.computeWidget] methods.
   DeferredCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
     final cell = DeferredCell(create);
     _deferredCells.add(cell);
