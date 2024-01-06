@@ -287,8 +287,8 @@ class Example extends CellWidget {
             ]
         ),
         const SizedBox(height: 10),
-        factorial.toWidget((context, fact, _) => Text('N! = $fact')),
-        factorial.toWidget((context, fact, child) => Text('The factorial of N is $fact'))
+        [n, factorial].computeWidget(() => Text('${n.value}! = ${factorial.value}')),
+        [n, factorial].computeWidget(() => Text('The factorial of ${n.value} is ${factorial.value}'))
       ],
     );
   }
@@ -302,6 +302,11 @@ cell that computes the factorial is created using `cell()`, which is then assign
 The `store` method is used to create a *store cell* so that the factorial is not recomputed when the
 cell's `value` is accessed more than once. As with the mutable cell `n` the *factorial* cell is 
 created during the first build of the widget, with the same instance returned in all subsequent builds.
+
+The above example also introduces the [ComputeWidgetExtension.computeWidget] method which is used
+to create a widget that is dependent on the values of multiple cells. Like `computeCell` the cells
+on which the widget depends are specified in a list and their values are accessed directly by their
+`value` properties within the widget builder function.
 
 ## Widgets Library
 
