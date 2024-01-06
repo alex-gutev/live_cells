@@ -244,19 +244,17 @@ member variables of a `StatelessWidget`. However, this can get a bit cumbersome 
 `CellWidget` comes in handy.
 
 `CellWidget` is a `Widget` base class, like `StatelessWidget`, which provides the method `cell()`
-for retrieving a `ValueCell` instance that is persisted between builds of the widget.
-
-Subclasses of `CellWidget` implement the `buildChild()` method (instead of `build()`) and retrieve 
-instances to cells using `cell()`, which takes a cell creation function that is called during the 
-first build of the widget to create the cell instance. Calls to `cell()` during subsequent builds
-return the same instance returned by the corresponding cell creation function during the first build.
+for retrieving a `ValueCell` instance that is persisted between builds of the widget. During the
+first build of the widget, calls to `cell()` create a new cell instance using the provided cell
+creation function. Calls to `cell()` during subsequent builds return the same instance 
+that was returned by the corresponding cell creation function during the first build.
 
 This is best explained with an example:
 
 ```dart
 class Example extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final n = cell(() => MutableCell(0));
 
     final factorial = cell(() => n.apply((n) {
@@ -341,7 +339,7 @@ Here's a simple example:
 ```dart
 class CellTextFieldExample extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final name = cell(() => MutableCell(''));
 
     return Column(
@@ -406,7 +404,7 @@ The above example can be used alongside `CellTextField` to create a text field f
 ```dart
 class IntTextFieldExample extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final a = cell(() => MutableCell(0));
 
     final content = cell(() => [a].mutableComputeCell(
