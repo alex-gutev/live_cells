@@ -70,6 +70,7 @@ abstract class CellWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     try {
       DeferredCell._stopInit = true;
+      _deferredCells.clear();
       final child = buildChild(context);
 
       return _DeferredCellBuilder(
