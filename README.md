@@ -319,8 +319,17 @@ most notable being `TextField` which requires a `TextEditingController` to be ab
 content. Controller objects are problematic because they adopt an imperative paradigm rather than
 the reactive paradigm adopted by Flutter making them difficult and clunky to use.
 
-The `live_cell_widgets` library provides wrappers around commonly used widgets which replace
-controller objects with cell objects.
+The `live_cell_widgets` library provides wrappers around commonly used widgets which allow the
+widget state to be controlled and accessed by cell objects. The following widgets are provided:
+
+* `CellCheckbox` - A `Checkbox` with the `value` property controlled by a cell
+* `CellCheckboxListTile` - A `CheckboxListTile` with the `value` property controlled by a cell
+* `CellRadio` - A `Radio` with the `groupValue` property controlled by a cell
+* `CellRadioListTile` - A `RadioListTile` with the `groupValue` property controlled by a cell`
+* `CellSlider` - A `Slider` with the `value` property controlled by a cell
+* `CellSwitch` - A `Switch` with the `value` property controlled by a cell
+* `CellSwitchListTile` - A `SwitchListTile` with the `value` property controlled by a cell
+* `CellTextField` - A `TextField` where the content is controlled by a cell instead of a `TextEditingController`
 
 The `CellTextField` widget is a wrapper around `TextField` which takes a "content cell" parameter,
 instead of a controller. When the user enters text in the text field, the value of the content
@@ -358,9 +367,6 @@ the value entered in the text field in a `Text` widget.
 
 The "Clear" button clears the text field when pressed by setting the value of the content cell to 
 the empty string.
-
-Currently only a wrapper for `TextField` is provided. The aim for future release is to provide a 
-cell-based interface to all widgets which take a controller object.
 
 ### Mutable Computational Cells
 
