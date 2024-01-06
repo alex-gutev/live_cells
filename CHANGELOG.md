@@ -62,3 +62,7 @@ Breaking changes:
 * `MutableCell` is now an interface with a factory constructor
 * `CellObserver` interface methods now take *observed cell* as arguments
 * Removed `CellBuilder`
+
+## 0.3.1
+
+* Bug fixes
