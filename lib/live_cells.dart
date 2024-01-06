@@ -21,5 +21,5 @@ export 'src/extensions/values_extension.dart'
     show NumValueCellExtension, StringValueCellExtension;
 export 'src/async_cell/delay_cell.dart' show DelayCell;
 export 'src/widgets/widget_extension.dart' show WidgetExtension, WidgetCellExtension, ComputeWidgetExtension;
-export 'src/deferred_cell/deferred_cell.dart' show DeferredCell, CellWidget;
+export 'src/deferred_cell/cell_widget.dart' show CellWidget;
 export 'src/deferred_cell/cell_widget_builder.dart' show CellWidgetBuilder;

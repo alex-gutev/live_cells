@@ -5,7 +5,7 @@ import 'package:live_cells/live_cells.dart';
 
 class CellSwitchDemo extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final state = cell(() => MutableCell(true));
 
     return Scaffold(

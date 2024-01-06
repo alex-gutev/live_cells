@@ -1,27 +1,30 @@
-part of 'deferred_cell.dart';
+import 'package:flutter/widgets.dart';
 
-/// Base class for widget which manages one or more [ValueCell] instances.
+import '../mutable_cell/mutable_cell.dart';
+import '../value_cell.dart';
+import 'proxy_cell.dart';
+
+/// Cell creation function.
 ///
-/// This usage of this class is similar to [StatelessWidget] however subclasses
-/// should override the [buildChild] method instead of [build].
+/// The cell is called with no arguments and should return a [ValueCell].
+typedef CreateCell<T extends ValueCell> = T Function();
+
+/// Base class for a widget which manages one or more [ValueCell] instances.
 ///
-/// Within [buildChild] the [cell] method can be used to obtain an instance of
+/// The [cell] method can be used within [build] to obtain an instance of
 /// a [ValueCell] that is persisted between builds of the widget.
 ///
-/// In the first call to [buildChild] every call to [cell] will create a new
-/// [ValueCell] instance using the corresponding cell creation function passed
-/// as an argument.
-///
-/// In subsequent calls to [buildChild], calls to [cell] return the existing
-/// [ValueCell] instance created using the corresponding cell creation function
-/// during a previous call to [buildChild]
+/// During the first build every call to [cell] will create a new [ValueCell] 
+/// instance using the provided cell creation function. In subsequent builds
+/// calls to [cell] return the existing instance that was created during the
+/// first build using the corresponding cell creation function.
 ///
 /// Example:
 ///
 /// ````dart
 /// class Example extends CellWidget {
 ///   @override
-///   Widget buildChild(BuildContext context) {
+///   Widget build(BuildContext context) {
 ///     final a = cell(() => MutableCell(0));
 ///     final b = cell(() => MutableCell(1));
 ///
@@ -56,110 +59,85 @@ part of 'deferred_cell.dart';
 ///
 /// 1. Calls to [cell] must not appear within conditionals or loops.
 /// 2. Calls to [cell] must not appear within widget builder functions, such as
-///    thosed used with [Builder] or [ValueListenableBuilder].
-/// 3. The cell returned by [cell] may only be referenced within a cell creation
-///    function, used with [cell]. The only exception is converting the cell to
-///    a widget using [ValueCell.toWidget] or [ComputeWidgetExtension.computeWidget].
+///    those used with [Builder] or [ValueListenableBuilder].
 abstract class CellWidget extends StatelessWidget {
-  CellWidget({super.key});
-
-  /// Build the user interface represented by this widget.
-  Widget buildChild(BuildContext context);
-
-  @override
-  Widget build(BuildContext context) {
-    try {
-      DeferredCell._stopInit = true;
-      _deferredCells.clear();
-      final child = buildChild(context);
-
-      return _DeferredCellBuilder(
-          deferredCells: _deferredCells,
-          child: child
-      );
-    }
-    finally {
-      DeferredCell._stopInit = false;
-    }
-  }
+  const CellWidget({super.key});
 
   /// Return an instance of a [ValueCell] that is kept between builds of the widget.
   ///
-  /// This function is intended to be used with [buildChild] to create and
+  /// This function is intended to be used within [build] to create and
   /// retrieve an instance of a [ValueCell], so that the same instance will be
-  /// returned across calls to [buildChild].
+  /// returned across calls to [build].
   ///
-  /// In the first call to [buildChild]: every call to [cell] will result in a
-  /// new [ValueCell] instance being created by calling the corresponding [create]
-  /// function.
-  ///
-  /// In subsequent calls to [buildChild], [cell] returns the existing [ValueCell]
-  /// instance previously created using the corresponding [create] function.
-  ///
-  /// The returned [DeferredCell] will function as though its the cell returned
-  /// by [create]. However, the [DeferredCell] may only be referenced within
-  /// a cell creation function of [cell]. Outside of a cell creation function it
-  /// may only be used with the [ValueCell.toWidget] and
-  /// [ComputeWidgetExtension.computeWidget] methods.
-  DeferredCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
-    final cell = DeferredCell(create);
-    _deferredCells.add(cell);
+  /// During the first build of the widget every call to [cell] will result in a
+  /// new [ValueCell] instance being created by calling the provided [create]
+  /// function. In subsequent calls to builds, [cell] returns the existing
+  /// [ValueCell] instance that was created during the first build using the 
+  /// corresponding [create] function.
+  MutableCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
+    final cell = _activeCellElement!.getCell(create);
+    _activeCellElement!.nextCell();
 
     return cell;
   }
 
+  @override
+  StatelessElement createElement() => _CellWidgetElement(this);
+
   /// Private
-
-  final List<DeferredCell> _deferredCells = [];
+  
+  /// The element of the [CellWidget] currently being built.
+  static _CellWidgetElement? _activeCellElement;
 }
 
-/// Keeps track of deferred [ValueCell] instances between builds.
-class _DeferredCellBuilder extends StatefulWidget {
-  /// List of deferred cell proxy objects
-  final List<DeferredCell> deferredCells;
+/// Widget element for [CellWidget]
+/// 
+/// Keeps track of the cell instances that were created during the lifetime of
+/// the widget.
+class _CellWidgetElement extends StatelessElement {
+  _CellWidgetElement(super.widget);
+  
+  /// List of created cells
+  final List<ProxyCell> _cells = [];
+  
+  /// Index of cell to retrieve/create when calling [getCell]
+  var _curCell = 0;
 
-  final Widget child;
+  /// Retrieve/create the current cell.
+  /// 
+  /// If there is no cell instance at the current cell index, [create] is called
+  /// to create a new instance. Calling [getCell] again at the current cell index
+  /// returns the existing cell instance.
+  /// 
+  /// The cell index can be advanced using [nextCell].
+  ProxyCell<T> getCell<T>(CreateCell<ValueCell<T>> create) {
+    if (_curCell < _cells.length) {
+      return _cells[_curCell] as ProxyCell<T>;
+    }
 
-  /// Create a new deferred cell builder with a list of [DeferredCell]'s.
+    final cell = ProxyCell(create());
+    _cells.add(cell);
+
+    return cell;
+  }
+
+  /// Advance the cell index by 1.
   ///
-  /// On the first build the deferred cells in [deferredCells] are created
-  /// using their respective cell creation functions. In subsequent builds, the
-  /// [deferredCells] are assigned the corresponding [ValueCell] instances from
-  /// the previous build.
-  ///
-  /// It is an error to pass a [deferredCells] list that is of a different
-  /// length than what was previously passed.
-  const _DeferredCellBuilder({
-    super.key,
-    required this.deferredCells,
-    required this.child
-  });
-
-  @override
-  State<_DeferredCellBuilder> createState() => _DeferredCellBuilderState();
-}
-
-class _DeferredCellBuilderState extends State<_DeferredCellBuilder> {
-  late final List<ValueCell> _cells;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _cells = widget.deferredCells.map((e) => e._getCell()).toList();
+  /// Calling [getCell] after [nextCell] will retrieve the cell at the next
+  /// cell index.
+  void nextCell() {
+    _curCell++;
   }
 
   @override
-  void didUpdateWidget(covariant _DeferredCellBuilder oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    assert(_cells.length == widget.deferredCells.length);
-
-    for (var i = 0; i < widget.deferredCells.length; i++) {
-      widget.deferredCells[i]._initCell(_cells[i]);
+  Widget build() {
+    try {
+      _curCell = 0;
+      CellWidget._activeCellElement = this;
+      return super.build();
+    }
+    finally {
+      CellWidget._activeCellElement = null;
     }
   }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }

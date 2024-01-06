@@ -3,7 +3,7 @@ import 'package:live_cells/live_cells.dart';
 
 class StoreCellDemo extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final n = cell(() => MutableCell(0));
 
     final factorial = cell(() => n.apply((n) {

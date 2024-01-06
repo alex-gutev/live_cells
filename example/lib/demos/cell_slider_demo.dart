@@ -5,7 +5,7 @@ import 'package:live_cells/live_cells.dart';
 
 class CellSliderDemo extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final n = cell(() => MutableCell(2.0));
 
     return Scaffold(

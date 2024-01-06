@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
-import 'deferred_cell.dart';
+import 'cell_widget.dart';
 
-/// A [CellWidget] of which the [buildChild] method can be specified by a [builder] function.
+/// A [CellWidget] of which the [build] method is implemented by a [builder] function.
 ///
 /// This allows you to define and keep references to [ValueCell]'s between builds,
 /// using [CellWidget.cell] without having to subclass [CellWidget].
@@ -16,13 +16,13 @@ class CellWidgetBuilder extends CellWidget {
   final Widget Function(BuildContext context, CellWidget cellWidget) builder;
 
   /// Create a [CellWidget] with [buildChild] defined by a [builder] function.
-  CellWidgetBuilder({
+  const CellWidgetBuilder({
     super.key,
     required this.builder
   });
 
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     return builder(context, this);
   }
 }

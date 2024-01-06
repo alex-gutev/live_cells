@@ -18,7 +18,7 @@ class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
 
 class SubclassDemo1 extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final a = cell(() => MutableCell(5));
     final aMax = 10.cell;
     final aMin = 2.cell;

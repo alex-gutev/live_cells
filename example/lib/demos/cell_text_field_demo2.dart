@@ -4,7 +4,7 @@ import 'package:live_cells/live_cells.dart';
 
 class CellTextFieldDemo2 extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final a = cell(() => MutableCell(0));
 
     final content = cell(() => [a].mutableComputeCell(

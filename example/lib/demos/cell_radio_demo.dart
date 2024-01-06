@@ -26,7 +26,7 @@ extension RadioOptionExtension on RadioOption {
 
 class CellRadioDemo extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final option = cell(() => MutableCell<RadioOption?>(RadioOption.optionB));
 
     return Scaffold(

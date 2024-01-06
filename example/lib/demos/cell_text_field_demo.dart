@@ -4,7 +4,7 @@ import 'package:live_cells/live_cell_widgets.dart';
 
 class CellTextFieldDemo extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final name = cell(() => MutableCell(''));
 
     return Scaffold(

@@ -3,7 +3,7 @@ import 'package:live_cells/live_cells.dart';
 
 class ComputeCellDemo3 extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final a = cell(() => MutableCell(0));
     final b = cell(() => MutableCell(0));
 

@@ -40,7 +40,7 @@ class CountCell extends NotifierCell<int> {
 
 class SubclassDemo2 extends CellWidget {
   @override
-  Widget buildChild(BuildContext context) {
+  Widget build(BuildContext context) {
     final counter = cell(() => CountCell(10, interval: const Duration(seconds: 1)));
 
     return Scaffold(
