@@ -30,7 +30,7 @@ class DelayCell<T> extends NotifierCell<T> implements CellObserver {
 
   /// Private
 
-  /// Time delay before notifying listeners
+  /// Time delay before notifying observers
   final Duration delay;
 
   /// Observed value cell
