@@ -66,3 +66,7 @@ Breaking changes:
 ## 0.3.1
 
 * Bug fixes
+
+## 0.4.0
+
+* Simplify implementation of `CellWidget`. Subclasses now override `build` instead of `buildChild`.
