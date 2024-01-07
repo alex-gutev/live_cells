@@ -7,7 +7,7 @@ class ComputeCellDemo3 extends CellWidget {
     final a = cell(() => MutableCell(0));
     final b = cell(() => MutableCell(0));
 
-    final sum = cell(() => [a, b].computeCell(() => a.value + b.value));
+    final sum = cell(() => ValueCell.computed(() => a() + b()));
 
     return Scaffold(
       appBar: AppBar(

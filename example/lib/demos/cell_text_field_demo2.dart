@@ -7,12 +7,9 @@ class CellTextFieldDemo2 extends CellWidget {
   Widget build(BuildContext context) {
     final a = cell(() => MutableCell(0));
 
-    final content = cell(() => [a].mutableComputeCell(
-            () => a.value.toString(),
-            (content) {
-              a.value = int.tryParse(content) ?? 0;
-            }
-    ));
+    final content = cell(() => MutableCell.computed(() => a().toString(), (content) {
+      a.value = int.tryParse(content) ?? 0;
+    }));
 
     final square = cell(() => a * a);
 
