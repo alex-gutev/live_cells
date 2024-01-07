@@ -1356,23 +1356,6 @@ void main() {
       expect(b.value, equals(6));
     });
 
-    test('MutableComputeCell.value recomputed when value of argument cell changes', () {
-      final a = MutableCell(1);
-      final b = [a].mutableComputeCell(
-          () => a.value + 1,
-          (b) {
-            a.value = b - 1;
-          }
-      );
-
-      final observer = MockSimpleObserver();
-
-      b.addObserver(observer);
-      a.value = 5;
-
-      expect(b.value, equals(6));
-    });
-
     test('MutableComputeCell.value recomputed when value of 1st argument cell changes', () {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
@@ -1698,6 +1681,440 @@ void main() {
 
       expect(observerC.values, equals([7, 8, 40]));
       expect(observerD.values, equals([7, 32]));
+    });
+  });
+
+  group('DynamicMutableComputeCell', () {
+    test('DynamicMutableComputeCell.value computed on construction', () {
+      final a = MutableCell(1);
+      final b = MutableCell.computed(() => a() + 1, (b) {
+        a.value = b - 1;
+      });
+
+      expect(b.value, equals(2));
+    });
+
+    test('DynamicMutableComputeCell.value recomputed when value of argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell.computed(() => a() + 1, (b) {
+        a.value = b - 1;
+      });
+
+      final observer = MockSimpleObserver();
+
+      b.addObserver(observer);
+      a.value = 5;
+
+      expect(b.value, equals(6));
+    });
+
+    test('DynamicMutableComputeCell.value recomputed when value of 1st argument cell changes', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final observer = MockSimpleObserver();
+
+      c.addObserver(observer);
+      a.value = 5;
+
+      expect(c.value, equals(8));
+    });
+
+    test('DynamicMutableComputeCell.value recomputed when value of 2nd argument cell changes', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final observer = MockSimpleObserver();
+
+      c.addObserver(observer);
+      b.value = 9;
+
+      expect(c.value, equals(10));
+    });
+
+    test('DynamicMutableComputeCell observers notified when value is recomputed', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final observer = MockSimpleObserver();
+
+      c.addObserver(observer);
+      b.value = 9;
+      a.value = 10;
+
+      verify(observer.update(c)).called(2);
+    });
+
+    test('DynamicMutableComputeCell observer not called after it is removed', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
+
+      c.addObserver(observer1);
+      c.addObserver(observer2);
+      b.value = 9;
+
+      c.removeObserver(observer1);
+      a.value = 10;
+
+      verify(observer1.update(c)).called(1);
+      verify(observer2.update(c)).called(2);
+    });
+
+    test('Setting DynamicMutableComputeCell.value updates values of argument cells', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      c.value = 10;
+
+      expect(a.value, equals(5));
+      expect(b.value, equals(5));
+      expect(c.value, equals(10));
+    });
+
+    test('Setting DynamicMutableComputeCell.value calls observers of MutableCell and argument cells', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final observerA = MockSimpleObserver();
+      final observerB = MockSimpleObserver();
+      final observerC = MockSimpleObserver();
+
+      a.addObserver(observerA);
+      b.addObserver(observerB);
+      c.addObserver(observerC);
+
+      c.value = 10;
+
+      verify(observerA.update(a)).called(1);
+      verify(observerB.update(b)).called(1);
+      verify(observerC.update(c)).called(1);
+    });
+
+    test('Observers of DynamicMutableComputeCell and argument cells called every time value is set', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final observerA = MockSimpleObserver();
+      final observerB = MockSimpleObserver();
+      final observerC = MockSimpleObserver();
+
+      a.addObserver(observerA);
+      b.addObserver(observerB);
+      c.addObserver(observerC);
+
+      c.value = 10;
+      c.value = 12;
+
+      verify(observerA.update(a)).called(2);
+      verify(observerB.update(b)).called(2);
+      verify(observerC.update(c)).called(2);
+    });
+
+    test('Consistency of values maintained when setting DynamicMutableComputeCell.value in batch update', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final d = MutableCell(50);
+      final e = ValueCell.computed(() => c() + d());
+
+      final observerA = MockValueObserver();
+      final observerB = MockValueObserver();
+      final observerC = MockValueObserver();
+      final observerE = MockValueObserver();
+
+      a.addObserver(observerA);
+      b.addObserver(observerB);
+      c.addObserver(observerC);
+      e.addObserver(observerE);
+
+      MutableCell.batch(() {
+        c.value = 10;
+        d.value = 9;
+      });
+
+      expect(observerA.values, equals([5]));
+      expect(observerB.values, equals([5]));
+      expect(observerC.values, equals([10]));
+      expect(observerE.values, equals([19]));
+    });
+
+    test('Observers notified correct number of times when setting DynamicMutableComputeCell.value in batch update', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = MutableCell.computed(() => a() + b(), (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      });
+
+      final d = MutableCell(50);
+      final e = ValueCell.computed(() => c() + d());
+
+      final observerA = MockValueObserver();
+      final observerB = MockValueObserver();
+      final observerC = MockValueObserver();
+      final observerE = MockValueObserver();
+
+      a.addObserver(observerA);
+      b.addObserver(observerB);
+      c.addObserver(observerC);
+      e.addObserver(observerE);
+
+      MutableCell.batch(() {
+        c.value = 10;
+        d.value = 9;
+      });
+
+      verify(observerA.update(a)).called(1);
+      verify(observerB.update(b)).called(1);
+      verify(observerC.update(c)).called(1);
+      verify(observerE.update(e)).called(1);
+    });
+
+    test('All DynamicMutableComputeCell observers called correct number of times', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final sum = MutableCell.computed(() => a() + b(), (sum) {
+        final half = sum ~/ 2;
+        a.value = half;
+        b.value = half;
+      });
+
+      final c = (a + sum).store();
+      final d = sum + 2.cell;
+
+      final observerC = MockSimpleObserver();
+      final observerD = MockSimpleObserver();
+
+      c.addObserver(observerC);
+      d.addObserver(observerD);
+
+      MutableCell.batch(() {
+        a.value = 2;
+        b.value = 3;
+      });
+
+      MutableCell.batch(() {
+        a.value = 3;
+        b.value = 2;
+      });
+
+      MutableCell.batch(() {
+        a.value = 10;
+        b.value = 20;
+      });
+
+      verify(observerC.update(c)).called(3);
+      verify(observerD.update(d)).called(2);
+    });
+
+    test('Correct values produced with DynamicMutableComputeCell across all observer cells', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final sum = MutableCell.computed(() => a() + b(), (sum) {
+        final half = sum ~/ 2;
+        a.value = half;
+        b.value = half;
+      });
+
+      final c = ValueCell.computed(() => a() + sum());
+      final d = ValueCell.computed(() => sum() + 2);
+
+      final observerC = MockValueObserver();
+      final observerD = MockValueObserver();
+
+      c.addObserver(observerC);
+      d.addObserver(observerD);
+
+      MutableCell.batch(() {
+        a.value = 2;
+        b.value = 3;
+      });
+
+      MutableCell.batch(() {
+        a.value = 3;
+        b.value = 2;
+      });
+
+      MutableCell.batch(() {
+        a.value = 10;
+        b.value = 20;
+      });
+
+      expect(observerC.values, equals([7, 8, 40]));
+      expect(observerD.values, equals([7, 32]));
+    });
+
+
+    test('DynamicMutableComputeCell arguments tracked correctly when using conditionals', () {
+      final a = MutableCell(true);
+      final b = MutableCell(2);
+      final c = MutableCell(3);
+
+      final d = MutableCell.computed(() => a() ? b() : c(), (d) {
+        a.value = true;
+        b.value = d;
+        c.value = d;
+      });
+
+      final observer = MockValueObserver();
+      d.addObserver(observer);
+
+      b.value = 1;
+      a.value = false;
+      c.value = 10;
+
+      expect(observer.values, equals([1, 3, 10]));
+    });
+
+    test('DynamicMutableComputeCell arguments tracked correctly when argument is a DynamicComputeCell', () {
+      final a = MutableCell(true);
+      final b = MutableCell(2);
+      final c = MutableCell(3);
+
+      final d = MutableCell.computed(() => a() ? b() : c(), (d) {
+        a.value = true;
+        b.value = d;
+        c.value = d;
+      });
+
+      final e = MutableCell(0);
+
+      final f = MutableCell.computed(() => d() + e(), (f) {
+        final half = f ~/ 2;
+
+        d.value = half;
+        e.value = half;
+      });
+
+      final observer = MockValueObserver();
+      f.addObserver(observer);
+
+      b.value = 1;
+      e.value = 10;
+      a.value = false;
+      c.value = 10;
+
+      expect(observer.values, equals([1, 11, 13, 20]));
+    });
+
+    test('No intermediate values are produced when using DynamicMutableComputeCell and branches are unequal', () {
+      final a = MutableCell(0);
+
+      final sum1 = MutableCell.computed(() => a() + 1, (v) {
+        // Reverse computation not necessary for this test
+      });
+      final sum = MutableCell.computed(() => sum1() + 10, (v) {
+        // Reverse computation not necessary for this test
+      });
+
+      final prod = MutableCell.computed(() => a() * 8, (v) {
+        // Reverse computation not necessary for this test
+      });
+      final result = MutableCell.computed(() => sum() + prod(), (v) {
+        // Reverse computation not necessary for this test
+      });
+
+      final observer = MockValueObserver();
+      result.addObserver(observer);
+
+      a.value = 2;
+      a.value = 6;
+
+      expect(observer.values, equals([(2 + 1 + 10) + (2 * 8), (6 + 1 + 10) + (6 * 8)]));
+    });
+
+    test('No intermediate values are produced when using MutableCell.batch and DynamicMutableComputeCell', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+      final c = MutableCell(3);
+      final select = MutableCell(true);
+
+      final sum = MutableCell.computed(() => a() + b(), (v) {
+        // Reverse computation not necessary for this test
+      });
+      final result = MutableCell.computed(() => select() ? c() : sum(), (v) {
+        // Reverse computation not necessary for this test
+      });
+
+      final observer = MockValueObserver();
+      result.addObserver(observer);
+
+      MutableCell.batch(() {
+        select.value = true;
+        c.value = 10;
+        a.value = 5;
+      });
+
+      MutableCell.batch(() {
+        b.value = 20;
+        select.value = false;
+      });
+
+      expect(observer.values, equals([10, 25]));
     });
   });
 
