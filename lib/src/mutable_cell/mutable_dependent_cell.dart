@@ -113,6 +113,8 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   void init() {
     super.init();
 
+    _stale = true;
+
     for (final dependency in arguments) {
       dependency.addObserver(this);
     }
