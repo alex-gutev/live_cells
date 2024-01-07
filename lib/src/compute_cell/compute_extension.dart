@@ -48,6 +48,6 @@ extension ListComputeExtension on List {
       MutableComputeCell(
           compute: compute,
           reverseCompute: reverse,
-          arguments: cast<MutableCell>()
+          arguments: cast<MutableCell>().toSet()
       );
 }

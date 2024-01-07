@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:live_cells/src/compute_cell/dynamic_mutable_compute_cell.dart';
 
 import '../base/notifier_cell.dart';
 import '../value_cell.dart';
@@ -7,6 +8,39 @@ import '../value_cell.dart';
 abstract class MutableCell<T> extends ValueCell<T> {
   /// Create a mutable cell with its value initialized to [value]
   factory MutableCell(T value) => _MutableCellImpl(value);
+
+  /// Create a computational cell which can also have its value set directly.
+  ///
+  /// The [compute] function is called to compute the value of the cell as a
+  /// function of one or more argument cells. Any cell referenced in [compute]
+  /// by the [call] method is considered an argument cell. Any change in the
+  /// value of an argument cell will result in the value of the returned cell
+  /// being recomputed.
+  ///
+  /// **NOTE**: All argument cells referenced in [compute] must be [MutableCell]'s.
+  ///
+  /// Additionally this cell can also have its value changed by setting the
+  /// [value] property directly. When the [value] property is set, [reverse]
+  /// is called, with the newly assigned value. [reverse] should set the values
+  /// of the argument cells such that calling [compute] again will produce the
+  /// same value that was assigned to the [value] property.
+  ///
+  /// [reverse] is called in a batch update, by [batch], so that the values of
+  /// the argument cells are set simultaneously.
+  ///
+  /// Example:
+  ///
+  /// ```dart
+  /// final a = MutableCell(1);
+  /// final b = MutableCell.computed(() => a() + 1, (b) => {
+  ///   a.value = b - 1;
+  /// });
+  /// ```
+  factory MutableCell.computed(T Function() compute, void Function(T value) reverse) =>
+      DynamicMutableComputeCell(
+          compute: compute,
+          reverseCompute: reverse
+      );
 
   /// Set the value of the cell.
   ///
