@@ -1,3 +1,4 @@
+import 'package:live_cells/src/compute_cell/dynamic_compute_cell.dart';
 import 'package:live_cells/src/compute_cell/mutable_compute_cell.dart';
 
 import '../mutable_cell/mutable_cell.dart';
