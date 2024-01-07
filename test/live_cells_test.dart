@@ -452,6 +452,176 @@ void main() {
     });
   });
 
+  group('DynamicComputeCell', () {
+    test('DynamicComputeCell function applied on ConstantCell value', () {
+      final a = 1.cell;
+      final b = ValueCell.computed(() => a() + 1);
+
+      expect(b.value, equals(2));
+    });
+
+    test('DynamicComputeCell reevaluated when value of argument cell changes', () {
+      final a = MutableCell(1);
+      final b = ValueCell.computed(() => a() + 1);
+
+      final observer = MockSimpleObserver();
+      b.addObserver(observer);
+
+      a.value = 5;
+
+      expect(b.value, equals(6));
+    });
+
+    test('N-ary DynamicComputeCell reevaluated when value of 1st argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ValueCell.computed(() => a() + b());
+
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
+
+      a.value = 5;
+
+      expect(c.value, equals(7));
+    });
+
+    test('N-ary DynamicComputeCell reevaluated when value of 2nd argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ValueCell.computed(() => a() + b());
+
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
+
+      b.value = 8;
+
+      expect(c.value, equals(9));
+    });
+
+    test('DynamicComputeCell observers notified when value of 1st argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ValueCell.computed(() => a() + b());
+
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
+
+      a.value = 8;
+
+      verify(observer.update(c)).called(1);
+    });
+
+    test('DynamicComputeCell observers notified when value of 2nd argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ValueCell.computed(() => a() + b());
+
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
+
+      b.value = 8;
+
+      verify(observer.update(c)).called(1);
+    });
+
+    test('DynamicComputeCell observers notified for each change of value of argument cell', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ValueCell.computed(() => a() + b());
+
+      final observer = MockSimpleObserver();
+      c.addObserver(observer);
+
+      b.value = 8;
+      a.value = 10;
+      b.value = 100;
+
+      verify(observer.update(c)).called(3);
+    });
+
+    test('DynamicComputeCell observer not called after it is removed', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ValueCell.computed(() => a() + b());
+
+      final observer = MockSimpleObserver();
+
+      c.addObserver(observer);
+      a.value = 8;
+
+      c.removeObserver(observer);
+      b.value = 10;
+      a.value = 100;
+
+      verify(observer.update(c)).called(1);
+    });
+
+    test('All DynamicComputeCell observers called when value changes', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final c = ValueCell.computed(() => a() + b());
+
+      final observer1 = MockSimpleObserver();
+      final observer2 = MockSimpleObserver();
+
+      c.addObserver(observer1);
+      a.value = 8;
+
+      c.addObserver(observer2);
+      b.value = 10;
+      a.value = 100;
+
+      verify(observer1.update(c)).called(3);
+      verify(observer2.update(c)).called(2);
+    });
+    
+    test('DynamicComputeCell arguments tracked correctly when using conditionals', () {
+      final a = MutableCell(true);
+      final b = MutableCell(2);
+      final c = MutableCell(3);
+      
+      final d = ValueCell.computed(() => a() ? b() : c());
+
+      final observer = MockValueObserver();
+      d.addObserver(observer);
+
+      b.value = 1;
+      a.value = false;
+      c.value = 10;
+
+      expect(observer.values, equals([1, 3, 10]));
+    });
+
+    test('DynamicComputeCell arguments tracked correctly when argument is a DynamicComputeCell', () {
+      final a = MutableCell(true);
+      final b = MutableCell(2);
+      final c = MutableCell(3);
+
+      final d = ValueCell.computed(() => a() ? b() : c());
+
+      final e = MutableCell(0);
+
+      final f = ValueCell.computed(() => d() + e());
+
+      final observer = MockValueObserver();
+      f.addObserver(observer);
+
+      b.value = 1;
+      e.value = 10;
+      a.value = false;
+      c.value = 10;
+
+      expect(observer.values, equals([1, 11, 13, 20]));
+    });
+  });
+
   group('StoreCell', () {
     test('StoreCell takes value of argument cell', () {
       final a = MutableCell('hello');
