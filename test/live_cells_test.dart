@@ -987,10 +987,40 @@ void main() {
       a.value = 2;
       a.value = 6;
 
-      verifyInOrder([
-        observer.gotValue((2 + 1 + 10) + (2 * 8)),
-        observer.gotValue((6 + 1 + 10) + (6 * 8)),
-      ]);
+      expect(observer.values, equals([(2 + 1 + 10) + (2 * 8), (6 + 1 + 10) + (6 * 8)]));
+    });
+
+    test('No intermediate values are produced when using DynamicComputeCell', () {
+      final a = MutableCell(0);
+      final sum = ValueCell.computed(() => a() + 1);
+      final prod = ValueCell.computed(() => a() * 8);
+      final result = ValueCell.computed(() => sum() + prod());
+
+      final observer = MockValueObserver();
+      result.addObserver(observer);
+
+      a.value = 2;
+      a.value = 6;
+
+      expect(observer.values, equals([(2 + 1) + (2 * 8), (6 + 1) + (6 * 8)]));
+    });
+
+    test('No intermediate values are produced when using DynamicComputeCell and branches are unequal', () {
+      final a = MutableCell(0);
+
+      final sum1 = ValueCell.computed(() => a() + 1);
+      final sum = ValueCell.computed(() => sum1() + 10);
+
+      final prod = ValueCell.computed(() => a() * 8);
+      final result = ValueCell.computed(() => sum() + prod());
+
+      final observer = MockValueObserver();
+      result.addObserver(observer);
+
+      a.value = 2;
+      a.value = 6;
+
+      expect(observer.values, equals([(2 + 1 + 10) + (2 * 8), (6 + 1 + 10) + (6 * 8)]));
     });
 
     test('No intermediate values are produced when using MutableCell.batch', () {
@@ -1053,6 +1083,32 @@ void main() {
         '1 + 2 = 3',
         '5 plus 6 = 11'
       ]));
+    });
+
+    test('No intermediate values are produced when using MutableCell.batch and DynamicComputeCell', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+      final c = MutableCell(3);
+      final select = MutableCell(true);
+
+      final sum = ValueCell.computed(() => a() + b());
+      final result = ValueCell.computed(() => select() ? c() : sum());
+
+      final observer = MockValueObserver();
+      result.addObserver(observer);
+
+      MutableCell.batch(() {
+        select.value = true;
+        c.value = 10;
+        a.value = 5;
+      });
+
+      MutableCell.batch(() {
+        b.value = 20;
+        select.value = false;
+      });
+
+      expect(observer.values, equals([10, 25]));
     });
 
     test('All StoreCell observers called correct number of times', () {
