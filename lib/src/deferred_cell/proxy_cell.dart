@@ -19,6 +19,9 @@ class ProxyCell<T> implements MutableCell<T> {
   }
 
   @override
+  T call() => _cell();
+
+  @override
   void addObserver(CellObserver observer) {
     _cell.addObserver(observer);
   }
