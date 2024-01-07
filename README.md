@@ -240,7 +240,7 @@ of a `StatefulWidget`.
 `ValueCell`'s are objects which maintain a state that needs to be persisted between builds of a widget.
 This means they cannot be stored in local variables or member variables of a `StatelessWidget`. They 
 must be stored either in an object which is passed to the widgets in which they are used, or in
-member variables of a `StatelessWidget`. However, this can get a bit cumbersome which is where 
+member variables of a widget `State` class. However, this can get a bit cumbersome which is where
 `CellWidget` comes in handy.
 
 `CellWidget` is a `Widget` base class, like `StatelessWidget`, which provides the method `cell()`
@@ -426,9 +426,9 @@ class IntTextFieldExample extends CellWidget {
             keyboardType: TextInputType.numberWithOptions(decimal: false),
           ),
           const SizedBox(height: 10),
-          a.toWidget((context, value, _) => Text('The square of ${a.value} is:')),
+          a.toWidget((context, value, _) => Text('The square of $value is:')),
           const SizedBox(height: 5),
-          square.toWidget((context, value, child) => Text('${square.value}')),
+          square.toWidget((context, value, _) => Text('$value')),
           ElevatedButton(
               onPressed: () => a.value = 0,
               child: const Text('Clear')
