@@ -65,6 +65,8 @@ class DynamicComputeCell<T> extends ManagedCell<T> with CellListeners<T>, CellEq
   void init() {
     super.init();
 
+    _stale = true;
+
     for (final argument in _arguments) {
       argument.addObserver(this);
     }
