@@ -30,7 +30,7 @@ class MutableComputedCellDemo2 extends CellWidget with CellInitializer {
                 children: [
                   Expanded(
                     child: CellTextField(
-                      content: cell(() => a.toMutableString()),
+                      content: cell(() => a.mutableString()),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -39,7 +39,7 @@ class MutableComputedCellDemo2 extends CellWidget with CellInitializer {
                   const SizedBox(width: 5),
                   Expanded(
                     child: CellTextField(
-                      content: cell(() => b.toMutableString()),
+                      content: cell(() => b.mutableString()),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -48,7 +48,7 @@ class MutableComputedCellDemo2 extends CellWidget with CellInitializer {
                   const SizedBox(width: 5),
                   Expanded(
                     child: CellTextField(
-                      content: cell(() => sum.toMutableString()),
+                      content: cell(() => sum.mutableString()),
                       keyboardType: TextInputType.number,
                     ),
                   )

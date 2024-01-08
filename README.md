@@ -296,15 +296,15 @@ print(a.value + 1); // Prints 101
 ```
 
 The above definition will prove useful when implementing a text field for numeric input. In-fact, this
-library already provides a definition for this cell with the `toMutableString` extension
+library already provides a definition for this cell with the `mutableString` extension
 method on `MutableCell`'s holding `int`, `double` and `num` values.
 
 ```dart
 final a = MutableCell<num>(0);
-final strA = a.toMutableString();
+final strA = a.mutableString();
 ```
 
-We can now reimplement the *sum* example from earlier using `CellTextField` and `toMutableString`:
+We can now reimplement the *sum* example from earlier using `CellTextField` and `mutableString`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -317,8 +317,8 @@ class ComputedExample extends CellWidget with CellInitializer {
     final a = cell(() => MutableCell<num>(0));
     final b = cell(() => MutableCell<num>(0));
 
-    final strA = cell(() => a.toMutableString());
-    final strB = cell(() => b.toMutableString());
+    final strA = cell(() => a.mutableString());
+    final strB = cell(() => b.mutableString());
 
     final sum = cell(() => a + b);
 
@@ -367,7 +367,7 @@ class ComputedExample extends CellWidget with CellInitializer {
 }
 ```
 
-In the above example two mutable computed cells `strA` and `strB` are created using `toMutableString`,
+In the above example two mutable computed cells `strA` and `strB` are created using `mutableString`,
 which are used as the content cells for the text fields for `a` and `b` respectively. There is also
 a "Reset" button which resets the values of cells `a` and `b` to 0 when pressed. When the values of
 `a` and `b` are set, the value of `sum` is automatically recomputed and the content of the text
@@ -452,7 +452,7 @@ class ComputedExample extends CellWidget with CellInitializer {
           children: [
             Expanded(
               child: CellTextField(
-                content: cell(() => a.toMutableString()),
+                content: cell(() => a.mutableString()),
                 keyboardType: TextInputType.number,
               ),
             ),
@@ -461,7 +461,7 @@ class ComputedExample extends CellWidget with CellInitializer {
             const SizedBox(width: 5),
             Expanded(
               child: CellTextField(
-                content: cell(() => b.toMutableString()),
+                content: cell(() => b.mutableString()),
                 keyboardType: TextInputType.number,
               ),
             ),
@@ -470,7 +470,7 @@ class ComputedExample extends CellWidget with CellInitializer {
             const SizedBox(width: 5),
             Expanded(
               child: CellTextField(
-                content: cell(() => sum.toMutableString()),
+                content: cell(() => sum.mutableString()),
                 keyboardType: TextInputType.number,
               ),
             )

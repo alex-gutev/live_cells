@@ -2119,9 +2119,9 @@ void main() {
   });
 
   group('Type Conversions', () {
-    test('ParseIntExtension.toMutableString() converts argument cell to string', () {
+    test('ParseIntExtension.mutableString() converts argument cell to string', () {
       final a = MutableCell(1);
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockSimpleObserver();
       strA.addObserver(observer);
@@ -2131,9 +2131,9 @@ void main() {
       expect(strA.value, equals('5'));
     });
 
-    test('ParseIntExtension.toMutableString() sets argument cell to parsed integer', () {
+    test('ParseIntExtension.mutableString() sets argument cell to parsed integer', () {
       final a = MutableCell(1);
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockSimpleObserver();
       strA.addObserver(observer);
@@ -2143,9 +2143,9 @@ void main() {
       expect(a.value, equals(32));
     });
 
-    test('ParseDoubleExtension.toMutableString() converts argument cell to string', () {
+    test('ParseDoubleExtension.mutableString() converts argument cell to string', () {
       final a = MutableCell(1.0);
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockSimpleObserver();
       strA.addObserver(observer);
@@ -2155,9 +2155,9 @@ void main() {
       expect(strA.value, equals('7.5'));
     });
 
-    test('ParseDoubleExtension.toMutableString() sets argument cell to parsed double', () {
+    test('ParseDoubleExtension.mutableString() sets argument cell to parsed double', () {
       final a = MutableCell(1.0);
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockSimpleObserver();
       strA.addObserver(observer);
@@ -2167,9 +2167,9 @@ void main() {
       expect(a.value, equals(3.5));
     });
 
-    test('ParseNumExtension.toMutableString() converts argument cell to string', () {
+    test('ParseNumExtension.mutableString() converts argument cell to string', () {
       final a = MutableCell<num>(1);
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockValueObserver();
       strA.addObserver(observer);
@@ -2180,9 +2180,9 @@ void main() {
       expect(observer.values, equals(['7.5', '3']));
     });
 
-    test('ParseNumExtension.toMutableString() sets argument cell to parsed num', () {
+    test('ParseNumExtension.mutableString() sets argument cell to parsed num', () {
       final a = MutableCell<num>(1);
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockValueObserver();
       a.addObserver(observer);
@@ -2193,9 +2193,9 @@ void main() {
       expect(observer.values, equals([3.5, 100]));
     });
 
-    test('ConvertStringExtension.toMutableString() converts argument cell to string', () {
+    test('ConvertStringExtension.mutableString() converts argument cell to string', () {
       final a = MutableCell('');
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockSimpleObserver();
       strA.addObserver(observer);
@@ -2205,9 +2205,9 @@ void main() {
       expect(strA.value, equals('hello'));
     });
 
-    test('ConvertStringExtension.toMutableString() simply sets argument cell value', () {
+    test('ConvertStringExtension.mutableString() simply sets argument cell value', () {
       final a = MutableCell('');
-      final strA = a.toMutableString();
+      final strA = a.mutableString();
 
       final observer = MockSimpleObserver();
       strA.addObserver(observer);

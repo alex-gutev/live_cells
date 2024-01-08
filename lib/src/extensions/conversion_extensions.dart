@@ -8,7 +8,7 @@ extension ParseIntExtension on MutableCell<int> {
   /// The returned cell is a mutable computed cell. If the value of the returned
   /// cell is set explicitly, an integer is parsed from the assigned string
   /// value and is assigned to this cell's value.
-  MutableCell<String> toMutableString() =>
+  MutableCell<String> mutableString() =>
       [this].mutableComputeCell(() => value.toString(), (value) {
         this.value = int.tryParse(value) ?? 0;
       });
@@ -21,7 +21,7 @@ extension ParseDoubleExtension on MutableCell<double> {
   /// The returned cell is a mutable computed cell. If the value of the returned
   /// cell is set explicitly, an integer is parsed from the assigned string
   /// value and is assigned to this cell's value.
-  MutableCell<String> toMutableString() =>
+  MutableCell<String> mutableString() =>
       [this].mutableComputeCell(() => value.toString(), (value) {
         this.value = double.tryParse(value) ?? 0.0;
       });
@@ -34,14 +34,14 @@ extension ParseNumExtension on MutableCell<num> {
   /// The returned cell is a mutable computed cell. If the value of the returned
   /// cell is set explicitly, a [num] is parsed from the assigned string
   /// value and is assigned to this cell's value.
-  MutableCell<String> toMutableString() =>
+  MutableCell<String> mutableString() =>
       [this].mutableComputeCell(() => value.toString(), (value) {
         this.value = num.tryParse(value) ?? 0;
       });
 }
 
-/// Provides the [toMutableString] method for String cells
+/// Provides the [mutableString] method for String cells
 extension ConvertStringExtension on MutableCell<String> {
   /// Simply returns this cell
-  MutableCell<String> toMutableString() => this;
+  MutableCell<String> mutableString() => this;
 }

@@ -8,8 +8,8 @@ class MutableComputedCellDemo extends CellWidget with CellInitializer {
     final a = cell(() => MutableCell<num>(0));
     final b = cell(() => MutableCell<num>(0));
 
-    final strA = cell(() => a.toMutableString());
-    final strB = cell(() => b.toMutableString());
+    final strA = cell(() => a.mutableString());
+    final strB = cell(() => b.mutableString());
 
     final sum = cell(() => a + b);
 
