@@ -102,23 +102,24 @@ class _WidgetCellElement extends StatelessElement {
 /// [CellObserver] that calls a callback when all argument cells have updated
 /// their values.
 class _WidgetCellObserver extends CellObserver {
+  /// Callback function to call
   final VoidCallback listener;
 
-  final Set<ValueCell> _dirty = HashSet();
+  /// Are the argument cells in the process of updating their values?
+  var _isUpdating = false;
 
   _WidgetCellObserver(this.listener);
 
   @override
   void update(ValueCell cell) {
-    if (_dirty.remove(cell)) {
-      if (_dirty.isEmpty) {
-        listener();
-      }
+    if (_isUpdating) {
+      listener();
+      _isUpdating = false;
     }
   }
 
   @override
   void willUpdate(ValueCell cell) {
-    _dirty.add(cell);
+    _isUpdating = true;
   }
 }
