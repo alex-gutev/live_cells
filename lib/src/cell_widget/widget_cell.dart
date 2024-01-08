@@ -4,7 +4,11 @@ import 'package:flutter/cupertino.dart';
 
 import '../base/cell_observer.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
+import '../mutable_cell/mutable_cell.dart';
 import '../value_cell.dart';
+import 'proxy_cell.dart';
+
+part 'cell_initializer.dart';
 
 /// A widget which is rebuilt in response to changes in the values of [ValueCell]'s.
 ///
@@ -40,6 +44,10 @@ abstract class WidgetCell extends StatelessWidget {
   /// This allows a widget, which is dependent on the values of one or more cells,
   /// to be defined without subclassing.
   ///
+  /// The returned widget includes the [CellInitializer] mixin, which allows the
+  /// [CellWidgetContextExtension.cell] method to be called on the [BuildContext]
+  /// passed to [builder].
+  ///
   /// Example:
   ///
   /// ```dart
@@ -53,7 +61,7 @@ abstract class WidgetCell extends StatelessWidget {
 }
 
 /// [WidgetCell] with the [build] method defined by [builder].
-class _WidgetCellBuilder extends WidgetCell {
+class _WidgetCellBuilder extends WidgetCell with CellInitializer {
   /// Widget builder function
   final WidgetBuilder builder;
 

@@ -1,20 +1,16 @@
-import 'package:flutter/widgets.dart';
-
-import '../mutable_cell/mutable_cell.dart';
-import '../value_cell.dart';
-import 'proxy_cell.dart';
+part of 'widget_cell.dart';
 
 /// Cell creation function.
 ///
-/// The cell is called with no arguments and should return a [ValueCell].
+/// The function is called with no arguments and should return a [ValueCell].
 typedef CreateCell<T extends ValueCell> = T Function();
 
-/// Base class for a widget which manages one or more [ValueCell] instances.
+/// Provides the [cell] method for creating and retrieving instances of [ValueCell]'s.
 ///
 /// The [cell] method can be used within [build] to obtain an instance of
 /// a [ValueCell] that is persisted between builds of the widget.
 ///
-/// During the first build every call to [cell] will create a new [ValueCell] 
+/// During the first build every call to [cell] will create a new [ValueCell]
 /// instance using the provided cell creation function. In subsequent builds
 /// calls to [cell] return the existing instance that was created during the
 /// first build using the corresponding cell creation function.
@@ -33,8 +29,8 @@ typedef CreateCell<T extends ValueCell> = T Function();
 ///
 ///     return Column(
 ///       children: [
-///          sum.toWidget((c, sum, _) => Text('a + b = $sum')),
-///          product.toWidget((c, product, _) => Text('a * b = $product')),
+///          Text('a + b = ${sum()}'),
+///          Text('a * b = ${product()}')
 ///          ...
 ///       ]
 ///     );
@@ -43,7 +39,7 @@ typedef CreateCell<T extends ValueCell> = T Function();
 /// ````
 ///
 /// In the example above, when the widget is built for the first time, two
-/// mutable cells are created and assigned to `a` and `b`, and two computational
+/// mutable cells are created and assigned to `a` and `b`, and two computed
 /// cells `a + b`, `a * b` are assigned to `sum` and `product`, respectively.
 /// In subsequent builds, the first two calls to [cell] return the same
 /// [MutableCell] instances created during the first build and
@@ -60,9 +56,7 @@ typedef CreateCell<T extends ValueCell> = T Function();
 /// 1. Calls to [cell] must not appear within conditionals or loops.
 /// 2. Calls to [cell] must not appear within widget builder functions, such as
 ///    those used with [Builder] or [ValueListenableBuilder].
-abstract class CellWidget extends StatelessWidget {
-  const CellWidget({super.key});
-
+mixin CellInitializer on WidgetCell {
   /// Return an instance of a [ValueCell] that is kept between builds of the widget.
   ///
   /// This function is intended to be used within [build] to create and
@@ -71,10 +65,12 @@ abstract class CellWidget extends StatelessWidget {
   ///
   /// During the first build of the widget every call to [cell] will result in a
   /// new [ValueCell] instance being created by calling the provided [create]
-  /// function. In subsequent calls to builds, [cell] returns the existing
-  /// [ValueCell] instance that was created during the first build using the 
-  /// corresponding [create] function.
+  /// function. In subsequent builds, [cell] returns the existing
+  /// [ValueCell] instance that was created during the first build using
+  /// [create].
   MutableCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
+    assert(_activeCellElement != null);
+
     final cell = _activeCellElement!.getCell(create);
     _activeCellElement!.nextCell();
 
@@ -82,24 +78,38 @@ abstract class CellWidget extends StatelessWidget {
   }
 
   @override
-  StatelessElement createElement() => _CellWidgetElement(this);
+  StatelessElement createElement() => _CellStorageElement(this);
 
   /// Private
-  
+
   /// The element of the [CellWidget] currently being built.
-  static _CellWidgetElement? _activeCellElement;
+  static _CellStorageElement? _activeCellElement;
+}
+
+/// Provides the [cell] method for creating and retrieving instances of [ValueCell]'s.
+extension CellWidgetContextExtension on BuildContext {
+  /// Return an instance of a [ValueCell] that is kept between builds of the widget.
+  ///
+  /// The functionality of this method is the same as [CellInitializer.cell].
+  ///
+  /// **NOTE**: This method may only be called if [this] is the [BuildContext]
+  /// of a [WidgetCell] with the [CellInitializer] mixin.
+  MutableCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
+    final element = this as _CellStorageElement;
+    return element.getCell(create);
+  }
 }
 
 /// Widget element for [CellWidget]
 /// 
 /// Keeps track of the cell instances that were created during the lifetime of
 /// the widget.
-class _CellWidgetElement extends StatelessElement {
-  _CellWidgetElement(super.widget);
-  
+class _CellStorageElement extends _WidgetCellElement {
+  _CellStorageElement(super.widget);
+
   /// List of created cells
   final List<ProxyCell> _cells = [];
-  
+
   /// Index of cell to retrieve/create when calling [getCell]
   var _curCell = 0;
 
@@ -133,11 +143,11 @@ class _CellWidgetElement extends StatelessElement {
   Widget build() {
     try {
       _curCell = 0;
-      CellWidget._activeCellElement = this;
+      CellInitializer._activeCellElement = this;
       return super.build();
     }
     finally {
-      CellWidget._activeCellElement = null;
+      CellInitializer._activeCellElement = null;
     }
   }
 }
