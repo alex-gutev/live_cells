@@ -36,10 +36,10 @@ part 'cell_initializer.dart';
 ///
 /// In the above example, the widget is rebuilt automatically whenever the
 /// value of cell `a` is changed.
-abstract class WidgetCell extends StatelessWidget {
-  WidgetCell({super.key});
+abstract class CellWidget extends StatelessWidget {
+  CellWidget({super.key});
 
-  /// Create a [WidgetCell] with the [build] method defined by [builder].
+  /// Create a [CellWidget] with the [build] method defined by [builder].
   ///
   /// This allows a widget, which is dependent on the values of one or more cells,
   /// to be defined without subclassing.
@@ -53,32 +53,32 @@ abstract class WidgetCell extends StatelessWidget {
   /// ```dart
   /// WidgetCell.builder((context) => Text('The value of cell a is ${a()}'))
   /// ```
-  factory WidgetCell.builder(WidgetBuilder builder) =>
+  factory CellWidget.builder(WidgetBuilder builder) =>
       _WidgetCellBuilder(builder);
 
   @override
-  StatelessElement createElement() => _WidgetCellElement(this);
+  StatelessElement createElement() => _CellWidgetElement(this);
 }
 
-/// [WidgetCell] with the [build] method defined by [builder].
-class _WidgetCellBuilder extends WidgetCell with CellInitializer {
+/// [CellWidget] with the [build] method defined by [builder].
+class _WidgetCellBuilder extends CellWidget with CellInitializer {
   /// Widget builder function
   final WidgetBuilder builder;
 
-  /// Create a [WidgetCell] with [build] defined by [builder].
+  /// Create a [CellWidget] with [build] defined by [builder].
   _WidgetCellBuilder(this.builder);
 
   @override
   Widget build(BuildContext context) => builder(context);
 }
 
-/// Element for [WidgetCell].
+/// Element for [CellWidget].
 ///
 /// Keeps track of cells that were referenced during the [build] method and
 /// automatically marks the widget for rebuilding if the value of a referenced
 /// cell changes.
-class _WidgetCellElement extends StatelessElement {
-  _WidgetCellElement(super.widget) {
+class _CellWidgetElement extends StatelessElement {
+  _CellWidgetElement(super.widget) {
     _observer = _WidgetCellObserver(markNeedsBuild);
   }
 

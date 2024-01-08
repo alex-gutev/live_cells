@@ -56,7 +56,7 @@ typedef CreateCell<T extends ValueCell> = T Function();
 /// 1. Calls to [cell] must not appear within conditionals or loops.
 /// 2. Calls to [cell] must not appear within widget builder functions, such as
 ///    those used with [Builder] or [ValueListenableBuilder].
-mixin CellInitializer on WidgetCell {
+mixin CellInitializer on CellWidget {
   /// Return an instance of a [ValueCell] that is kept between builds of the widget.
   ///
   /// This function is intended to be used within [build] to create and
@@ -93,7 +93,7 @@ extension CellWidgetContextExtension on BuildContext {
   /// The functionality of this method is the same as [CellInitializer.cell].
   ///
   /// **NOTE**: This method may only be called if [this] is the [BuildContext]
-  /// of a [WidgetCell] with the [CellInitializer] mixin.
+  /// of a [CellWidget] with the [CellInitializer] mixin.
   MutableCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
     final element = this as _CellStorageElement;
     return element.getCell(create);
@@ -104,7 +104,7 @@ extension CellWidgetContextExtension on BuildContext {
 /// 
 /// Keeps track of the cell instances that were created during the lifetime of
 /// the widget.
-class _CellStorageElement extends _WidgetCellElement {
+class _CellStorageElement extends _CellWidgetElement {
   _CellStorageElement(super.widget);
 
   /// List of created cells

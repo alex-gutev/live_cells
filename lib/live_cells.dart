@@ -22,4 +22,4 @@ export 'src/extensions/values_extension.dart'
 export 'src/async_cell/delay_cell.dart' show DelayCell;
 export 'src/extensions/widget_extension.dart' show WidgetExtension, WidgetCellExtension, ComputeWidgetExtension;
 export 'src/cell_widget/widget_cell.dart'
-    show WidgetCell, CreateCell, CellInitializer, CellWidgetContextExtension;
+    show CellWidget, CreateCell, CellInitializer, CellWidgetContextExtension;
