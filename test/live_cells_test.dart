@@ -2118,6 +2118,106 @@ void main() {
     });
   });
 
+  group('Type Conversions', () {
+    test('ParseIntExtension.toMutableString() converts argument cell to string', () {
+      final a = MutableCell(1);
+      final strA = a.toMutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      a.value = 5;
+
+      expect(strA.value, equals('5'));
+    });
+
+    test('ParseIntExtension.toMutableString() sets argument cell to parsed integer', () {
+      final a = MutableCell(1);
+      final strA = a.toMutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      strA.value = '32';
+
+      expect(a.value, equals(32));
+    });
+
+    test('ParseDoubleExtension.toMutableString() converts argument cell to string', () {
+      final a = MutableCell(1.0);
+      final strA = a.toMutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      a.value = 7.5;
+
+      expect(strA.value, equals('7.5'));
+    });
+
+    test('ParseDoubleExtension.toMutableString() sets argument cell to parsed double', () {
+      final a = MutableCell(1.0);
+      final strA = a.toMutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      strA.value = '3.5';
+
+      expect(a.value, equals(3.5));
+    });
+
+    test('ParseNumExtension.toMutableString() converts argument cell to string', () {
+      final a = MutableCell<num>(1);
+      final strA = a.toMutableString();
+
+      final observer = MockValueObserver();
+      strA.addObserver(observer);
+
+      a.value = 7.5;
+      a.value = 3;
+
+      expect(observer.values, equals(['7.5', '3']));
+    });
+
+    test('ParseNumExtension.toMutableString() sets argument cell to parsed num', () {
+      final a = MutableCell<num>(1);
+      final strA = a.toMutableString();
+
+      final observer = MockValueObserver();
+      a.addObserver(observer);
+
+      strA.value = '3.5';
+      strA.value = '100';
+
+      expect(observer.values, equals([3.5, 100]));
+    });
+
+    test('ConvertStringExtension.toMutableString() converts argument cell to string', () {
+      final a = MutableCell('');
+      final strA = a.toMutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      a.value = 'hello';
+
+      expect(strA.value, equals('hello'));
+    });
+
+    test('ConvertStringExtension.toMutableString() simply sets argument cell value', () {
+      final a = MutableCell('');
+      final strA = a.toMutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      strA.value = '3.5';
+
+      expect(a.value, equals('3.5'));
+    });
+  });
+
   group('DelayCell', () {
     test('DelayCell.value equals initial value of cell when not changed', () {
       final cell = MutableCell(2);
