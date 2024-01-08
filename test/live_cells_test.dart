@@ -687,29 +687,6 @@ void main() {
       verify(observer.update(store)).called(1);
     });
 
-    test('StoreCell observers not called when argument cell value does not change', () {
-      final a = MutableCell(2);
-      final b = a.apply((value) => value.isEven);
-      final store = b.store();
-
-      final observer1 = MockSimpleObserver();
-      final observer2 = MockSimpleObserver();
-
-      b.addObserver(observer1);
-      store.addObserver(observer2);
-
-      a.value = 4;
-      a.value = 6;
-      a.value = 8;
-
-      verify(observer1.update(b)).called(3);
-      verifyNever(observer2.update(store));
-
-      a.value = 11;
-
-      verify(observer2.update(store)).called(1);
-    });
-
     test('StoreCell.value updated when observer called', () {
       final cell = MutableCell('hello');
       final store = cell.store();
@@ -1141,7 +1118,7 @@ void main() {
       });
 
       verify(observerC.update(c)).called(3);
-      verify(observerD.update(d)).called(2);
+      verify(observerD.update(d)).called(3);
     });
 
     test('Correct values produced with StoreCell across all observer cells', () {
@@ -1642,7 +1619,7 @@ void main() {
       });
 
       verify(observerC.update(c)).called(3);
-      verify(observerD.update(d)).called(2);
+      verify(observerD.update(d)).called(3);
     });
 
     test('Correct values produced with MutableComputeCell across all observer cells', () {
@@ -1967,7 +1944,7 @@ void main() {
       });
 
       verify(observerC.update(c)).called(3);
-      verify(observerD.update(d)).called(2);
+      verify(observerD.update(d)).called(3);
     });
 
     test('Correct values produced with DynamicMutableComputeCell across all observer cells', () {

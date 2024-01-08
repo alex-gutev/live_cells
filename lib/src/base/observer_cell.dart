@@ -25,7 +25,6 @@ mixin ObserverCell<T> on CellListeners<T> implements CellObserver {
   void willUpdate(ValueCell cell) {
     if (!updating) {
       updating = true;
-      _oldValue = value;
 
       notifyWillUpdate();
       stale = true;
@@ -35,18 +34,9 @@ mixin ObserverCell<T> on CellListeners<T> implements CellObserver {
   @override
   void update(ValueCell cell) {
     if (updating) {
-      if (value != _oldValue) {
-        notifyUpdate();
-      }
+      notifyUpdate();
 
-      stale = false;
       updating = false;
-      _oldValue = null;
     }
   }
-
-  /// Private
-
-  /// The cell's value at the start of the current update cycle
-  T? _oldValue;
 }
