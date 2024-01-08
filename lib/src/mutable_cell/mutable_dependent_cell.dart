@@ -77,7 +77,14 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
     _value = value;
 
     MutableCell.batch(() {
-      reverseCompute(value);
+      try {
+        reverseCompute(value);
+      }
+      catch (e, st) {
+        if (kDebugMode) {
+          print('Exception in MutableDependentCell reverse computation function: $e - $st');
+        }
+      }
     });
 
     if (MutableCell.isBatchUpdate) {
