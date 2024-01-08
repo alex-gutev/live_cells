@@ -31,7 +31,7 @@ class CellSliderDemo extends CellWidget {
                 min: 0,
                 max: 5,
               ),
-              n.toWidget((_, value, __) => Text('Slider value is: ${value.toStringAsFixed(2)}')),
+              WidgetCell.builder((_) => Text('Slider value is: ${n().toStringAsFixed(2)}')),
               ElevatedButton(
                   onPressed: () => n.value = 2,
                   child: const Text('Reset')

@@ -30,9 +30,9 @@ class CellCheckboxDemo extends CellWidget {
                 value: state,
                 tristate: true,
               ),
-              state.toWidget((_, state, __) {
-                if (state != null) {
-                  return Text('The checkbox is ${state ? 'checked' : 'unchecked'}');
+              WidgetCell.builder((_) {
+                if (state() != null) {
+                  return Text('The checkbox is ${state()! ? 'checked' : 'unchecked'}');
                 }
                 else {
                   return Text('The checkbox is in the null state');

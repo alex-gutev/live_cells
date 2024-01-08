@@ -63,8 +63,8 @@ class SubclassDemo2 extends CellWidget {
               const SizedBox(height: 10),
               const Text('Counting to 10'),
               const SizedBox(height: 10),
-              counter.toWidget((context, value, _) => Text(
-                  '$value',
+              WidgetCell.builder((_) => Text(
+                  '${counter()}',
                   style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20

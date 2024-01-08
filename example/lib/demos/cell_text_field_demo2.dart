@@ -37,9 +37,7 @@ class CellTextFieldDemo2 extends CellWidget {
                 keyboardType: TextInputType.numberWithOptions(decimal: false),
               ),
               const SizedBox(height: 10),
-              a.toWidget((context, value, _) => Text('The square of ${a.value} is:')),
-              const SizedBox(height: 5),
-              square.toWidget((context, value, child) => Text('${square.value}')),
+              WidgetCell.builder((_) => Text('${a()} squared is ${square()}')),
               ElevatedButton(
                   onPressed: () => a.value = 0,
                   child: const Text('Clear')

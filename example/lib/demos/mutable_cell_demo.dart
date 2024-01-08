@@ -29,8 +29,8 @@ class _MutableCellDemoState extends State<MutableCellDemo> {
                 ),
               ),
               const SizedBox(height: 10),
-              counter.toWidget((context, count, _) =>
-                  Text('You clicked the button $count times')
+              WidgetCell.builder((context) =>
+                  Text('You clicked the button ${counter()} times')
               ),
               ElevatedButton(
                 child: const Text('Increment Counter'),

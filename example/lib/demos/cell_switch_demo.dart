@@ -29,7 +29,7 @@ class CellSwitchDemo extends CellWidget {
               CellSwitch(
                 value: state,
               ),
-              state.toWidget((_, state, __) => Text('The switch is ${state ? 'on' : 'off'}')),
+              WidgetCell.builder((_) => Text('The switch is ${state() ? 'on' : 'off'}')),
               ElevatedButton(
                   onPressed: () => state.value = true,
                   child: const Text('Reset')

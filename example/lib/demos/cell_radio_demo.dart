@@ -62,7 +62,7 @@ class CellRadioDemo extends CellWidget {
                 groupValue: option,
                 title: const Text('Option C'),
               ),
-              option.toWidget((_, option, __) => Text('Selected option: ${option?.prettyName ?? 'None'}')),
+              WidgetCell.builder((_) => Text('Selected option: ${option()?.prettyName ?? 'None'}')),
               ElevatedButton(
                   onPressed: () => option.value = RadioOption.optionB,
                   child: const Text('Reset')

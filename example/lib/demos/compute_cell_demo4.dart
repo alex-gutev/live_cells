@@ -56,7 +56,7 @@ class ComputeCellDemo4 extends CellWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              [a, b, sum].computeWidget(() => Text('${a.value} + ${b.value} = ${sum.value}'))
+              WidgetCell.builder((_) => Text('${a()} + ${b()} = ${sum()}'))
             ],
           ),
         ),

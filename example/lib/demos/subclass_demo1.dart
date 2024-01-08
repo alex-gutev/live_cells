@@ -60,7 +60,7 @@ class SubclassDemo1 extends CellWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              [a, clamped].computeWidget(() => Text('ClampCell(${a.value}, 2, 10) value is ${clamped.value}'))
+              WidgetCell.builder((_) => Text('ClampCell(${a()}, 2, 10) value is ${clamped()}'))
             ],
           ),
         ),

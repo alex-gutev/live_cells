@@ -52,8 +52,8 @@ class StoreCellDemo extends CellWidget {
                   ]
               ),
               const SizedBox(height: 10),
-              [n, factorial].computeWidget(() => Text('${n.value}! = ${factorial.value}')),
-              [n, factorial].computeWidget(() => Text('The factorial of ${n.value} is ${factorial.value}'))
+              WidgetCell.builder((_) => Text('${n()}! = ${factorial()}')),
+              WidgetCell.builder((_) => Text('The factorial of ${n()} is ${factorial()}'))
             ],
           ),
         ),

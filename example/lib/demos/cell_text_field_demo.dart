@@ -30,7 +30,7 @@ class CellTextFieldDemo extends CellWidget {
                 content: name,
               ),
               const SizedBox(height: 10),
-              name.toWidget((context, name, _) => Text('Hello $name')),
+              WidgetCell.builder((_) => Text('Hello ${name()}')),
               ElevatedButton(
                   onPressed: () => name.value = '',
                   child: const Text('Clear')
