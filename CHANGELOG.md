@@ -99,3 +99,7 @@ Improvements:
 ## 0.5.1
 
 * Fix typos and bugs in examples in README
+
+## 0.5.2
+
+* Fix potential issues
