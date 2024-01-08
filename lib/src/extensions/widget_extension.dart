@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../base/cell_listenable.dart';
-import '../compute_cell/compute_extension.dart';
+import 'compute_extension.dart';
 import '../value_cell.dart';
 
 /// Provides functionality for creating [Widget]'s from [ValueCell]'s

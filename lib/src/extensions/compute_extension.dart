@@ -1,9 +1,7 @@
-import 'package:live_cells/src/compute_cell/dynamic_compute_cell.dart';
-import 'package:live_cells/src/compute_cell/mutable_compute_cell.dart';
-
+import '../compute_cell/mutable_compute_cell.dart';
 import '../mutable_cell/mutable_cell.dart';
 import '../value_cell.dart';
-import 'compute_cell.dart';
+import '../compute_cell/compute_cell.dart';
 
 /// Utility methods for creating new cells by applying functions on their values.
 extension ComputeExtension<T> on ValueCell<T> {
