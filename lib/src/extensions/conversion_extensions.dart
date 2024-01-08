@@ -14,6 +14,19 @@ extension ParseIntExtension on MutableCell<int> {
       });
 }
 
+/// Provides methods for converting a double to a string and vice versa.
+extension ParseDoubleExtension on MutableCell<double> {
+  /// Return a cell which evaluates to a string representation of this cell's value.
+  ///
+  /// The returned cell is a mutable computed cell. If the value of the returned
+  /// cell is set explicitly, an integer is parsed from the assigned string
+  /// value and is assigned to this cell's value.
+  MutableCell<String> toMutableString() =>
+      [this].mutableComputeCell(() => value.toString(), (value) {
+        this.value = double.tryParse(value) ?? 0.0;
+      });
+}
+
 /// Provides methods for converting a num to a string and vice versa.
 extension ParseNumExtension on MutableCell<num> {
   /// Return a cell which evaluates to a string representation of this cell's value.
