@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
@@ -35,7 +34,7 @@ class CellCheckboxDemo extends CellWidget with CellInitializer {
                   return Text('The checkbox is ${state()! ? 'checked' : 'unchecked'}');
                 }
                 else {
-                  return Text('The checkbox is in the null state');
+                  return const Text('The checkbox is in the null state');
                 }
               }),
               ElevatedButton(

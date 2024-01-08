@@ -32,7 +32,7 @@ class SumDemo extends CellWidget with CellInitializer {
                     ),
                   ),
                   const SizedBox(width: 5),
-                  Text('+'),
+                  const Text('+'),
                   const SizedBox(width: 5),
                   Expanded(
                     child: TextField(

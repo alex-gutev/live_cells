@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:live_cells/live_cells.dart';
 
 import '../value_cell.dart';
+import 'cell_listeners.dart';
 import 'cell_observer.dart';
 
 /// Implements the [CellObserver] interface for cells of which the value depends on other cells.

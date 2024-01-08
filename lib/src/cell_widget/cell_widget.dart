@@ -37,7 +37,7 @@ part 'cell_initializer.dart';
 /// In the above example, the widget is rebuilt automatically whenever the
 /// value of cell `a` is changed.
 abstract class CellWidget extends StatelessWidget {
-  CellWidget({super.key});
+  const CellWidget({super.key});
 
   /// Create a [CellWidget] with the [build] method defined by [builder].
   ///
