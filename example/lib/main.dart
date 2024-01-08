@@ -1,20 +1,16 @@
-import 'package:example/demos/basics_demo.dart';
-import 'package:example/demos/cell_checkbox_demo.dart';
-import 'package:example/demos/cell_radio_demo.dart';
-import 'package:example/demos/cell_slider_demo.dart';
-import 'package:example/demos/cell_switch_demo.dart';
-import 'package:example/demos/cell_text_field_demo.dart';
-import 'package:example/demos/cell_text_field_demo2.dart';
-import 'package:example/demos/compute_cell_demo1.dart';
-import 'package:example/demos/compute_cell_demo2.dart';
-import 'package:example/demos/compute_cell_demo3.dart';
-import 'package:example/demos/compute_cell_demo4.dart';
-import 'package:example/demos/equality_cell_demo.dart';
-import 'package:example/demos/mutable_cell_demo.dart';
-import 'package:example/demos/store_cell_demo.dart';
-import 'package:example/demos/subclass_demo1.dart';
-import 'package:example/demos/subclass_demo2.dart';
 import 'package:flutter/material.dart';
+
+import 'demos/cell_text_field_demo.dart';
+import 'demos/counter_demo.dart';
+import 'demos/mutable_computed_cell_demo.dart';
+import 'demos/mutable_computed_cell_demo2.dart';
+import 'demos/sum_demo.dart';
+import 'demos/cell_checkbox_demo.dart';
+import 'demos/cell_radio_demo.dart';
+import 'demos/cell_slider_demo.dart';
+import 'demos/cell_switch_demo.dart';
+import 'demos/subclass_demo1.dart';
+import 'demos/subclass_demo2.dart';
 
 void main() {
   runApp(const MyApp());
@@ -93,83 +89,43 @@ class MyHomePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       ElevatedButton(
-                        child: const Text('Cell Basics'),
+                        child: const Text('Counter'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => BasicsDemo())
+                              builder: (context) => CounterDemo())
                           );
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('Mutable Cells'),
+                        child: const Text('Computed Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => MutableCellDemo())
+                              builder: (context) => SumDemo())
                           );
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Computational Cells 1'),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ComputeCellDemo1()
-                          ));
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Computational Cells 2'),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ComputeCellDemo2()
-                          ));
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Equality Cells'),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => EqualityCellDemo()
-                          ));
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Computational Cells 3'),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ComputeCellDemo3()
-                          ));
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Computational Cells 4'),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ComputeCellDemo4()
-                          ));
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Store Cells'),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => StoreCellDemo()
-                          ));
                         },
                       ),
                       ElevatedButton(
                         child: const Text('CellTextField'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellTextFieldDemo()
-                          ));
+                              builder: (context) => CellTextFieldDemo())
+                          );
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('CellTextField 2'),
+                        child: const Text('Mutable Computed Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellTextFieldDemo2()
-                          ));
+                              builder: (context) => MutableComputedCellDemo())
+                          );
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Mutable Computed Cells 2'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => MutableComputedCellDemo2())
+                          );
                         },
                       ),
                       ElevatedButton(

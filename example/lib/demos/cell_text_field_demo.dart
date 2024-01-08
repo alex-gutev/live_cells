@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cells.dart';
 import 'package:live_cells/live_cell_widgets.dart';
+import 'package:live_cells/live_cells.dart';
 
 class CellTextFieldDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
-    final name = cell(() => MutableCell(''));
+    final input = cell(() => MutableCell(''));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CellTextField Demo'),
+        title: const Text('User input using CellTextField'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -17,23 +17,23 @@ class CellTextFieldDemo extends CellWidget with CellInitializer {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const SizedBox(height: 10),
+              CellTextField(content: input),
+              const SizedBox(height: 10),
               const Text(
-                'Demonstration of CellTextField widget which binds its value to a cell.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold
-                ),
+                  'You wrote:',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20
+                  )
               ),
               const SizedBox(height: 10),
-              const Text('Enter your name:'),
-              CellTextField(
-                content: name,
-              ),
-              const SizedBox(height: 10),
-              CellWidget.builder((_) => Text('Hello ${name()}')),
+              CellWidget.builder((_) => Text(input())),
               ElevatedButton(
-                  onPressed: () => name.value = '',
-                  child: const Text('Clear')
+                child: const Text('Clear'),
+                onPressed: () {
+                    input.value = '';
+                },
               )
             ],
           ),
