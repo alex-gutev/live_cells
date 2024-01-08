@@ -189,8 +189,8 @@ final sum = cell(() => a + b);
 ```
 
 The arithmetic and relational operators are overloaded for `ValueCell`'s holding `num` values, so that
-a computed cell can be created directly by an expression of `ValueCell`'s. This is not only simpler
-but more efficient since the argument cells are determined at compile-time, *more on this later*.
+a computed cell can be defined as an expression of `ValueCell`'s. This is not only simpler
+but more efficient since the argument cells are determined at compile time.
 
 ### User Input
 
@@ -198,7 +198,8 @@ So far we've used the `onChanged` callback with the stock `TextField` provided b
 two disadvantages:
 
 * The content of the `TextField` cannot be set externally without a `TextEditingController`.
-* You have to set the value of the cells representing the user input manually in an event handler.
+* You have to manually synchronize the state of the cells with the state of the text field, in an
+  event handler.
 
 Live cells provides a `CellTextField` widget which allows its content to be accessed and controlled
 by a `ValueCell`.
@@ -248,7 +249,7 @@ reflect the content of the text field whenever it is changed by the user. Whatev
 in the field is reflected in the widget below.
 
 The 'Clear' button clears the text field by setting the `input` cell to the empty string. The benefits
-of this approach:
+of this approach are:
 
 * No need for a `TextEditingController`
 * No need for event handlers allowing for a declarative style of programming
@@ -266,12 +267,12 @@ However, a mutable computed cell can also have its value changed by setting its 
 as though it is a `MutableCell`. When the value of a mutable computed cell is set, it *reverses*
 the computation by setting the argument cells to a value such that when the mutable computed
 cell is recomputed, the same value will be produced as the value that was set. Thus mutable
-computed cells support two-way data flow, which is what sets live cells apart from other reactive
+computed cells support two-way data flow, which is what sets *Live Cells* apart from other reactive
 state management libraries.
 
 Mutable computed cells can be created using the `MutableCell.computed` constructor, which takes the
 computation function and reverse computation function. The computation function computes the cell's
-value as a function of argument cells, same is with `ValueCell.computed`. The reverse computation
+value as a function of argument cells, like `ValueCell.computed`. The reverse computation
 function *reverses* the computation by assigning a value to the argument cells. It is given the
 value that was assigned to the `value` property.
 
@@ -295,7 +296,7 @@ print(a.value + 1); // Prints 101
 ```
 
 The above definition will prove useful when implementing a text field for numeric input. In-fact, this
-library already provides a definition for this cell using with the `toMutableString` extension
+library already provides a definition for this cell with the `toMutableString` extension
 method on `MutableCell`'s holding `int`, `double` and `num` values.
 
 ```dart
@@ -378,7 +379,7 @@ The benefits of using `CellTextField` and mutable computed cells are:
 * No manual synchronization of state between the `TextEditingController` and the widget `State` / 
   `ChangeNotifier` object. Your state is instead stored in one place and in one representation.
 * No need to use `StatefulWidget` or make ugly empty calls to `setState(() {})` to force the widget
-  to update when the `TextEditingController` is updated.
+  to update when the `text` property of the `TextEditingController` is updated.
 
 **NOTE**:
 
@@ -516,7 +517,6 @@ widgets which expose their properties via `ValueCell`'s:
 * `CellSlider` - A `Slider` with the `value` property controlled by a cell
 * `CellSwitch` - A `Switch` with the `value` property controlled by a cell
 * `CellSwitchListTile` - A `SwitchListTile` with the `value` property controlled by a cell
-* `CellTextField` - A `TextField` where the content is controlled by a cell instead of a `TextEditingController`
 
 ## Advanced
 
