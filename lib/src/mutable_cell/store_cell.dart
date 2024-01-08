@@ -1,5 +1,5 @@
+import '../base/observer_cell.dart';
 import '../base/cell_observer.dart';
-
 import '../base/notifier_cell.dart';
 import '../value_cell.dart';
 
@@ -10,7 +10,7 @@ import '../value_cell.dart';
 ///
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
-class StoreCell<T> extends NotifierCell<T> implements CellObserver {
+class StoreCell<T> extends NotifierCell<T> with ObserverCell implements CellObserver {
   /// Create a [StoreCell] which observes and saves the value of [valueCell]
   StoreCell(this.valueCell) : super(valueCell.value);
 
@@ -19,8 +19,7 @@ class StoreCell<T> extends NotifierCell<T> implements CellObserver {
     super.init();
     valueCell.addObserver(this);
 
-    _stale = false;
-    setValue(valueCell.value);
+    stale = true;
   }
 
   @override
@@ -31,9 +30,9 @@ class StoreCell<T> extends NotifierCell<T> implements CellObserver {
 
   @override
   T get value {
-    if (_stale) {
+    if (stale) {
       setValue(valueCell.value);
-      _stale = false;
+      stale = false;
     }
 
     return super.value;
@@ -43,39 +42,6 @@ class StoreCell<T> extends NotifierCell<T> implements CellObserver {
 
   /// The observed cell
   final ValueCell<T> valueCell;
-
-  /// Is the cell in the process of updating its value?
-  var _updating = false;
-
-  /// Is the saved value outdated?
-  var _stale = false;
-
-  /// Previous cell value at the start of current update cycle
-  T? _oldValue;
-  
-  @override
-  void willUpdate(ValueCell cell) {
-    if (!_updating) {
-      _updating = true;
-      _stale = true;
-      _oldValue = super.value;
-
-      notifyWillUpdate();
-    }
-  }
-
-  @override
-  void update(ValueCell cell) {
-    if (_updating) {
-      if (value != _oldValue) {
-        notifyUpdate();
-      }
-
-      _stale = false;
-      _updating = false;
-      _oldValue = null;
-    }
-  }
 }
 
 extension StoreCellExtension<T> on ValueCell<T> {
