@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:live_cells/live_cells.dart';
 
 import '../value_cell.dart';
 import 'cell_observer.dart';
-import 'notifier_cell.dart';
 
 /// Implements the [CellObserver] interface for cells of which the value depends on other cells.
 ///
@@ -12,15 +12,19 @@ import 'notifier_cell.dart';
 ///
 /// Classes which make use of this mixin, should check the [stale] property
 /// within [value]. If [stale] is true, the cell's value should be recomputed.
-mixin ObserverCell<T> on NotifierCell<T> implements CellObserver {
+mixin ObserverCell<T> on CellListeners<T> implements CellObserver {
   /// Should the cell's value be recomputed
   @protected
   var stale = false;
 
+  /// Is a cell value update currently in progress
+  @protected
+  var updating = false;
+
   @override
   void willUpdate(ValueCell cell) {
-    if (!_updating) {
-      _updating = true;
+    if (!updating) {
+      updating = true;
       _oldValue = value;
 
       notifyWillUpdate();
@@ -30,21 +34,18 @@ mixin ObserverCell<T> on NotifierCell<T> implements CellObserver {
 
   @override
   void update(ValueCell cell) {
-    if (_updating) {
+    if (updating) {
       if (value != _oldValue) {
         notifyUpdate();
       }
 
       stale = false;
-      _updating = false;
+      updating = false;
       _oldValue = null;
     }
   }
 
   /// Private
-
-  /// Is a cell value update currently in progress
-  var _updating = false;
 
   /// The cell's value at the start of the current update cycle
   T? _oldValue;

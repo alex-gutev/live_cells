@@ -1,7 +1,6 @@
-import 'dart:collection';
-
 import 'package:flutter/foundation.dart';
 
+import '../base/observer_cell.dart';
 import '../base/cell_listeners.dart';
 import '../base/cell_observer.dart';
 import '../base/managed_cell.dart';
@@ -23,7 +22,8 @@ import 'mutable_cell.dart';
 /// which is called whenever the value of the cell is set. This method should
 /// update the values of the argument cells.
 abstract class MutableDependentCell<T> extends ManagedCell<T>
-    with CellEquality<T>, CellListeners<T> implements CellObserver, MutableCell<T> {
+    with CellEquality<T>, CellListeners<T>, ObserverCell<T>
+    implements CellObserver, MutableCell<T> {
 
   /// List of argument cells.
   @protected
@@ -55,9 +55,9 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
 
   @override
   T get value {
-    if (_stale) {
+    if (stale) {
       _value = compute();
-      _stale = false;
+      stale = false;
     }
 
     return _value;
@@ -70,11 +70,11 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
     }
 
     _reverse = true;
-
     notifyWillUpdate();
-    _value = value;
 
-    // TODO: Handle potential exceptions in reverseCompute
+    updating = false;
+    stale = false;
+    _value = value;
 
     MutableCell.batch(() {
       reverseCompute(value);
@@ -97,23 +97,11 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   /// Is a reverse computation being performed?
   var _reverse = false;
 
-  /// Is the cell in the process of recomputing its value?
-  var _updating = false;
-
-  /// Should the cell's value be recomputed?
-  var _stale = false;
-
-  /// Previous cell value at the start of current update cycle
-  T? _oldValue;
-
-  /// Set of argument cells from which observer events should be suppressed
-  final Set<ValueCell> _suppressedArgs = HashSet();
-
   @override
   void init() {
     super.init();
 
-    _stale = true;
+    stale = true;
 
     for (final dependency in arguments) {
       dependency.addObserver(this);
@@ -130,34 +118,9 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   }
 
   @override
-  void update(ValueCell cell) {
-    if (_suppressedArgs.contains(cell)) {
-      _suppressedArgs.remove(cell);
-      return;
-    }
-
-    if (_updating) {
-      if (value != _oldValue) {
-        notifyUpdate();
-      }
-
-      _stale = false;
-      _updating = false;
-      _oldValue = null;
-    }
-  }
-
-  @override
   void willUpdate(ValueCell cell) {
-    if (_reverse) {
-      _suppressedArgs.add(cell);
-    }
-    else if (!_updating) {
-      _updating = true;
-      _stale = true;
-      _oldValue = _value;
-
-      notifyWillUpdate();
+    if (!_reverse) {
+      super.willUpdate(cell);
     }
   }
 }

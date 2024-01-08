@@ -3,6 +3,7 @@ import 'dart:collection';
 import '../base/cell_listeners.dart';
 import '../base/cell_observer.dart';
 import '../base/managed_cell.dart';
+import '../base/observer_cell.dart';
 import '../value_cell.dart';
 
 /// A computational cell which determines its dependencies at runtime
@@ -15,7 +16,10 @@ import '../value_cell.dart';
 /// ```dart
 /// final sum = DyanmicComputeCell(() => a() + b());
 /// ```
-class DynamicComputeCell<T> extends ManagedCell<T> with CellListeners<T>, CellEquality<T> implements CellObserver {
+class DynamicComputeCell<T> extends ManagedCell<T>
+    with CellListeners<T>, CellEquality<T>, ObserverCell<T>
+    implements CellObserver {
+
   /// Create a cell which computes its value using [compute].
   DynamicComputeCell(this._compute) {
     _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
@@ -25,7 +29,7 @@ class DynamicComputeCell<T> extends ManagedCell<T> with CellListeners<T>, CellEq
 
   @override
   T get value {
-    if (_stale) {
+    if (stale) {
       _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
         if (!_arguments.contains(cell)) {
           _arguments.add(cell);
@@ -35,6 +39,8 @@ class DynamicComputeCell<T> extends ManagedCell<T> with CellListeners<T>, CellEq
           }
         }
       });
+
+      stale = false;
     }
 
     return _value;
@@ -52,20 +58,11 @@ class DynamicComputeCell<T> extends ManagedCell<T> with CellListeners<T>, CellEq
   /// The value
   late T _value;
 
-  /// Is the a cell value update in progress?
-  var _updating = false;
-  
-  /// Is the current value of the cell stale?
-  var _stale = false;
-  
-  /// The value of the cell before the current update cycle
-  T? _oldValue;
-
   @override
   void init() {
     super.init();
 
-    _stale = true;
+    stale = true;
 
     for (final argument in _arguments) {
       argument.addObserver(this);
@@ -79,30 +76,6 @@ class DynamicComputeCell<T> extends ManagedCell<T> with CellListeners<T>, CellEq
     }
 
     super.dispose();
-  }
-
-  @override
-  void update(ValueCell<dynamic> cell) {
-    if (_updating) {
-      if (value != _oldValue) {
-        notifyUpdate();
-      }
-
-      _stale = false;
-      _updating = false;
-      _oldValue = null;
-    }
-  }
-
-  @override
-  void willUpdate(ValueCell<dynamic> cell) {
-    if (!_updating) {
-      _updating = true;
-      _stale = true;
-      _oldValue = _value;
-
-      notifyWillUpdate();
-    }
   }
 }
 

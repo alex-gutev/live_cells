@@ -10,7 +10,7 @@ import '../value_cell.dart';
 ///
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
-class StoreCell<T> extends NotifierCell<T> with ObserverCell implements CellObserver {
+class StoreCell<T> extends NotifierCell<T> with ObserverCell<T> implements CellObserver {
   /// Create a [StoreCell] which observes and saves the value of [valueCell]
   StoreCell(this.valueCell) : super(valueCell.value);
 
