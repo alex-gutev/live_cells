@@ -95,3 +95,7 @@ Improvements:
 * Simplified and streamlined API
 * Improved README
 * Bug fixes
+
+## 0.5.1
+
+* Fix typos and bugs in examples in README
