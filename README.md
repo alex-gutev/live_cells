@@ -153,7 +153,7 @@ class ComputedExample extends CellWidget with CellInitializer {
               ),
             ),
             const SizedBox(width: 5),
-            Text('+'),
+            const Text('+'),
             const SizedBox(width: 5),
             Expanded(
               child: TextField(
@@ -336,7 +336,7 @@ class ComputedExample extends CellWidget with CellInitializer {
               ),
             ),
             const SizedBox(width: 5),
-            Text('+'),
+            const Text('+'),
             const SizedBox(width: 5),
             Expanded(
               child: CellTextField(
@@ -457,7 +457,7 @@ class ComputedExample extends CellWidget with CellInitializer {
               ),
             ),
             const SizedBox(width: 5),
-            Text('+'),
+            const Text('+'),
             const SizedBox(width: 5),
             Expanded(
               child: CellTextField(
@@ -466,7 +466,7 @@ class ComputedExample extends CellWidget with CellInitializer {
               ),
             ),
             const SizedBox(width: 5),
-            Text('='),
+            const Text('='),
             const SizedBox(width: 5),
             Expanded(
               child: CellTextField(
