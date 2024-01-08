@@ -1,4 +1,4 @@
-part of 'widget_cell.dart';
+part of 'cell_widget.dart';
 
 /// Cell creation function.
 ///
