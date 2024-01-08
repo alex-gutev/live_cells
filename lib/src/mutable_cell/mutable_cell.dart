@@ -83,8 +83,13 @@ abstract class MutableCell<T> extends ValueCell<T> {
     }
     else {
       _beginBatch();
-      fn();
-      _endBatch();
+
+      try {
+        fn();
+      }
+      finally {
+        _endBatch();
+      }
     }
   }
 
