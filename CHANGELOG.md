@@ -74,3 +74,24 @@ Breaking changes:
 ## 0.4.1
 
 * Bug fixes
+
+## 0.5.0
+
+New features:
+
+* `ValueCell.computed` constructor for creating computed cells with dynamic dependencies
+* `MutableCell.computed` constructor for creating mutable computed cells with dynamic dependencies
+* `CellWidget` can now also track the cells it depends on at runtime
+* `mutableString` extension method on `MutableCell`'s holding an `int`, `double`, `num` or `string`
+
+Breaking changes:
+
+* `CellWidget.cell` method has been moved to `CellListeners` mixin
+* `CellWidgetBuilder` has been removed in favour of `CellWidget.builder` constructor
+
+Improvements:
+
+* Simplified examples demonstrating core concepts only
+* Simplified and streamlined API
+* Improved README
+* Bug fixes
