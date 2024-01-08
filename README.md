@@ -253,7 +253,7 @@ of this approach are:
 
 * No need for a `TextEditingController`
 * No need for event handlers allowing for a declarative style of programming
-* The content of the text field is a cell and can referenced by a computed cell
+* The content of the text field is a cell and can be referenced by a computed cell
 
 ### Two-way data flow
 
@@ -327,12 +327,9 @@ class ComputedExample extends CellWidget with CellInitializer {
         Row(
           children: [
             Expanded(
-              child: TextField(
-                child: CellTextField(
-                  content: strA,
-                  keyboardType: TextInputType.number,
-                ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: false),
+              child: TCellTextField(
+                content: strA,
+                keyboardType: TextInputType.number,
               ),
             ),
             const SizedBox(width: 5),
