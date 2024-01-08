@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
-class StoreCellDemo extends CellWidget {
+class StoreCellDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final n = cell(() => MutableCell(0));
@@ -52,8 +52,8 @@ class StoreCellDemo extends CellWidget {
                   ]
               ),
               const SizedBox(height: 10),
-              WidgetCell.builder((_) => Text('${n()}! = ${factorial()}')),
-              WidgetCell.builder((_) => Text('The factorial of ${n()} is ${factorial()}'))
+              CellWidget.builder((_) => Text('${n()}! = ${factorial()}')),
+              CellWidget.builder((_) => Text('The factorial of ${n()} is ${factorial()}'))
             ],
           ),
         ),

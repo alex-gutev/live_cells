@@ -3,7 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class CellCheckboxDemo extends CellWidget {
+class CellCheckboxDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final state = cell(() => MutableCell<bool?>(true));
@@ -30,7 +30,7 @@ class CellCheckboxDemo extends CellWidget {
                 value: state,
                 tristate: true,
               ),
-              WidgetCell.builder((_) {
+              CellWidget.builder((_) {
                 if (state() != null) {
                   return Text('The checkbox is ${state()! ? 'checked' : 'unchecked'}');
                 }

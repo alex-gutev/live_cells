@@ -16,7 +16,7 @@ class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
   T get value => min(argMax.value, max(argMin.value, argValue.value));
 }
 
-class SubclassDemo1 extends CellWidget {
+class SubclassDemo1 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final a = cell(() => MutableCell(5));
@@ -60,7 +60,7 @@ class SubclassDemo1 extends CellWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              WidgetCell.builder((_) => Text('ClampCell(${a()}, 2, 10) value is ${clamped()}'))
+              CellWidget.builder((_) => Text('ClampCell(${a()}, 2, 10) value is ${clamped()}'))
             ],
           ),
         ),

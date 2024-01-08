@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
-class ComputeCellDemo4 extends CellWidget {
+class ComputeCellDemo4 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final a = cell(() => MutableCell(0));
@@ -56,7 +56,7 @@ class ComputeCellDemo4 extends CellWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              WidgetCell.builder((_) => Text('${a()} + ${b()} = ${sum()}'))
+              CellWidget.builder((_) => Text('${a()} + ${b()} = ${sum()}'))
             ],
           ),
         ),

@@ -24,7 +24,7 @@ extension RadioOptionExtension on RadioOption {
   }
 }
 
-class CellRadioDemo extends CellWidget {
+class CellRadioDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final option = cell(() => MutableCell<RadioOption?>(RadioOption.optionB));
@@ -62,7 +62,7 @@ class CellRadioDemo extends CellWidget {
                 groupValue: option,
                 title: const Text('Option C'),
               ),
-              WidgetCell.builder((_) => Text('Selected option: ${option()?.prettyName ?? 'None'}')),
+              CellWidget.builder((_) => Text('Selected option: ${option()?.prettyName ?? 'None'}')),
               ElevatedButton(
                   onPressed: () => option.value = RadioOption.optionB,
                   child: const Text('Reset')

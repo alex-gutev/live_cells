@@ -38,7 +38,7 @@ class CountCell extends NotifierCell<int> {
   }
 }
 
-class SubclassDemo2 extends CellWidget {
+class SubclassDemo2 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final counter = cell(() => CountCell(10, interval: const Duration(seconds: 1)));
@@ -63,7 +63,7 @@ class SubclassDemo2 extends CellWidget {
               const SizedBox(height: 10),
               const Text('Counting to 10'),
               const SizedBox(height: 10),
-              WidgetCell.builder((_) => Text(
+              CellWidget.builder((_) => Text(
                   '${counter()}',
                   style: const TextStyle(
                       fontWeight: FontWeight.bold,

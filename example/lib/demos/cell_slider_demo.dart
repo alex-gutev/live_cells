@@ -3,7 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class CellSliderDemo extends CellWidget {
+class CellSliderDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final n = cell(() => MutableCell(2.0));
@@ -31,7 +31,7 @@ class CellSliderDemo extends CellWidget {
                 min: 0,
                 max: 5,
               ),
-              WidgetCell.builder((_) => Text('Slider value is: ${n().toStringAsFixed(2)}')),
+              CellWidget.builder((_) => Text('Slider value is: ${n().toStringAsFixed(2)}')),
               ElevatedButton(
                   onPressed: () => n.value = 2,
                   child: const Text('Reset')

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 
-class CellTextFieldDemo extends CellWidget {
+class CellTextFieldDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final name = cell(() => MutableCell(''));
@@ -30,7 +30,7 @@ class CellTextFieldDemo extends CellWidget {
                 content: name,
               ),
               const SizedBox(height: 10),
-              WidgetCell.builder((_) => Text('Hello ${name()}')),
+              CellWidget.builder((_) => Text('Hello ${name()}')),
               ElevatedButton(
                   onPressed: () => name.value = '',
                   child: const Text('Clear')

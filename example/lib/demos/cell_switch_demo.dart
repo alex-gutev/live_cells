@@ -3,7 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class CellSwitchDemo extends CellWidget {
+class CellSwitchDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final state = cell(() => MutableCell(true));
@@ -29,7 +29,7 @@ class CellSwitchDemo extends CellWidget {
               CellSwitch(
                 value: state,
               ),
-              WidgetCell.builder((_) => Text('The switch is ${state() ? 'on' : 'off'}')),
+              CellWidget.builder((_) => Text('The switch is ${state() ? 'on' : 'off'}')),
               ElevatedButton(
                   onPressed: () => state.value = true,
                   child: const Text('Reset')

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class CellTextFieldDemo2 extends CellWidget {
+class CellTextFieldDemo2 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final a = cell(() => MutableCell(0));
@@ -37,7 +37,7 @@ class CellTextFieldDemo2 extends CellWidget {
                 keyboardType: TextInputType.numberWithOptions(decimal: false),
               ),
               const SizedBox(height: 10),
-              WidgetCell.builder((_) => Text('${a()} squared is ${square()}')),
+              CellWidget.builder((_) => Text('${a()} squared is ${square()}')),
               ElevatedButton(
                   onPressed: () => a.value = 0,
                   child: const Text('Clear')
