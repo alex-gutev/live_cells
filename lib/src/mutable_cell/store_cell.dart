@@ -5,9 +5,6 @@ import '../value_cell.dart';
 
 /// Value cell which stores the computed value of another [ValueCell] in memory.
 ///
-/// The value of the cell is stored in memory, and the observers of the
-/// [StoreCell] are only called if the value of the observed call has changed.
-///
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
 class StoreCell<T> extends NotifierCell<T> with ObserverCell<T> implements CellObserver {
