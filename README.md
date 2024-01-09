@@ -517,6 +517,46 @@ widgets which expose their properties via `ValueCell`'s:
 
 ## Advanced
 
+### Optimization
+
+`ValueCell.computed` and `MutableCell.computed` determine the argument cells referenced by the
+value computation function at runtime. This allows you to conveniently create a computed cell
+without having to list out the referenced argument cells beforehand, however it also introduces
+additional overhead at runtime.
+
+There are two ways to avoid this:
+
+1. Use the overloaded operators or compose your computations out of the functions offered by the
+   library, rather than implementing a value computation function.
+2. Specify the argument cells manually
+
+We've already seen an example of option 1, in the definition of the *sum* cell from earlier.
+For option 2 a computed cell can be defined with an explicit argument list using the `computeCell`,
+`mutableComputeCell` for mutable computede cells, extension method on `List`.
+
+To create a computed cell with static argument cells, call `computeCell` on a `List` containing the 
+arguments cells referenced within the computation function:
+
+```dart
+final sum = [a, b].computeCell(() => a.value + b.value);
+```
+
+The example above shows a definition for the *sum* cell using the `computeCell` method. The arguments
+args referenced by within the computation function, passed to `computeCell`, are specified in the list
+on which the method is called. Note the value property is accessed directly rather than using the function
+call syntax since the argument cells are not determined at runtime.
+
+This definition has two major differences from the definition using
+`ValueCell.computed`:
+
+1. The argument cells are known at compile-time, eliminating the overhead of determining the argument
+   cells at runtime.
+2. A *lightweight* computed cell is created.
+
+Cells created using `computeCell` are *lightweight* which means they neither store their own value nor
+track their own observers. Instead their value is computed on demand whenever the *value* property is 
+accessed and all observers added to the cell are added directly to the argument cells.
+
 ### Writing your own cells
 
 Occasionally you may need to write your own `ValueCell` subclasses. A common situation is if you
