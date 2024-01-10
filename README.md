@@ -519,10 +519,10 @@ widgets which expose their properties via `ValueCell`'s:
 
 ### Optimization
 
-`ValueCell.computed` and `MutableCell.computed` determine the argument cells referenced by the
-value computation function at runtime. This allows you to conveniently create a computed cell
-without having to list out the referenced argument cells beforehand, however it also introduces
-additional overhead at runtime.
+`ValueCell.computed` and `MutableCell.computed` determine their dependencies, the argument
+cells referenced by the value computation function, at runtime. This allows you to 
+conveniently create a computed cell without having to list out the referenced cells beforehand,
+however it also introduces additional overhead at runtime.
 
 There are two ways to avoid this:
 
@@ -531,10 +531,10 @@ There are two ways to avoid this:
 2. Specify the argument cells manually
 
 We've already seen an example of option 1, in the definition of the *sum* cell from earlier.
-For option 2 a computed cell can be defined with an explicit argument list using the `computeCell`,
-`mutableComputeCell` for mutable computede cells, extension method on `List`.
+For option 2 a computed cell can be defined with an explicit argument list using the `computeCell`
+extension method on `List`.
 
-To create a computed cell with static argument cells, call `computeCell` on a `List` containing the 
+To create a computed cell with a static dependencies, call `computeCell` on a `List` containing the 
 arguments cells referenced within the computation function:
 
 ```dart
@@ -542,9 +542,9 @@ final sum = [a, b].computeCell(() => a.value + b.value);
 ```
 
 The example above shows a definition for the *sum* cell using the `computeCell` method. The arguments
-args referenced by within the computation function, passed to `computeCell`, are specified in the list
+referenced within the computation function, passed to `computeCell`, are specified in the list
 on which the method is called. Note the value property is accessed directly rather than using the function
-call syntax since the argument cells are not determined at runtime.
+call syntax since the cell dependencies are not determined at runtime.
 
 This definition has two major differences from the definition using
 `ValueCell.computed`:
@@ -556,6 +556,39 @@ This definition has two major differences from the definition using
 Cells created using `computeCell` are *lightweight* which means they neither store their own value nor
 track their own observers. Instead their value is computed on demand whenever the *value* property is 
 accessed and all observers added to the cell are added directly to the argument cells.
+
+The `store` method creates a cell which stores the value of a *lightweight* cell, created using `computeCell`,
+in memory so that it is not recomputed when the `value` property is is accessed again. This is useful for
+time-intensive computations.
+
+```dart
+final sum = [a, b].computeCell(() => a.value + b.value).store()
+```
+
+The above definition of the `sum` cell uses the `store` method to create a cell which stores its value instead
+of computing it on demand whenever the `value` property is accessed.
+
+Mutable computed cells with static dependencies can be created using the `mutableComputeCell` method on `List`,
+which takes the computation and reverse computation functions. Like `computeCell` the arguments referenced within
+the computation function are specified in the list on which the method is called. Unlike `computeCell` the returned
+cell does store its own value and track its own listeners, so `store` is unnecessary.
+
+```dart
+final sum = [a, b].mutableComputeCell(() => a.value + b.value, (sum) {
+  final half = sum / 2;
+  a.value = half;
+  b.value = half;
+});
+```
+
+The above example shows the definition for the mutable `sum` cell, from the example in **Fun with mutable computed cells**,
+using `mutableComputeCell` and a static dependency list.
+
+When should you use `computeCell` and `mutableComputeCell`? The `ValueCell.computed` and `MutableCell.computed`
+constructors are preferred since they are easier to use and reduce the risk of bugs caused by omitting an argument 
+cell from the depency list. Use `computeCell` and `mutableComputeCell` if you'd like to optimize your code after
+it is working correctly and even then it is preferred you limit their usage to within reusable components, such as
+functions or methods which create cells.
 
 ### Writing your own cells
 
