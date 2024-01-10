@@ -15,7 +15,7 @@ import 'cell_observer.dart';
 mixin ObserverCell<T> on CellListeners<T> implements CellObserver {
   /// Should the cell's value be recomputed
   @protected
-  var stale = false;
+  var stale = true;
 
   /// Is a cell value update currently in progress
   @protected

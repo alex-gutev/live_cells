@@ -21,7 +21,9 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T> implements CellO
 
   @override
   void dispose() {
+    stale = true;
     valueCell.removeObserver(this);
+
     super.dispose();
   }
 
@@ -29,7 +31,7 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T> implements CellO
   T get value {
     if (stale) {
       setValue(valueCell.value);
-      stale = false;
+      stale = !isInitialized;
     }
 
     return super.value;

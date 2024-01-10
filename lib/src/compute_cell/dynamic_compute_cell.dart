@@ -40,7 +40,7 @@ class DynamicComputeCell<T> extends ManagedCell<T>
         }
       });
 
-      stale = false;
+      stale = !isInitialized;
     }
 
     return _value;
@@ -71,6 +71,8 @@ class DynamicComputeCell<T> extends ManagedCell<T>
 
   @override
   void dispose() {
+    stale = true;
+
     for (final argument in _arguments) {
       argument.removeObserver(this);
     }
