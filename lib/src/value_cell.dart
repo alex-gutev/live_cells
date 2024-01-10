@@ -13,10 +13,10 @@ abstract class ValueCell<T> {
   /// The cell's value
   T get value;
 
-  ValueCell();
+  const ValueCell();
 
   /// Create a value cell with a constant value
-  factory ValueCell.value(T value) => ConstantCell(value);
+  const factory ValueCell.value(T value) = ConstantCell;
 
   /// Create a cell which computes its value using the function [compute].
   ///

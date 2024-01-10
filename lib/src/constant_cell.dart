@@ -5,7 +5,7 @@ part of 'value_cell.dart';
 /// This class implements the [ValueCell] interface but its observers
 /// are never called since the cell's value does not change.
 class ConstantCell<T> extends ValueCell<T> with CellEquality<T> {
-  ConstantCell(this._value);
+  const ConstantCell(this._value);
 
   @override
   T get value => _value;
