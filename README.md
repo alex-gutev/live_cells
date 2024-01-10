@@ -592,8 +592,7 @@ functions or methods which create cells.
 
 ### Writing your own cells
 
-Occasionally you may need to write your own `ValueCell` subclasses. A common situation is if you
-have a specific computation that you want to apply to different cells throughout your code.
+Rarely will you need to write your own `ValueCell` subclasses but should the need live cells can be extended.
 
 To subclass `ValueCell`, the following methods have to be implemented:
 
@@ -604,10 +603,10 @@ To subclass `ValueCell`, the following methods have to be implemented:
 The `CellEquality` mixin provides implementations of the equality comparison methods using the
 `==` and `!=` operators for a given type.
 
-To implement a cell that performs a computation which is dependent on the values of one or more
-argument cells, you should extend `DependentCell`. This class already implements `addObserver` and 
-`removeObserver`, and provides a constructor which takes a list of the argument cells on which the
-value of the cell depends. You're only required to implement the `value` property accessor in which 
+To implement a lightweight cell which performs a computation on the values of one or more argument cells, 
+you should extend `DependentCell`. This class already implements `addObserver` and `removeObserver`, and
+provides a constructor which takes a list of the argument cells on which the value of the cell depends.
+You're only required to implement the `value` property accessor in which 
 the value of the cell is computed.
 
 Example:
@@ -631,44 +630,15 @@ clamped between a minimum and maximum which are also supplied in argument cells.
 
 **NOTE**: The argument cell containing the value to be clamped as well as the cells containing the
 minimum and maximum are all passed to the constructor of `DependentCell` so that the observers
-of the `ClampCell` are called whenever the value of one of the argument cells changes.
+of the `ClampCell` are called whenever the values of the argument cells change.
 
-If your cell needs to store its value rather than computing it on demand or initiate value changes 
-you will need to subclass `NotifierCell`. This class provides implementations of `addObserver`,
-`removeObserver` and the `get value` property accessor. This class also provides a protected
-`set value` property accessor for setting the cell's value. When the value of the cell is set via 
-`set value` the observers of the cell are notified, if the new value is not equal to the previous value.
+If you need to implement a cell which initiates changes to its value you will need to subclass `NotifierCell`. 
+This class provides implementations of `addObserver`, `removeObserver` and the `get value` property accessor.
+This class also provides a protected `set value` property accessor for setting the cell's value. When the value
+of the cell is set via  `set value` the observers of the cell are notified, if the new value is 
+not equal to the previous value.
 
-Example:
-
-```dart
-class CountCell extends NotifierCell<int> {
-  final int end;
-  final Duration interval;
-
-  CountCell(this.end, {
-    this.interval = const Duration(seconds: 1)
-  }) : super(0) {
-    unawaited(_startCounter());
-  }
-
-  Future<void> _startCounter() async {
-    while (value < end) {
-      await Future.delayed(interval);
-      value++;
-    }
-  }
-}
-```
-
-The above example is an implementation of a cell of which the value starts at `0` and is incremented
-by one every second. If the value in this cell is displayed in a widget using `toWidget` you'd see
-the widget display a new value every second.
-
-**NOTE**: The constructor of `NotifierCell` must be called to give the cell an initial value.
-In this case the cell is given an initial value of `0` using `super(0)`.
-
-### Resource Management
+#### Resource Management
 
 In Flutter resources are typically acquired in a constructor or *init* method and are released by
 calling a *dispose* method. You'll notice that there are no calls to *dispose* anywhere
@@ -682,14 +652,7 @@ called again after `dispose` if a new observer is added after the last one is re
 implementations of `ManagedCell` should be written in such a way that the cell can be reused after
 `dispose` is called.
 
-You will have noticed that the implementation of `CountCell` in the previous example has a serious
-flaw. It starts counting immediately when it is created and continues counting even when there are
-no observers. If the value of this cell is displayed in a widget, the counter might appear to start
-from a value greater than `0` or the counting could be complete before the widget has even rendered,
-depending on where the cell is constructed.
-
-Here's a better example that uses `init` and `dispose` to start and stop a timer, for incrementing
-the value:
+Below is an example of a `NotifierCell` subclass which overrides the `ManagedCell` methods:
 
 ```dart
 import 'dart:async';
@@ -731,9 +694,13 @@ class CountCell extends NotifierCell<int> {
 }
 ```
 
-If you're implementing a subclass of `NotifierCell` which depends on the value of another cell, you
-should add an observer to the cell in the `init` method and remove the observer in the `dispose`
-method.
+The `CountCell` class above implements a cell which increments its value by 1 every second. The initial value
+of `0` is given in the call to the `NotifierCell` constructor `super(0)`. A timer is initialized in `init`
+which increments the `value` property directly every time the timer callback is called, hence the cell
+starts "counting" after the first observer is added. The timer is cancelled in the `dispose` method to
+stop the cell from incrementing its value after the last observer is removed.
+
+#### Observing Cells
 
 ### ValueListenable Interface
 
