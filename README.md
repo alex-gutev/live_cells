@@ -700,14 +700,32 @@ which increments the `value` property directly every time the timer callback is 
 starts "counting" after the first observer is added. The timer is cancelled in the `dispose` method to
 stop the cell from incrementing its value after the last observer is removed.
 
-#### Observing Cells
+### Observing Cells
 
-### ValueListenable Interface
+Observers of cells implement the `CellObserver` interface which has the following methods:
 
-The `ValueCell` class provides a `listenable` property which provides an object that exposes the cell's
-value via the `ValueListenable` interface. Listeners added to the `ValueListenable` will be called
-whenever the value of the cell changes. This allows you to use a `ValueCell` where a `ValueListenable`
-is expected.
+* `willUpdate` -- Called before the value of a cell changes.
+* `update` -- Called after the value of a cell has changed.
+
+When a cell's value is changed first its observers are notified that its value will changed,
+by calling the `willUpdate` method and then after its value is set, its observers are notified
+that the value has changed, by calling the `update` method.
+
+If you're implementing a `ValueCell` subclass which observes and reacts to changes in the values of
+other cells you'll have to properly implement both `willUpdate` and `update`.
+
+The correct behaviour of `willUpdate` is to mark the cell's value as *stale* and call the `willUpdate` 
+method of the cell's observers. When the cell's value is referenced while it is marked as *stale*,
+the value should be recomputed even if it is referenced before the `update` method is called.
+
+The correct behaviour of `update` is to recompute the cell's value, if it hasn't been recomputed
+already, and call the `update` method of the cell's observers.
+
+#### ValueListenable Interface
+
+A `ValueCell` can also function as a `ValueListenable`. The `listenable` property provides a `ValueListenable`
+object which calls its listeners, adding using `ValueListenable.addListener` whenever the value of the cell
+changes.
 
 ## Additional information
 
