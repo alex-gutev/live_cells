@@ -68,7 +68,7 @@ mixin CellInitializer on CellWidget {
   /// function. In subsequent builds, [cell] returns the existing
   /// [ValueCell] instance that was created during the first build using
   /// [create].
-  MutableCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     assert(_activeCellElement != null);
 
     final cell = _activeCellElement!.getCell(create);
@@ -94,7 +94,7 @@ extension CellWidgetContextExtension on BuildContext {
   ///
   /// **NOTE**: This method may only be called if [this] is the [BuildContext]
   /// of a [CellWidget] with the [CellInitializer] mixin.
-  MutableCell<T> cell<T>(CreateCell<ValueCell<T>> create) {
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     final element = this as _CellStorageElement;
     return element.getCell(create);
   }
@@ -108,7 +108,7 @@ class _CellStorageElement extends _CellWidgetElement {
   _CellStorageElement(super.widget);
 
   /// List of created cells
-  final List<ProxyCell> _cells = [];
+  final List<ValueCell> _cells = [];
 
   /// Index of cell to retrieve/create when calling [getCell]
   var _curCell = 0;
@@ -120,12 +120,12 @@ class _CellStorageElement extends _CellWidgetElement {
   /// returns the existing cell instance.
   /// 
   /// The cell index can be advanced using [nextCell].
-  ProxyCell<T> getCell<T>(CreateCell<ValueCell<T>> create) {
+  V getCell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     if (_curCell < _cells.length) {
-      return _cells[_curCell] as ProxyCell<T>;
+      return _cells[_curCell] as V;
     }
 
-    final cell = ProxyCell(create());
+    final cell = create();
     _cells.add(cell);
 
     return cell;
