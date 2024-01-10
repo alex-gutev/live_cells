@@ -2120,6 +2120,67 @@ void main() {
       expect(a.value, equals(32));
     });
 
+    test('ParseIntExtension.mutableString() sets error cell to error during parsing integer', () {
+      final a = MutableCell(1);
+      final error = MutableCell<dynamic>(null);
+      final strA = a.mutableString(
+          error: error,
+          errorValue: null
+      );
+
+      final observerA = MockSimpleObserver();
+      final observerError = MockSimpleObserver();
+
+      strA.addObserver(observerA);
+      error.addObserver(observerError);
+
+      strA.value = '25';
+
+      expect(a.value, equals(25));
+      expect(error.value, isNull);
+
+      strA.value = '12djdjdjdj';
+
+      expect(a.value, equals(25));
+      expect(error.value, isNotNull);
+
+      strA.value = '16';
+
+      expect(a.value, equals(16));
+      expect(error.value, isNull);
+    });
+
+
+    test('ParseIntExtension.mutableString() sets cell to errorValue on errors during parsing integer', () {
+      final a = MutableCell(1);
+      final error = MutableCell<dynamic>(null);
+      final strA = a.mutableString(
+          error: error,
+          errorValue: 7.cell
+      );
+
+      final observerA = MockSimpleObserver();
+      final observerError = MockSimpleObserver();
+
+      strA.addObserver(observerA);
+      error.addObserver(observerError);
+
+      strA.value = '25';
+
+      expect(a.value, equals(25));
+      expect(error.value, isNull);
+
+      strA.value = '12djdjdjdj';
+
+      expect(a.value, equals(7));
+      expect(error.value, isNotNull);
+
+      strA.value = '16';
+
+      expect(a.value, equals(16));
+      expect(error.value, isNull);
+    });
+
     test('ParseDoubleExtension.mutableString() converts argument cell to string', () {
       final a = MutableCell(1.0);
       final strA = a.mutableString();
