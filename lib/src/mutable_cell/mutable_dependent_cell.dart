@@ -27,7 +27,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
 
   /// List of argument cells.
   @protected
-  final Set<MutableCell> arguments;
+  final Set<ValueCell> arguments;
 
   /// Construct a [MutableDependentCell] which depends on the cells in [arguments]
   ///

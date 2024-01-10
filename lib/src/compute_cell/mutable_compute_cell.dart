@@ -1,5 +1,6 @@
 import '../mutable_cell/mutable_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
+import '../value_cell.dart';
 
 /// A cell with a value computed by a user provided function which can also be set explicitly.
 class MutableComputeCell<T> extends MutableDependentCell<T> {
@@ -18,7 +19,7 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
   /// that the values of the argument cells are set simultaneously.
   ///
   /// [arguments] is a list of argument cells on which the value of the cell
-  /// depends. The cells included in this list must be [MutableCell]'s.
+  /// depends.
   ///
   /// Example:
   ///
@@ -37,7 +38,7 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
   MutableComputeCell({
     required T Function() compute,
     required void Function(T) reverseCompute,
-    required Set<MutableCell> arguments
+    required Set<ValueCell> arguments
   }) : _compute = compute, _reverseCompute = reverseCompute, super(arguments);
 
   @override

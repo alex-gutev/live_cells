@@ -1,5 +1,5 @@
-import 'package:live_cells/live_cells.dart';
-import 'package:live_cells/src/compute_cell/dynamic_compute_cell.dart';
+import 'dynamic_compute_cell.dart';
+import '../mutable_cell/mutable_dependent_cell.dart';
 
 /// A mutable computational cell which determines is dependencies at runtime
 ///
@@ -24,10 +24,8 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   @override
   T compute() {
     return ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
-      assert(cell is MutableCell);
-
       if (!arguments.contains(cell)) {
-        arguments.add(cell as MutableCell);
+        arguments.add(cell);
 
         if (isInitialized) {
           cell.addObserver(this);
