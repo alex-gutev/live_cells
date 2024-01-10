@@ -2150,7 +2150,6 @@ void main() {
       expect(error.value, isNull);
     });
 
-
     test('ParseIntExtension.mutableString() sets cell to errorValue on errors during parsing integer', () {
       final a = MutableCell(1);
       final error = MutableCell<dynamic>(null);
@@ -2205,6 +2204,66 @@ void main() {
       expect(a.value, equals(3.5));
     });
 
+    test('ParseDoubleExtension.mutableString() sets error cell to error during parsing double', () {
+      final a = MutableCell(1.0);
+      final error = MutableCell<dynamic>(null);
+      final strA = a.mutableString(
+          error: error,
+          errorValue: null
+      );
+
+      final observerA = MockSimpleObserver();
+      final observerError = MockSimpleObserver();
+
+      strA.addObserver(observerA);
+      error.addObserver(observerError);
+
+      strA.value = '7.5';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNull);
+
+      strA.value = '3.4djdjdjdj';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNotNull);
+
+      strA.value = '9.0';
+
+      expect(a.value, equals(9.0));
+      expect(error.value, isNull);
+    });
+
+    test('ParseDoubleExtension.mutableString() sets cell to errorValue on errors during parsing double', () {
+      final a = MutableCell(1.0);
+      final error = MutableCell<dynamic>(null);
+      final strA = a.mutableString(
+          error: error,
+          errorValue: 2.5.cell
+      );
+
+      final observerA = MockSimpleObserver();
+      final observerError = MockSimpleObserver();
+
+      strA.addObserver(observerA);
+      error.addObserver(observerError);
+
+      strA.value = '7.5';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNull);
+
+      strA.value = '3.4djdjdjdj';
+
+      expect(a.value, equals(2.5));
+      expect(error.value, isNotNull);
+
+      strA.value = '9.0';
+
+      expect(a.value, equals(9.0));
+      expect(error.value, isNull);
+    });
+
     test('ParseNumExtension.mutableString() converts argument cell to string', () {
       final a = MutableCell<num>(1);
       final strA = a.mutableString();
@@ -2229,6 +2288,66 @@ void main() {
       strA.value = '100';
 
       expect(observer.values, equals([3.5, 100]));
+    });
+
+    test('ParseNumExtension.mutableString() sets error cell to error during parsing num', () {
+      final a = MutableCell<num>(0);
+      final error = MutableCell<dynamic>(null);
+      final strA = a.mutableString(
+          error: error,
+          errorValue: null
+      );
+
+      final observerA = MockSimpleObserver();
+      final observerError = MockSimpleObserver();
+
+      strA.addObserver(observerA);
+      error.addObserver(observerError);
+
+      strA.value = '7.5';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNull);
+
+      strA.value = '3.4djdjdjdj';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNotNull);
+
+      strA.value = '5';
+
+      expect(a.value, equals(5));
+      expect(error.value, isNull);
+    });
+
+    test('ParseNumExtension.mutableString() sets cell to errorValue on errors during parsing num', () {
+      final a = MutableCell<num>(0);
+      final error = MutableCell<dynamic>(null);
+      final strA = a.mutableString(
+          error: error,
+          errorValue: 8.cell
+      );
+
+      final observerA = MockSimpleObserver();
+      final observerError = MockSimpleObserver();
+
+      strA.addObserver(observerA);
+      error.addObserver(observerError);
+
+      strA.value = '7.5';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNull);
+
+      strA.value = '3.4djdjdjdj';
+
+      expect(a.value, equals(8));
+      expect(error.value, isNotNull);
+
+      strA.value = '5';
+
+      expect(a.value, equals(5));
+      expect(error.value, isNull);
     });
 
     test('ConvertStringExtension.mutableString() converts argument cell to string', () {
