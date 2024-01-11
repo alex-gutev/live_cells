@@ -130,7 +130,7 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('Error handling with mutableString()'),
+                        child: const Text('Error handling 1'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => MutableComputedCellDemo3())

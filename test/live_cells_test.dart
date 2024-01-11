@@ -2120,49 +2120,29 @@ void main() {
       expect(a.value, equals(32));
     });
 
-    test('ParseIntExtension.mutableString() sets error cell to error during parsing integer', () {
-      final a = MutableCell(1);
-      final error = MutableCell<dynamic>(null);
-      final strA = a.mutableString(
-          error: error,
-          errorValue: null
-      );
-
-      final observerA = MockSimpleObserver();
-      final observerError = MockSimpleObserver();
-
-      strA.addObserver(observerA);
-      error.addObserver(observerError);
-
-      strA.value = '25';
-
-      expect(a.value, equals(25));
-      expect(error.value, isNull);
-
-      strA.value = '12djdjdjdj';
-
-      expect(a.value, equals(25));
-      expect(error.value, isNotNull);
-
-      strA.value = '16';
-
-      expect(a.value, equals(16));
-      expect(error.value, isNull);
-    });
-
     test('ParseIntExtension.mutableString() sets cell to errorValue on errors during parsing integer', () {
       final a = MutableCell(1);
-      final error = MutableCell<dynamic>(null);
+
       final strA = a.mutableString(
-          error: error,
           errorValue: 7.cell
       );
 
-      final observerA = MockSimpleObserver();
-      final observerError = MockSimpleObserver();
+      strA.value = '25';
+      expect(a.value, equals(25));
 
-      strA.addObserver(observerA);
-      error.addObserver(observerError);
+      strA.value = '12djdjdjdj';
+      expect(a.value, equals(7));
+
+      strA.value = '16';
+      expect(a.value, equals(16));
+    });
+
+    test('ParseMaybeIntExtension.mutableString() forwards errors to argument cell', () {
+      final a = MutableCell(1);
+      final maybe = a.maybe();
+      final error = maybe.error;
+
+      final strA = maybe.mutableString();
 
       strA.value = '25';
 
@@ -2171,7 +2151,7 @@ void main() {
 
       strA.value = '12djdjdjdj';
 
-      expect(a.value, equals(7));
+      expect(a.value, equals(25));
       expect(error.value, isNotNull);
 
       strA.value = '16';
@@ -2204,49 +2184,29 @@ void main() {
       expect(a.value, equals(3.5));
     });
 
-    test('ParseDoubleExtension.mutableString() sets error cell to error during parsing double', () {
-      final a = MutableCell(1.0);
-      final error = MutableCell<dynamic>(null);
-      final strA = a.mutableString(
-          error: error,
-          errorValue: null
-      );
-
-      final observerA = MockSimpleObserver();
-      final observerError = MockSimpleObserver();
-
-      strA.addObserver(observerA);
-      error.addObserver(observerError);
-
-      strA.value = '7.5';
-
-      expect(a.value, equals(7.5));
-      expect(error.value, isNull);
-
-      strA.value = '3.4djdjdjdj';
-
-      expect(a.value, equals(7.5));
-      expect(error.value, isNotNull);
-
-      strA.value = '9.0';
-
-      expect(a.value, equals(9.0));
-      expect(error.value, isNull);
-    });
-
     test('ParseDoubleExtension.mutableString() sets cell to errorValue on errors during parsing double', () {
       final a = MutableCell(1.0);
-      final error = MutableCell<dynamic>(null);
+
       final strA = a.mutableString(
-          error: error,
           errorValue: 2.5.cell
       );
 
-      final observerA = MockSimpleObserver();
-      final observerError = MockSimpleObserver();
+      strA.value = '7.5';
+      expect(a.value, equals(7.5));
 
-      strA.addObserver(observerA);
-      error.addObserver(observerError);
+      strA.value = '3.4djdjdjdj';
+      expect(a.value, equals(2.5));
+
+      strA.value = '9.0';
+      expect(a.value, equals(9.0));
+    });
+
+    test('ParseMaybeDoubleExtension.mutableString() forwards errors to argument cell', () {
+      final a = MutableCell(1.0);
+      final maybe = a.maybe();
+      final error = maybe.error;
+
+      final strA = maybe.mutableString();
 
       strA.value = '7.5';
 
@@ -2255,7 +2215,7 @@ void main() {
 
       strA.value = '3.4djdjdjdj';
 
-      expect(a.value, equals(2.5));
+      expect(a.value, equals(7.5));
       expect(error.value, isNotNull);
 
       strA.value = '9.0';
@@ -2290,49 +2250,30 @@ void main() {
       expect(observer.values, equals([3.5, 100]));
     });
 
-    test('ParseNumExtension.mutableString() sets error cell to error during parsing num', () {
-      final a = MutableCell<num>(0);
-      final error = MutableCell<dynamic>(null);
-      final strA = a.mutableString(
-          error: error,
-          errorValue: null
-      );
-
-      final observerA = MockSimpleObserver();
-      final observerError = MockSimpleObserver();
-
-      strA.addObserver(observerA);
-      error.addObserver(observerError);
-
-      strA.value = '7.5';
-
-      expect(a.value, equals(7.5));
-      expect(error.value, isNull);
-
-      strA.value = '3.4djdjdjdj';
-
-      expect(a.value, equals(7.5));
-      expect(error.value, isNotNull);
-
-      strA.value = '5';
-
-      expect(a.value, equals(5));
-      expect(error.value, isNull);
-    });
-
     test('ParseNumExtension.mutableString() sets cell to errorValue on errors during parsing num', () {
       final a = MutableCell<num>(0);
-      final error = MutableCell<dynamic>(null);
+
       final strA = a.mutableString(
-          error: error,
           errorValue: 8.cell
       );
 
-      final observerA = MockSimpleObserver();
-      final observerError = MockSimpleObserver();
+      strA.value = '7.5';
+      expect(a.value, equals(7.5));
 
-      strA.addObserver(observerA);
-      error.addObserver(observerError);
+      strA.value = '3.4djdjdjdj';
+      expect(a.value, equals(8));
+
+      strA.value = '5';
+      expect(a.value, equals(5));
+
+    });
+
+    test('ParseNumExtension.mutableString() forwards errors to argument cell', () {
+      final a = MutableCell<num>(0);
+      final maybe = a.maybe();
+      final error = maybe.error;
+
+      final strA = maybe.mutableString();
 
       strA.value = '7.5';
 
@@ -2341,7 +2282,7 @@ void main() {
 
       strA.value = '3.4djdjdjdj';
 
-      expect(a.value, equals(8));
+      expect(a.value, equals(7.5));
       expect(error.value, isNotNull);
 
       strA.value = '5';

@@ -2,30 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class MutableComputedCellDemo3 extends CellWidget with CellInitializer {
+class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final a = cell(() => MutableCell<num>(0));
     final b = cell(() => MutableCell<num>(0));
 
-    final errorA = cell(() => MutableCell<dynamic>(null));
-    final errorB = cell(() => MutableCell<dynamic>(null));
+    final maybeA = cell(() => a.maybe());
+    final maybeB = cell(() => b.maybe());
 
-    final strA = cell(() => a.mutableString(
-      error: errorA,
-      errorValue: null
-    ));
+    final strA = cell(() => maybeA.mutableString());
+    final strB = cell(() => maybeB.mutableString());
 
-    final strB = cell(() => b.mutableString(
-      error: errorB,
-      errorValue: null
-    ));
+    final errorA = cell(() => maybeA.error);
+    final errorB = cell(() => maybeB.error);
 
     final sum = cell(() => a + b);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Error handling with mutableString()'),
+        title: const Text('Error handling with Maybe'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
