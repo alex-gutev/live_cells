@@ -16,12 +16,24 @@ export 'src/compute_cell/compute_cell.dart' show ComputeCell;
 export 'src/extensions/compute_extension.dart'
     show ComputeExtension, ListComputeExtension;
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
+export 'src/maybe_cell/maybe.dart'
+    show Maybe, MaybeCell, CellMaybeExtension, MaybeCellExtension;
 export 'src/extensions/numeric_extension.dart' show NumericExtension;
 export 'src/extensions/values_extension.dart'
     show NumValueCellExtension, StringValueCellExtension;
+
 export 'src/extensions/conversion_extensions.dart'
-    show ParseIntExtension, ParseDoubleExtension, ParseNumExtension, ConvertStringExtension;
+    show
+        ParseIntExtension,
+        ParseDoubleExtension,
+        ParseNumExtension,
+        ParseMaybeIntExtension,
+        ParseMaybeDoubleExtension,
+        ParseMaybeNumExtension,
+        ConvertStringExtension;
+
 export 'src/async_cell/delay_cell.dart' show DelayCell;
-export 'src/extensions/widget_extension.dart' show WidgetExtension, WidgetCellExtension, ComputeWidgetExtension;
+export 'src/extensions/widget_extension.dart'
+    show WidgetExtension, WidgetCellExtension, ComputeWidgetExtension;
 export 'src/cell_widget/cell_widget.dart'
     show CellWidget, CreateCell, CellInitializer, CellWidgetContextExtension;
