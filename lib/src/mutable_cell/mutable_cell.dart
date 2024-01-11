@@ -111,7 +111,7 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// previous value.
   @protected
   static void addToBatch(MutableCell cell, bool isEqual) {
-    _batchList[cell] = isEqual;
+    _batchList.update(cell, (value) => value && isEqual, ifAbsent: () => isEqual);
   }
 
   /// Private
@@ -139,7 +139,6 @@ abstract class MutableCell<T> extends ValueCell<T> {
       entry.key.notifyUpdate(entry.value);
     }
 
-    _batched = false;
     _batchList.clear();
   }
 }
