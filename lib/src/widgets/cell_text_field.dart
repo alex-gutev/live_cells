@@ -231,18 +231,27 @@ class _CellTextFieldState extends State<CellTextField> {
   }
 
   void _onTextChange() {
-    try {
-      _suppressUpdate = true;
-      widget.content.value = _controller.text;
-    }
-    finally {
-      _suppressUpdate = false;
-    }
+    _withSuppressUpdates(() => widget.content.value = _controller.text);
   }
 
   void _onChangeCellContent() {
+    _withSuppressUpdates(() => _controller.text = widget.content.value);
+  }
+
+  /// Suppress events triggered by [fn].
+  ///
+  /// If [fn] updates [_controller.text] do not reflect the change in
+  /// [widget.content]. Similarly, if [fn] updates [widget.content] do not
+  /// reflect the change in [_controller.text].
+  void _withSuppressUpdates(VoidCallback fn) {
     if (!_suppressUpdate) {
-      _controller.text = widget.content.value;
+      try {
+        _suppressUpdate = true;
+        fn();
+      }
+      finally {
+        _suppressUpdate = false;
+      }
     }
   }
 }
