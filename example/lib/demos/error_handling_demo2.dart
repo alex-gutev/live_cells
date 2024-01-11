@@ -2,26 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
+class ErrorHandlingDemo2 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final a = cell(() => MutableCell<num>(0));
     final b = cell(() => MutableCell<num>(0));
 
-    final maybeA = cell(() => a.maybe());
-    final maybeB = cell(() => b.maybe());
-
-    final strA = cell(() => maybeA.mutableString());
-    final strB = cell(() => maybeB.mutableString());
-
-    final errorA = cell(() => maybeA.error);
-    final errorB = cell(() => maybeB.error);
-
     final sum = cell(() => a + b);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Error handling 1'),
+        title: const Text('Error handling 2'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -33,29 +24,13 @@ class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
               Row(
                 children: [
                   Expanded(
-                    child: CellTextField(
-                      content: strA,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        errorText: errorA() != null
-                            ? 'Please enter a valid number'
-                            : null
-                      ),
-                    ),
+                    child: inputField(a),
                   ),
                   const SizedBox(width: 5),
                   const Text('+'),
                   const SizedBox(width: 5),
                   Expanded(
-                    child: CellTextField(
-                      content: strB,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                          errorText: errorB() != null
-                              ? 'Please enter a valid number'
-                              : null
-                      ),
-                    ),
+                    child: inputField(b),
                   ),
                 ],
               ),
@@ -81,5 +56,27 @@ class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
         ),
       ),
     );
+  }
+
+  static Widget inputField(MutableCell<num> cell) {
+    return CellWidget.builder((context) {
+      final maybe = context.cell(() => cell.maybe());
+      final content = context.cell(() => maybe.mutableString());
+      final error = context.cell(() => maybe.error);
+
+      final isEmpty = context.cell(() => ValueCell.computed(() => content().isEmpty));
+
+      return CellTextField(
+        content: content,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          errorText: isEmpty()
+              ? 'Please enter a value'
+              : error() != null
+              ? 'Not a valid number'
+              : null
+        ),
+      );
+    });
   }
 }

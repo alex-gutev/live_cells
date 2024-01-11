@@ -4,7 +4,8 @@ import 'demos/cell_text_field_demo.dart';
 import 'demos/counter_demo.dart';
 import 'demos/mutable_computed_cell_demo.dart';
 import 'demos/mutable_computed_cell_demo2.dart';
-import 'demos/mutable_computed_cell_demo3.dart';
+import 'demos/error_handling_demo1.dart';
+import 'demos/error_handling_demo2.dart';
 import 'demos/sum_demo.dart';
 import 'demos/cell_checkbox_demo.dart';
 import 'demos/cell_radio_demo.dart';
@@ -133,7 +134,15 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Error handling 1'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => MutableComputedCellDemo3())
+                              builder: (context) => ErrorHandlingDemo1())
+                          );
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Error handling 2'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ErrorHandlingDemo2())
                           );
                         },
                       ),
