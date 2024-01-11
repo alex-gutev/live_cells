@@ -96,7 +96,10 @@ extension CellWidgetContextExtension on BuildContext {
   /// of a [CellWidget] with the [CellInitializer] mixin.
   V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     final element = this as _CellStorageElement;
-    return element.getCell(create);
+    final cell = element.getCell(create);
+
+    element.nextCell();
+    return cell;
   }
 }
 
