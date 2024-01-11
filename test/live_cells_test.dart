@@ -16,7 +16,10 @@ abstract class ValueObserver {
 ///
 ///   - Add instance as an observer of a cell
 ///   - verify(instance.update())
-class MockSimpleObserver extends Mock implements CellObserver {}
+class MockSimpleObserver extends Mock implements CellObserver {
+  @override
+  bool get shouldNotifyAlways => false;
+}
 
 /// Mock class implementing [ValueObserver]
 ///

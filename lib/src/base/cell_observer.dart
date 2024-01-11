@@ -2,6 +2,15 @@ import '../value_cell.dart';
 
 /// Interface for observing changes to the value of a [ValueCell]
 abstract class CellObserver {
+  /// Should the observer be notified if the new value of the cell is equal to the previous value?
+  ///
+  /// If false the observer is only notified if the new value is different
+  /// from the previous value.
+  ///
+  /// **NOTE**: The behaviour is undefined if the value of this property changes
+  /// for a given observer.
+  bool get shouldNotifyAlways => false;
+
   /// The observed cell will change its value.
   ///
   /// This method is called when the value of an ancestor of [cell] has been

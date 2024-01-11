@@ -61,4 +61,7 @@ class _CellObserverWrapper extends CellObserver {
   void willUpdate(ValueCell cell) {
     observer.willUpdate(observedCell);
   }
+
+  @override
+  bool get shouldNotifyAlways => observer.shouldNotifyAlways;
 }

@@ -41,6 +41,9 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T> implements CellO
 
   /// The observed cell
   final ValueCell<T> valueCell;
+
+  @override
+  bool get shouldNotifyAlways => false;
 }
 
 extension StoreCellExtension<T> on ValueCell<T> {

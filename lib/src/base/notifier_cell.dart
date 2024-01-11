@@ -27,7 +27,7 @@ abstract class NotifierCell<T> extends ManagedCell<T> with CellEquality<T>, Cell
 
   @protected
   set value(T value) {
-    if (_value == value) {
+    if (!hasShouldNotifyAlways && _value == value) {
       return;
     }
 

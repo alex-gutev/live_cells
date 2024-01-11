@@ -16,6 +16,10 @@ mixin CellListeners<T> on ManagedCell<T> {
   /// Has the cell been initialized
   @protected
   bool get isInitialized => _observers.isNotEmpty;
+  
+  /// Does this cell have observers for which [CellObserver.shouldNotifyAlways] is true?
+  @protected
+  bool get hasShouldNotifyAlways => _nNotifyAlways > 0;
 
   @override
   void addObserver(CellObserver observer) {
@@ -24,6 +28,10 @@ mixin CellListeners<T> on ManagedCell<T> {
     }
 
     _observers.update(observer, (count) => count + 1, ifAbsent: () => 1);
+    
+    if (observer.shouldNotifyAlways) {
+      _nNotifyAlways++;
+    }
   }
 
   @override
@@ -31,6 +39,11 @@ mixin CellListeners<T> on ManagedCell<T> {
     final count = _observers[observer];
 
     if (count != null) {
+      if (observer.shouldNotifyAlways) {
+        assert(_nNotifyAlways > 0);
+        _nNotifyAlways--;
+      }
+      
       if (count > 1) {
         _observers[observer] = count - 1;
       }
@@ -87,4 +100,7 @@ mixin CellListeners<T> on ManagedCell<T> {
   /// storing a count of how many times [addObserver] was called for a given
   /// observer.
   final Map<CellObserver, int> _observers = HashMap();
+  
+  /// Number of observers for which [CellObserver.shouldNotifyAlways] is true
+  var _nNotifyAlways = 0;
 }

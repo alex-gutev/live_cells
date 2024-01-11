@@ -79,6 +79,9 @@ class DynamicComputeCell<T> extends ManagedCell<T>
 
     super.dispose();
   }
+
+  @override
+  bool get shouldNotifyAlways => false;
 }
 
 /// Provides static methods for tracking computational cell arguments at runtime.

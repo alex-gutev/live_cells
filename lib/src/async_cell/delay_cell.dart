@@ -49,4 +49,7 @@ class DelayCell<T> extends NotifierCell<T> implements CellObserver {
   @override
   void willUpdate(ValueCell cell) {
   }
+
+  @override
+  bool get shouldNotifyAlways => false;
 }

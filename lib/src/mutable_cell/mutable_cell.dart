@@ -136,7 +136,7 @@ class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T> {
   @override
   set value(T value) {
     if (MutableCell._batched) {
-      if (value != this.value) {
+      if (hasShouldNotifyAlways || value != this.value) {
         notifyWillUpdate();
         setValue(value);
 

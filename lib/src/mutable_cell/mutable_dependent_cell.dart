@@ -65,7 +65,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
 
   @override
   set value(T value) {
-    if (_value == value) {
+    if (!hasShouldNotifyAlways && _value == value) {
       return;
     }
 
@@ -130,4 +130,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
       super.willUpdate(cell);
     }
   }
+  
+  @override
+  bool get shouldNotifyAlways => true;
 }
