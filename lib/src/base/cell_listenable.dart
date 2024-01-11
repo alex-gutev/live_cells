@@ -60,6 +60,9 @@ class _ListenerCellObserverAdapter extends CellObserver {
   /// The listener function
   final VoidCallback listener;
 
+  /// Is an update currently in progress.
+  var _updating = false;
+
   _ListenerCellObserverAdapter(this.listener);
 
   @override
@@ -72,10 +75,14 @@ class _ListenerCellObserverAdapter extends CellObserver {
   
   @override
   void update(ValueCell cell) {
-    listener();
+    if (_updating) {
+      _updating = false;
+      listener();
+    }
   }
 
   @override
   void willUpdate(ValueCell cell) {
+    _updating = true;
   }
 }
