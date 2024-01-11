@@ -16,10 +16,6 @@ mixin CellListeners<T> on ManagedCell<T> {
   /// Has the cell been initialized
   @protected
   bool get isInitialized => _observers.isNotEmpty;
-  
-  /// Does this cell have observers for which [CellObserver.shouldNotifyAlways] is true?
-  @protected
-  bool get hasShouldNotifyAlways => _nNotifyAlways > 0;
 
   @override
   void addObserver(CellObserver observer) {
@@ -28,10 +24,6 @@ mixin CellListeners<T> on ManagedCell<T> {
     }
 
     _observers.update(observer, (count) => count + 1, ifAbsent: () => 1);
-    
-    if (observer.shouldNotifyAlways) {
-      _nNotifyAlways++;
-    }
   }
 
   @override
@@ -39,11 +31,6 @@ mixin CellListeners<T> on ManagedCell<T> {
     final count = _observers[observer];
 
     if (count != null) {
-      if (observer.shouldNotifyAlways) {
-        assert(_nNotifyAlways > 0);
-        _nNotifyAlways--;
-      }
-      
       if (count > 1) {
         _observers[observer] = count - 1;
       }
@@ -60,15 +47,20 @@ mixin CellListeners<T> on ManagedCell<T> {
   /// Notify the observers of the cell that the cell's value will change.
   ///
   /// This should be called before the value of the cell has actually changed.
+  ///
+  /// If [isEqual] is true then only the observers, for which
+  /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
-  void notifyWillUpdate() {
+  void notifyWillUpdate([bool isEqual = false]) {
     for (final observer in _observers.keys) {
       try {
-        observer.willUpdate(this);
+        if (!isEqual || observer.shouldNotifyAlways) {
+          observer.willUpdate(this);
+        }
       }
       catch (e, st) {
         if (kDebugMode) {
-          print('Error in CellObserver.preUpdate: $e - $st');
+          print('Error in CellObserver.willUpdate: $e - $st');
         }
       }
     }
@@ -78,11 +70,16 @@ mixin CellListeners<T> on ManagedCell<T> {
   ///
   /// This should be called after the value of the cell has changed to a new
   /// value following a [notifyWillChange] call.
+  ///
+  /// If [isEqual] is true then only the observers, for which
+  /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
-  void notifyUpdate() {
+  void notifyUpdate([bool isEqual = false]) {
     for (final observer in _observers.keys) {
       try {
-        observer.update(this);
+        if (!isEqual || observer.shouldNotifyAlways) {
+          observer.update(this);
+        }
       }
       catch (e, st) {
         if (kDebugMode) {
@@ -100,7 +97,4 @@ mixin CellListeners<T> on ManagedCell<T> {
   /// storing a count of how many times [addObserver] was called for a given
   /// observer.
   final Map<CellObserver, int> _observers = HashMap();
-  
-  /// Number of observers for which [CellObserver.shouldNotifyAlways] is true
-  var _nNotifyAlways = 0;
 }

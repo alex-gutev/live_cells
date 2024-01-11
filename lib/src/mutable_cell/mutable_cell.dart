@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:live_cells/src/compute_cell/dynamic_mutable_compute_cell.dart';
 
@@ -58,18 +60,24 @@ abstract class MutableCell<T> extends ValueCell<T> {
 
   /// Notify the observers of the cell that the cell's value will change.
   ///
+  /// If [isEqual] is true it indicates that the new value is equal to the
+  /// previous value.
+  ///
   /// This is called before the value of the cell has been set during a batch
   /// update, *see [MutableCell.batch]*.
   @protected
-  void notifyWillUpdate();
+  void notifyWillUpdate([bool isEqual = false]);
 
   /// Notify the observers of the cell that the cell's value has change.
+  ///
+  /// If [isEqual] is true it indicates that the new value is equal to the
+  /// previous value.
   ///
   /// This is called after the value of a batch update of cells,
   /// *see [MutableCell.batch]*. At this point the value of the [value] property
   /// will have been set to the new value of the cell.
   @protected
-  void notifyUpdate();
+  void notifyUpdate([bool isEqual = false]);
 
   /// Set the value of multiple [MutableCell]'s simultaneously.
   ///
@@ -98,9 +106,12 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// This method should be called by subclasses of [MutableCell] when
   /// [value] is being set while [isBatchUpdate] is true. The observers of [cell]
   /// are notified, by [notifyUpdate] after the batch update is complete.
+  ///
+  /// If [isEqual] is true it indicates that the new value is equal to the
+  /// previous value.
   @protected
-  static void addToBatch(MutableCell cell) {
-    _batchList.add(cell);
+  static void addToBatch(MutableCell cell, bool isEqual) {
+    _batchList[cell] = isEqual;
   }
 
   /// Private
@@ -108,8 +119,11 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// Is a batch update currently ongoing?
   static var _batched = false;
 
-  /// List of cells of which the observers should be notified after the current batch update
-  static final List<MutableCell> _batchList = [];
+  /// Set of cells of which the observers should be notified after the current batch update.
+  ///
+  /// The map is indexed by the cell object, with the value being a boolean
+  /// which is true if the new value of the cell is equal to the previous value.
+  static final Map<MutableCell, bool> _batchList = LinkedHashMap();
 
   /// Begin a update update.
   static void _beginBatch() {
@@ -121,8 +135,8 @@ abstract class MutableCell<T> extends ValueCell<T> {
   static void _endBatch() {
     _batched = false;
 
-    for (final cell in _batchList) {
-      cell.notifyUpdate();
+    for (final entry in _batchList.entries) {
+      entry.key.notifyUpdate(entry.value);
     }
 
     _batched = false;
@@ -135,13 +149,13 @@ class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T> {
 
   @override
   set value(T value) {
-    if (MutableCell._batched) {
-      if (hasShouldNotifyAlways || value != this.value) {
-        notifyWillUpdate();
-        setValue(value);
+    if (MutableCell.isBatchUpdate) {
+      final isEqual = value == this.value;
 
-        MutableCell._batchList.add(this);
-      }
+      notifyWillUpdate(isEqual);
+      setValue(value);
+
+      MutableCell.addToBatch(this, isEqual);
     }
     else {
       super.value = value;

@@ -65,12 +65,10 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
 
   @override
   set value(T value) {
-    if (!hasShouldNotifyAlways && _value == value) {
-      return;
-    }
+    final isEqual = _value == value;
 
     _reverse = true;
-    notifyWillUpdate();
+    notifyWillUpdate(isEqual);
 
     updating = false;
     stale = false;
@@ -88,10 +86,10 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
     });
 
     if (MutableCell.isBatchUpdate) {
-      MutableCell.addToBatch(this);
+      MutableCell.addToBatch(this, isEqual);
     }
     else {
-      notifyUpdate();
+      notifyUpdate(isEqual);
     }
 
     _reverse = false;

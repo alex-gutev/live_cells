@@ -27,13 +27,11 @@ abstract class NotifierCell<T> extends ManagedCell<T> with CellEquality<T>, Cell
 
   @protected
   set value(T value) {
-    if (!hasShouldNotifyAlways && _value == value) {
-      return;
-    }
+    final isEqual = _value == value;
 
-    notifyWillUpdate();
+    notifyWillUpdate(isEqual);
     _value = value;
-    notifyUpdate();
+    notifyUpdate(isEqual);
   }
 
   /// Set the value of the cell without notifying the cell's observers.
