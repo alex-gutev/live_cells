@@ -1,9 +1,9 @@
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:live_cells/src/compute_cell/dynamic_mutable_compute_cell.dart';
 
 import '../base/notifier_cell.dart';
+import '../compute_cell/dynamic_mutable_compute_cell.dart';
 import '../value_cell.dart';
 
 /// Interface for a [ValueCell] of which the [value] property can be set explicitly
