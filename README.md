@@ -517,10 +517,82 @@ widgets which expose their properties via `ValueCell`'s:
 
 ## Advanced
 
+### Optimization
+
+`ValueCell.computed` and `MutableCell.computed` determine their dependencies, the argument
+cells referenced by the value computation function, at runtime. This allows you to 
+conveniently create a computed cell without having to list out the referenced cells beforehand,
+however it also introduces additional overhead at runtime.
+
+There are two ways to avoid this:
+
+1. Use the overloaded operators or compose your computations out of the functions offered by the
+   library, rather than implementing a value computation function.
+2. Specify the argument cells manually
+
+We've already seen an example of option 1, in the definition of the *sum* cell from earlier.
+For option 2 a computed cell can be defined with an explicit argument list using the `computeCell`
+extension method on `List`.
+
+To create a computed cell with a static dependencies, call `computeCell` on a `List` containing the 
+arguments cells referenced within the computation function:
+
+```dart
+final sum = [a, b].computeCell(() => a.value + b.value);
+```
+
+The example above shows a definition for the *sum* cell using the `computeCell` method. The arguments
+referenced within the computation function, passed to `computeCell`, are specified in the list
+on which the method is called. Note the value property is accessed directly rather than using the function
+call syntax since the cell dependencies are not determined at runtime.
+
+This definition has two major differences from the definition using
+`ValueCell.computed`:
+
+1. The argument cells are known at compile-time, eliminating the overhead of determining the argument
+   cells at runtime.
+2. A *lightweight* computed cell is created.
+
+Cells created using `computeCell` are *lightweight* which means they neither store their own value nor
+track their own observers. Instead their value is computed on demand whenever the *value* property is 
+accessed and all observers added to the cell are added directly to the argument cells.
+
+The `store` method creates a cell which stores the value of a *lightweight* cell, created using `computeCell`,
+in memory so that it is not recomputed when the `value` property is is accessed again. This is useful for
+time-intensive computations.
+
+```dart
+final sum = [a, b].computeCell(() => a.value + b.value).store()
+```
+
+The above definition of the `sum` cell uses the `store` method to create a cell which stores its value instead
+of computing it on demand whenever the `value` property is accessed.
+
+Mutable computed cells with static dependencies can be created using the `mutableComputeCell` method on `List`,
+which takes the computation and reverse computation functions. Like `computeCell` the arguments referenced within
+the computation function are specified in the list on which the method is called. Unlike `computeCell` the returned
+cell does store its own value and track its own listeners, so `store` is unnecessary.
+
+```dart
+final sum = [a, b].mutableComputeCell(() => a.value + b.value, (sum) {
+  final half = sum / 2;
+  a.value = half;
+  b.value = half;
+});
+```
+
+The above example shows the definition for the mutable `sum` cell, from the example in **Fun with mutable computed cells**,
+using `mutableComputeCell` and a static dependency list.
+
+When should you use `computeCell` and `mutableComputeCell`? The `ValueCell.computed` and `MutableCell.computed`
+constructors are preferred since they are easier to use and reduce the risk of bugs caused by omitting an argument 
+cell from the depency list. Use `computeCell` and `mutableComputeCell` if you'd like to optimize your code after
+it is working correctly and even then it is preferred you limit their usage to within reusable components, such as
+functions or methods which create cells.
+
 ### Writing your own cells
 
-Occasionally you may need to write your own `ValueCell` subclasses. A common situation is if you
-have a specific computation that you want to apply to different cells throughout your code.
+Rarely will you need to write your own `ValueCell` subclasses but should the need live cells can be extended.
 
 To subclass `ValueCell`, the following methods have to be implemented:
 
@@ -531,10 +603,10 @@ To subclass `ValueCell`, the following methods have to be implemented:
 The `CellEquality` mixin provides implementations of the equality comparison methods using the
 `==` and `!=` operators for a given type.
 
-To implement a cell that performs a computation which is dependent on the values of one or more
-argument cells, you should extend `DependentCell`. This class already implements `addObserver` and 
-`removeObserver`, and provides a constructor which takes a list of the argument cells on which the
-value of the cell depends. You're only required to implement the `value` property accessor in which 
+To implement a lightweight cell which performs a computation on the values of one or more argument cells, 
+you should extend `DependentCell`. This class already implements `addObserver` and `removeObserver`, and
+provides a constructor which takes a list of the argument cells on which the value of the cell depends.
+You're only required to implement the `value` property accessor in which 
 the value of the cell is computed.
 
 Example:
@@ -558,44 +630,15 @@ clamped between a minimum and maximum which are also supplied in argument cells.
 
 **NOTE**: The argument cell containing the value to be clamped as well as the cells containing the
 minimum and maximum are all passed to the constructor of `DependentCell` so that the observers
-of the `ClampCell` are called whenever the value of one of the argument cells changes.
+of the `ClampCell` are called whenever the values of the argument cells change.
 
-If your cell needs to store its value rather than computing it on demand or initiate value changes 
-you will need to subclass `NotifierCell`. This class provides implementations of `addObserver`,
-`removeObserver` and the `get value` property accessor. This class also provides a protected
-`set value` property accessor for setting the cell's value. When the value of the cell is set via 
-`set value` the observers of the cell are notified, if the new value is not equal to the previous value.
+If you need to implement a cell which initiates changes to its value you will need to subclass `NotifierCell`. 
+This class provides implementations of `addObserver`, `removeObserver` and the `get value` property accessor.
+This class also provides a protected `set value` property accessor for setting the cell's value. When the value
+of the cell is set via  `set value` the observers of the cell are notified, if the new value is 
+not equal to the previous value.
 
-Example:
-
-```dart
-class CountCell extends NotifierCell<int> {
-  final int end;
-  final Duration interval;
-
-  CountCell(this.end, {
-    this.interval = const Duration(seconds: 1)
-  }) : super(0) {
-    unawaited(_startCounter());
-  }
-
-  Future<void> _startCounter() async {
-    while (value < end) {
-      await Future.delayed(interval);
-      value++;
-    }
-  }
-}
-```
-
-The above example is an implementation of a cell of which the value starts at `0` and is incremented
-by one every second. If the value in this cell is displayed in a widget using `toWidget` you'd see
-the widget display a new value every second.
-
-**NOTE**: The constructor of `NotifierCell` must be called to give the cell an initial value.
-In this case the cell is given an initial value of `0` using `super(0)`.
-
-### Resource Management
+#### Resource Management
 
 In Flutter resources are typically acquired in a constructor or *init* method and are released by
 calling a *dispose* method. You'll notice that there are no calls to *dispose* anywhere
@@ -609,14 +652,7 @@ called again after `dispose` if a new observer is added after the last one is re
 implementations of `ManagedCell` should be written in such a way that the cell can be reused after
 `dispose` is called.
 
-You will have noticed that the implementation of `CountCell` in the previous example has a serious
-flaw. It starts counting immediately when it is created and continues counting even when there are
-no observers. If the value of this cell is displayed in a widget, the counter might appear to start
-from a value greater than `0` or the counting could be complete before the widget has even rendered,
-depending on where the cell is constructed.
-
-Here's a better example that uses `init` and `dispose` to start and stop a timer, for incrementing
-the value:
+Below is an example of a `NotifierCell` subclass which overrides the `ManagedCell` methods:
 
 ```dart
 import 'dart:async';
@@ -658,16 +694,38 @@ class CountCell extends NotifierCell<int> {
 }
 ```
 
-If you're implementing a subclass of `NotifierCell` which depends on the value of another cell, you
-should add an observer to the cell in the `init` method and remove the observer in the `dispose`
-method.
+The `CountCell` class above implements a cell which increments its value by 1 every second. The initial value
+of `0` is given in the call to the `NotifierCell` constructor `super(0)`. A timer is initialized in `init`
+which increments the `value` property directly every time the timer callback is called, hence the cell
+starts "counting" after the first observer is added. The timer is cancelled in the `dispose` method to
+stop the cell from incrementing its value after the last observer is removed.
 
-### ValueListenable Interface
+### Observing Cells
 
-The `ValueCell` class provides a `listenable` property which provides an object that exposes the cell's
-value via the `ValueListenable` interface. Listeners added to the `ValueListenable` will be called
-whenever the value of the cell changes. This allows you to use a `ValueCell` where a `ValueListenable`
-is expected.
+Observers of cells implement the `CellObserver` interface which has the following methods:
+
+* `willUpdate` -- Called before the value of a cell changes.
+* `update` -- Called after the value of a cell has changed.
+
+When a cell's value is changed first its observers are notified that its value will changed,
+by calling the `willUpdate` method and then after its value is set, its observers are notified
+that the value has changed, by calling the `update` method.
+
+If you're implementing a `ValueCell` subclass which observes and reacts to changes in the values of
+other cells you'll have to properly implement both `willUpdate` and `update`.
+
+The correct behaviour of `willUpdate` is to mark the cell's value as *stale* and call the `willUpdate` 
+method of the cell's observers. When the cell's value is referenced while it is marked as *stale*,
+the value should be recomputed even if it is referenced before the `update` method is called.
+
+The correct behaviour of `update` is to recompute the cell's value, if it hasn't been recomputed
+already, and call the `update` method of the cell's observers.
+
+#### ValueListenable Interface
+
+A `ValueCell` can also function as a `ValueListenable`. The `listenable` property provides a `ValueListenable`
+object which calls its listeners, adding using `ValueListenable.addListener` whenever the value of the cell
+changes.
 
 ## Additional information
 
