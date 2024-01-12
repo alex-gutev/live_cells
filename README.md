@@ -904,11 +904,47 @@ the value should be recomputed even if it is referenced before the `update` meth
 The correct behaviour of `update` is to recompute the cell's value, if it hasn't been recomputed
 already, and call the `update` method of the cell's observers.
 
+The `ObserverCell` mixin already provides definitions of `willUpdate` and `update` for a cell which
+reacts to changes in the value of other cells. All you need to do is mixin `ObserverCell` into your
+`NotifierCell` subclass and add the cell as an observer of the cells it should observer changes in.
+
+**NOTE**:
+
+The cell must add itself as an observer to its dependent cells in the `init` method and remove itself
+in the `dispose` method to ensure that no resources are leaked:
+
+```dart
+class MyCell<T> extends NotifierCell<T> with ObserverCell<T> {
+  final ValueCell<T> arg1;
+  final ValueCell<T> arg2;
+  
+  MyCell(super.value, {
+    required this.arg1,
+    required this.arg2
+  });
+  
+  @override
+  void init() {
+    arg1.addListener(this);
+    arg2.addListener(this);
+  }
+  
+  @override
+  void dispose() {
+    arg1.removeListener(this);
+    arg2.removeListener(this);
+  }
+  
+  ...
+}
+```
+
 #### ValueListenable Interface
 
-A `ValueCell` can also function as a `ValueListenable`. The `listenable` property provides a `ValueListenable`
-object which calls its listeners, adding using `ValueListenable.addListener` whenever the value of the cell
-changes.
+If you're not implement a `ValueCell` subclass and you're only interested in the `update` method of 
+the `CellObserver` interface, you can use the `listenable` property of `ValueCell` to retrieve a
+`ValueListenable` object which calls its listeners, whenever the value of the cell changes. Listeners
+are added using `addListener` and removed using `removeListener`.
 
 ## Additional information
 
