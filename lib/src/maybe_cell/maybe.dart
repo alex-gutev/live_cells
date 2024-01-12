@@ -1,6 +1,6 @@
-import 'package:live_cells/live_cells.dart';
-
+import '../extensions/compute_extension.dart';
 import '../mutable_cell/mutable_cell.dart';
+import '../value_cell.dart';
 
 /// Container that either holds a value or an exception that was raised while computing the value.
 class Maybe<T> {
@@ -10,7 +10,7 @@ class Maybe<T> {
   /// Exception thrown during the computation of [value].
   ///
   /// If [value] was computed successfully, this is `null`.
-  final error;
+  final dynamic error;
 
   /// Create a [Maybe] that holds a computed value.
   Maybe(this.value) : error = null;

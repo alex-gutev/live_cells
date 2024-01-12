@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/foundation.dart';
 
 import '../base/notifier_cell.dart';
@@ -123,7 +121,7 @@ abstract class MutableCell<T> extends ValueCell<T> {
   ///
   /// The map is indexed by the cell object, with the value being a boolean
   /// which is true if the new value of the cell is equal to the previous value.
-  static final Map<MutableCell, bool> _batchList = LinkedHashMap();
+  static final Map<MutableCell, bool> _batchList = {};
 
   /// Begin a update update.
   static void _beginBatch() {
