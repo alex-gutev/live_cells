@@ -925,14 +925,14 @@ class MyCell<T> extends NotifierCell<T> with ObserverCell<T> {
   
   @override
   void init() {
-    arg1.addListener(this);
-    arg2.addListener(this);
+    arg1.addObserver(this);
+    arg2.addObserver(this);
   }
   
   @override
   void dispose() {
-    arg1.removeListener(this);
-    arg2.removeListener(this);
+    arg1.removeObserver(this);
+    arg2.removeObserver(this);
   }
   
   ...
