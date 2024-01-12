@@ -71,7 +71,7 @@ class ErrorHandlingDemo2 extends CellWidget with CellInitializer {
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
           errorText: isEmpty()
-              ? 'Please enter a value'
+              ? 'Cannot be empty'
               : error() != null
               ? 'Not a valid number'
               : null
