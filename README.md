@@ -515,6 +515,189 @@ widgets which expose their properties via `ValueCell`'s:
 * `CellSwitch` - A `Switch` with the `value` property controlled by a cell
 * `CellSwitchListTile` - A `SwitchListTile` with the `value` property controlled by a cell
 
+### Error Handling
+
+The user might enter text in the text field from which a number cannot be parsed. `mutableString`,
+as used in the previous examples, handles this by assigning a default value to its argument cell,
+which is controlled by the `errorValue` argument. 
+
+Example:
+
+
+```dart
+final strA = a.mutableString(
+  errorValue: -1.cell
+);
+
+strA.vaue = 'not a valid number';
+
+print(a.value); // Prints -1
+```
+
+In the above example a default vaue of `-1` was set in the case that a number cannot be parsed from
+the value of the string cell.
+
+**NOTE**: The `errorValue` argument is a `ValueCell`, which allows the default value to be changed
+dynamically. The `cell` extension property was used in the above example to create a *constant 
+value cell*.
+
+Usually, however, we want to handle the error rather than assigning a default value. This can be
+done with `Maybe` cells. A `Maybe` object either holds a value or an exception that was thrown
+while computing a value. 
+
+A `Maybe` cell is a cell which holds a `Maybe`. A `Maybe` cell can easily be created from a 
+`MutableCell` with the `maybe()` method. The resulting `Maybe` cell is a mutable computed cell with
+the following behaviour:
+
+* It's computed value is the value of the argument cell wrapped in a `Maybe`.
+* When the cell's value is set, it sets the value of the argument cell to the value wrapped in the
+  `Maybe` if it is holding a value.
+
+The `Maybe` cell provides an `error` property which retrieves a `ValueCell` that evaluates to the
+exception held in the `Maybe` or `null` if the `Maybe` is holding a value. This can be used to
+determine whether an error occurred while computing a value.
+
+To handle errors while parsing a number, `mutableString` should be called on a cell containing
+a `Maybe<num>` rather than a `num`. We can then check whether the `error` cell is non-null to check
+if an error occurred.
+
+Putting it all together the cell definition for `a` now becomes:
+
+```dart
+final a = cell(() => MutableCell<num>(0));
+final maybeA = cell(() => a.maybe());
+final strA = cell(() => maybeA.mutableString());
+final errorA = cell(() => maybeA.error);
+```
+
+* `maybeA` holds the the value of `a` wrapped in a `Maybe`.
+* `strA` will be used as the content cell for `a` which binds the value of the text field to `maybeA`.
+* `errorA` holds the error which occurred while parsing a number from `strA`.
+
+The definition of the text field for `a` becomes:
+
+```dart
+CellTextField(
+  content: strA,
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    errorText: errorA() != null
+      ? 'Please enter a valid number'
+      : null
+    ),
+)
+```
+
+Here we're testing whether `errorA` is non-null, that is whether an error occurred while parsing a 
+number from `strA` and providing an error message in the `errorText` of the `InputDecoration`. 
+**NOTE**: The value of `errorA` is accessed directly in the `CellWidget`, this can be done but it 
+will cause the entire `CellWidget` to be rebuilt which may be inefficient.
+
+The error message can be made more descriptive by also checking whether the field is empty, or not.
+
+For example:
+
+```dart
+final isEmptyA = cell(() => ValueCell.computed(() => strA().isEmpty));
+
+...
+
+CellTextField(
+  content: strA,
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    errorText: isEmpty()
+        ? 'Cannot be empty'
+        : error() != null
+        ? 'Not a valid number'
+        : null
+    ),
+  );
+)
+```
+
+Here we've created a new cell `isEmptyA` which depends directly on `strA` (the content cell) and has
+a value of true if the `strA` holds an empty string.
+
+You'll notice the cell definitions are becoming a bit unwieldy. To clean things up the definition
+for the text field, along with its related cells can be packaged in a function:
+
+```dart
+Widget inputField(MutableCell<num> cell) {   
+  return CellWidget.builder((context) {
+    final maybe = context.cell(() => cell.maybe());
+    final content = context.cell(() => maybe.mutableString());
+    final error = context.cell(() => maybe.error);
+
+    final isEmpty = context.cell(() => ValueCell.computed(() => content().isEmpty));
+
+    return CellTextField(
+      content: content,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+         errorText: isEmpty() 
+              ? 'Cannot be empty'
+              : error() != null
+              ? 'Not a valid number'
+              : null
+      ),
+    );
+  }); 
+}
+```
+
+Note we've used `CellWidget.builder` to create a `CellWidget` without subclassing and the cells are 
+defined using the `cell` method of the `context` object provided to the builder function. This is
+identical to the `cell` method provided by the `CellInitializer` mixin. **NOTE**: This method may
+only be called on the `BuildContext` of a `CellWidget` with the `CellInitializer` mixin or a
+`CellWidget` created using `CellWidget.builder`.
+
+The UI definition now becomes the following:
+
+```dart
+Widget build(BuildContext context) {   
+  final a = cell(() => MutableCell<num>(0));
+  final b = cell(() => MutableCell<num>(0));
+
+  final sum = cell(() => a + b);
+
+  return Column(
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: inputField(a),
+          ),
+          const SizedBox(width: 5),
+          const Text('+'),
+          const SizedBox(width: 5),
+          Expanded(
+            child: inputField(b),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      CellWidget.builder((_) => Text(
+         '${a()} + ${b()} = ${sum()}',
+         style: const TextStyle(
+             fontWeight: FontWeight.bold,
+             fontSize: 20
+         )
+      )),
+      ElevatedButton(
+        child: const Text('Reset'),
+        onPressed: () {
+          MutableCell.batch(() {
+            a.value = 0;
+            b.value = 0;
+          });
+        },
+      )
+    ],
+  );
+}
+```
+
 ## Advanced
 
 ### Optimization
