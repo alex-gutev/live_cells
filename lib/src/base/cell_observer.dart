@@ -6,9 +6,6 @@ abstract class CellObserver {
   ///
   /// If false the observer is only notified if the new value is different
   /// from the previous value.
-  ///
-  /// **NOTE**: The behaviour is undefined if the value of this property changes
-  /// for a given observer.
   bool get shouldNotifyAlways => false;
 
   /// The observed cell will change its value.
