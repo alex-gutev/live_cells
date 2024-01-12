@@ -103,3 +103,22 @@ Improvements:
 ## 0.5.2
 
 * Fix potential issues
+
+## 0.6.0
+
+New features:
+
+* `Maybe` type and `MaybeCell` for error handling
+* `errorValue` argument of `mutableString` method to control value in case of errors during parsing
+* Remove restriction that arguments of *mutable computed cells* be mutable cells
+
+Breaking changes:
+
+* Add `shouldNotifyAlways` property to `CellObserver` interface
+
+Improvements and bug fixes:
+
+* Simplify implementation of `CellInitializer.cell`
+* Allow updated cell value to be accessed even when the cell has no observers
+* Fix bug in `BuildContext.cell` method
+* Fix bug in `CellTextField`
