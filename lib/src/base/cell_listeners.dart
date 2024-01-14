@@ -52,7 +52,7 @@ mixin CellListeners<T> on ManagedCell<T> {
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
   void notifyWillUpdate([bool isEqual = false]) {
-    for (final observer in _observers.keys) {
+    for (final observer in _observers.keys.toList(growable: false)) {
       try {
         if (!isEqual || observer.shouldNotifyAlways) {
           observer.willUpdate(this);
@@ -75,7 +75,7 @@ mixin CellListeners<T> on ManagedCell<T> {
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
   void notifyUpdate([bool isEqual = false]) {
-    for (final observer in _observers.keys) {
+    for (final observer in _observers.keys.toList(growable: false)) {
       try {
         if (!isEqual || observer.shouldNotifyAlways) {
           observer.update(this);
