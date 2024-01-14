@@ -122,3 +122,8 @@ Improvements and bug fixes:
 * Allow updated cell value to be accessed even when the cell has no observers
 * Fix bug in `BuildContext.cell` method
 * Fix bug in `CellTextField`
+
+## 0.6.1
+
+* Fix potential issues
+* Fix typos and improve README
