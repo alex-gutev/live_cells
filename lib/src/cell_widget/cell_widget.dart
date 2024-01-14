@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 import '../base/cell_observer.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
-import '../mutable_cell/mutable_cell.dart';
 import '../value_cell.dart';
 
 part 'cell_initializer.dart';
