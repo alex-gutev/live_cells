@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'cell_watch/cell_watch.dart';
 import 'compute_cell/dynamic_compute_cell.dart';
 import 'base/cell_observer.dart';
 
@@ -36,6 +37,15 @@ abstract class ValueCell<T> {
   factory ValueCell.computed(T Function() compute) =>
       DynamicComputeCell(compute);
 
+  /// Register a callback function to be called whenever the values of the referenced cells change.
+  ///
+  /// The function [watch] is called whenever the values of the cells referenced
+  /// within the function with the [call] method changes. The function is always
+  /// called once immediately before [watch] returns.
+  ///
+  /// **NOTE**: [CellWatch.stop] must be called on the returned object when the
+  /// watch function should no longer be called.
+  static CellWatch watch(VoidCallback watch) => CellWatch(watch);
 
   /// Retrieve the value of the cell.
   ///
