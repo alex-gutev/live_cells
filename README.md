@@ -13,7 +13,7 @@ over `ChangeNotifier` / `ValueNotifier`:
 + Simpler resource management, no need to call `dispose`.
 + (Still in early stages) A library of widgets which replaces "controller" objects with 
   `ValueCell`'s. This allows for a style of programming which fits in with the reactive
-  paradigm of flutter.
+  paradigm of Flutter.
   
 This package also has the following advantages over other state management libraries:
 
@@ -27,8 +27,8 @@ This package also has the following advantages over other state management libra
 
 ### Basics
 
-The basis of this package is the `ValueCell` which provides the cell interface. Every cell has a 
-`value` and a set of observers which react to changes in the value.
+The basis of this package is the `ValueCell` interface which provides the cell interface. Every
+cell has a `value` and a set of observers which react to changes in the value.
 
 A `MutableCell` is a cell which can have its `value` property set directly:
 
@@ -124,7 +124,7 @@ class CounterExample extends CellWidget with CellInitializer {
 
 The `counter` cell is created directly within the `build` method using the `cell` method, provided by
 the `CellInitializer` mixin, which creates an instance of a `ValueCell`, using the provided function,
-on the first build of the widget, and retrieves the existing instance in subsequent builds.
+on the first build of the widget and retrieves the existing instance in subsequent builds.
 
 The following example demonstrates computed cells:
 
@@ -248,7 +248,7 @@ is provided. The value of the provided content cell, which must be a `MutableCel
 reflect the content of the text field whenever it is changed by the user. Whatever the user writes 
 in the field is reflected in the widget below.
 
-The 'Clear' button clears the text field by setting the `input` cell to the empty string. The benefits
+The "Clear" button clears the text field by setting the `input` cell to the empty string. The benefits
 of this approach are:
 
 * No need for a `TextEditingController`
@@ -545,11 +545,11 @@ Usually, however, we want to handle the error rather than assigning a default va
 done with `Maybe` cells. A `Maybe` object either holds a value or an exception that was thrown
 while computing a value. 
 
-A `Maybe` cell is a cell which holds a `Maybe`. A `Maybe` cell can easily be created from a 
+A `Maybe` cell, a cell holding a `Maybe`, can easily be created from a 
 `MutableCell` with the `maybe()` method. The resulting `Maybe` cell is a mutable computed cell with
 the following behaviour:
 
-* It's computed value is the value of the argument cell wrapped in a `Maybe`.
+* Its computed value is the value of the argument cell wrapped in a `Maybe`.
 * When the cell's value is set, it sets the value of the argument cell to the value wrapped in the
   `Maybe` if it is holding a value.
 
@@ -620,7 +620,7 @@ Here we've created a new cell `isEmptyA` which depends directly on `strA` (the c
 a value of true if the `strA` holds an empty string.
 
 You'll notice the cell definitions are becoming a bit unwieldy. To clean things up the definition
-for the text field, along with its related cells can be packaged in a function:
+for the text field, along with its related cells, can be packaged in a function:
 
 ```dart
 Widget inputField(MutableCell<num> cell) {   
@@ -704,8 +704,8 @@ Widget build(BuildContext context) {
 
 `ValueCell.computed` and `MutableCell.computed` determine their dependencies, the argument
 cells referenced by the value computation function, at runtime. This allows you to 
-conveniently create a computed cell without having to list out the referenced cells beforehand,
-however it also introduces additional overhead at runtime.
+conveniently create a computed cell without having to list out the referenced cells beforehand.
+However it also introduces additional overhead at runtime.
 
 There are two ways to avoid this:
 
@@ -775,7 +775,8 @@ functions or methods which create cells.
 
 ### Writing your own cells
 
-Rarely will you need to write your own `ValueCell` subclasses but should the need live cells can be extended.
+Rarely will you need to write your own `ValueCell` subclasses but should the need arise, 
+*Live Cells* can be extended.
 
 To subclass `ValueCell`, the following methods have to be implemented:
 
@@ -889,6 +890,8 @@ Observers of cells implement the `CellObserver` interface which has the followin
 
 * `willUpdate` -- Called before the value of a cell changes.
 * `update` -- Called after the value of a cell has changed.
+* `shouldNotifyAlways` -- Should the observer be notified if the new value of the observed cell is 
+  equal to the previous value.
 
 When a cell's value is changed first its observers are notified that its value will changed,
 by calling the `willUpdate` method and then after its value is set, its observers are notified
@@ -905,8 +908,11 @@ The correct behaviour of `update` is to recompute the cell's value, if it hasn't
 already, and call the `update` method of the cell's observers.
 
 The `ObserverCell` mixin already provides definitions of `willUpdate` and `update` for a cell which
-reacts to changes in the value of other cells. All you need to do is mixin `ObserverCell` into your
+reacts to changes in the value of other cells. You should mixin `ObserverCell` into your
 `NotifierCell` subclass and add the cell as an observer of the cells it should observer changes in.
+The mixin also provides a `stale` property which is true when the value of the cell should be 
+recomputed. Override the get `value` property accessor and recompute the cell'a value if `stale` is
+true.
 
 **NOTE**:
 
@@ -924,7 +930,20 @@ class MyCell<T> extends NotifierCell<T> with ObserverCell<T> {
   });
   
   @override
+  T get value {
+    if (stale) {
+      // recompute value
+      ...
+      stale = false;
+    }
+    
+    return super.value;
+  }
+  
+  @override
   void init() {
+    super.init();
+    
     arg1.addObserver(this);
     arg2.addObserver(this);
   }
@@ -933,18 +952,30 @@ class MyCell<T> extends NotifierCell<T> with ObserverCell<T> {
   void dispose() {
     arg1.removeObserver(this);
     arg2.removeObserver(this);
+    
+    super.dispose();
   }
   
   ...
 }
 ```
 
+The `shouldNotifyAlways` property should be true if the observer should be notified when an observed
+cell is **assigned** a new value that is equal to the previous value. **Note**: This only applies when
+observing a `MutableCell` and then only when its `value` property is set directly. By default this 
+is false.
+
 #### ValueListenable Interface
 
-If you're not implement a `ValueCell` subclass and you're only interested in the `update` method of 
+If you're not implementing a `ValueCell` subclass and you're only interested in the `update` method of 
 the `CellObserver` interface, you can use the `listenable` property of `ValueCell` to retrieve a
 `ValueListenable` object which calls its listeners, whenever the value of the cell changes. Listeners
 are added using `addListener` and removed using `removeListener`.
+
+**NOTE**:
+
+Every call to `addListener` has to be matched by a call to `removeListener` for the same listener
+function when the listener is no longer required.
 
 ## Additional information
 
