@@ -77,6 +77,23 @@ mixin CellInitializer on CellWidget {
     return cell;
   }
 
+  /// Register a callback to be called whenever the values of cells change.
+  ///
+  /// The function [watch] is called whenever the values of the cells referenced
+  /// within it using [ValueCell.call] change. [watch] is called once after it
+  /// is registered.
+  ///
+  /// [watch] is not called after the widget is removed from the tree.
+  ///
+  /// **NOTE**: The callback is only registered once during the first build,
+  /// and will not be registered again on subsequent builds.
+  void watch(VoidCallback watch) {
+    assert(_activeCellElement != null);
+
+    _activeCellElement!.getWatcher(watch);
+    _activeCellElement!.nextWatcher();
+  }
+
   @override
   StatelessElement createElement() => _CellStorageElement(this);
 
@@ -101,6 +118,20 @@ extension CellWidgetContextExtension on BuildContext {
     element.nextCell();
     return cell;
   }
+
+  /// Register a callback function to be called whenever the values of cells change.
+  ///
+  /// The functionality of this method is the same as [CellInitializer.watch].
+  ///
+  /// **NOTE**: This method may only be called if [this] is the [BuildContext]
+  /// of a [CellWidget] with the [CellInitializer] mixin.
+  CellWatch watch(VoidCallback watch) {
+    final element = this as _CellStorageElement;
+    final watcher = element.getWatcher(watch);
+
+    element.nextWatcher();
+    return watcher;
+  }
 }
 
 /// Widget element for [CellWidget]
@@ -113,8 +144,14 @@ class _CellStorageElement extends _CellWidgetElement {
   /// List of created cells
   final List<ValueCell> _cells = [];
 
+  /// List of registered cell watchers
+  final List<CellWatch> _watchers = [];
+
   /// Index of cell to retrieve/create when calling [getCell]
   var _curCell = 0;
+
+  /// Index of watcher to retrieve/create when calling [getWatcher]
+  var _curWatcher = 0;
 
   /// Retrieve/create the current cell.
   /// 
@@ -142,15 +179,54 @@ class _CellStorageElement extends _CellWidgetElement {
     _curCell++;
   }
 
+  /// Retrieve/create the current *cell watcher*
+  ///
+  /// If there is no [CellWatch] instance at the current watcher index a new one
+  /// is created with watch function [watch]. Calling [getWatcher] again at the
+  /// current watcher index returns the existing [CellWatch] instance.
+  ///
+  /// The [CellWatch] is automatically stopped when the element is unmounted.
+  ///
+  /// The watcher index can be advanced using [nextWatcher].
+  CellWatch getWatcher(VoidCallback watch) {
+    if (_curWatcher < _watchers.length) {
+      return _watchers[_curWatcher];
+    }
+
+    final watcher = CellWatch(watch);
+    _watchers.add(watcher);
+
+    return watcher;
+  }
+
+  /// Advance the watcher index by 1.
+  ///
+  /// Calling [getWatcher] after [nextWatcher] will retrieve the *cell watcher*
+  /// at the next watcher index.
+  void nextWatcher() {
+    _curWatcher++;
+  }
+
   @override
   Widget build() {
     try {
       _curCell = 0;
+      _curWatcher = 0;
+
       CellInitializer._activeCellElement = this;
       return super.build();
     }
     finally {
       CellInitializer._activeCellElement = null;
     }
+  }
+
+  @override
+  void unmount() {
+    for (final watcher in _watchers) {
+      watcher.stop();
+    }
+
+    super.unmount();
   }
 }
