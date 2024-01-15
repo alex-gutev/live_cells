@@ -13,6 +13,8 @@ import 'demos/cell_slider_demo.dart';
 import 'demos/cell_switch_demo.dart';
 import 'demos/subclass_demo1.dart';
 import 'demos/subclass_demo2.dart';
+import 'demos/watch_demo1.dart';
+import 'demos/watch_demo2.dart';
 
 void main() {
   runApp(const MyApp());
@@ -144,6 +146,22 @@ class MyHomePage extends StatelessWidget {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => ErrorHandlingDemo2())
                           );
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Watching Cells 1'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => WatchDemo1()
+                          ));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Watching Cells 2'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => WatchDemo2()
+                          ));
                         },
                       ),
                       ElevatedButton(
