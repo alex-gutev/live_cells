@@ -36,7 +36,13 @@ export 'src/extensions/conversion_extensions.dart'
 export 'src/async_cell/delay_cell.dart' show DelayCell;
 export 'src/extensions/widget_extension.dart'
     show WidgetExtension, WidgetCellExtension, ComputeWidgetExtension;
+
 export 'src/cell_widget/cell_widget.dart'
-    show CellWidget, CreateCell, CellInitializer, CellWidgetContextExtension;
+    show
+        CellWidget,
+        CreateCell,
+        CellInitializer,
+        CellWidgetContextExtension,
+        CellObserverState;
 
 export 'src/cell_watch/cell_watcher.dart' show CellWatcher;

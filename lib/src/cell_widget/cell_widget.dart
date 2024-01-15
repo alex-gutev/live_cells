@@ -8,6 +8,7 @@ import '../compute_cell/dynamic_compute_cell.dart';
 import '../value_cell.dart';
 
 part 'cell_initializer.dart';
+part 'cell_observer_state.dart';
 
 /// A widget which is rebuilt in response to changes in the values of [ValueCell]'s.
 ///
