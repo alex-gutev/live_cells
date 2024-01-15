@@ -54,6 +54,8 @@ class _CellWatchObserver implements CellObserver {
     for (final cell in _arguments) {
       cell.removeObserver(this);
     }
+
+    _arguments.clear();
   }
 
   /// Call [watch] and track referenced cells
