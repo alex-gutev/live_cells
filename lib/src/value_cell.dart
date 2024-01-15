@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'cell_watch/cell_watch.dart';
+import 'cell_watch/cell_watcher.dart';
 import 'compute_cell/dynamic_compute_cell.dart';
 import 'base/cell_observer.dart';
 
@@ -43,9 +43,9 @@ abstract class ValueCell<T> {
   /// within the function with the [call] method changes. The function is always
   /// called once immediately before [watch] returns.
   ///
-  /// **NOTE**: [CellWatch.stop] must be called on the returned object when the
+  /// **NOTE**: [CellWatcher.stop] must be called on the returned object when the
   /// watch function should no longer be called.
-  static CellWatch watch(VoidCallback watch) => CellWatch(watch);
+  static CellWatcher watch(VoidCallback watch) => CellWatcher(watch);
 
   /// Retrieve the value of the cell.
   ///

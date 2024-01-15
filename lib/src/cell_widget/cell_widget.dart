@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 
 import '../base/cell_observer.dart';
-import '../cell_watch/cell_watch.dart';
+import '../cell_watch/cell_watcher.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
 import '../value_cell.dart';
 

@@ -9,7 +9,7 @@ import '../value_cell.dart';
 ///
 /// A *cell watcher* is a function which is called whenever the values of the
 /// cells referenced within it change.
-class CellWatch {
+class CellWatcher {
   /// The watcher function
   final VoidCallback watch;
 
@@ -18,7 +18,7 @@ class CellWatch {
   /// The function [watch] is called whenever the values of the cells referenced
   /// within the function with the [call] method changes. The function is always
   /// called once immediately before this constructor returns.
-  CellWatch(this.watch) :
+  CellWatcher(this.watch) :
       _observer = _CellWatchObserver(watch);
 
   /// Stop watching the referenced cells.

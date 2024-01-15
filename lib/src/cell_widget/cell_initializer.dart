@@ -125,7 +125,7 @@ extension CellWidgetContextExtension on BuildContext {
   ///
   /// **NOTE**: This method may only be called if [this] is the [BuildContext]
   /// of a [CellWidget] with the [CellInitializer] mixin.
-  CellWatch watch(VoidCallback watch) {
+  CellWatcher watch(VoidCallback watch) {
     final element = this as _CellStorageElement;
     final watcher = element.getWatcher(watch);
 
@@ -145,7 +145,7 @@ class _CellStorageElement extends _CellWidgetElement {
   final List<ValueCell> _cells = [];
 
   /// List of registered cell watchers
-  final List<CellWatch> _watchers = [];
+  final List<CellWatcher> _watchers = [];
 
   /// Index of cell to retrieve/create when calling [getCell]
   var _curCell = 0;
@@ -181,19 +181,19 @@ class _CellStorageElement extends _CellWidgetElement {
 
   /// Retrieve/create the current *cell watcher*
   ///
-  /// If there is no [CellWatch] instance at the current watcher index a new one
+  /// If there is no [CellWatcher] instance at the current watcher index a new one
   /// is created with watch function [watch]. Calling [getWatcher] again at the
-  /// current watcher index returns the existing [CellWatch] instance.
+  /// current watcher index returns the existing [CellWatcher] instance.
   ///
-  /// The [CellWatch] is automatically stopped when the element is unmounted.
+  /// The [CellWatcher] is automatically stopped when the element is unmounted.
   ///
   /// The watcher index can be advanced using [nextWatcher].
-  CellWatch getWatcher(VoidCallback watch) {
+  CellWatcher getWatcher(VoidCallback watch) {
     if (_curWatcher < _watchers.length) {
       return _watchers[_curWatcher];
     }
 
-    final watcher = CellWatch(watch);
+    final watcher = CellWatcher(watch);
     _watchers.add(watcher);
 
     return watcher;

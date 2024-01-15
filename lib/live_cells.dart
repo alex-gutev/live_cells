@@ -39,4 +39,4 @@ export 'src/extensions/widget_extension.dart'
 export 'src/cell_widget/cell_widget.dart'
     show CellWidget, CreateCell, CellInitializer, CellWidgetContextExtension;
 
-export 'src/cell_watch/cell_watch.dart' show CellWatch;
+export 'src/cell_watch/cell_watcher.dart' show CellWatcher;
