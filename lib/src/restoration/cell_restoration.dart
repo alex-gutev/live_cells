@@ -128,7 +128,7 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
   /// The cell index is advanced when calling this method.
   V getCell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     if (_curCell < _cells.length) {
-      return _cells[_curCell] as V;
+      return _cells[_curCell++] as V;
     }
 
     final cell = create();
@@ -169,17 +169,15 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
 
       final coder = makeCoder();
       
-      if (_curCellValue <= _cellValues.length) {
+      if (_curCellValue < _cellValues.length) {
         final restorableCell = cell as RestorableCell<T>;
         restorableCell.restoreValue(coder.decode(_cellValues[_curCellValue]));
       }
-      else {
-        final index = _curCellValue;
-        
-        _watchers.add(ValueCell.watch(() {
-          _cellValues[index] = coder.encode(cell());
-        }));
-      }
+
+      final index = _curCellValue;
+      _watchers.add(ValueCell.watch(() {
+        _cellValues[index] = coder.encode(cell());
+      }));
 
       _curCellValue++;
     }
@@ -265,6 +263,7 @@ class _RestorableCellValueList extends RestorableProperty<List>{
 
   @override
   Object? toPrimitives() {
-    return _values;
+    // The list has to be copied otherwise the updated list is not saved.
+    return List.from(_values);
   }
 }
