@@ -1,13 +1,15 @@
 import '../base/observer_cell.dart';
 import '../base/cell_observer.dart';
 import '../base/notifier_cell.dart';
+import '../restoration/restoration.dart';
 import '../value_cell.dart';
 
 /// Value cell which stores the computed value of another [ValueCell] in memory.
 ///
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
-class StoreCell<T> extends NotifierCell<T> with ObserverCell<T> implements CellObserver {
+class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
+    implements CellObserver, RestorableCell<T> {
   /// Create a [StoreCell] which observes and saves the value of [valueCell]
   StoreCell(this.valueCell) : super(valueCell.value);
 
@@ -44,6 +46,11 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T> implements CellO
 
   @override
   bool get shouldNotifyAlways => false;
+
+  @override
+  void restoreValue(T value) {
+    setValue(value);
+  }
 }
 
 extension StoreCellExtension<T> on ValueCell<T> {

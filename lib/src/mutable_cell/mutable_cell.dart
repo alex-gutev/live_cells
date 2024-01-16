@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../base/notifier_cell.dart';
 import '../compute_cell/dynamic_mutable_compute_cell.dart';
+import '../restoration/restoration.dart';
 import '../value_cell.dart';
 
 /// Interface for a [ValueCell] of which the [value] property can be set explicitly
@@ -141,7 +142,7 @@ abstract class MutableCell<T> extends ValueCell<T> {
   }
 }
 
-class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T> {
+class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T>, RestorableCell<T> {
   _MutableCellImpl(super.value);
 
   @override
@@ -157,5 +158,10 @@ class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T> {
     else {
       super.value = value;
     }
+  }
+
+  @override
+  void restoreValue(T value) {
+    setValue(value);
   }
 }

@@ -4,6 +4,7 @@ import '../base/cell_listeners.dart';
 import '../base/cell_observer.dart';
 import '../base/managed_cell.dart';
 import '../base/observer_cell.dart';
+import '../restoration/restoration.dart';
 import '../value_cell.dart';
 
 /// A computational cell which determines its dependencies at runtime
@@ -18,7 +19,7 @@ import '../value_cell.dart';
 /// ```
 class DynamicComputeCell<T> extends ManagedCell<T>
     with CellListeners<T>, CellEquality<T>, ObserverCell<T>
-    implements CellObserver {
+    implements CellObserver, RestorableCell<T> {
 
   /// Create a cell which computes its value using [compute].
   DynamicComputeCell(this._compute) {
@@ -82,6 +83,11 @@ class DynamicComputeCell<T> extends ManagedCell<T>
 
   @override
   bool get shouldNotifyAlways => false;
+
+  @override
+  void restoreValue(T value) {
+    _value = value;
+  }
 }
 
 /// Provides static methods for tracking computational cell arguments at runtime.

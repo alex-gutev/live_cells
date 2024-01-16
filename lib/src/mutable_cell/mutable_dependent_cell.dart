@@ -4,6 +4,7 @@ import '../base/observer_cell.dart';
 import '../base/cell_listeners.dart';
 import '../base/cell_observer.dart';
 import '../base/managed_cell.dart';
+import '../restoration/restoration.dart';
 import '../value_cell.dart';
 import 'mutable_cell.dart';
 
@@ -23,7 +24,7 @@ import 'mutable_cell.dart';
 /// update the values of the argument cells.
 abstract class MutableDependentCell<T> extends ManagedCell<T>
     with CellEquality<T>, CellListeners<T>, ObserverCell<T>
-    implements CellObserver, MutableCell<T> {
+    implements CellObserver, MutableCell<T>, RestorableCell<T> {
 
   /// List of argument cells.
   @protected
@@ -131,4 +132,9 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   
   @override
   bool get shouldNotifyAlways => true;
+
+  @override
+  void restoreValue(T value) {
+    _value = value;
+  }
 }
