@@ -1,4 +1,4 @@
-import 'package:live_cells/live_cells.dart';
+import '../value_cell.dart';
 
 /// Interface for a cell which can have its value restored after initialization
 abstract class RestorableCell<T> extends ValueCell<T> {
