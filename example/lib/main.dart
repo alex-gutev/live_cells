@@ -9,6 +9,7 @@ import 'demos/error_handling_demo2.dart';
 import 'demos/sum_demo.dart';
 import 'demos/cell_checkbox_demo.dart';
 import 'demos/cell_radio_demo.dart';
+import 'demos/cell_restoration_demo.dart';
 import 'demos/cell_slider_demo.dart';
 import 'demos/cell_switch_demo.dart';
 import 'demos/subclass_demo1.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
+      restorationScopeId: 'root',
       home: const MyHomePage(title: 'Live Cells Demo'),
     );
   }
@@ -197,6 +199,12 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
+                        child: const Text('State Restoration'),
+                        onPressed: () {
+                            Navigator.restorablePush(context, _makeStateRestorationDemo);
+                        },
+                      ),
+                      ElevatedButton(
                         child: const Text('ValueCell Subclass 1'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
@@ -221,5 +229,10 @@ class MyHomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @pragma('vm:entry-point')
+  static Route _makeStateRestorationDemo(BuildContext context, Object? args) {
+    return MaterialPageRoute(builder: (context) => CellRestorationDemo());
   }
 }
