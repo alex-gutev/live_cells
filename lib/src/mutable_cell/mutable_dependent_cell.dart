@@ -59,6 +59,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
     if (stale) {
       _value = compute();
       stale = false;
+      _computed = true;
     }
 
     return _value;
@@ -73,6 +74,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
 
     updating = false;
     stale = false;
+    _computed = false;
     _value = value;
 
     MutableCell.batch(() {
@@ -103,11 +105,16 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   /// Is a reverse computation being performed?
   var _reverse = false;
 
+  /// Is the current value computed or assigned using the [value] property.
+  var _computed = true;
+
   @override
   void init() {
     super.init();
 
-    stale = true;
+    if (_computed) {
+      stale = true;
+    }
 
     for (final dependency in arguments) {
       dependency.addObserver(this);
@@ -134,7 +141,25 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   bool get shouldNotifyAlways => true;
 
   @override
-  void restoreValue(T value) {
-    _value = value;
+  Object? dumpState(CellValueCoder coder) {
+    final currentValue = value;
+
+    return {
+      'computed': _computed,
+      'value': coder.encode(currentValue)
+    };
+  }
+
+  @override
+  void restoreState(Object? state, CellValueCoder coder) {
+    final map = state as Map;
+
+    if (map['computed']) {
+      _computed = true;
+      _value = coder.decode(map['value']);
+    }
+    else {
+      value = coder.decode(map['value']);
+    }
   }
 }

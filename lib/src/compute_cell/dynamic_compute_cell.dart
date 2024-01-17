@@ -85,8 +85,13 @@ class DynamicComputeCell<T> extends ManagedCell<T>
   bool get shouldNotifyAlways => false;
 
   @override
-  void restoreValue(T value) {
-    _value = value;
+  Object? dumpState(CellValueCoder coder) {
+    return coder.encode(value);
+  }
+
+  @override
+  void restoreState(Object? state, CellValueCoder coder) {
+    _value = coder.decode(state);
   }
 }
 

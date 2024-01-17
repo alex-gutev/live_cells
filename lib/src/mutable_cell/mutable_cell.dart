@@ -161,7 +161,12 @@ class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T>, Res
   }
 
   @override
-  void restoreValue(T value) {
-    setValue(value);
+  Object? dumpState(CellValueCoder coder) {
+    return coder.encode(value);
+  }
+
+  @override
+  void restoreState(Object? state, CellValueCoder coder) {
+    setValue(coder.decode(state));
   }
 }

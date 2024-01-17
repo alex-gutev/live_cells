@@ -9,7 +9,7 @@ enum RadioValue {
   value3
 }
 
-class RadioValueCoder implements CellValueCoder<RadioValue?> {
+class RadioValueCoder implements CellValueCoder {
   @override
   RadioValue? decode(Object? primitive) {
     if (primitive != null) {
@@ -22,7 +22,7 @@ class RadioValueCoder implements CellValueCoder<RadioValue?> {
   }
 
   @override
-  Object? encode(RadioValue? value) {
+  Object? encode(covariant RadioValue? value) {
     return value?.name;
   }
 }

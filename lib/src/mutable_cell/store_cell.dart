@@ -48,8 +48,13 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
   bool get shouldNotifyAlways => false;
 
   @override
-  void restoreValue(T value) {
-    setValue(value);
+  Object? dumpState(CellValueCoder coder) {
+    return coder.encode(value);
+  }
+
+  @override
+  void restoreState(Object? state, CellValueCoder coder) {
+    setValue(coder.decode(state));
   }
 }
 
