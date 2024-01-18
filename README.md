@@ -59,6 +59,25 @@ value of either `a` or `b` changes the value of `sum` is recomputed using the ne
 accessing the `value` property. This is so that the computed cell can observe changes to the values
 of those cells and automatically recompute its own value.
 
+`ValueCell.watch` is like `ValueCell.computed` but instead of creating a new `ValueCell` a function
+is called whenever the values of the cells referenced within the *watch* function change. This is 
+useful for side effects, such as printing to a log, which need to be executed whenever the values of
+cells change.
+
+Example:
+
+```dart
+final watcher = ValueCell.watch(() => print('a = ${a()}, b = ${b()}'));
+...
+// Stop calling the watch function
+watcher.stop();
+```
+
+In the above example `ValueCell.watch` is used to print the values of the cells `a` and `b`,
+referenced within the watch function, whenever they change. `watch()` returns a *cell
+watcher* object which provides a `stop()` method. The watch function is no longer called after 
+calling `stop()`.
+
 Putting it all together let's implement the most trivial of examples, a simple counter:
 
 ```dart
@@ -127,6 +146,9 @@ class CounterExample extends CellWidget with CellInitializer {
 The `counter` cell is created directly within the `build` method using the `cell` method, provided by
 the `CellInitializer` mixin, which creates an instance of a `ValueCell`, using the provided function,
 on the first build of the widget and retrieves the existing instance in subsequent builds.
+
+`CellInitializer` also provides a `watch` method which is like `ValueCell.watch` but automatically
+calls `stop()` when the widget is removed from the tree.
 
 The following example demonstrates computed cells:
 
@@ -952,7 +974,8 @@ defined.
 To avoid this:
 
 * Define all the cells first in the `build` method before referencing them. 
-* Do not add *watchers* until after all the cells have been defined.
+* Do not *watch* cells, using `ValueCell.watch()` or `RestorableCellWidget.watch` until after
+  all the cells have been defined.
 * If you're placing the definition of cells directly in a widget constructor, make sure all 
   references to the cell values are contained in a `CellWidget.builder`. 
 
