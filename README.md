@@ -4,7 +4,7 @@ via `ValueCell`'s replacing the need for controller objects and event handlers.
 
 ## Features
 
-This package provides a `ValueCell` interface which offers the following benefits 
+This package provides `ValueCell`, an interface which offers the following benefits 
 over `ChangeNotifier` / `ValueNotifier`:
 
 + Implementing a `ValueCell` which is an expression of other `ValueCell`'s, e.g. `a + b`,
@@ -14,6 +14,8 @@ over `ChangeNotifier` / `ValueNotifier`:
 + (Still in early stages) A library of widgets which replaces "controller" objects with 
   `ValueCell`'s. This allows for a style of programming which fits in with the reactive
   paradigm of Flutter.
++ Effortless state restoration, when your app is resumed after being terminated by the OS, with no
+  additional boilerplate.
   
 This package also has the following advantages over other state management libraries:
 
@@ -697,6 +699,262 @@ Widget build(BuildContext context) {
   );
 }
 ```
+
+### State Restoration
+
+A mobile application may be terminated at any point when the user is not interacting with it. When it
+is resumed, due to the user navigating back to it, it should restore its state to the point where it
+was terminating.
+
+In order for the state of cells to be restored `RestorableCellWidget` has to be used instead of
+`CellWidget`. `RestorableCellWidget` provides the same interface as `CellWidget` however it also
+restores the state of the cells, creating within its `build` method using the `cell(..)`. Therefore
+all you need to do, for the most part, to make your widgets restorable is to replace `CellWidget`
+with `RestorableCellWidget`.
+
+Here is an example:
+
+```dart
+class CellRestorationExample extends RestorableCellWidget {
+  @override
+  String get restorationId => 'cell_restoration_example';
+
+  @override
+  Widget build(BuildContext context) {
+    final sliderValue = cell(() => MutableCell(0.0));
+    final switchValue = cell(() => MutableCell(false));
+    final checkboxValue = cell(() => MutableCell(true));
+
+    final textValue = cell(() => MutableCell(''));
+
+    return Column(
+      children: [
+        const Text('A Slider'),
+        Row(
+          children: [
+            CellWidget.builder((context) => Text(sliderValue().toStringAsFixed(2))),
+            Expanded(
+              child: CellSlider(
+                 min: 0.0,
+                 max: 10,
+                 value: sliderValue
+              ),
+            )
+          ],
+        ),
+        CellSwitchListTile(
+          value: switchValue,
+          title: const Text('A Switch'),
+        ),
+        CellCheckboxListTile(
+          value: checkboxValue,
+          title: Text('A checkbox'),
+        ),
+        const Text('Enter some text:'),
+        CellTextField(content: textValue),
+        CellWidget.builder((context) => Text('You wrote: ${textValue()}')),
+      ],
+    );
+  }
+}
+```
+
+The above example demonstrates how the state of cells created within a `RestorableCellWidget` is
+restored automatically. Notice there is an additional `restorationId` property. When using 
+`RestorableCellWidget`, you'll need to provide a unique identifier, via this property, to associated
+the saved state with the widget. See 
+[`RestorationMixin.restorationId`](https://api.flutter.dev/flutter/widgets/RestorationMixin/restorationId.html),
+for more information.
+
+The `build` method defines four widgets, a slider, a switch, a checkbox and a text field as well as
+four cells, creating using `cell` for holding the state of the widgets. The code defining the cells
+is exactly the same as it would be when using `CellWidget`, however when the app is resumed the
+state of the cells, and likewise the widgets which are dependent on the cells, is restored.
+
+**NOTE**:
+
+* `CellSlider`, `CellSwitchListTile` and `CellCheckboxListTile` are the live cell equivalents,
+  provided by `live_cell_widgets`, of `Slider`, `SwitchListTile` and `CheckboxListTile` which allow
+  their state to be controlled by a `ValueCell`.
+* You don't have to use the widgets provided by `live_cell_widgets` for the state of the cells
+  defined by `RestorableCellWidget.cell` to be restored.
+
+In order for cell state restoration to be successful there are some things you need to take into 
+account:
+
+* Only cells implementing the `RestorableCell` interface can have their state restored. All cells
+  provided by **Live Cells** implement this interface except:
+  + *Lightweight computed cells*, which do not have a state.
+  + *DelayCell*
+* The values of the cells to be restored must be encodable by `StandardMessageCodec`. This means
+  that only cells holding primitive values (`num`, `bool`, `null`, `String`, `List`, `Map`) can 
+  have their state saved and restored.
+* To support state restoration of cells holding values not supported by `StandardMessageCodec`, a
+  `CellValueCoder` has to be provided.
+
+`CellValueCoder` is an interface for encoding, and decoding, a value using a representation 
+which is supported by `StandardMessageCodec`. Two methods have to be implemented:
+
+* `encode()` which takes a value and encodes it to a primitive value representation
+* `decode()` which decodes a value from its primitive value representation
+
+The following example demonstrates state restoration
+of a radio button group using a `CellValueCoder` to encode the *group value* which is an `enum`.
+
+```dart
+enum RadioValue {
+  value1,
+  value2,
+  value3
+}
+
+class RadioValueCoder implements CellValueCoder {
+  @override
+  RadioValue? decode(Object? primitive) {
+    if (primitive != null) {
+      final name = primitive as String;
+      return RadioValue.values.byName(name);
+    }
+
+    return null;
+  }
+
+  @override
+  Object? encode(covariant RadioValue? value) {
+    return value?.name;
+  }
+}
+
+class CellRestorationExample extends RestorableCellWidget {
+  @override
+  String get restorationId => 'cell_restoration_example';
+
+  @override
+  Widget build(BuildContext context) {
+    final radioValue = cell(
+       () => MutableCell<RadioValue?>(RadioValue.value1),
+       coder: RadioValueCoder.new
+    );
+
+    return Column(
+      children: [
+        const Text('Radio Buttons:',),
+        CellWidget.builder((context) => Text('Selected option: ${radioValue()?.name}')),
+        Column(
+          children: [
+            CellRadioListTile(
+              groupValue: radioValue,
+              value: RadioValue.value1,
+              title: const Text('value1'),
+            ),
+            CellRadioListTile(
+              groupValue: radioValue,
+              value: RadioValue.value2,
+              title: const Text('value2'),
+            ),
+            CellRadioListTile(
+              groupValue: radioValue,
+              value: RadioValue.value3,
+              title: const Text('value3'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+```
+
+`RadioValueCoder` is a `CellValueCoder` subclass which encodes the `RadioValue` enum class to a 
+string. In the definition of the `radioValue`, the constructor of `RadioValueCoder` 
+(`RadioValueCoder.new`) is provided to the `cell()` call in the `coder` argument.
+
+If a cell's value is not restored, its value is recomputed. As a result, it is not necessary that
+a cell's state be saved if it can be recomputed.
+
+Example:
+
+
+```dart
+class CellRestorationExample extends RestorableCellWidget {
+  @override
+  String get restorationId => 'cell_restoration_example';
+
+  @override
+  Widget build(BuildContext context) {
+    final numValue = cell(() => MutableCell<num>(1));
+    final numMaybe = cell(() => numValue.maybe(), restorable: false);
+    final numError = cell(() => numMaybe.error);
+
+    return Column(
+      children: [
+        const Text('Text field for numeric input:'),
+        CellTextField(
+          content: cell(() => numMaybe.mutableString()),
+          decoration: InputDecoration(
+            errorText: numError() != null
+               ? 'Not a valid number'
+               : null
+          ),
+        ),
+        const SizedBox(height: 10),
+        CellWidget.builder((context) {
+          final a1 = context.cell(() => numValue + 1.cell);
+          return Text('${numValue()} + 1 = ${a1()}');
+        }),
+        ElevatedButton(
+          child: const Text('Reset'),
+          onPressed: () => numValue.value = 1
+        )
+      ],
+    );
+  }
+}
+```
+
+The above is an example of a text field for numeric input with error handling. The only cells in the
+above example which have their state restored are `numValue`, the cell holding the numeric value
+that was entered in the field, and `numMaybe.mutableString()` which is the *content* cell
+for the text field. When the state of the app is restored the values of the remaining cells are
+recomputed, which in-effect restores their state without it actually being saved.
+
+When you leave the app and return to it, you'll see the exact same state, including erroneous input
+and the associated error message, as when you left.
+
+Some points to note from this example:
+
+* We've used `restorable: false`, in the `cell()` call for `numMaybe` to prevent its state from
+  being saved, since `Maybe` values cannot be saved. 
+* If `restorable` is omitted (`null`) the cell's state is saved only if it is a `RestorableCell`. If
+  `restorable` is `true` the cell's state is saved and an assertion is violated if the given cell is 
+  not a `RestorableCell`.
+* Computed cells don't require their state to be saved, e.g. the state of the `a1` cell is not saved,
+  since it is defined within a `CellWidget` rather than a `RestorableCellWidget`, however it is
+  *restored* (the same state is recomputed on launch) nevertheless.
+
+As a general rule of thumb only mutable cells which are either set directly, such as `numValue`
+which has its value set in the "Reset" button, or hold user input from widgets, such as the content
+cells of text fields, are required to have their state saved.
+
+**Pitfalls**:
+
+When the app is resumed, after being terminated, and its state is being restored. The cells defined
+in the `RestorableCellWidget` are:
+
+1. Created using their initial values given during construction.
+2. Assigned new values after their saved state is restored.
+
+Step 2 may trigger the observers of the cells to be notified of a value change from the initial
+values given during construction to the restored values. This will not affect observers added after
+the definition of the cells, however it may affect observers added before all the cells have been
+defined.
+
+To avoid this:
+
+* Define all the cells first in the `build` method before referencing them. 
+* Do not add *watchers* until after all the cells have been defined.
+* If you're placing the definition of cells directly in a widget constructor, make sure all 
+  references to the cell values are contained in a `CellWidget.builder`. 
 
 ## Advanced
 
