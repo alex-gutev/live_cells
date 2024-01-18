@@ -90,11 +90,11 @@ class TestManagedCell<T> extends NotifierCell<T> {
 void main() {
   group('ConstantCell', () {
     test('Integer ConstantCell.value equals value given in constructor', () {
-      final cell = ConstantCell(10);
+      final cell = const ConstantCell(10);
       expect(cell.value, equals(10));
     });
     test('String ConstantCell.value equals value given in constructor', () {
-      final cell = ConstantCell('Hello World');
+      final cell = const ConstantCell('Hello World');
       expect(cell.value, equals('Hello World'));
     });
   });
@@ -217,29 +217,29 @@ void main() {
 
   group('Equality Comparisons', () {
     test('ConstantCell\'s are eq if they have equal values', () {
-      final a = ConstantCell(1);
-      final b = ConstantCell(1);
+      final a = const ConstantCell(1);
+      final b = const ConstantCell(1);
 
       expect(a.eq(b).value, equals(true));
     });
 
     test('ConstantCell\'s are not eq if they have unequal values', () {
-      final a = ConstantCell(1);
-      final b = ConstantCell(2);
+      final a = const ConstantCell(1);
+      final b = const ConstantCell(2);
 
       expect(a.eq(b).value, equals(false));
     });
 
     test('ConstantCell\'s are neq if they have unequal values', () {
-      final a = ConstantCell(3);
-      final b = ConstantCell(4);
+      final a = const ConstantCell(3);
+      final b = const ConstantCell(4);
 
       expect(a.neq(b).value, equals(true));
     });
 
     test('ConstantCell\'s are not neq if they have equal values', () {
-      final a = ConstantCell(3);
-      final b = ConstantCell(3);
+      final a = const ConstantCell(3);
+      final b = const ConstantCell(3);
 
       expect(a.neq(b).value, equals(false));
     });
@@ -335,7 +335,7 @@ void main() {
 
   group('ComputeCell', () {
     test('ComputeCell function applied on ConstantCell value', () {
-      final a = ConstantCell(1);
+      final a = const ConstantCell(1);
       final b = a.apply((value) => value + 1);
 
       expect(b.value, equals(2));
@@ -885,7 +885,7 @@ void main() {
     });
 
     test('a.abs() creates ValueCell which is equal to absolute value of a', () {
-      final a = ValueCell.value(-3);
+      final a = const ValueCell.value(-3);
 
       expect(a.abs().value, equals(3));
     });
@@ -897,7 +897,7 @@ void main() {
     });
 
     test('a.sign creates ValueCell which is equal to -1 if a < 0', () {
-      final a = ValueCell.value(-3);
+      final a = const ValueCell.value(-3);
 
       expect(a.sign.value, equals(-1));
     });

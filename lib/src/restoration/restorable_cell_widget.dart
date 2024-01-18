@@ -14,6 +14,8 @@ import '../cell_widget/cell_widget.dart';
 /// widget, see [CellInitializer.cell] for more information. Additionally, the
 /// state of these cells is restored during state restoration of the application.
 abstract class RestorableCellWidget extends StatelessWidget {
+  const RestorableCellWidget({super.key});
+
   /// Restoration id used to identify the state of the widget, see [RestorationMixin.restorationId]
   String get restorationId;
 
@@ -138,7 +140,7 @@ class _RestorableCellWidget extends StatefulWidget {
 class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
     CellObserverState, RestorationMixin {
   /// State of the RestorableWidgee currently being built
-  static _RestorableCellWidgetState? _activeState = null;
+  static _RestorableCellWidgetState? _activeState;
 
   /// Restorable list holding the saved cell states
   final _cellStates = _RestorableCellStateList();

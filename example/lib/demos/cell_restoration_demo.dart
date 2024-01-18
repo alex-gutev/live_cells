@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
@@ -71,7 +70,7 @@ class CellRestorationDemo extends RestorableCellWidget {
               const SizedBox(height: 10),
               const Text(
                 'A Slider',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold
                 ),
               ),
@@ -95,12 +94,12 @@ class CellRestorationDemo extends RestorableCellWidget {
               const SizedBox(height: 5),
               CellCheckboxListTile(
                 value: checkboxValue,
-                title: Text('A checkbox'),
+                title: const Text('A checkbox'),
               ),
               const SizedBox(height: 5),
               const Text(
                 'Radio Buttons:',
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold
                 ),
               ),
