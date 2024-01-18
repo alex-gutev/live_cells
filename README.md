@@ -704,11 +704,11 @@ Widget build(BuildContext context) {
 
 A mobile application may be terminated at any point when the user is not interacting with it. When it
 is resumed, due to the user navigating back to it, it should restore its state to the point where it
-was terminating.
+was when terminated.
 
 In order for the state of cells to be restored `RestorableCellWidget` has to be used instead of
 `CellWidget`. `RestorableCellWidget` provides the same interface as `CellWidget` however it also
-restores the state of the cells, creating within its `build` method using the `cell(..)`. Therefore
+restores the state of the cells using `cell(..)` within the `build` method. Therefore
 all you need to do, for the most part, to make your widgets restorable is to replace `CellWidget`
 with `RestorableCellWidget`.
 
@@ -768,7 +768,7 @@ for more information.
 
 The `build` method defines four widgets, a slider, a switch, a checkbox and a text field as well as
 four cells, creating using `cell` for holding the state of the widgets. The code defining the cells
-is exactly the same as it would be when using `CellWidget`, however when the app is resumed the
+is exactly the same as it would be with `CellWidget`, however when the app is resumed the
 state of the cells, and likewise the widgets which are dependent on the cells, is restored.
 
 **NOTE**:
@@ -776,24 +776,24 @@ state of the cells, and likewise the widgets which are dependent on the cells, i
 * `CellSlider`, `CellSwitchListTile` and `CellCheckboxListTile` are the live cell equivalents,
   provided by `live_cell_widgets`, of `Slider`, `SwitchListTile` and `CheckboxListTile` which allow
   their state to be controlled by a `ValueCell`.
-* You don't have to use the widgets provided by `live_cell_widgets` for the state of the cells
-  defined by `RestorableCellWidget.cell` to be restored.
+* You can use any widgets not just those provided by `live_cell_widgets`. The state of the cells
+  defined by `RestorableCellWidget.cell` will be restored regardless of the widgets you use.
 
 In order for cell state restoration to be successful there are some things you need to take into 
 account:
 
 * Only cells implementing the `RestorableCell` interface can have their state restored. All cells
   provided by **Live Cells** implement this interface except:
-  + *Lightweight computed cells*, which do not have a state.
-  + *DelayCell*
+  + *Lightweight computed cells*, which do not have a state
+  + `DelayCell`
 * The values of the cells to be restored must be encodable by `StandardMessageCodec`. This means
   that only cells holding primitive values (`num`, `bool`, `null`, `String`, `List`, `Map`) can 
   have their state saved and restored.
 * To support state restoration of cells holding values not supported by `StandardMessageCodec`, a
   `CellValueCoder` has to be provided.
 
-`CellValueCoder` is an interface for encoding, and decoding, a value using a representation 
-which is supported by `StandardMessageCodec`. Two methods have to be implemented:
+`CellValueCoder` is an interface for encoding, and decoding, a value using a primitive value
+representation that is supported by `StandardMessageCodec`. Two methods have to be implemented:
 
 * `encode()` which takes a value and encodes it to a primitive value representation
 * `decode()` which decodes a value from its primitive value representation
@@ -866,8 +866,8 @@ class CellRestorationExample extends RestorableCellWidget {
 ```
 
 `RadioValueCoder` is a `CellValueCoder` subclass which encodes the `RadioValue` enum class to a 
-string. In the definition of the `radioValue`, the constructor of `RadioValueCoder` 
-(`RadioValueCoder.new`) is provided to the `cell()` call in the `coder` argument.
+string. In the definition of the `radioValue` cell, the constructor of `RadioValueCoder` 
+(`RadioValueCoder.new`) is provided to `cell()` in the `coder` argument.
 
 If a cell's value is not restored, its value is recomputed. As a result, it is not necessary that
 a cell's state be saved if it can be recomputed.
@@ -938,11 +938,11 @@ cells of text fields, are required to have their state saved.
 
 **Pitfalls**:
 
-When the app is resumed, after being terminated, and its state is being restored. The cells defined
+When the state of the app is being restored, after being terminated, the cells defined
 in the `RestorableCellWidget` are:
 
 1. Created using their initial values given during construction.
-2. Assigned new values after their saved state is restored.
+2. Assigned their restored values from the saved state.
 
 Step 2 may trigger the observers of the cells to be notified of a value change from the initial
 values given during construction to the restored values. This will not affect observers added after
