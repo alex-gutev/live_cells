@@ -209,6 +209,7 @@ class _CellStorageElement extends _CellWidgetElement {
 
   @override
   Widget build() {
+    final previousActiveElement = CellInitializer._activeCellElement;
     try {
       _curCell = 0;
       _curWatcher = 0;
@@ -217,7 +218,7 @@ class _CellStorageElement extends _CellWidgetElement {
       return super.build();
     }
     finally {
-      CellInitializer._activeCellElement = null;
+      CellInitializer._activeCellElement = previousActiveElement;
     }
   }
 
