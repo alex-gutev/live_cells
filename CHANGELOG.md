@@ -127,3 +127,11 @@ Improvements and bug fixes:
 
 * Fix potential issues
 * Fix typos and improve README
+
+## 0.7.0
+
+New features:
+
+* `ValueCell.watch` and `CellInitializer.watch` for calling a function whenever the values of cells
+  change.
+* State restoration of cells with `RestorableCellWidget`
