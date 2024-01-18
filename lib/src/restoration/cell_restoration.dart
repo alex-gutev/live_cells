@@ -31,13 +31,13 @@ abstract class RestorableCellWidget extends StatelessWidget {
   /// If [restorable] is false, the state of the returned cell is not restored.
   /// If [restorable] is true, an assertion is violated if the cell returned
   /// by [create] is not a [RestorableCell]. Otherwise if [restorable] is null
-  /// (the default) the state of the cell is only restored if [RestorableCell]
-  /// is true.
+  /// (the default) the state of the cell is only restored if the cell
+  /// is a [RestorableCell].
   ///
   /// **NOTE**: Only cells holding values encodable by [StandardMessageCodec],
   /// can have their state restored. To restore the state of cells holding other
   /// value types, a [CellValueCoder] subclass has to be implemented for the
-  /// value types. To use a [CellValueCoder] subclass, pass the constructor of
+  /// value types. To use a [CellValueCoder] subclass, provide the constructor of
   /// the subclass in [coder].
   ///
   /// **NOTE**: This method may only be called within the [build] method.
@@ -45,7 +45,14 @@ abstract class RestorableCellWidget extends StatelessWidget {
     bool? restorable,
     CellValueCoder Function() coder = CellValueCoder.new
   }) {
-    assert(_RestorableCellWidgetState._activeState != null);
+    assert(
+        _RestorableCellWidgetState._activeState != null,
+        'RestorableCellWidget.cell() called from outside build method. '
+        'This usually happens when you call cell() from a widget builder function '
+        'that is called after the build method returns, such as the builder functions '
+        'used with the Builder and ValueListenableBuilder widgets. '
+        'To fix this please place the cell creation directly within the build '
+        'method of the RestorableCellWidget.');
 
     if (restorable ?? true) {
       return _RestorableCellWidgetState._activeState!.getRestorableCell(

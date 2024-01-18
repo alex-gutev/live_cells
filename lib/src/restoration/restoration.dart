@@ -27,7 +27,7 @@ abstract class RestorableCell<T> extends ValueCell<T> {
 /// Cell value encoder and decoder interface.
 ///
 /// The base implementation simply passes through the values both in [encode]
-/// and [decode], thus it can only be used to encoder and decode values
+/// and [decode], thus it can only be used to encode and decode values
 /// supported by [StandardMessageCodec].
 ///
 /// This class should be subclassed to support cell restoration of cells holding
