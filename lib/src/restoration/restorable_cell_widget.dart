@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/widgets.dart';
 
 import '../base/cell_observer.dart';
+import '../cell_watch/cell_watcher.dart';
 import '../value_cell.dart';
 import 'restoration.dart';
 import '../cell_widget/cell_widget.dart';
@@ -64,6 +65,32 @@ abstract class RestorableCellWidget extends StatelessWidget {
     else {
       return _RestorableCellWidgetState._activeState!.getCell(create);
     }
+  }
+
+  /// Register a callback to be called whenever the values of cells change.
+  ///
+  /// The function [watch] is called whenever the values of the cells referenced
+  /// within it using [ValueCell.call] change. [watch] is called once immediately
+  /// after it is registered.
+  ///
+  /// [watch] is not called after the widget is removed from the tree.
+  ///
+  /// **NOTE**: The callback is only registered once during the first build,
+  /// and will not be registered again on subsequent builds.
+  ///
+  /// **NOTE**: This method may only be called within the [build] method.
+  void watch(VoidCallback watch) {
+    assert(
+        _RestorableCellWidgetState._activeState != null,
+        'RestorableCellWidget.watch() called from outside build method. '
+        'This usually happens when you call watch() from a widget builder function '
+        'that is called after the build method returns, such as the builder functions '
+        'used with the Builder and ValueListenableBuilder widgets. '
+        'To fix this place the call to watch() directly within the build '
+        'method of the RestorableCellWidget.'
+    );
+
+    _RestorableCellWidgetState._activeState!.getWatcher(watch);
   }
 
   @override
@@ -131,11 +158,19 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
   /// Observes the restorable cells for changes in their values
   late final _observer = _RestorableWidgetCellObserver(_cellStates);
 
+  /// List of registered cell watchers
+  final List<CellWatcher> _watchers = [];
+
+  /// Index of watcher to retrieve/create when calling [getWatcher]
+  var _curWatcher = 0;
+
   /// Retrieve/create the current cell.
   ///
-  /// If there is no cell instance at the current cell index, [create] is called
-  /// to create a new instance. Calling [getCell] again at the current cell index
-  /// returns the existing cell instance.
+  /// During the first build of the widget, [create] is called to create a new
+  /// instance at the current cell index.
+  ///
+  /// In subsequent builds, [getCell] returns the existing cell instance at the
+  /// current cell index.
   ///
   /// The cell index is advanced when calling this method.
   V getCell<T, V extends ValueCell<T>>(CreateCell<V> create) {
@@ -216,6 +251,34 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
     return cell;
   }
 
+  /// Retrieve/create the current *cell watcher*.
+  ///
+  /// During the first build of the widget, a new cell watcher is created with
+  /// watch function [watch], at the current watcher index.
+  ///
+  /// In subsequent builds, [getWatcher] returns the existing [CellWatcher]
+  /// instance at the current watcher index.
+  ///
+  /// The watcher index is advanced when calling this method.
+  CellWatcher getWatcher(VoidCallback watch) {
+    if (_isFirstBuild) {
+      final watcher = CellWatcher(watch);
+      _watchers.add(watcher);
+      _curWatcher++;
+
+      return watcher;
+    }
+
+    assert(
+        _curWatcher < _watchers.length,
+        'RestorableCellWidget.watch() was called more times in this build of the '
+        'widget than in the previous build. This usually happens when a call to '
+        'watch() is placed inside a conditional or loop.'
+    );
+
+    return _watchers[_curWatcher++];
+  }
+
   @override
   String? get restorationId => widget.restorationId;
 
@@ -229,21 +292,29 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
     _observer.dispose();
     _cellStates.dispose();
 
+    for (final watcher in _watchers) {
+      watcher.stop();
+    }
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final previousActiveState = _activeState;
+
     try {
       _activeState = this;
+
       _curCell = 0;
       _curCellState = 0;
+      _curWatcher = 0;
 
       return observe(widget.builder);
     }
     finally {
       _isFirstBuild = false;
-      _activeState = null;
+      _activeState = previousActiveState;
     }
   }
 }
