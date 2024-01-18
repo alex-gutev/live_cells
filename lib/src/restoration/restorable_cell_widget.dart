@@ -279,7 +279,7 @@ class _RestorableWidgetCellObserver implements CellObserver {
   }
 
   @override
-  bool get shouldNotifyAlways => false;
+  bool get shouldNotifyAlways => true;
 
   @override
   void update(covariant RestorableCell<dynamic> cell) {
