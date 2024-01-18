@@ -61,8 +61,7 @@ of those cells and automatically recompute its own value.
 
 `ValueCell.watch` is like `ValueCell.computed` but instead of creating a new `ValueCell` a function
 is called whenever the values of the cells referenced within the *watch* function change. This is 
-useful for side effects, such as printing to a log, which need to be executed whenever the values of
-cells change.
+useful for side effects, such as printing to a log.
 
 Example:
 
@@ -75,8 +74,8 @@ watcher.stop();
 
 In the above example `ValueCell.watch` is used to print the values of the cells `a` and `b`,
 referenced within the watch function, whenever they change. `watch()` returns a *cell
-watcher* object which provides a `stop()` method. The watch function is no longer called after 
-calling `stop()`.
+watcher* object which provides a `stop()` method. After calling `stop()`, the watch function is no 
+longer called.
 
 Putting it all together let's implement the most trivial of examples, a simple counter:
 
