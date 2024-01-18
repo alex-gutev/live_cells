@@ -49,4 +49,4 @@ export 'src/cell_watch/cell_watcher.dart' show CellWatcher;
 
 export 'src/restoration/restoration.dart' show RestorableCell, CellValueCoder;
 
-export 'src/restoration/cell_restoration.dart' show RestorableCellWidget;
+export 'src/restoration/restorable_cell_widget.dart' show RestorableCellWidget;
