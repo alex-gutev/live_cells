@@ -51,7 +51,7 @@ abstract class RestorableCellWidget extends StatelessWidget {
         'This usually happens when you call cell() from a widget builder function '
         'that is called after the build method returns, such as the builder functions '
         'used with the Builder and ValueListenableBuilder widgets. '
-        'To fix this please place the cell creation directly within the build '
+        'To fix this place the cell creation directly within the build '
         'method of the RestorableCellWidget.');
 
     if (restorable ?? true) {
@@ -116,6 +116,9 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
   /// Restorable list holding the saved cell states
   final _cellStates = _RestorableCellStateList();
 
+  /// Is this the first build of the widget
+  var _isFirstBuild = true;
+
   /// List of created cells
   final List<ValueCell> _cells = [];
 
@@ -136,16 +139,22 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
   ///
   /// The cell index is advanced when calling this method.
   V getCell<T, V extends ValueCell<T>>(CreateCell<V> create) {
-    if (_curCell < _cells.length) {
-      return _cells[_curCell++] as V;
+    if (_isFirstBuild) {
+      final cell = create();
+      _cells.add(cell);
+      _curCell++;
+
+      return cell;
     }
 
-    final cell = create();
-    _cells.add(cell);
+    assert(
+        _curCell < _cells.length,
+        'RestorableCellWidget.cell() was called more times in this build of the '
+        'widget than in the previous build. This usually happens when a call to '
+        'cell() is placed inside a conditional or loop.'
+    );
 
-    _curCell++;
-
-    return cell;
+    return _cells[_curCell++] as V;
   }
 
   /// Retrieve/create the current cell, and restore its value.
@@ -168,28 +177,35 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
     required CellValueCoder Function() makeCoder,
     required bool forceRestore,
   }) {
-    final isNew = _curCell == _cells.length;
     final cell = getCell(create);
 
-    if (isNew) {
-      if (!(forceRestore || cell is RestorableCell<T>)) {
+    if (_isFirstBuild) {
+      assert(
+        !forceRestore || cell is RestorableCell<T>,
+        'RestorableCellWidget.cell(): cell returned by creation function is not '
+        'a RestorableCell. You are seeing this error because you\'ve created a '
+        'cell with cell(..., restore: true) which is not a RestorableCell. To '
+        'fix this either return a RestorableCell from the creation function or '
+        'call cell() without the restore argument.'
+      );
+
+      if (cell is! RestorableCell<T>) {
         return cell;
       }
 
-      final restorableCell = cell as RestorableCell<T>;
       final coder = makeCoder();
 
       if (_curCellState < _cellStates.length) {
-        restorableCell.restoreState(_cellStates[_curCellState], coder);
+        cell.restoreState(_cellStates[_curCellState], coder);
       }
       else {
-        _cellStates.add(restorableCell.dumpState(coder));
+        _cellStates.add(cell.dumpState(coder));
       }
 
       final index = _curCellState;
 
       _observer.addCell(
-          cell: restorableCell,
+          cell: cell,
           index: index,
           coder: coder
       );
@@ -226,6 +242,7 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
       return observe(widget.builder);
     }
     finally {
+      _isFirstBuild = false;
       _activeState = null;
     }
   }
