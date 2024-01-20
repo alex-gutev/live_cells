@@ -19,6 +19,10 @@ export 'src/extensions/compute_extension.dart'
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
 export 'src/maybe_cell/maybe.dart'
     show Maybe, MaybeCell, CellMaybeExtension, MaybeCellExtension;
+
+export 'src/cell_states/prev_value_cell.dart'
+    show PrevValueCell, PrevValueCellExtension, UninitializedCellError;
+
 export 'src/extensions/numeric_extension.dart' show NumericExtension;
 export 'src/extensions/values_extension.dart'
     show NumValueCellExtension, StringValueCellExtension;
