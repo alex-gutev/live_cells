@@ -2609,4 +2609,107 @@ void main() {
       verifyNever(cell.dispose());
     });
   });
+
+  group('PrevValueCell', () {
+    test('PrevValueCell.value holds error on initialization', () {
+      final a = MutableCell(0);
+      final prev = a.previous;
+
+      expect(() => prev.value, throwsA(isA<UninitializedCellError>()));
+    });
+
+    test('PrevValueCell.value holds previous value of cell after being set once', () {
+      final a = MutableCell(0);
+      final prev = a.previous;
+
+      addObserver(prev, MockSimpleObserver());
+
+      a.value = 10;
+
+      expect(prev.value, equals(0));
+    });
+
+    test('PrevValueCell.value holds previous value of cell after being set multiple times', () {
+      final a = MutableCell(0);
+      final prev = a.previous;
+
+      addObserver(prev, MockSimpleObserver());
+
+      a.value = 10;
+      a.value = 5;
+      a.value = 32;
+      a.value = 40;
+
+      expect(prev.value, equals(32));
+    });
+
+    test('PrevValueCell.value set to previous value when observer called', () {
+      final a = MutableCell(0);
+      final prev = a.previous;
+
+      final observer = addObserver(prev, MockValueObserver());
+
+      a.value = 10;
+      a.value = 5;
+      a.value = 32;
+      a.value = 40;
+
+      expect(observer.values, [0, 10, 5, 32]);
+    });
+
+    test('Restoration of PrevValueCell restores value', () {
+      final a = MutableCell(10);
+      final prev = a.previous as RestorableCell<int>;
+
+      addObserver(prev, MockSimpleObserver());
+
+      a.value = 30;
+
+      final restored = a.previous as RestorableCell<int>;
+      restored.restoreState(prev.dumpState(const CellValueCoder()), const CellValueCoder());
+
+      expect(restored.value, equals(10));
+    });
+
+    test('Restoration of PrevValueCell restores error', () {
+      final a = MutableCell(10);
+      final prev = a.previous as RestorableCell<int>;
+
+      addObserver(prev, MockSimpleObserver());
+
+      final restored = a.previous as RestorableCell<int>;
+      restored.restoreState(prev.dumpState(const CellValueCoder()), const CellValueCoder());
+
+      expect(() => restored.value, throwsA(isA<UninitializedCellError>()));
+    });
+
+    test('Restoration of PrevValueCell restores functionality', () {
+      final a = MutableCell(10);
+      final prev = a.previous as RestorableCell<int>;
+
+      addObserver(prev, MockSimpleObserver());
+
+      final restored = a.previous as RestorableCell<int>;
+      restored.restoreState(prev.dumpState(const CellValueCoder()), const CellValueCoder());
+
+      addObserver(restored, MockSimpleObserver());
+
+      a.value = 45;
+
+      expect(restored.value, equals(10));
+    });
+  });
+}
+
+// Test utility functions
+
+/// Add an observer to a cell.
+///
+/// This function also adds a teardown to the current test which removes
+/// the [observer] from [cell], after the current test runs.
+T addObserver<T extends CellObserver>(ValueCell cell, T observer) {
+  cell.addObserver(observer);
+  addTearDown(() => cell.removeObserver(observer));
+
+  return observer;
 }
