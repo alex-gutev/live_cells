@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../base/exceptions.dart';
 import '../base/observer_cell.dart';
 import '../base/cell_listeners.dart';
 import '../base/cell_observer.dart';
@@ -57,7 +58,13 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   @override
   T get value {
     if (stale) {
-      _value = compute();
+      try {
+        _value = compute();
+      }
+      on StopComputeException {
+        // Keep previous value and reset stale and _computed
+      }
+
       stale = false;
       _computed = true;
     }

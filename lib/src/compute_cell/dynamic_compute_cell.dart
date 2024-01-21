@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import '../base/cell_listeners.dart';
 import '../base/cell_observer.dart';
+import '../base/exceptions.dart';
 import '../base/managed_cell.dart';
 import '../base/observer_cell.dart';
 import '../restoration/restoration.dart';
@@ -31,15 +32,20 @@ class DynamicComputeCell<T> extends ManagedCell<T>
   @override
   T get value {
     if (stale) {
-      _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
-        if (!_arguments.contains(cell)) {
-          _arguments.add(cell);
+      try {
+        _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
+          if (!_arguments.contains(cell)) {
+            _arguments.add(cell);
 
-          if (isInitialized) {
-            cell.addObserver(this);
+            if (isInitialized) {
+              cell.addObserver(this);
+            }
           }
-        }
-      });
+        });
+      }
+      on StopComputeException {
+        /// Keep the previous value and reset stale if necessary
+      }
 
       stale = !isInitialized;
     }

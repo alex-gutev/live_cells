@@ -1,3 +1,4 @@
+import '../base/exceptions.dart';
 import '../base/observer_cell.dart';
 import '../base/cell_observer.dart';
 import '../base/notifier_cell.dart';
@@ -32,7 +33,13 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
   @override
   T get value {
     if (stale) {
-      setValue(valueCell.value);
+      try {
+        setValue(valueCell.value);
+      }
+      on StopComputeException {
+        // Keep previous value and reset stale if necessary
+      }
+
       stale = !isInitialized;
     }
 

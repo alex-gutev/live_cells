@@ -623,6 +623,21 @@ void main() {
 
       expect(observer.values, equals([1, 11, 13, 20]));
     });
+
+    test('Previous DynamicComputeCell.value preserved if ValueCell.none is used', () {
+      final a = MutableCell(0);
+      final evens = ValueCell.computed(() => a().isEven ? a() : ValueCell.none);
+
+      final observer = addObserver(evens, MockValueObserver());
+
+      a.value = 1;
+      a.value = 2;
+      a.value = 3;
+      a.value = 4;
+      a.value = 5;
+
+      expect(observer.values, equals([0, 2, 4]));
+    });
   });
 
   group('StoreCell', () {
@@ -700,6 +715,21 @@ void main() {
 
       cell.value = 'bye';
       verify(observer.gotValue('bye'));
+    });
+
+    test('Previous StoreCell.value preserved if ValueCell.none is used', () {
+      final a = MutableCell(0);
+      final evens = [a].computeCell(() => a.value.isEven ? a.value : ValueCell.none).store();
+
+      final observer = addObserver(evens, MockValueObserver());
+
+      a.value = 1;
+      a.value = 2;
+      a.value = 3;
+      a.value = 4;
+      a.value = 5;
+
+      expect(observer.values, equals([0, 2, 4]));
     });
   });
 
@@ -1662,6 +1692,24 @@ void main() {
       expect(observerC.values, equals([7, 8, 40]));
       expect(observerD.values, equals([7, 32]));
     });
+
+    test('Previous MutableComputeCell.value preserved if ValueCell.none is used', () {
+      final a = MutableCell(0);
+      final evens = [a].mutableComputeCell(() => a().isEven ? a() : ValueCell.none, (a) {
+        a.value = a;
+      });
+
+      final observer = addObserver(evens, MockValueObserver());
+
+      a.value = 1;
+      a.value = 2;
+      a.value = 3;
+      a.value = 4;
+      a.value = 5;
+
+      expect(observer.values, equals([0, 2, 4]));
+
+    });
   });
 
   group('DynamicMutableComputeCell', () {
@@ -1988,7 +2036,6 @@ void main() {
       expect(observerD.values, equals([7, 32]));
     });
 
-
     test('DynamicMutableComputeCell arguments tracked correctly when using conditionals', () {
       final a = MutableCell(true);
       final b = MutableCell(2);
@@ -2095,6 +2142,24 @@ void main() {
       });
 
       expect(observer.values, equals([10, 25]));
+    });
+
+    test('Previous DynamicMutableComputeCell.value preserved if ValueCell.none is used', () {
+      final a = MutableCell(0);
+      final evens = MutableCell.computed(() => a().isEven ? a() : ValueCell.none, (a) {
+        a.value = a;
+      });
+
+      final observer = addObserver(evens, MockValueObserver());
+
+      a.value = 1;
+      a.value = 2;
+      a.value = 3;
+      a.value = 4;
+      a.value = 5;
+
+      expect(observer.values, equals([0, 2, 4]));
+
     });
   });
 
