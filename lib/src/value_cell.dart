@@ -53,7 +53,10 @@ abstract class ValueCell<T> {
   /// When this method is called within a cell's value computation function,
   /// the cell's value is not recomputed. Instead the cell's current value is
   /// preserved.
-  static get none => throw StopComputeException();
+  ///
+  /// If this method is called when a cell's initial value is being computed,
+  /// the cell's initial value is set to [defaultValue].
+  static none([defaultValue]) => throw StopComputeException(defaultValue);
 
   /// Retrieve the value of the cell.
   ///

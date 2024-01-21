@@ -24,9 +24,14 @@ class DynamicComputeCell<T> extends ManagedCell<T>
 
   /// Create a cell which computes its value using [compute].
   DynamicComputeCell(this._compute) {
-    _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
-      _arguments.add(cell);
-    });
+    try {
+      _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
+        _arguments.add(cell);
+      });
+    }
+    on StopComputeException catch (e) {
+      _value = e.defaultValue;
+    }
   }
 
   @override

@@ -36,7 +36,12 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   /// Every cell of which the value is referenced in [compute] must be
   /// included in [arguments].
   MutableDependentCell(this.arguments) {
-    _value = compute();
+    try {
+      _value = compute();
+    }
+    on StopComputeException catch (e) {
+      _value = e.defaultValue;
+    }
   }
 
   /// Compute the value of the cell.

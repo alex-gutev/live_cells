@@ -12,7 +12,7 @@ import '../value_cell.dart';
 class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
     implements CellObserver, RestorableCell<T> {
   /// Create a [StoreCell] which observes and saves the value of [valueCell]
-  StoreCell(this.valueCell) : super(valueCell.value);
+  StoreCell(this.valueCell) : super(_getInitialValue(valueCell));
 
   @override
   void init() {
@@ -62,6 +62,16 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
   @override
   void restoreState(Object? state, CellValueCoder coder) {
     setValue(coder.decode(state));
+  }
+
+  /// Get the initial value of [cell] while handling [StopComputeException]
+  static T _getInitialValue<T>(ValueCell<T> cell) {
+    try {
+      return cell.value;
+    }
+    on StopComputeException catch (e) {
+      return e.defaultValue;
+    }
   }
 }
 
