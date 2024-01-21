@@ -28,6 +28,7 @@ export 'src/extensions/values_extension.dart'
     show NumValueCellExtension, StringValueCellExtension;
 
 export 'src/extensions/bool_extension.dart' show BoolCellExtension;
+export 'src/extensions/error_handling_extension.dart' show ErrorCellExtension;
 
 export 'src/extensions/conversion_extensions.dart'
     show

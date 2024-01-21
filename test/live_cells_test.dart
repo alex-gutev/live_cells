@@ -1058,6 +1058,64 @@ void main() {
     });
   });
 
+  group('ErrorCellExtension', () {
+    test('ErrorCellExtension.on handles all exceptions without type argument', () {
+      final a = MutableCell(1);
+      final b = ValueCell.computed(() {
+        if (a() <= 0) {
+          throw "A generic exception";
+        }
+
+        return a();
+      });
+
+      final c = MutableCell(2);
+      final result = b.on(c);
+
+      final observer = addObserver(result, MockValueObserver());
+      expect(result.value, equals(1));
+
+      a.value = 0;
+      c.value = 4;
+      a.value = 10;
+      c.value = 100;
+
+      expect(observer.values, equals([2, 4, 10]));
+    });
+
+    test('ErrorCellExtension.on handles only given exception with type argument', () {
+      final a = MutableCell(1);
+      final b = ValueCell.computed(() {
+        if (a() < 0) {
+          throw Exception("A generic exception");
+        }
+        else if (a() == 0) {
+          throw ArgumentError('A cannot be 0');
+        }
+
+        return a();
+      });
+
+      final c = MutableCell(2);
+      final result = b.on<ArgumentError>(c);
+
+      final observer = addObserver(result, MockValueObserver());
+      expect(result.value, equals(1));
+
+      a.value = 0;
+      c.value = 4;
+      a.value = 10;
+      c.value = 100;
+
+      expect(observer.values, equals([2, 4, 10]));
+
+      result.removeObserver(observer);
+
+      a.value = -1;
+      expect(() => result.value, throwsException);
+    });
+  });
+
   group('Cell update consistency', () {
     test('All observer methods called in correct order', () {
       final cell = MutableCell(10);
