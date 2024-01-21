@@ -17,4 +17,34 @@ extension ErrorCellExtension<T> on ValueCell<T> {
       return other();
     }
   });
+
+  /// Create a cell which captures exceptions thrown during the computation of this cell.
+  ///
+  /// If [this] cell throws an exception during the computation of its value,
+  /// the returned cell evaluates to the thrown exception.
+  ///
+  /// If [this] cell does not throw during the computation of its value, the
+  /// value of the returned cell is `null` if [all] is `true`. If [all] is
+  /// `false`, its value is not updated.
+  ///
+  /// If [E] is given, only exceptions of type [E] are captured, otherwise all
+  /// exceptions are captured.
+  ValueCell<E?> error<E extends Object>({bool all = false}) => ValueCell.computed(() {
+
+    try {
+      this();
+    }
+    on E catch (e) {
+      return e;
+    }
+    catch (e) {
+      // To prevent errors being propagated through this cell
+    }
+
+    if (!all) {
+      ValueCell.none();
+    }
+
+    return null;
+  });
 }
