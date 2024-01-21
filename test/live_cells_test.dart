@@ -967,6 +967,97 @@ void main() {
     });
   });
 
+  group('BoolCellExtension', () {
+    test('BoolCellExtension.and produces cell which is the logical and of its arguments', () {
+      final a = MutableCell(true);
+      final b = MutableCell(true);
+      final and = a.and(b);
+
+      expect(and.value, isTrue);
+
+      a.value = false;
+      expect(and.value, isFalse);
+
+      b.value = false;
+      expect(and.value, isFalse);
+
+      a.value = true;
+      expect(and.value, isFalse);
+
+      b.value = true;
+      expect(and.value, isTrue);
+    });
+
+    test('BoolCellExtension.or produces cell which is the logical or of its arguments', () {
+      final a = MutableCell(true);
+      final b = MutableCell(true);
+      final and = a.or(b);
+
+      expect(and.value, isTrue);
+
+      a.value = false;
+      expect(and.value, isTrue);
+
+      b.value = false;
+      expect(and.value, isFalse);
+
+      a.value = true;
+      expect(and.value, isTrue);
+
+      b.value = true;
+      expect(and.value, isTrue);
+    });
+
+    test('BoolCellExtension.not produces cell which is the logical not of itself', () {
+      final a = MutableCell(true);
+      final not = a.not();
+
+      expect(not.value, isFalse);
+
+      a.value = false;
+      expect(not.value, isTrue);
+    });
+
+    test('BoolCellExtension.select with ifFalse selects correct value', () {
+      final a = 'true'.cell;
+      final b = MutableCell('false');
+      final cond = MutableCell(true);
+
+      final select = cond.select(a, b);
+      final observer = addObserver(select, MockValueObserver());
+
+      expect(select.value, equals('true'));
+
+      cond.value = false;
+      b.value = 'else';
+      cond.value = true;
+
+      expect(observer.values, equals(['false', 'else', 'true']));
+    });
+
+    test('BoolCellExtension.select with ifFalse does not update value when false', () {
+      final a = MutableCell('true');
+      final cond = MutableCell(true);
+
+      final select = cond.select(a);
+
+      observeCell(select);
+      expect(select.value, equals('true'));
+
+      cond.value = false;
+      expect(select.value, equals('true'));
+
+      a.value = 'then';
+      expect(select.value, equals('true'));
+
+      cond.value = true;
+      expect(select.value, equals('then'));
+
+      a.value = 'when';
+      expect(select.value, equals('when'));
+    });
+  });
+
   group('Cell update consistency', () {
     test('All observer methods called in correct order', () {
       final cell = MutableCell(10);
@@ -2826,6 +2917,13 @@ void main() {
 }
 
 // Test utility functions
+
+/// Add an observer to a cell so that it reacts to changes in is dependencies.
+///
+/// The observer is removed in a teardown function added to the current test.
+void observeCell(ValueCell cell) {
+  addObserver(cell, MockSimpleObserver());
+}
 
 /// Add an observer to a cell.
 ///

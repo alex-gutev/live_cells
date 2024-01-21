@@ -27,6 +27,8 @@ export 'src/extensions/numeric_extension.dart' show NumericExtension;
 export 'src/extensions/values_extension.dart'
     show NumValueCellExtension, StringValueCellExtension;
 
+export 'src/extensions/bool_extension.dart' show BoolCellExtension;
+
 export 'src/extensions/conversion_extensions.dart'
     show
         ParseIntExtension,
