@@ -413,10 +413,14 @@ final prev = a.previous;
 final sum = ValueCell.computed(() => a() + prev());
 
 a.value = 1;
-print(sum.value); // Prints 1
+print(a.value);    // Prints 1
+print(prev.value); // Prints 0
+print(sum.value);  // Prints 1
 
 a.value = 5;
-print(sum.value); // Prints 6
+print(a.value);    // Prints 5
+print(prev.value); // Prints 1
+print(sum.value);  // Prints 6
 ```
 
 **NOTE**:
