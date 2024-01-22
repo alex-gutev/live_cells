@@ -9,7 +9,7 @@ extension ErrorCellExtension<T> on ValueCell<T> {
   ///
   /// [E] is the type of exception to handle. By default, if this is not
   /// explicitly given, all exceptions are handled.
-  ValueCell<T> on<E extends Object>(ValueCell<T> other) => ValueCell.computed(() {
+  ValueCell<T> onError<E extends Object>(ValueCell<T> other) => ValueCell.computed(() {
     try {
       return this();
     }

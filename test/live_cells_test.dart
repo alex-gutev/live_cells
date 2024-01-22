@@ -1084,7 +1084,7 @@ void main() {
       });
 
       final c = MutableCell(2);
-      final result = b.on(c);
+      final result = b.onError(c);
 
       final observer = addObserver(result, MockValueObserver());
       expect(result.value, equals(1));
