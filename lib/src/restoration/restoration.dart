@@ -1,3 +1,4 @@
+import '../maybe_cell/maybe.dart';
 import '../value_cell.dart';
 
 /// Interface for saving and restoring the state of a cell after initialization.
@@ -44,4 +45,39 @@ class CellValueCoder {
   decode(Object? primitive) {
     return primitive;
   }
+}
+
+/// Value coder for cells holding [Maybe] values wrapping a [T]
+class MaybeValueCoder<T> implements CellValueCoder {
+  /// Value coder to use for encoding [Maybe.value]
+  final CellValueCoder valueCoder;
+
+  /// Value coder to use for encoding [Maybe.error]
+  final CellValueCoder errorCoder;
+
+  /// Create a [Maybe] value coder.
+  ///
+  /// [valueCoder] is used to encode [Maybe.value].
+  /// [errorCoder] is used to encoder [Maybe.error]
+  MaybeValueCoder({
+    required this.valueCoder,
+    required this.errorCoder,
+  });
+
+  @override
+  decode(Object? primitive) {
+    final map = primitive as Map;
+
+    return map['error'] != null
+        ? Maybe<T>.error(errorCoder.decode(map['error']))
+        : Maybe<T>(valueCoder.decode(map['value']));
+  }
+
+  @override
+  Object? encode(covariant Maybe<T> maybe) => {
+      if (maybe.error != null)
+        'error': errorCoder.encode(maybe.error)
+      else
+        'value': valueCoder.encode(maybe.value)
+    };
 }

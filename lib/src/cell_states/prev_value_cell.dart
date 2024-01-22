@@ -1,6 +1,7 @@
 import '../base/cell_listeners.dart';
 import '../base/managed_cell.dart';
 import '../base/observer_cell.dart';
+import '../maybe_cell/maybe.dart';
 import '../restoration/restoration.dart';
 import '../value_cell.dart';
 
@@ -11,7 +12,7 @@ class UninitializedCellError implements Exception {
       'The value of a cell was referenced before it was initialized.';
 }
 
-/// A cell which records the stores value of another cell at a given time.
+/// A cell which records the stores previous value of another cell at a given time.
 class PrevValueCell<T> extends ManagedCell<T>
     with CellEquality<T>, CellListeners<T>, ObserverCell<T>
     implements RestorableCell<T> {
@@ -20,7 +21,7 @@ class PrevValueCell<T> extends ManagedCell<T>
   ///
   /// When [value] is accessed it will always return the previous value
   /// of [cell].
-  PrevValueCell(this.cell) : _currentValue = cell.value;
+  PrevValueCell(this.cell) : _currentValue = Maybe.wrap(() => cell.value);
 
   /// Retrieve the previous value of [cell].
   ///
@@ -29,7 +30,7 @@ class PrevValueCell<T> extends ManagedCell<T>
   @override
   T get value {
     if (_hasValue) {
-      return _prevValue;
+      return _prevValue.unwrap;
     }
     else {
       throw UninitializedCellError();
@@ -44,8 +45,8 @@ class PrevValueCell<T> extends ManagedCell<T>
   final ValueCell<T> cell;
 
   var _hasValue = false;
-  late T _prevValue;
-  T _currentValue;
+  late Maybe<T> _prevValue;
+  Maybe<T> _currentValue;
 
   @override
   void init() {
@@ -64,20 +65,27 @@ class PrevValueCell<T> extends ManagedCell<T>
     if (updating) {
       _hasValue = true;
       _prevValue = _currentValue;
-      _currentValue = cell.value;
+      _currentValue = Maybe.wrap(() => cell.value);
     }
 
     super.update(cell);
   }
 
   @override
-  Object? dumpState(CellValueCoder coder) => {
-    'has_value': _hasValue,
-    'current_value': coder.encode(_currentValue),
+  Object? dumpState(CellValueCoder coder) {
+    final maybeCoder = MaybeValueCoder<T>(
+        valueCoder: coder,
+        errorCoder: coder
+    );
 
-    if (_hasValue)
-      'prev_value': coder.encode(_prevValue),
-  };
+    return {
+      'has_value': _hasValue,
+      'current_value': maybeCoder.encode(_currentValue),
+
+      if (_hasValue)
+        'prev_value': maybeCoder.encode(_prevValue),
+    };
+  }
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
@@ -85,11 +93,16 @@ class PrevValueCell<T> extends ManagedCell<T>
 
     final map = state as Map;
 
+    final maybeCoder = MaybeValueCoder<T>(
+        valueCoder: coder,
+        errorCoder: coder
+    );
+
     _hasValue = map['has_value'];
-    _currentValue = coder.decode(map['current_value']);
+    _currentValue = maybeCoder.decode(map['current_value']);
 
     if (_hasValue) {
-      _prevValue = coder.decode(map['prev_value']);
+      _prevValue = maybeCoder.decode(map['prev_value']);
     }
   }
 }
