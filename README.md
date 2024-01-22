@@ -27,12 +27,10 @@ This package also has the following advantages over other state management libra
 
 ## Usage
 
-### Basics
+### Cells
 
-The basis of this package is the `ValueCell` interface which provides the cell interface. Every
-cell has a `value` and a set of observers which react to changes in the value.
-
-A `MutableCell` is a cell which can have its `value` property set directly:
+A cell is an object with a `value` and a set of observers which react to changes in the value. A 
+`MutableCell` is a cell which can have its `value` property set directly:
 
 ```dart
 final cell = MutableCell(0);
@@ -40,10 +38,21 @@ final cell = MutableCell(0);
 cell.value = 1;
 ```
 
+Cells holding a constant value are created using `ValueCell.value` or the `cell` property on `num`
+and `String` values:
+
+```dart
+final a = 1.cell;
+final b = 'hello'.cell;
+final c = ValueCell.value(someValue);
+```
+
 When the `value` property is set the observers of the cell react to the change.
 
-A cell which is a function of other cells can be created using the `ValueCell.computed` constructor,
-which takes the function that computes the cell's value.
+### Computed cells
+
+A *computed cell* is a cell with a value that is a function of the values of other cells. Computed
+cells are created using `ValueCell.computed`:.
 
 ```dart
 final a = MutableCell(0);
@@ -53,31 +62,66 @@ final sum = ValueCell.computed(() => a() + b());
 ```
 
 In the above example, cell `sum` computes the sum of the values of cells `a` and `b`. Whenever the
-value of either `a` or `b` changes the value of `sum` is recomputed using the new values.
+value of either `a` or `b` changes the value of `sum` is recomputed:
 
-**NOTE**: The values of `a` and `b` are accessed using the function call syntax rather than by
-accessing the `value` property. This is so that the computed cell can observe changes to the values
-of those cells and automatically recompute its own value.
+```dart
+print(sum.value); // Prints 1
+a.value = 2;
+print(sum.value); // Prints 3
+```
 
-`ValueCell.watch` is like `ValueCell.computed` but instead of creating a new `ValueCell` a function
-is called whenever the values of the cells referenced within the *watch* function change. This is 
-useful for side effects, such as printing to a log.
+**NOTE**: The values of cells are referenced using the function call syntax within
+`ValueCell.computed`.
+
+When `ValueCell.none()` is called within a computed cell, the computation of the cell's value is
+aborted and its current value is preserved. This can be used to prevent a cell's value from
+being recomputed when a condition is not met:
+
+```dart
+final a = MutableCell(4);
+final b = ValueCell.computed(() => a() < 10 ? a() : ValueCell.none());
+
+a.value = 6;
+print(b.value); // Prints 6
+
+a.value = 15;
+print(b.value); // Prints 6
+
+a.value = 8;
+print(b.value); // Prints 8
+```
+
+### Observing cells
+
+`ValueCell.watch` registers a *watch* function to be called when the values of the cells referenced
+within it change:
 
 Example:
 
 ```dart
+final a = MutableCell(0);
+final b = MutableCell(1);
+
 final watcher = ValueCell.watch(() => print('a = ${a()}, b = ${b()}'));
-...
-// Stop calling the watch function
-watcher.stop();
+
+a.value = 3; // Prints: a = 3, b = 1
 ```
 
-In the above example `ValueCell.watch` is used to print the values of the cells `a` and `b`,
-referenced within the watch function, whenever they change. `watch()` returns a *cell
-watcher* object which provides a `stop()` method. After calling `stop()`, the watch function is no 
-longer called.
+`ValueCell.watch` returns a `CellWatch` object. The *watch* function is not called again after
+`CellWatch.stop()` is called:
 
-Putting it all together let's implement the most trivial of examples, a simple counter:
+```dart
+b.value = 5;    // Prints: a = 3, b = 5
+watcher.stop(); // Watch function not called after this
+b.value = 10;   // Nothing is printed
+```
+
+### Using cells in widgets
+
+`CellWidget.builder` creates a widget which is rebuilt whenever the values of the cells referenced
+within it, using the function call syntax, change.
+
+An example of a simple counter:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -108,15 +152,17 @@ class _CounterDemoState extends State<CounterDemo> {
 }
 ```
 
-`CellWidget.builder` is used to create a widget which is rebuilt whenever the value of `counter`
-changes. Like `ValueCell.computed`, the widget is rebuilt when the value of a cell, that is 
-referenced within the widget builder function, changes.
+**NOTE**: You don't have to call a `dispose` method on cell's when they are no longer used.
+Disposal is taken care of automatically.
 
-**NOTE**: `ValueCell`'s do not require manually calling a `dispose` method once they're no longer
-used. Disposal is taken care of automatically.
+Subclassing `CellWidget` creates a widget which is rebuilt whenever the values of the cells
+referenced within its `build` method change.
 
-This example can be condensed further by moving the `counter` cell initialization directly within
-the `build` method:
+The `CellInitializer` mixin provides the `cell` method which allows cells to be defined directly
+within the `build` method. On the first build, `cell` creates a new cell using the provided function.
+On subsequent builds, `cell` returns the instance created during the first build.
+
+The counter example using `CellWidget` and `CellInitializer.cell`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -129,9 +175,7 @@ class CounterExample extends CellWidget with CellInitializer {
 
     return Column(
       children: [
-        CellWidget.builder((context) =>
-            Text('You clicked the button ${counter()} times')
-        ),
+        Text('You clicked the button ${counter()} times'),
         ElevatedButton(
           child: const Text('Increment Counter'),
           onPressed: () => counter.value += 1,
@@ -141,10 +185,6 @@ class CounterExample extends CellWidget with CellInitializer {
   }
 }
 ```
-
-The `counter` cell is created directly within the `build` method using the `cell` method, provided by
-the `CellInitializer` mixin, which creates an instance of a `ValueCell`, using the provided function,
-on the first build of the widget and retrieves the existing instance in subsequent builds.
 
 `CellInitializer` also provides a `watch` method which is like `ValueCell.watch` but automatically
 calls `stop()` when the widget is removed from the tree.
@@ -202,20 +242,132 @@ class ComputedExample extends CellWidget with CellInitializer {
 }
 ```
 
-The above example demonstrates how the value of a computed cell, created using `ValueCell.computed`,
-is recomputed whenever the values of the referenced argument cells change.
+The above example also demonstrates how the value of a computed cell is recomputed whenever the
+values of the referenced argument cells change.
 
-The definition of the `sum` cell above can be simplified further to the following:
+### Cell Expressions
+
+The arithmetic and comparison operators are overloaded for cells holding `num` values to return
+cells which compute the result of the expression.
+
+The definition of the `sum` cell from the previous example can be simplified to the following:
 
 ```dart
 final sum = cell(() => a + b);
 ```
 
-The arithmetic and relational operators are overloaded for `ValueCell`'s holding `num` values, so that
-a computed cell can be defined as an expression of `ValueCell`'s. This is not only simpler
-but more efficient since the argument cells are determined at compile time.
+This is not only simpler but more efficient since the argument cells are determined at compile time.
 
-### User Input
+The `eq` and `neq` method create cells which compare two cells for equality and inequality, 
+respectively. 
+
+```dart
+final isEq = a.eq(b); // isEq() == true when a() == b()
+final notEq = a.neq(b); // notEq() == true when a() != b()
+```
+
+Cells holding `bool` values are extended with the following methods:
+
+* `and`: Creates a cell with a value that is the logical and of two `bool` cells
+* `or`: Creates a cell with a value that is the logical or of two `bool` cells
+* `not`: Creates a cell with a value which is the logical `not` of a cell
+* `select`: Creates a cell which selects between the values of two cells based on a condition
+
+```dart
+final cond = a.or(b); // cond() is true when a() || b() is true
+final cell = cond.select(c, d); // when cond() is true, cell() == c() else cell() == d()
+
+a.value = true;
+c.value = 1;
+d.value = 2;
+
+print(cell.value); // Prints 1
+
+a.value = false;
+b.value = false;
+
+print(cell.value); // Prints 2
+```
+
+The second argument of `select` can be omitted, in which case the cell's value will not be updated
+if the condition is false:
+
+```dart
+final cell = cond.select(c);
+
+cond.value = true;
+a.value = 2;
+
+print(cell.value); // Prints 2
+
+cond.value = false;
+a.value = 4;
+
+print(cell.value); // Prints 2
+```
+
+### Exceptions
+
+If an exception is thrown while a cell's value is computed, it will be propagated to all points
+where the cell's value is referenced. This allows exceptions to be handled using `try` and `catch`
+inside computed cells:
+
+```dart
+final str = MutableCell('0');
+final n = ValueCell.computed(() => int.parse(str()));
+final isValid = ValueCell.computed(() {
+  try {
+    return n() > 0;
+  }
+  catch (e) {
+    return false;
+  }
+});
+
+print(isValid.value); // Prints false
+
+str.value = '5';
+print(isValid.value); // Prints true
+
+str.value = 'not a number';
+print(isValid.value); // Prints false
+```
+
+Exceptions can also be handled using the `onError` method which uses the value of another cell when
+an exception is thrown:
+
+```dart
+final str = MutableCell('0');
+final m = MutableCell(2);
+final n = ValueCell.computed(() => int.parse(str()));
+
+final result = n.onError(m); // Equal to n(). If n() throws eqaul to m();
+
+str.value = '3';
+print(result.value); // Prints 3
+
+str.value = 'not a number';
+print(result.value); // Prints 2
+```
+
+`onError` is a generic method with a type argument which when given, only exceptions of the given
+type are handled.
+
+```dart
+final result = n.onError<FormatException>(m); // Only handle's FormatException
+```
+
+The `error` method creates a cell which evaluates to the exceptions thrown by another cell.
+
+The above validation logic can be implemented more succintly using:
+
+```dart
+final str = MutableCell('0');
+final n = ValueCell.computed(() => int.parse(str()));
+final isValid = (n > 0).onError(ValueCell.value(false));
+```
+
+### Cell Widgets
 
 So far we've used the `onChanged` callback with the stock `TextField` provided by Flutter. This has
 two disadvantages:
@@ -224,8 +376,14 @@ two disadvantages:
 * You have to manually synchronize the state of the cells with the state of the text field, in an
   event handler.
 
-Live cells provides a `CellTextField` widget which allows its content to be accessed and controlled
-by a `ValueCell`.
+The `live_cell_widgets` library provides a collection of widgets which allow their properties to be
+controlled by cells.
+
+`CellTextField` is a `TextField` with its content accessed and controlled by a cell, which is provided
+in the `content` parameter of the `CellTextField` constructor. Whenever the content of the field
+changes, the value of the `content` cell is updated to reflect the content. Similarly, whenever
+the value of the `content` cell changes, the content of the field is updated to reflect the value
+of the cell.
 
 Example:
 
@@ -266,13 +424,11 @@ class CellTextFieldDemo extends CellWidget with CellInitializer {
 }
 ```
 
-The `CellTextField` constructor takes a `content` cell parameter, in this example the cell `input` 
-is provided. The value of the provided content cell, which must be a `MutableCell`, is updated to 
-reflect the content of the text field whenever it is changed by the user. Whatever the user writes 
-in the field is reflected in the widget below.
+The `input` cell serves as the *content cell* of the `CellTextField`. When text is entered in the 
+text field, the value of the `input` cell is set to the text that was entered. The "Clear" button
+clears the text field by setting the `input` cell to the empty string. 
 
-The "Clear" button clears the text field by setting the `input` cell to the empty string. The benefits
-of this approach are:
+The benefits of this approach are:
 
 * No need for a `TextEditingController`
 * No need for event handlers allowing for a declarative style of programming
@@ -284,13 +440,12 @@ Whilst the above is an improvement over what is offered by the stock Flutter `Te
 quite limited in that the *content cell* has to be a string cell. You'll run into difficulties,
 if instead of string input you require numeric input, as in the *sum* example.
 
-*Mutable computed cells* are `MutableCell`'s which ordinarily function like normal computed cells,
-created with `ValueCell.computed`, in that they compute a value out of one or more argument cells.
-However, a mutable computed cell can also have its value changed by setting its `value` property
+A *Mutable computed cell* is a cell which  ordinarily functions like a normal computed cell,
+created with `ValueCell.computed`, but can also have its value changed by setting its `value` property
 as though it is a `MutableCell`. When the value of a mutable computed cell is set, it *reverses*
 the computation by setting the argument cells to a value such that when the mutable computed
 cell is recomputed, the same value will be produced as the value that was set. Thus mutable
-computed cells support two-way data flow, which is what sets *Live Cells* apart from other reactive
+computed cells support two-way data flow, which is what sets **Live Cells** apart from other reactive
 state management libraries.
 
 Mutable computed cells can be created using the `MutableCell.computed` constructor, which takes the
@@ -389,7 +544,7 @@ class ComputedExample extends CellWidget with CellInitializer {
 
 In the above example two mutable computed cells `strA` and `strB` are created using `mutableString`,
 which are used as the content cells for the text fields for `a` and `b` respectively. There is also
-a "Reset" button which resets the values of cells `a` and `b` to 0 when pressed. When the values of
+a "Reset" button which resets the values of cells `a` and `b` to `0` when pressed. When the values of
 `a` and `b` are set, the value of `sum` is automatically recomputed and the content of the text
 fields is updated to reflect the new values of `a` and `b`.
 
