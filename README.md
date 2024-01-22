@@ -115,6 +115,24 @@ watcher.stop(); // Watch function not called after this
 b.value = 10;   // Nothing is printed
 ```
 
+### Batch Updates
+
+`MutableCell.batch` performs a batch update of cells. The values of cells set within 
+`MutableCell.batch` are set simultaneously with the observers only reacting to the change after
+all the cell values have been set:
+
+```dart
+final a = MutableCell(0);
+final b = MutableCell(1);
+
+final watcher = ValueCell.watch(() => print('a = ${a()}, b = ${b()}'));
+
+MutableCell.batch(() {
+  a.value = 5;
+  b.value = 6;
+}); // Only prints: a = 5, b = 6
+```
+
 ### Using cells in widgets
 
 `CellWidget.builder` creates a widget which is rebuilt whenever the values of the cells referenced
