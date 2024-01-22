@@ -12,6 +12,7 @@ import 'demos/cell_radio_demo.dart';
 import 'demos/cell_restoration_demo.dart';
 import 'demos/cell_slider_demo.dart';
 import 'demos/cell_switch_demo.dart';
+import 'demos/previous_value_demo.dart';
 import 'demos/subclass_demo1.dart';
 import 'demos/subclass_demo2.dart';
 import 'demos/watch_demo1.dart';
@@ -107,6 +108,14 @@ class MyHomePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => SumDemo())
+                          );
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Previous Values'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => PreviousValueDemo())
                           );
                         },
                       ),
