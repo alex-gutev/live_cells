@@ -34,6 +34,7 @@ This package also has the following advantages over other state management libra
   * [Using cells in widgets](#using-cells-in-widgets)
   * [Cell expressions](#cell-expressions)
   * [Exception handling](#exception-handling)
+  * [Previous values](#previous-values)
   * [Cell widgets](#cell-widgets)
   * [Two-way data flow](#two-way-data-flow)
   * [Handling errors in two-way data flow](#handling-errors-in-two-way-data-flow)
@@ -105,6 +106,9 @@ print(b.value); // Prints 6
 a.value = 8;
 print(b.value); // Prints 8
 ```
+
+`ValueCell.none()` takes an optional argument which is the value to which the cell is initialized to
+if it is used during the computation of the cell's initial value.
 
 ### Observing cells
 
@@ -397,6 +401,30 @@ final str = MutableCell('0');
 final n = ValueCell.computed(() => int.parse(str()));
 final isValid = (n > 0).onError(ValueCell.value(false));
 ```
+
+### Previous values
+
+The `previous` property of cells can be used to retrieve the previous values of cells:
+
+```dart
+final a = MutableCell(0);
+final prev = a.previous;
+
+final sum = ValueCell.computed(() => a() + prev());
+
+a.value = 1;
+print(sum.value); // Prints 1
+
+a.value = 5;
+print(sum.value); // Prints 6
+```
+
+**NOTE**:
+
+* The `previous` property returns a cell, which can be used like any other cell.
+* On creation `prev` does not hold a value. Accessing it will throw an `UninitializedCellError`.
+* For `prev` to actually keep track of the previous value of `a`, `prev` must be observed, either
+  by another cell, a `CellWidget` or a *watch function*.
 
 ### Cell widgets
 
