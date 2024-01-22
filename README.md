@@ -4,8 +4,7 @@ via `ValueCell`'s replacing the need for controller objects and event handlers.
 
 ## Features
 
-This package provides `ValueCell`, an interface which offers the following benefits 
-over `ChangeNotifier` / `ValueNotifier`:
+`ValueCell` offers the following benefits over `ChangeNotifier` / `ValueNotifier`:
 
 + Implementing a `ValueCell` which is an expression of other `ValueCell`'s, e.g. `a + b`,
   can be done in a functional manner without manually adding and removing listeners using
@@ -152,7 +151,7 @@ class _CounterDemoState extends State<CounterDemo> {
 }
 ```
 
-**NOTE**: You don't have to call a `dispose` method on cell's when they are no longer used.
+**NOTE**: You don't have to call a `dispose` method on cells when they are no longer used.
 Disposal is taken care of automatically.
 
 Subclassing `CellWidget` creates a widget which is rebuilt whenever the values of the cells
@@ -242,13 +241,10 @@ class ComputedExample extends CellWidget with CellInitializer {
 }
 ```
 
-The above example also demonstrates how the value of a computed cell is recomputed whenever the
-values of the referenced argument cells change.
-
 ### Cell Expressions
 
-The arithmetic and comparison operators are overloaded for cells holding `num` values to return
-cells which compute the result of the expression.
+The arithmetic and relational (`<`, `<=`, `>`, `>=`) operators, when applied to cells holding `num`
+values, return cells which compute the result of the expression.
 
 The definition of the `sum` cell from the previous example can be simplified to the following:
 
@@ -268,8 +264,8 @@ final notEq = a.neq(b); // notEq() == true when a() != b()
 
 Cells holding `bool` values are extended with the following methods:
 
-* `and`: Creates a cell with a value that is the logical and of two `bool` cells
-* `or`: Creates a cell with a value that is the logical or of two `bool` cells
+* `and`: Creates a cell with a value that is the logical and of two cells
+* `or`: Creates a cell with a value that is the logical or of two cells
 * `not`: Creates a cell with a value which is the logical `not` of a cell
 * `select`: Creates a cell which selects between the values of two cells based on a condition
 
@@ -308,13 +304,14 @@ print(cell.value); // Prints 2
 
 ### Exceptions
 
-If an exception is thrown while a cell's value is computed, it will be propagated to all points
-where the cell's value is referenced. This allows exceptions to be handled using `try` and `catch`
+If an exception is thrown during the computation of a cell's value, it will be propagated to all 
+points where the value is referenced. This allows exceptions to be handled using `try` and `catch`
 inside computed cells:
 
 ```dart
 final str = MutableCell('0');
 final n = ValueCell.computed(() => int.parse(str()));
+
 final isValid = ValueCell.computed(() {
   try {
     return n() > 0;
@@ -333,15 +330,15 @@ str.value = 'not a number';
 print(isValid.value); // Prints false
 ```
 
-Exceptions can also be handled using the `onError` method which uses the value of another cell when
-an exception is thrown:
+Exceptions can also be handled using the `onError` method which creates a cell that selects the 
+value of another cell when an exception is thrown:
 
 ```dart
 final str = MutableCell('0');
 final m = MutableCell(2);
 final n = ValueCell.computed(() => int.parse(str()));
 
-final result = n.onError(m); // Equal to n(). If n() throws eqaul to m();
+final result = n.onError(m); // Equal to n(). If n() throws, equal to m();
 
 str.value = '3';
 print(result.value); // Prints 3
@@ -354,7 +351,7 @@ print(result.value); // Prints 2
 type are handled.
 
 ```dart
-final result = n.onError<FormatException>(m); // Only handle's FormatException
+final result = n.onError<FormatException>(m); // Only handles FormatException
 ```
 
 The `error` method creates a cell which evaluates to the exceptions thrown by another cell.
@@ -377,7 +374,7 @@ two disadvantages:
   event handler.
 
 The `live_cell_widgets` library provides a collection of widgets which allow their properties to be
-controlled by cells.
+controlled directly by cells.
 
 `CellTextField` is a `TextField` with its content accessed and controlled by a cell, which is provided
 in the `content` parameter of the `CellTextField` constructor. Whenever the content of the field
@@ -433,6 +430,16 @@ The benefits of this approach are:
 * No need for a `TextEditingController`
 * No need for event handlers allowing for a declarative style of programming
 * The content of the text field is a cell and can be referenced by a computed cell
+
+In addition to `CellTextField`, the `live_cell_widgets` currently provides the following widgets:
+
+* `CellCheckbox` - A `Checkbox` with the `value` property controlled by a cell
+* `CellCheckboxListTile` - A `CheckboxListTile` with the `value` property controlled by a cell
+* `CellRadio` - A `Radio` with the `groupValue` property controlled by a cell
+* `CellRadioListTile` - A `RadioListTile` with the `groupValue` property controlled by a cell`
+* `CellSlider` - A `Slider` with the `value` property controlled by a cell
+* `CellSwitch` - A `Switch` with the `value` property controlled by a cell
+* `CellSwitchListTile` - A `SwitchListTile` with the `value` property controlled by a cell
 
 ### Two-way data flow
 
@@ -532,8 +539,10 @@ class ComputedExample extends CellWidget with CellInitializer {
         ElevatedButton(
           child: const Text('Reset'),
           onPressed: () {
-            a.value = 0;
-            b.value = 0;
+            MutableCell.batch(() {
+              a.value = 0;
+              b.value = 0;
+            });
           },
         )
       ],
@@ -555,31 +564,6 @@ The benefits of using `CellTextField` and mutable computed cells are:
   `ChangeNotifier` object. Your state is instead stored in one place and in one representation.
 * No need to use `StatefulWidget` or make ugly empty calls to `setState(() {})` to force the widget
   to update when the `text` property of the `TextEditingController` is updated.
-
-**NOTE**:
-
-The reverse computation functions of mutable computed cells are called in a batch update, which
-means that all cell value updates performed within the function will be reflected, in the observers
-of the cells, only after the function returns.
-
-A batch update can be done outside of a reverse computation function using `Mutable.batch`. In-fact
-the proper implementation of the "Reset" button is:
-
-```dart
-ElevatedButton( 
-  child: const Text('Reset'),
-  onPressed: () {
-    MutableCell.batch(() {
-      a.value = 0;
-      b.value = 0;
-    });
-  },
-)
-```
-
-With the above implementation cells `a` and `b` are both set to `0` simultaneously after the batch
-update function returns. With this implementation the `sum` cell, which is an observer of both `a`
-and `b` will only be recomputed once after both `a` and `b` are set to `0`.
 
 #### Fun with mutable computed cells
 
@@ -680,20 +664,7 @@ result text field. When a value for the result is entered in the result text fie
 and `b` and reflected in their corresponding text fields. This example also demonstrates how
 mutable computed cells can be chained.
 
-### Other Widgets
-
-We've already covered `CellTextField`. The `live_cell_widgets` library also provides the following
-widgets which expose their properties via `ValueCell`'s:
-
-* `CellCheckbox` - A `Checkbox` with the `value` property controlled by a cell
-* `CellCheckboxListTile` - A `CheckboxListTile` with the `value` property controlled by a cell
-* `CellRadio` - A `Radio` with the `groupValue` property controlled by a cell
-* `CellRadioListTile` - A `RadioListTile` with the `groupValue` property controlled by a cell`
-* `CellSlider` - A `Slider` with the `value` property controlled by a cell
-* `CellSwitch` - A `Switch` with the `value` property controlled by a cell
-* `CellSwitchListTile` - A `SwitchListTile` with the `value` property controlled by a cell
-
-### Error Handling
+### Handling errors in two-way data flow
 
 The user might enter text in the text field from which a number cannot be parsed. `mutableString`,
 as used in the previous examples, handles this by assigning a default value to its argument cell,
@@ -716,16 +687,14 @@ In the above example a default vaue of `-1` was set in the case that a number ca
 the value of the string cell.
 
 **NOTE**: The `errorValue` argument is a `ValueCell`, which allows the default value to be changed
-dynamically. The `cell` extension property was used in the above example to create a *constant 
-value cell*.
+dynamically.
 
 Usually, however, we want to handle the error rather than assigning a default value. This can be
 done with `Maybe` cells. A `Maybe` object either holds a value or an exception that was thrown
 while computing a value. 
 
-A `Maybe` cell, a cell holding a `Maybe`, can easily be created from a 
-`MutableCell` with the `maybe()` method. The resulting `Maybe` cell is a mutable computed cell with
-the following behaviour:
+A `Maybe` cell can easily be created from a`MutableCell` with the `maybe()` method. The resulting 
+`Maybe` cell is a mutable computed cell with the following behaviour:
 
 * Its computed value is the value of the argument cell wrapped in a `Maybe`.
 * When the cell's value is set, it sets the value of the argument cell to the value wrapped in the
@@ -767,9 +736,7 @@ CellTextField(
 ```
 
 Here we're testing whether `errorA` is non-null, that is whether an error occurred while parsing a 
-number from `strA` and providing an error message in the `errorText` of the `InputDecoration`. 
-**NOTE**: The value of `errorA` is accessed directly in the `CellWidget`, this can be done but it 
-will cause the entire `CellWidget` to be rebuilt which may be inefficient.
+number from `strA` and if so providing an error message in the `errorText` of the `InputDecoration`. 
 
 The error message can be made more descriptive by also checking whether the field is empty, or not.
 
@@ -882,9 +849,8 @@ A mobile application may be terminated at any point when the user is not interac
 is resumed, due to the user navigating back to it, it should restore its state to the point where it
 was when terminated.
 
-In order for the state of cells to be restored `RestorableCellWidget` has to be used instead of
-`CellWidget`. `RestorableCellWidget` provides the same interface as `CellWidget` however it also
-restores the state of the cells using `cell(..)` within the `build` method. Therefore
+`RestorableCellWidget` is like `CellWidget` but also automatically restores the state of cells, 
+created within its `build` method using `cell`, when the application is resued. Therefore
 all you need to do, for the most part, to make your widgets restorable is to replace `CellWidget`
 with `RestorableCellWidget`.
 
@@ -935,10 +901,8 @@ class CellRestorationExample extends RestorableCellWidget {
 }
 ```
 
-The above example demonstrates how the state of cells created within a `RestorableCellWidget` is
-restored automatically. Notice there is an additional `restorationId` property. When using 
-`RestorableCellWidget`, you'll need to provide a unique identifier, via this property, to associated
-the saved state with the widget. See 
+Notice there is an additional `restorationId` property. When using `RestorableCellWidget`, you'll 
+need to provide a unique identifier, via this property, to associate the saved state with the widget. See 
 [`RestorationMixin.restorationId`](https://api.flutter.dev/flutter/widgets/RestorationMixin/restorationId.html),
 for more information.
 
@@ -1111,27 +1075,6 @@ Some points to note from this example:
 As a general rule of thumb only mutable cells which are either set directly, such as `numValue`
 which has its value set in the "Reset" button, or hold user input from widgets, such as the content
 cells of text fields, are required to have their state saved.
-
-**Pitfalls**:
-
-When the state of the app is being restored, after being terminated, the cells defined
-in the `RestorableCellWidget` are:
-
-1. Created using their initial values given during construction.
-2. Assigned their restored values from the saved state.
-
-Step 2 may trigger the observers of the cells to be notified of a value change from the initial
-values given during construction to the restored values. This will not affect observers added after
-the definition of the cells, however it may affect observers added before all the cells have been
-defined.
-
-To avoid this:
-
-* Define all the cells first in the `build` method before referencing them. 
-* Do not *watch* cells, using `ValueCell.watch()` or `RestorableCellWidget.watch` until after
-  all the cells have been defined.
-* If you're placing the definition of cells directly in a widget constructor, make sure all 
-  references to the cell values are contained in a `CellWidget.builder`. 
 
 ## Advanced
 
