@@ -24,6 +24,22 @@ This package also has the following advantages over other state management libra
 + Supports two-way data flow, whereas most other libraries, if not all, only support
   one-way data flow.
 
+## Table of Contents
+
+* [Usage](#usage)
+  * [Cells](#cells)
+  * [Computed cells](#computed-cells)
+  * [Observing cells](#observing-cells)
+  * [Batch updates](#batch-updates)
+  * [Using cells in widgets](#using-cells-in-widgets)
+  * [Cell expressions](#cell-expressions)
+  * [Exception handling](#exception-handling)
+  * [Cell widgets](#cell-widgets)
+  * [Two-way data flow](#two-way-data-flow)
+  * [Handling errors in two-way data flow](#handling-errors-in-two-way-data-flow)
+  * [State restoration](#state-restoration)
+* [Advanced](#advanced) 
+
 ## Usage
 
 ### Cells
@@ -115,7 +131,7 @@ watcher.stop(); // Watch function not called after this
 b.value = 10;   // Nothing is printed
 ```
 
-### Batch Updates
+### Batch updates
 
 `MutableCell.batch` performs a batch update of cells. The values of cells set within 
 `MutableCell.batch` are set simultaneously with the observers only reacting to the change after
@@ -259,7 +275,7 @@ class ComputedExample extends CellWidget with CellInitializer {
 }
 ```
 
-### Cell Expressions
+### Cell expressions
 
 The arithmetic and relational (`<`, `<=`, `>`, `>=`) operators, when applied to cells holding `num`
 values, return cells which compute the result of the expression.
@@ -320,7 +336,7 @@ a.value = 4;
 print(cell.value); // Prints 2
 ```
 
-### Exceptions
+### Exception handling
 
 If an exception is thrown during the computation of a cell's value, it will be propagated to all 
 points where the value is referenced. This allows exceptions to be handled using `try` and `catch`
@@ -382,7 +398,7 @@ final n = ValueCell.computed(() => int.parse(str()));
 final isValid = (n > 0).onError(ValueCell.value(false));
 ```
 
-### Cell Widgets
+### Cell widgets
 
 So far we've used the `onChanged` callback with the stock `TextField` provided by Flutter. This has
 two disadvantages:
@@ -861,7 +877,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-### State Restoration
+### State restoration
 
 A mobile application may be terminated at any point when the user is not interacting with it. When it
 is resumed, due to the user navigating back to it, it should restore its state to the point where it
