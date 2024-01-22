@@ -135,3 +135,13 @@ New features:
 * `ValueCell.watch` and `CellInitializer.watch` for calling a function whenever the values of cells
   change.
 * State restoration of cells with `RestorableCellWidget`
+
+## 0.8.0
+
+New features:
+
+* Ability to access the previous values of cells with `.previous`
+* Ability to abort a cell value update with `ValueCell.none()`
+* `and`, `or`, `not` and `select` methods on bool cells
+* Exception handling using `onError` and `error`
+* Clarified how exceptions are propagated between cells
