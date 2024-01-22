@@ -1,7 +1,8 @@
+import '../base/cell_listeners.dart';
 import '../base/exceptions.dart';
+import '../base/managed_cell.dart';
 import '../base/observer_cell.dart';
 import '../base/cell_observer.dart';
-import '../base/notifier_cell.dart';
 import '../restoration/restoration.dart';
 import '../value_cell.dart';
 
@@ -9,10 +10,25 @@ import '../value_cell.dart';
 ///
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
-class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
+class StoreCell<T> extends ManagedCell<T>
+    with CellListeners<T>, CellEquality<T>, ObserverCell<T>
     implements CellObserver, RestorableCell<T> {
+
   /// Create a [StoreCell] which observes and saves the value of [valueCell]
-  StoreCell(this.valueCell) : super(_getInitialValue(valueCell));
+  StoreCell(this.valueCell) {
+    try {
+      _value = valueCell.value;
+    }
+    on StopComputeException catch (e) {
+      _value = e.defaultValue;
+    }
+    catch (e) {
+      // Set stale to true so that exception is reproduced when value is
+      // accessed
+
+      stale = true;
+    }
+  }
 
   @override
   void init() {
@@ -34,7 +50,7 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
   T get value {
     if (stale) {
       try {
-        setValue(valueCell.value);
+        _value = valueCell.value;
       }
       on StopComputeException {
         // Keep previous value and reset stale if necessary
@@ -43,13 +59,16 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
       stale = !isInitialized;
     }
 
-    return super.value;
+    return _value;
   }
 
   /// Private
 
   /// The observed cell
   final ValueCell<T> valueCell;
+
+  /// The saved value of the cell
+  late T _value;
 
   @override
   bool get shouldNotifyAlways => false;
@@ -61,17 +80,7 @@ class StoreCell<T> extends NotifierCell<T> with ObserverCell<T>
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
-    setValue(coder.decode(state));
-  }
-
-  /// Get the initial value of [cell] while handling [StopComputeException]
-  static T _getInitialValue<T>(ValueCell<T> cell) {
-    try {
-      return cell.value;
-    }
-    on StopComputeException catch (e) {
-      return e.defaultValue;
-    }
+    _value = coder.decode(state);
   }
 }
 

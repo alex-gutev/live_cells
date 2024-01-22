@@ -652,6 +652,12 @@ void main() {
 
       expect(observer.values, equals([0, 4, 6]));
     });
+
+    test('Exception on initialization of value reproduced on value access', () {
+      final cell = ValueCell.computed(() => throw Exception());
+
+      expect(() => cell.value, throwsException);
+    });
   });
 
   group('StoreCell', () {
@@ -758,6 +764,14 @@ void main() {
       a.value = 6;
 
       expect(observer.values, equals([10, 4, 6]));
+    });
+
+    test('Exception on initialization of value reproduced on value access', () {
+      final a = MutableCell(0);
+      final cell = [a].computeCell(() => a() == 0 ? throw Exception() : a());
+      final store = cell.store();
+
+      expect(() => store.value, throwsException);
     });
   });
 
@@ -2009,6 +2023,15 @@ void main() {
 
       expect(observer.values, equals([10, 4, 6]));
     });
+
+    test('Exception on initialization of value reproduced on value access', () {
+      final a = MutableCell(0);
+      final cell = [a].mutableComputeCell(() => a() == 0 ? throw Exception() : a(), (val) {
+        a.value = val;
+      });
+
+      expect(() => cell.value, throwsException);
+    });
   });
 
   group('DynamicMutableComputeCell', () {
@@ -2474,6 +2497,15 @@ void main() {
       a.value = 6;
 
       expect(observer.values, equals([20, 4, 6]));
+    });
+
+    test('Exception on initialization of value reproduced on value access', () {
+      final a = MutableCell(0);
+      final cell = MutableCell.computed(() => a() == 0 ? throw Exception() : a(), (val) {
+        a.value = val;
+      });
+
+      expect(() => cell.value, throwsException);
     });
   });
 

@@ -32,6 +32,12 @@ class DynamicComputeCell<T> extends ManagedCell<T>
     on StopComputeException catch (e) {
       _value = e.defaultValue;
     }
+    catch (e) {
+      // Set stale to true so that exception is reproduced when value is
+      // accessed
+
+      stale = true;
+    }
   }
 
   @override
