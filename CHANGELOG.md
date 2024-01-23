@@ -145,3 +145,7 @@ New features:
 * `and`, `or`, `not` and `select` methods on bool cells
 * Exception handling using `onError` and `error`
 * Clarified how exceptions are propagated between cells
+
+## 0.8.1
+
+* Correct typos and errors in readme examples
