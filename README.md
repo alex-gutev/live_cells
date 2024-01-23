@@ -54,7 +54,9 @@ final cell = MutableCell(0);
 cell.value = 1;
 ```
 
-Cells holding a constant value are created using `ValueCell.value` or the `cell` property on `num`
+When the `value` property is set the observers of the cell react to the change.
+
+Cells holding constant values are created using `ValueCell.value` or the `cell` property on `num`
 and `String` values:
 
 ```dart
@@ -63,12 +65,10 @@ final b = 'hello'.cell;
 final c = ValueCell.value(someValue);
 ```
 
-When the `value` property is set the observers of the cell react to the change.
-
 ### Computed cells
 
 A *computed cell* is a cell with a value that is a function of the values of other cells. Computed
-cells are created using `ValueCell.computed`:.
+cells are created using `ValueCell.computed`:
 
 ```dart
 final a = MutableCell(0);
@@ -292,7 +292,7 @@ final sum = cell(() => a + b);
 
 This is not only simpler but more efficient since the argument cells are determined at compile time.
 
-The `eq` and `neq` method create cells which compare two cells for equality and inequality, 
+The `eq` and `neq` methods create cells which compare two cells for equality and inequality, 
 respectively. 
 
 ```dart
@@ -399,12 +399,12 @@ The above validation logic can be implemented more succintly using:
 ```dart
 final str = MutableCell('0');
 final n = ValueCell.computed(() => int.parse(str()));
-final isValid = (n > 0).onError(ValueCell.value(false));
+final isValid = (n > 0.cell).onError(ValueCell.value(false));
 ```
 
 ### Previous values
 
-The `previous` property of cells can be used to retrieve the previous values of cells:
+The `previous` property can be used to retrieve the previous values of cells:
 
 ```dart
 final a = MutableCell(0);
@@ -497,7 +497,7 @@ The benefits of this approach are:
 * No need for event handlers allowing for a declarative style of programming
 * The content of the text field is a cell and can be referenced by a computed cell
 
-In addition to `CellTextField`, the `live_cell_widgets` currently provides the following widgets:
+In addition to `CellTextField`, the `live_cell_widgets` library currently provides the following widgets:
 
 * `CellCheckbox` - A `Checkbox` with the `value` property controlled by a cell
 * `CellCheckboxListTile` - A `CheckboxListTile` with the `value` property controlled by a cell
@@ -916,7 +916,7 @@ is resumed, due to the user navigating back to it, it should restore its state t
 was when terminated.
 
 `RestorableCellWidget` is like `CellWidget` but also automatically restores the state of cells, 
-created within its `build` method using `cell`, when the application is resued. Therefore
+created within its `build` method using `cell`, when the application is resumed. Therefore
 all you need to do, for the most part, to make your widgets restorable is to replace `CellWidget`
 with `RestorableCellWidget`.
 
