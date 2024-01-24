@@ -1,7 +1,7 @@
 import '../cell_watch/cell_watcher.dart';
 import '../value_cell.dart';
 
-/// Provides the [watch] for observing changes in cell.
+/// Provides the [watch] method for observing changes in cell.
 ///
 /// Usage:
 ///
