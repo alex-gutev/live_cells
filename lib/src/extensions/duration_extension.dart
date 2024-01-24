@@ -1,4 +1,6 @@
-import 'package:live_cells/live_cells.dart';
+import 'compute_extension.dart';
+import '../mutable_cell/mutable_cell.dart';
+import '../value_cell.dart';
 
 /// Provides accessors for [Duration] properties on cells holding a [Duration].
 ///
@@ -40,6 +42,47 @@ extension DurationCellExtension on ValueCell<Duration> {
   /// A cell is returned which accesses this property of the value held in
   /// [this] cell.
   ValueCell<int> get inMicroseconds => apply((value) => value.inMicroseconds);
+
+  /// Returns a cell, the value of which is true if [this] is negative, see [Duration.isNegative].
+  ValueCell<bool> get isNegative => apply((value) => value.isNegative);
+
+  /// Returns a cell holding a [Duration] of the same length as this but positive, see [Duration.abs].
+  ValueCell<Duration> abs() => apply((value) => value.abs());
+
+  /// Returns a cell which holds the sum of [this] and [other].
+  ValueCell<Duration> operator +(ValueCell<Duration> other) =>
+      [this, other].computeCell(() => value + other.value);
+
+  /// Returns a cell which holds the subtraction of [other] from [this].
+  ValueCell<Duration> operator -(ValueCell<Duration> other) =>
+      [this, other].computeCell(() => value - other.value);
+
+  /// Returns a cell which holds the multiplication of [this] by [factor].
+  ValueCell<Duration> operator *(ValueCell<num> factor) =>
+      [this, factor].computeCell(() => value * factor.value);
+
+  /// Returns a cell which holds the division of [this] by [quotient].
+  ValueCell<Duration> operator ~/(ValueCell<int> quotient) =>
+      [this, quotient].computeCell(() => value ~/ quotient.value);
+
+  /// Returns a cell which holds the negation of [this].
+  ValueCell<Duration> operator -() => apply((value) => -value);
+
+  /// Returns a cell of which the value is true if [this] is less than [other]
+  ValueCell<bool> operator <(ValueCell<Duration> other) =>
+      [this, other].computeCell(() => value < other.value);
+
+  /// Returns a cell of which the value is true if [this] is greater than [other]
+  ValueCell<bool> operator >(ValueCell<Duration> other) =>
+      [this, other].computeCell(() => value > other.value);
+
+  /// Returns a cell of which the value is true if [this] is less than or equal to [other]
+  ValueCell<bool> operator <=(ValueCell<Duration> other) =>
+      [this, other].computeCell(() => value <= other.value);
+
+  /// Returns a cell of which the value is true if [this] is greater than or equal to [other]
+  ValueCell<bool> operator >=(ValueCell<Duration> other) =>
+      [this, other].computeCell(() => value >= other.value);
 }
 
 /// Provides accessors for [Duration] properties on cells holding a [Duration].
