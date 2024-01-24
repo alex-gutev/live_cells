@@ -87,15 +87,46 @@ class TestManagedCell<T> extends NotifierCell<T> {
   }
 }
 
+enum TestEnum {
+  value1,
+  value2,
+  value3
+}
+
 void main() {
   group('ConstantCell', () {
     test('Integer ConstantCell.value equals value given in constructor', () {
-      final cell = const ConstantCell(10);
+      final cell = 10.cell;
       expect(cell.value, equals(10));
     });
+
     test('String ConstantCell.value equals value given in constructor', () {
-      final cell = const ConstantCell('Hello World');
+      final cell = 'Hello World'.cell;
       expect(cell.value, equals('Hello World'));
+    });
+
+    test('Boolean ConstantCell.value equals value given in constructor', () {
+      final cell1 = true.cell;
+      final cell2 = false.cell;
+
+      expect(cell1.value, isTrue);
+      expect(cell2.value, isFalse);
+    });
+
+    test('Null ConstantCell.value equals value given in constructor', () {
+      final cell = null.cell;
+
+      expect(cell.value, isNull);
+    });
+
+    test('Enum ConstantCell.value equals value given in constructor', () {
+      final cell1 = TestEnum.value1.cell;
+      final cell2 = TestEnum.value2.cell;
+      final cell3 = TestEnum.value3.cell;
+
+      expect(cell1.value, equals(TestEnum.value1));
+      expect(cell2.value, equals(TestEnum.value2));
+      expect(cell3.value, equals(TestEnum.value3));
     });
   });
 

@@ -25,7 +25,12 @@ export 'src/cell_states/prev_value_cell.dart'
 
 export 'src/extensions/numeric_extension.dart' show NumericExtension;
 export 'src/extensions/values_extension.dart'
-    show NumValueCellExtension, StringValueCellExtension;
+    show
+        NumValueCellExtension,
+        StringValueCellExtension,
+        BoolValueCellExtension,
+        NullValueCellExtension,
+        EnumValueCellExtension;
 
 export 'src/extensions/bool_extension.dart' show BoolCellExtension;
 export 'src/extensions/error_handling_extension.dart' show ErrorCellExtension;
