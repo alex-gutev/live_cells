@@ -32,6 +32,12 @@ export 'src/extensions/values_extension.dart'
         NullValueCellExtension,
         EnumValueCellExtension;
 
+export 'src/extensions/duration_extension.dart'
+    show
+        DurationCellExtension,
+        MutableDurationCellExtension,
+        DurationCellConstructorExtension;
+
 export 'src/extensions/bool_extension.dart' show BoolCellExtension;
 export 'src/extensions/error_handling_extension.dart' show ErrorCellExtension;
 

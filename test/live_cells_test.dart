@@ -2761,6 +2761,79 @@ void main() {
     });
   });
 
+  group('Duration extensions', () {
+    test('Duration properties are accessed correctly on ValueCell', () {
+      const duration = Duration(days: 24);
+
+      final cell = duration.cell;
+      final days = cell.inDays;
+      final hours = cell.inHours;
+      final minutes = cell.inMinutes;
+      final seconds = cell.inSeconds;
+      final milliseconds = cell.inMilliseconds;
+      final microseconds = cell.inMicroseconds;
+
+      expect(cell.value, equals(duration));
+      expect(days.value, equals(duration.inDays));
+      expect(hours.value, equals(duration.inHours));
+      expect(minutes.value, equals(duration.inMinutes));
+      expect(seconds.value, equals(duration.inSeconds));
+      expect(milliseconds.value, equals(duration.inMilliseconds));
+      expect(microseconds.value, equals(duration.inMicroseconds));
+    });
+
+    test('Duration properties are accessed correctly on MutableCell', () {
+      const duration = Duration(days: 24);
+      final cell = MutableCell(Duration.zero);
+
+      cell.value = duration;
+
+      final days = cell.inDays;
+      final hours = cell.inHours;
+      final minutes = cell.inMinutes;
+      final seconds = cell.inSeconds;
+      final milliseconds = cell.inMilliseconds;
+      final microseconds = cell.inMicroseconds;
+
+      expect(cell.value, equals(duration));
+      expect(days.value, equals(duration.inDays));
+      expect(hours.value, equals(duration.inHours));
+      expect(minutes.value, equals(duration.inMinutes));
+      expect(seconds.value, equals(duration.inSeconds));
+      expect(milliseconds.value, equals(duration.inMilliseconds));
+      expect(microseconds.value, equals(duration.inMicroseconds));
+    });
+
+    test('Setting MutableCell Duration properties updates Duration stored in cell', () {
+      final cell = MutableCell(Duration.zero);
+
+      final days = cell.inDays;
+      final hours = cell.inHours;
+      final minutes = cell.inMinutes;
+      final seconds = cell.inSeconds;
+      final milliseconds = cell.inMilliseconds;
+      final microseconds = cell.inMicroseconds;
+
+      days.value = 30;
+      expect(cell.value, equals(const Duration(days: 30)));
+
+      hours.value = 45;
+      expect(cell.value, equals(const Duration(hours: 45)));
+
+      minutes.value = 23;
+      expect(cell.value, equals(const Duration(minutes: 23)));
+
+      seconds.value = 45;
+      expect(cell.value, equals(const Duration(seconds: 45)));
+
+      milliseconds.value = 398;
+      expect(cell.value, equals(const Duration(milliseconds: 398)));
+
+      microseconds.value = 1204;
+      expect(cell.value, equals(const Duration(microseconds: 1204)));
+    });
+  });
+
   group('DelayCell', () {
     test('DelayCell.value equals initial value of cell when not changed', () {
       final cell = MutableCell(2);
