@@ -56,8 +56,8 @@ cell.value = 1;
 
 When the `value` property is set the observers of the cell react to the change.
 
-Cells holding constant values are created using `ValueCell.value` or the `cell` property on `num`
-and `String` values:
+Cells holding constant values are created using `ValueCell.value` or the `cell` property on `num`, 
+`String`, `bool`, `null` and `Enum` values:
 
 ```dart
 final a = 1.cell;
@@ -399,7 +399,7 @@ The above validation logic can be implemented more succintly using:
 ```dart
 final str = MutableCell('0');
 final n = ValueCell.computed(() => int.parse(str()));
-final isValid = (n > 0.cell).onError(ValueCell.value(false));
+final isValid = (n > 0.cell).onError(false.cell);
 ```
 
 ### Previous values
