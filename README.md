@@ -39,7 +39,7 @@ This package also has the following advantages over other state management libra
   * [Two-way data flow](#two-way-data-flow)
   * [Handling errors in two-way data flow](#handling-errors-in-two-way-data-flow)
   * [State restoration](#state-restoration)
-  * [Other freatures](#other-features)
+  * [Other features](#other-features)
 * [Advanced](#advanced) 
 
 ## Usage
