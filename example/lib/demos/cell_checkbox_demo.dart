@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
+/// Example showing usage of [CellCheckbox]
 class CellCheckboxDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
+    // Cell holding the state of the checkbox.
     final state = cell(() => MutableCell<bool?>(true));
 
     return Scaffold(
@@ -25,6 +27,7 @@ class CellCheckboxDemo extends CellWidget with CellInitializer {
                 ),
               ),
               const SizedBox(height: 10),
+              // A checkbox with its state controlled by the cell `state`
               CellCheckbox(
                 value: state,
                 tristate: true,
@@ -37,6 +40,8 @@ class CellCheckboxDemo extends CellWidget with CellInitializer {
                   return const Text('The checkbox is in the null state');
                 }
               }),
+              // The following buttons set the state of the checkbox by
+              // assigning a value to the `state` cell.
               ElevatedButton(
                   onPressed: () => state.value = true,
                   child: const Text('Reset')

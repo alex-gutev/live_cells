@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
+/// Example of ValueCell.watch
+///
+/// NOTE: This example uses a StatefulWidget to stop the watch function from
+/// being called once the widget is removed from the tree.
 class WatchDemo1 extends StatefulWidget {
   @override
   State<WatchDemo1> createState() => _WatchDemo1State();
@@ -10,12 +14,18 @@ class _WatchDemo1State extends State<WatchDemo1> {
   final counter1 = MutableCell(0);
   final counter2 = MutableCell(0);
 
+  // Registered watch function
   late final CellWatcher watcher;
 
   @override
   void initState() {
     super.initState();
 
+    // Register a watch function to be called when the values of counter1 and
+    // counter2 change.
+    //
+    // NOTE: The watch function is always called once before ValueCell.watch
+    // returns.
     watcher = ValueCell.watch(() {
       print('Counters incremented to: ${counter1()}, ${counter2()}');
     });
@@ -23,6 +33,8 @@ class _WatchDemo1State extends State<WatchDemo1> {
 
   @override
   void dispose() {
+    // The watch function will no longer be called for future updates of counter1
+    // and counter2
     watcher.stop();
     super.dispose();
   }

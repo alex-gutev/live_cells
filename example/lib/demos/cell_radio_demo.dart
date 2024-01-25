@@ -23,9 +23,11 @@ extension RadioOptionExtension on RadioOption {
   }
 }
 
+/// Example showing usage of [CellRadio]
 class CellRadioDemo extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
+    // Cell holding the group value - the value of the selected radio button
     final option = cell(() => MutableCell<RadioOption?>(RadioOption.optionB));
 
     return Scaffold(
@@ -46,6 +48,8 @@ class CellRadioDemo extends CellWidget with CellInitializer {
                 ),
               ),
               const SizedBox(height: 10),
+              // Three radio buttons with the group value controlled by the
+              // `option` cell
               CellRadioListTile(
                 value: RadioOption.optionA,
                 groupValue: option,
@@ -62,6 +66,8 @@ class CellRadioDemo extends CellWidget with CellInitializer {
                 title: const Text('Option C'),
               ),
               CellWidget.builder((_) => Text('Selected option: ${option()?.prettyName ?? 'None'}')),
+              // The following buttons change the selected radio button by
+              // assigning a value to the `option` cell.
               ElevatedButton(
                   onPressed: () => option.value = RadioOption.optionB,
                   child: const Text('Reset')

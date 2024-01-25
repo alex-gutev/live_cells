@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
+/// Example showing usage of *maybe cells* for handling errors in two-way data
+/// flow.
+///
+/// The example demonstrates the same functionality as `error_handling_demo1.dart`
+/// with the only difference being that the error message is more informative.
+///
+/// The purpose of this example is to demonstrate how the text field validation
+/// functionality can be packaged in a reusable function.
 class ErrorHandlingDemo2 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
@@ -58,8 +66,18 @@ class ErrorHandlingDemo2 extends CellWidget with CellInitializer {
     );
   }
 
+  /// Creates a text field for numeric input with error checking.
+  ///
+  /// NOTE: [cell] is a `num` cell to which the parsed numeric input is assigned,
+  /// whenever text is entered in the field. Similarly changing the value of
+  /// [cell] results in that value being displayed in the field.
+  ///
+  /// The field also displays an error message if it is empty or the entered
+  /// text is not a valid number
   static Widget inputField(MutableCell<num> cell) {
     return CellWidget.builder((context) {
+      // Note the use of `context.cell` to persist the cell definitions between
+      // builds of the widget
       final maybe = context.cell(() => cell.maybe());
       final content = context.cell(() => maybe.mutableString());
       final error = context.cell(() => maybe.error);

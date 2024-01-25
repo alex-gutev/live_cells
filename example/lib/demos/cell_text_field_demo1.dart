@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
+/// Example showing using of [CellTextField]
 class CellTextFieldDemo1 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
+    // Cell holding the content of the field
     final input = cell(() => MutableCell(''));
 
     return Scaffold(
@@ -18,6 +20,7 @@ class CellTextFieldDemo1 extends CellWidget with CellInitializer {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 10),
+              // A text field with its content controlled by cell `input`
               CellTextField(content: input),
               const SizedBox(height: 10),
               const Text(
@@ -28,7 +31,10 @@ class CellTextFieldDemo1 extends CellWidget with CellInitializer {
                   )
               ),
               const SizedBox(height: 10),
+              // The content of the text field is retrieved using the `input` cell
               CellWidget.builder((_) => Text(input())),
+              // This button clears the text field by assigning the empty string
+              // to the `input` cell
               ElevatedButton(
                 child: const Text('Clear'),
                 onPressed: () {

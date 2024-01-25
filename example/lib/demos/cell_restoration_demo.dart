@@ -2,12 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
+// Example of cell state restoration using [RestorableCellWidget]:
+//
+// This example also shows an example of a [CellValueCoder] implementation, to
+// allow the state of cells, which do not store a dart primitive value, to be
+// saved.
+
 enum RadioValue {
   value1,
   value2,
   value3
 }
 
+/// CellValueCoder subclass which encodes [RadioValue] to a representation using
+/// dart primitive values. This allows the state of a cell holding a [RadioValue]
+/// to be restored.
 class RadioValueCoder implements CellValueCoder {
   @override
   RadioValue? decode(Object? primitive) {
@@ -32,18 +41,30 @@ class CellRestorationDemo extends RestorableCellWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The state of the following cells is restored without additional steps
     final sliderValue = cell(() => MutableCell(0.0));
     final switchValue = cell(() => MutableCell(false));
     final checkboxValue = cell(() => MutableCell(true));
 
+    // This cell requires a [CellValueCoder] to have its state restored.
+    // In this case the [RadioValueCoder] constructor is provided since the
+    // cell holds a [RadioValue].
     final radioValue = cell(
       () => MutableCell<RadioValue?>(RadioValue.value1),
       coder: RadioValueCoder.new
     );
 
+    // This cell is restored automatically
     final textValue = cell(() => MutableCell(''));
 
+    // This cell is restored automatically
     final numValue = cell(() => MutableCell<num>(1));
+
+    // The state of this cannot be saved since it holds a [Maybe] which is
+    // not a value that can be saved, hence the `restorable: false`.
+    //
+    // Although its state cannot be saved, its state is recomputed on state
+    // restoration and effectively restored
     final numMaybe = cell(() => numValue.maybe(), restorable: false);
     final numError = cell(() => numMaybe.error);
 
@@ -140,6 +161,11 @@ class CellRestorationDemo extends RestorableCellWidget {
                 ),
               ),
               const SizedBox(height: 10),
+
+              // Notice the use of CellWidget here.
+              // The state of the a1 cell defined below is not saved,
+              // since it is defined within a CellWidget's context. However,
+              // it's state is restored because it is recomputed from `numValue`.
               CellWidget.builder((context) {
                 final a1 = context.cell(() => numValue + 1.cell);
                 return Text('${numValue()} + 1 = ${a1()}');

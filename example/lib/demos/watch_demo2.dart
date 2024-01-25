@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
+/// Example of cell watch functions
+///
+/// NOTE: This example uses CellWidget and the watch method instead of
+/// ValueCell.watch.
 class WatchDemo2 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final counter1 = cell(() => MutableCell(0));
     final counter2 = cell(() => MutableCell(0));
 
+    // Register a watch function to be called when the values of counter1 and
+    // counter2 change.
+    //
+    // NOTE: Unlike in the previous example, this watch function is automatically
+    // removed once the widget is removed from the tree.
     watch(() {
       print('Counters incremented to: ${counter1()}, ${counter2()}');
     });
