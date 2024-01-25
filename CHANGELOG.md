@@ -158,5 +158,9 @@ New features:
   e.g. `true.cell`.
 * Utilities for working with cells holding a `Duration`.
 * `CellObserverModel` for creating classes which observe one or more cells
-* Add `selection` cell parameter to `CellTextField` constructor for observer and controlled the 
+* Add `selection` cell parameter to `CellTextField` constructor for observing and controlling the 
   field's selection.
+
+## 0.9.1
+
+* Fixed bug with accessing previous cell values
