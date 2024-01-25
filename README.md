@@ -1178,7 +1178,7 @@ use it. The library also offers the following features:
    ...
    final model = MyModel(a,b,c);
    ...
-   model.dispose(); // Removes all watch functions created in constructor
+   model.dispose(); // Removes all watch functions created by `model` using `watch` method.
    ``` 
 
 3. `CellTextField` also takes an optional `selection` cell argument in its constructor which if 
