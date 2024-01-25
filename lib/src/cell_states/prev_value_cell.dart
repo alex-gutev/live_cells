@@ -21,7 +21,9 @@ class PrevValueCell<T> extends ManagedCell<T>
   ///
   /// When [value] is accessed it will always return the previous value
   /// of [cell].
-  PrevValueCell(this.cell) : _currentValue = Maybe.wrap(() => cell.value);
+  PrevValueCell(this.cell) : _currentValue = Maybe.wrap(() => cell.value) {
+    stale = false;
+  }
 
   /// Retrieve the previous value of [cell].
   ///
@@ -29,6 +31,10 @@ class PrevValueCell<T> extends ManagedCell<T>
   /// of this cell, an [UninitializedCellError] exception is thrown.
   @override
   T get value {
+    if (stale) {
+      _updateCurrentValue();
+    }
+
     if (_hasValue) {
       return _prevValue.unwrap;
     }
@@ -62,10 +68,8 @@ class PrevValueCell<T> extends ManagedCell<T>
 
   @override
   void update(ValueCell cell) {
-    if (updating) {
-      _hasValue = true;
-      _prevValue = _currentValue;
-      _currentValue = Maybe.wrap(() => cell.value);
+    if (stale) {
+      _updateCurrentValue();
     }
 
     super.update(cell);
@@ -104,6 +108,15 @@ class PrevValueCell<T> extends ManagedCell<T>
     if (_hasValue) {
       _prevValue = maybeCoder.decode(map['prev_value']);
     }
+  }
+
+  /// Get the current value of the cell and set [_prevValue] to the previous [_currentValue].
+  void _updateCurrentValue() {
+    _hasValue = true;
+    _prevValue = _currentValue;
+    _currentValue = Maybe.wrap(() => cell.value);
+
+    stale = false;
   }
 }
 
