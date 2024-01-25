@@ -2832,6 +2832,57 @@ void main() {
       microseconds.value = 1204;
       expect(cell.value, equals(const Duration(microseconds: 1204)));
     });
+
+    test('Arithmetic involving Duration cells', () {
+      final a = const Duration(hours: 5).cell;
+      final delta = const Duration(hours: 10, minutes: 30).cell;
+
+      final sum = a + delta;
+      final diff = a - delta;
+      final prod = delta * 2.cell;
+      final div = delta ~/ 2.cell;
+      final neg = -a;
+
+      expect(sum.value, equals(const Duration(hours: 15, minutes: 30)));
+      expect(diff.value, equals(const Duration(hours: -5, minutes: -30)));
+      expect(prod.value, equals(const Duration(hours: 21)));
+      expect(div.value, equals(const Duration(hours: 5, minutes: 15)));
+      expect(neg.value, equals(const Duration(hours: -5)));
+    });
+
+    test('Comparison of Duration cells', () {
+      final a = const Duration(hours: 5).cell;
+      final b = const Duration(hours: 10, minutes: 30).cell;
+
+      expect((a < b).value, isTrue);
+      expect((b < a).value, isFalse);
+
+      expect((a > b).value, isFalse);
+      expect((b > a).value, isTrue);
+
+      expect((a <= b).value, isTrue);
+      expect((a <= a).value, isTrue);
+      expect((b <= a).value, isFalse);
+
+      expect((a >= b).value, isFalse);
+      expect((a >= a).value, isTrue);
+      expect((b >= a).value, isTrue);
+    });
+
+    test('isNegative property of Duration cells', () {
+      final a = const Duration(hours: 1, minutes: 20).cell;
+
+      expect(a.isNegative.value, isFalse);
+      expect((-a).isNegative.value, isTrue);
+    });
+
+    test('abs() method of Duration cells', () {
+      final a = const Duration(hours: 5).cell;
+      final b = const Duration(hours: -5).cell;
+
+      expect(a.abs().value, equals(const Duration(hours: 5)));
+      expect(b.abs().value, equals(const Duration(hours: 5)));
+    });
   });
 
   group('DelayCell', () {
