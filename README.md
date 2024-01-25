@@ -578,7 +578,7 @@ class ComputedExample extends CellWidget with CellInitializer {
         Row(
           children: [
             Expanded(
-              child: TCellTextField(
+              child: CellTextField(
                 content: strA,
                 keyboardType: TextInputType.number,
               ),
