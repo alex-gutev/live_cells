@@ -149,3 +149,14 @@ New features:
 ## 0.8.1
 
 * Correct typos and errors in readme examples
+
+## 0.9.0
+
+New features:
+
+* Constant `bool`, `null`, `Enum` and `Duration` cells can now be created with the `cell` property,
+  e.g. `true.cell`.
+* Utilities for working with cells holding a `Duration`.
+* `CellObserverModel` for creating classes which observe one or more cells
+* Add `selection` cell parameter to `CellTextField` constructor for observer and controlled the 
+  field's selection.
