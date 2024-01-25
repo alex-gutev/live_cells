@@ -1142,6 +1142,50 @@ As a general rule of thumb only mutable cells which are either set directly, suc
 which has its value set in the "Reset" button, or hold user input from widgets, such as the content
 cells of text fields, are required to have their state saved.
 
+### Other features
+
+This readme demonstrates the most prominent features of the library and a basic guide on how to
+use it. The library also offers the following features:
+
+1. Utilities for working with cells holding a `Duration`:
+
+   ```dart 
+   final cell = MutableCell(const Duration(minutes: 10));
+   final minutes = cell.inMinutes;
+
+   print(minutes.value); // Prints 10
+   
+   minutes.value = 30
+   print(cell.value.inMinutes); // Prints 30 
+   ```
+
+2. `CellObserverModel` which provides the `watch` method to subclasses for observing changes in 
+   cells. This is similar to `ValueCell.watch` however calling `dispose` also calls *stops* all
+   watch functions registered with the `watch` method.
+
+   ```dart
+  class MyModel extends CellObserverModel {
+    MyModel(ValueCell<int> a, ValueCell<String> b, ValueCell<num> c) {
+      watch(() {
+        foo(a(), b());
+      });
+    
+      watch(() => bar(c()));
+    }
+  }
+
+  ...
+  final model = MyModel(a,b,c);
+  ...
+  model.dispose(); // Removes all watch functions created in constructor
+  ``` 
+
+3. `CellTextField` also takes an optional `selection` cell argument in its constructor which if 
+   provided allows the field's selection to be observed and set via the provided cell.
+   
+Please check out the API documentation for more information and also take a look at the example,
+in the example directory for a more detailed and complete examples of this library's features.
+
 ## Advanced
 
 ### Optimization
