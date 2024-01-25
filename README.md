@@ -127,8 +127,8 @@ final watcher = ValueCell.watch(() => print('a = ${a()}, b = ${b()}'));
 a.value = 3; // Prints: a = 3, b = 1
 ```
 
-`ValueCell.watch` returns a `CellWatcher` object. The *watch* function is not called again after
-`CellWatcher.stop()` is called:
+`ValueCell.watch` returns a `CellWatcher` object which provides a `stop()` method. The *watch* 
+function is not called again after `stop()` is called:
 
 ```dart
 b.value = 5;    // Prints: a = 3, b = 5
@@ -488,7 +488,7 @@ class CellTextFieldDemo extends CellWidget with CellInitializer {
 }
 ```
 
-The `input` cell serves as the *content cell* of the `CellTextField`. When text is entered in the 
+The `input` cell is used as the *content cell* of the `CellTextField`. When text is entered in the 
 text field, the value of the `input` cell is set to the text that was entered. The "Clear" button
 clears the text field by setting the `input` cell to the empty string. 
 
@@ -537,7 +537,7 @@ final strA = MutableCell.computed(() => a().toString(), (value) {
 });
 ```
 
-The above mutable computation cell converts the value of its argument cell `a`, which is a `num`
+The above mutable computed cell converts the value of its argument cell `a`, which is a `num`
 in this case, to a string. The reverse computation function parses a `num` from the string which was
 assigned to the cell. Assigning a string value to `strA` will result in the `num` parsed from the
 string being assigned to cell `a`.
@@ -803,7 +803,7 @@ CellTextField(
 ```
 
 Here we're testing whether `errorA` is non-null, that is whether an error occurred while parsing a 
-number from `strA` and if so providing an error message in the `errorText` of the `InputDecoration`. 
+number from `strA`, and if so providing an error message in the `errorText` of the `InputDecoration`. 
 
 The error message can be made more descriptive by also checking whether the field is empty, or not.
 
@@ -999,7 +999,7 @@ account:
 * To support state restoration of cells holding values not supported by `StandardMessageCodec`, a
   `CellValueCoder` has to be provided.
 
-`CellValueCoder` is an interface for encoding, and decoding, a value using a primitive value
+`CellValueCoder` is an interface for encoding (and decoding) a value to a primitive value
 representation that is supported by `StandardMessageCodec`. Two methods have to be implemented:
 
 * `encode()` which takes a value and encodes it to a primitive value representation
@@ -1165,21 +1165,21 @@ use it. The library also offers the following features:
    watch functions registered with the `watch` method.
 
    ```dart
-  class MyModel extends CellObserverModel {
-    MyModel(ValueCell<int> a, ValueCell<String> b, ValueCell<num> c) {
-      watch(() {
-        foo(a(), b());
-      });
+   class MyModel extends CellObserverModel {
+     MyModel(ValueCell<int> a, ValueCell<String> b, ValueCell<num> c) {
+       watch(() {
+         foo(a(), b());
+       });
     
-      watch(() => bar(c()));
-    }
-  }
+       watch(() => bar(c()));
+     }
+   }
 
-  ...
-  final model = MyModel(a,b,c);
-  ...
-  model.dispose(); // Removes all watch functions created in constructor
-  ``` 
+   ...
+   final model = MyModel(a,b,c);
+   ...
+   model.dispose(); // Removes all watch functions created in constructor
+   ``` 
 
 3. `CellTextField` also takes an optional `selection` cell argument in its constructor which if 
    provided allows the field's selection to be observed and set via the provided cell.
