@@ -126,8 +126,8 @@ final watcher = ValueCell.watch(() => print('a = ${a()}, b = ${b()}'));
 a.value = 3; // Prints: a = 3, b = 1
 ```
 
-`ValueCell.watch` returns a `CellWatch` object. The *watch* function is not called again after
-`CellWatch.stop()` is called:
+`ValueCell.watch` returns a `CellWatcher` object. The *watch* function is not called again after
+`CellWatcher.stop()` is called:
 
 ```dart
 b.value = 5;    // Prints: a = 3, b = 5
