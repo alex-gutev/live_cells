@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
-class CellTextFieldDemo extends CellWidget with CellInitializer {
+class CellTextFieldDemo1 extends CellWidget with CellInitializer {
   @override
   Widget build(BuildContext context) {
     final input = cell(() => MutableCell(''));

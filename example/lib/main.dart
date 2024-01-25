@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'demos/cell_text_field_demo.dart';
+import 'demos/cell_text_field_demo1.dart';
+import 'demos/cell_text_field_demo2.dart';
 import 'demos/counter_demo.dart';
 import 'demos/mutable_computed_cell_demo.dart';
 import 'demos/mutable_computed_cell_demo2.dart';
@@ -123,7 +124,15 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('CellTextField'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellTextFieldDemo())
+                              builder: (context) => CellTextFieldDemo1())
+                          );
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('CellTextField 2'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => CellTextFieldDemo2())
                           );
                         },
                       ),
