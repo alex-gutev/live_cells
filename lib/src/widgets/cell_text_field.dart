@@ -4,8 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../base/cell_listenable.dart';
-import '../mutable_cell/mutable_cell.dart';
+import '../../live_cells.dart';
 
 /// A text field widget, similar to [TextField], with content controlled by a [ValueCell].
 ///
@@ -17,6 +16,9 @@ import '../mutable_cell/mutable_cell.dart';
 class CellTextField extends StatefulWidget {
   /// Content cell
   final MutableCell<String> content;
+
+  /// Cell holding the text selection
+  final MutableCell<TextSelection>? selection;
 
   // Fields from [TextField]
 
@@ -80,10 +82,17 @@ class CellTextField extends StatefulWidget {
   /// the content of the text field is changed, the cell's value is updated to
   /// reflect content.
   ///
+  /// The text selection is bound to the cell [selection] if it is given. This
+  /// means when the selection is changed by the user, the value of [selection]
+  /// is updated to reflect the selection. When the value of [selection] is
+  /// changed, the selection in the text field is updated to reflect the value
+  /// of [selection].
+  ///
   /// The remaining parameters are the same as in the constructor of [TextField].
   const CellTextField({
     super.key,
     required this.content,
+    this.selection,
     this.node,
     this.decoration = const InputDecoration(),
     this.keyboardType,
@@ -144,19 +153,20 @@ class _CellTextFieldState extends State<CellTextField> {
   final _controller = TextEditingController();
   var _suppressUpdate = false;
 
+  /// Watches the content and selection cells for changes
+  late CellWatcher _watcher;
+
   @override
   void initState() {
     super.initState();
 
-    _onChangeCellContent();
-    widget.content.listenable.addListener(_onChangeCellContent);
-
+    _watcher = ValueCell.watch(_onChangeCellContent);
     _controller.addListener(_onTextChange);
   }
 
   @override
   void dispose() {
-    widget.content.listenable.removeListener(_onChangeCellContent);
+    _watcher.stop();
     _controller.dispose();
 
     super.dispose();
@@ -167,10 +177,8 @@ class _CellTextFieldState extends State<CellTextField> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.content != oldWidget.content) {
-      oldWidget.content.listenable.removeListener(_onChangeCellContent);
-
-      _onChangeCellContent();
-      widget.content.listenable.addListener(_onChangeCellContent);
+      _watcher.stop();
+      _watcher = ValueCell.watch(_onChangeCellContent);
     }
   }
 
@@ -231,11 +239,29 @@ class _CellTextFieldState extends State<CellTextField> {
   }
 
   void _onTextChange() {
-    _withSuppressUpdates(() => widget.content.value = _controller.text);
+    _withSuppressUpdates(() {
+      MutableCell.batch(() {
+        widget.content.value = _controller.text;
+        widget.selection?.value = _controller.selection;
+      });
+    });
   }
 
   void _onChangeCellContent() {
-    _withSuppressUpdates(() => _controller.text = widget.content.value);
+    final text = widget.content();
+    final selection = widget.selection?.call();
+
+    _withSuppressUpdates(() {
+      if (selection != null) {
+        _controller.value = _controller.value.copyWith(
+          text: text,
+          selection: selection
+        );
+      }
+      else {
+        _controller.text = widget.content.value;
+      }
+    });
   }
 
   /// Suppress events triggered by [fn].
