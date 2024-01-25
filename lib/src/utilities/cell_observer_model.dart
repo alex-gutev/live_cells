@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../cell_watch/cell_watcher.dart';
 import '../value_cell.dart';
 
@@ -15,6 +17,7 @@ abstract class CellObserverModel {
   ///
   /// The returned [CellWatcher] is automatically stopped when [dispose]
   /// is called.
+  @protected
   CellWatcher watch(void Function() fn) {
     final watch = ValueCell.watch(fn);
     _watchers.add(watch);
