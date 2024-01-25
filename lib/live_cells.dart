@@ -69,4 +69,4 @@ export 'src/restoration/restoration.dart' show RestorableCell, CellValueCoder;
 
 export 'src/restoration/restorable_cell_widget.dart' show RestorableCellWidget;
 
-export 'src/utilities/cell_watch_model.dart' show CellWatchModel;
+export 'src/utilities/cell_observer_model.dart' show CellObserverModel;

@@ -8,7 +8,7 @@ import '../value_cell.dart';
 ///  1. Create a subclass
 ///  2. Call [watch] in your methods to observe changes to cells
 ///  3. Call [dispose] once the model is no longer used
-abstract class CellWatchModel {
+abstract class CellObserverModel {
   /// Register a cell watch function [fn].
   ///
   /// See [ValueCell.watch] for more details.
