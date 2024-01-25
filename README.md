@@ -1181,11 +1181,11 @@ use it. The library also offers the following features:
    model.dispose(); // Removes all watch functions created by `model` using `watch` method.
    ``` 
 
-3. `CellTextField` also takes an optional `selection` cell argument in its constructor which if 
+3. `CellTextField` also takes an optional `selection` cell argument in its constructor, which if 
    provided allows the field's selection to be observed and set via the provided cell.
    
 Please check out the API documentation for more information and also take a look at the example,
-in the example directory for a more detailed and complete examples of this library's features.
+in the example directory, for a more detailed and complete examples of this library's features.
 
 ## Advanced
 
