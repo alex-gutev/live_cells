@@ -52,6 +52,28 @@
 /// held in the cell on which the accessor was used. This is achieved by creating
 /// a new instance of the class with the new value of the modified property
 /// and the same values for the remaining properties.
+///
+/// If the `Person` class were annotated with `@CellExtension(mutable: true)`,
+/// the following accessors would be generated:
+///
+/// ```dart
+/// final person = MutableCell(
+///   const Person(
+///     name: 'John Smith',
+///     age: 25
+///   )
+/// );
+///
+/// // name and age are both MutableCell's
+/// final name = person.name;
+/// final age = person.age;
+///
+/// name.value = 'Bob';
+/// print('${person.value.name} - ${person.value.age}'); // Prints Bob 25
+///
+/// age.value = 49;
+/// print('${person.value.name} - ${person.value.age}'); // Prints Bob 49
+/// ```
 class CellExtension {
   /// Should an extension on [MutableCell] be generated?
   final bool mutable;
