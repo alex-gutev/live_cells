@@ -19,6 +19,8 @@ class CellTable {
   /// 2. [fn] is called with the acquired instance
   /// 
   /// 3. The reference count of the instance is decremented
+  ///
+  /// Returns the value returned by [fn].
   R useCell<R,T>(key, CellCreator<T> create, R Function(ValueCell<T> cell) fn) {
     try {
       return fn(_acquire(key, create));
@@ -26,6 +28,17 @@ class CellTable {
     finally {
       _release(key);
     }
+  }
+
+  /// Call [fn] with the instance of the cell identified by [key].
+  ///
+  /// If the cell identified by [key] exists, [fn] is called and the
+  /// value returned by [fn] is returned.
+  ///
+  /// If the cell does not exist, [fn] is not called and `null` is returned.
+  R? withCell<R, T>(key, R Function(ValueCell<T> cell) fn) {
+    final ref = _cells[key];
+    return ref != null ? fn(ref.cell as ValueCell<T>) : null;
   }
 
   /// Add an observer to the cell identified by [key].

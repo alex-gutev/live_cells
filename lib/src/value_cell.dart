@@ -45,8 +45,7 @@ abstract class ValueCell<T> {
   /// This constructor creates a cell, using the function [create], and guarantees
   /// that only a single instance of the cell, for a given [key] is active at a
   /// time.
-  /// ```
-  factory ValueCell.unique(key, CellCreator<T> create) =>
+  factory ValueCell.unique(key, ValueCell<T> Function() create) =>
       ProxyCell(key: key, create: create);
 
   /// Register a callback function to be called whenever the values of the referenced cells change.

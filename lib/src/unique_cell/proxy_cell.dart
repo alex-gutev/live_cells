@@ -1,8 +1,11 @@
 import '../base/cell_equality_factory.dart';
 import '../base/cell_observer.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
+import '../mutable_cell/mutable_cell.dart';
 import '../value_cell.dart';
 import 'cell_table.dart';
+
+part 'mutable_proxy_cell.dart';
 
 /// A cell which is proxy for another cell identifier by [key].
 class ProxyCell<T> implements ValueCell<T> {
