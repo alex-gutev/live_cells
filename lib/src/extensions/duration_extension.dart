@@ -105,7 +105,7 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
   /// A [MutableCell] is returned which accesses this property of the value held in
   /// [this] cell. Setting the value of the returned cell updates the value of
   /// [this] by creating a new [Duration] as if by `Duration(days: value)`.
-  MutableCell<int> get inDays => [this].mutableComputeCell(() => value.inDays, (value) {
+  MutableCell<int> get inDays => _getProp('inDays', () => value.inDays, (value) {
     this.value = Duration(days: value);
   });
 
@@ -114,7 +114,7 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
   /// A [MutableCell] is returned which accesses this property of the value held in
   /// [this] cell. Setting the value of the returned cell updates the value of
   /// [this] by creating a new [Duration] as if by `Duration(hours: value)`.
-  MutableCell<int> get inHours => [this].mutableComputeCell(() => value.inHours, (value) {
+  MutableCell<int> get inHours => _getProp('inHours', () => value.inHours, (value) {
     this.value = Duration(hours: value);
   });
 
@@ -123,7 +123,7 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
   /// A [MutableCell] is returned which accesses this property of the value held in
   /// [this] cell. Setting the value of the returned cell updates the value of
   /// [this] by creating a new [Duration] as if by `Duration(minutes: value)`.
-  MutableCell<int> get inMinutes => [this].mutableComputeCell(() => value.inMinutes, (value) {
+  MutableCell<int> get inMinutes => _getProp('inMinutes', () => value.inMinutes, (value) {
     this.value = Duration(minutes: value);
   });
 
@@ -132,7 +132,7 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
   /// A [MutableCell] is returned which accesses this property of the value held in
   /// [this] cell. Setting the value of the returned cell updates the value of
   /// [this] by creating a new [Duration] as if by `Duration(seconds: value)`.
-  MutableCell<int> get inSeconds => [this].mutableComputeCell(() => value.inSeconds, (value) {
+  MutableCell<int> get inSeconds => _getProp('inSeconds', () => value.inSeconds, (value) {
     this.value = Duration(seconds: value);
   });
 
@@ -141,7 +141,7 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
   /// A [MutableCell] is returned which accesses this property of the value held in
   /// [this] cell. Setting the value of the returned cell updates the value of
   /// [this] by creating a new [Duration] as if by `Duration(milliseconds: value)`.
-  MutableCell<int> get inMilliseconds => [this].mutableComputeCell(() => value.inMilliseconds, (value) {
+  MutableCell<int> get inMilliseconds => _getProp('inMilliseconds', () => value.inMilliseconds, (value) {
     this.value = Duration(milliseconds: value);
   });
 
@@ -150,9 +150,18 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
   /// A [MutableCell] is returned which accesses this property of the value held in
   /// [this] cell. Setting the value of the returned cell updates the value of
   /// [this] by creating a new [Duration] as if by `Duration(microseconds: value)`.
-  MutableCell<int> get inMicroseconds => [this].mutableComputeCell(() => value.inMicroseconds, (value) {
+  MutableCell<int> get inMicroseconds => _getProp('inMicroseconds', () => value.inMicroseconds, (value) {
     this.value = Duration(microseconds: value);
   });
+
+  // Private
+
+  /// Generate the property cell key for property [prop].
+  dynamic _key(String prop) => _MutableDurationPropKey(this, prop);
+
+  /// Create a unique cell which references the property [prop] using [get] and sets it using [set].
+  MutableCell<T> _getProp<T>(String prop, T Function() get, void Function(T) set) =>
+      MutableCell.unique(_key(prop), () => [this].mutableComputeCell(get, set));
 }
 
 /// Extends [Duration] with a [cell] property to create a [ValueCell] holding a [Duration].
@@ -174,4 +183,8 @@ class _DurationPropKey {
 
   @override
   int get hashCode => Object.hash(runtimeType, cell, prop);
+}
+
+class _MutableDurationPropKey extends _DurationPropKey {
+  _MutableDurationPropKey(super.cell, super.prop);
 }
