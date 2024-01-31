@@ -1,4 +1,5 @@
 import '../base/cell_observer.dart';
+import '../compute_cell/dynamic_compute_cell.dart';
 import '../value_cell.dart';
 import 'cell_table.dart';
 
@@ -36,21 +37,27 @@ class ProxyCell<T> implements ValueCell<T> {
   @override
   void addObserver(CellObserver observer) {
     _acquireCell().addObserver(observer);
-    CellTable().acquire(key, create).addObserver(observer);
   }
 
   @override
-  void removeObserver(CellObserver observer) {
-    if (_cell != null) {
-      _cell!.removeObserver(observer);
-      _releaseCell();
-    }
+  bool removeObserver(CellObserver observer) {
+    return CellTable().removeObserver(key, observer);
   }
 
   @override
   T call() {
     try {
-      return _acquireCell().call();
+      var tracked = false;;
+
+      final value = ComputeArgumentsTracker.computeWithTracker(_acquireCell().call, (_) {
+        tracked = true;
+      });
+
+      if (tracked) {
+        ComputeArgumentsTracker.trackArgument(this);
+      }
+
+      return value;
     }
     finally {
       _releaseCell();
@@ -58,33 +65,58 @@ class ProxyCell<T> implements ValueCell<T> {
   }
 
   @override
-  ValueCell<bool> eq<U>(ValueCell<U> other) => EqCell(this, other);
+  ValueCell<bool> eq<U>(ValueCell<U> other) =>
+      ValueCell.unique(_ProxyEqCellKey(this, other), () => _acquireCell().eq(other));
 
   @override
-  ValueCell<bool> neq<U>(ValueCell<U> other) => NeqCell(this, other);
+  ValueCell<bool> neq<U>(ValueCell<U> other) =>
+      ValueCell.unique(_ProxyNeqCellKey(this, other), () => _acquireCell().neq(other));
 
   /// Private
 
   final dynamic key;
   final CellCreator<T> create;
 
-  /// The proxied cell
-  ValueCell<T>? _cell;
-
   /// Acquire the instance to the cell identified by [key].
   ///
   /// This tells [CellTable] to increment the reference count for the cell.
-  ValueCell<T> _acquireCell() {
-    _cell = CellTable().acquire(key, create);
-    return _cell!;
-  }
+  ValueCell<T> _acquireCell() => CellTable().acquire(key, create);
 
   /// Release the instance of the cell
   ///
   /// This tells [CellTable] to decrement the reference count for the cell.
-  void _releaseCell() {
-    if (CellTable().release(key)) {
-      _cell = null;
-    }
-  }
+  void _releaseCell() => CellTable().release(key);
+}
+
+/// Key for indexing an equality comparison cell of ProxyCell
+class _ProxyEqCellKey {
+  final ValueCell a;
+  final ValueCell b;
+
+  _ProxyEqCellKey(this.a, this.b);
+
+  @override
+  bool operator==(other) => other is _ProxyEqCellKey &&
+      a == other.a &&
+      b == other.b;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, a, b);
+}
+
+
+/// Key for indexing an inequality comparison cell of ProxyCell
+class _ProxyNeqCellKey {
+  final ValueCell a;
+  final ValueCell b;
+
+  _ProxyNeqCellKey(this.a, this.b);
+
+  @override
+  bool operator==(other) => other is _ProxyNeqCellKey &&
+      a == other.a &&
+      b == other.b;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, a, b);
 }

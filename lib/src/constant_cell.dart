@@ -16,9 +16,7 @@ class ConstantCell<T> extends ValueCell<T> with CellEquality<T> {
   }
 
   @override
-  void removeObserver(CellObserver observer) {
-    // Do nothing since the value of the cell never changes
-  }
+  bool removeObserver(CellObserver observer) => false;
 
   /// Private
 

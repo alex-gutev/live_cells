@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import '../base/cell_observer.dart';
 import '../value_cell.dart';
 
 /// Cell creation function for [ValueCell] holding a [T]
@@ -32,6 +33,21 @@ class CellTable {
 
     if (ref != null && --ref.count == 0) {
       return _cells.remove(key) == null;
+    }
+
+    return false;
+  }
+
+  /// Remove an observer from the cell identified by [key].
+  ///
+  /// If the cell exists and [observer] was an actual observer, the reference
+  /// count of the cell is decremented.
+  bool removeObserver(key, CellObserver observer) {
+    final ref = _cells[key];
+
+    if (ref?.cell.removeObserver(observer) ?? false) {
+      release(key);
+      return true;
     }
 
     return false;

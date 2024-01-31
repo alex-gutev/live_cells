@@ -28,10 +28,14 @@ abstract class DependentCell<T> extends ValueCell<T> {
   }
 
   @override
-  void removeObserver(CellObserver observer) {
+  bool removeObserver(CellObserver observer) {
+    var removed = true;
+
     for (final dependency in arguments) {
-      dependency.removeObserver(_CellObserverWrapper(this, observer));
+      removed = removed && dependency.removeObserver(_CellObserverWrapper(this, observer));
     }
+
+    return removed;
   }
 }
 

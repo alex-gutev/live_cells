@@ -116,9 +116,7 @@ class DynamicComputeCell<T> extends ManagedCell<T>
 extension ComputeArgumentsTracker<T> on ValueCell<T> {
   /// Inform the current argument cell listener that the value of [cell] was referenced. 
   static void trackArgument(ValueCell cell) {
-    if (_onUseArgument != null) {
-      _onUseArgument!(cell);
-    }
+    _onUseArgument?.call(cell);
   }
 
   /// Compute a cell value using [fn] while tracking argument cells using [tracker].

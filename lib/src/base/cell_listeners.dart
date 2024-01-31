@@ -27,7 +27,7 @@ mixin CellListeners<T> on ManagedCell<T> {
   }
 
   @override
-  void removeObserver(CellObserver observer) {
+  bool removeObserver(CellObserver observer) {
     final count = _observers[observer];
 
     if (count != null) {
@@ -41,7 +41,11 @@ mixin CellListeners<T> on ManagedCell<T> {
           dispose();
         }
       }
+
+      return true;
     }
+
+    return false;
   }
 
   /// Notify the observers of the cell that the cell's value will change.
