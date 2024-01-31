@@ -2763,7 +2763,14 @@ void main() {
 
   group('Duration extensions', () {
     test('Duration properties are accessed correctly on ValueCell', () {
-      const duration = Duration(days: 24);
+      const duration = Duration(
+          days: 24,
+          hours: 10,
+          minutes: 23,
+          seconds: 47,
+          milliseconds: 100,
+          microseconds: 500
+      );
 
       final cell = duration.cell;
       final days = cell.inDays;
