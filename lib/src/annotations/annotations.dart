@@ -6,6 +6,9 @@
 /// accessor returns a *computed cell* which accesses the corresponding property
 /// of the value held in the cell on which the accessor was used.
 ///
+/// **NOTE**: For the actual code to be generated, the live_cell_extension
+/// package is required.
+///
 /// For example when the annotation is applied on the following class:
 ///
 /// ```dart
