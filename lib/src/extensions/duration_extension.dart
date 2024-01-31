@@ -87,7 +87,7 @@ extension DurationCellExtension on ValueCell<Duration> {
   // Private
 
   /// Generate the property cell key for property [prop].
-  dynamic _key(String prop) => (this, prop);
+  dynamic _key(String prop) => _DurationPropKey(this, prop);
 
   /// Create a unique cell which references the property [prop] using [get].
   ValueCell<T> _getProp<T>(String prop, T Function(Duration) get) =>
@@ -159,4 +159,19 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
 extension DurationCellConstructorExtension on Duration {
   /// Create a constant [ValueCell] with value equal to [this].
   ValueCell<Duration> get cell => ValueCell.value(this);
+}
+
+class _DurationPropKey {
+  final ValueCell cell;
+  final String prop;
+
+  _DurationPropKey(this.cell, this.prop);
+
+  @override
+  bool operator==(other) => other is _DurationPropKey &&
+      cell == other.cell &&
+      prop == other.prop;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, cell, prop);
 }
