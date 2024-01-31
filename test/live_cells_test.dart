@@ -87,6 +87,32 @@ class TestManagedCell<T> extends NotifierCell<T> {
   }
 }
 
+class TestMutableManagedCell<T> extends MutableDependentCell<T> {
+  final TestResource _resource;
+
+  T cellValue;
+
+  TestMutableManagedCell(this._resource, this.cellValue) : super({});
+
+  @override
+  void init() {
+    super.init();
+    _resource.init();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _resource.dispose();
+  }
+
+  @override
+  T compute() => cellValue;
+
+  @override
+  void reverseCompute(T value) {}
+}
+
 enum TestEnum {
   value1,
   value2,
@@ -2610,7 +2636,7 @@ void main() {
 
     test('ValueCell.unique().value returns actual cell value', () {
       final a = MutableCell(1);
-      factory() => a * a;
+      factory() => ValueCell.unique('a_sum', () => a * a);
 
       expect(factory().value, 1);
 
@@ -2665,6 +2691,167 @@ void main() {
       expect(f1().neq(f2()).value, isTrue);
 
       a.value = 6;
+      expect(f1().neq(f1()).value, isFalse);
+    });
+  });
+
+  group('MutableCell.unique', () {
+    test('Cells returned by MutableCell.unique compare == for the same key', () {
+      final a = MutableCell(0);
+
+      factoryA() => MutableCell.unique('keyA', () => a.mutableString());
+
+      final u1 = factoryA();
+      final u2 = factoryA();
+
+      expect(u1 == u2, isTrue);
+      expect(u1.hashCode == u2.hashCode, isTrue);
+    });
+
+    test('Cells returned by MutableCell.unique compare != for different keys', () {
+      final a = MutableCell(0);
+      final b = MutableCell(1);
+
+      factoryA() => MutableCell.unique('keyA', () => a.mutableString());
+      factoryB() => MutableCell.unique('keyB', () => b.mutableString());
+
+      final u1 = factoryA();
+      final u2 = factoryB();
+
+      expect(u1 == u2, isFalse);
+    });
+
+    test('ManagedCell.init() called only on adding first observer on any Mutable.unique instance', () {
+      final resource = MockResource();
+      factory() => MutableCell.unique('theKey', () => TestMutableManagedCell(resource, 0));
+
+      final u1 = factory();
+      final u2 = factory();
+
+      observeCell(u1);
+      observeCell(u2);
+
+      final u3 = factory();
+      observeCell(u3);
+
+      verify(resource.init()).called(1);
+      verifyNever(resource.dispose());
+    });
+
+    test('ManagedCell.dispose() called only once after removing last observer of any Mutable.unique instance', () {
+      final resource = MockResource();
+      factory() => MutableCell.unique('theKey', () => TestMutableManagedCell(resource, 0));
+
+      final u1 = factory();
+      final u2 = factory();
+
+      final observer1 = addObserver(u1, MockSimpleObserver());
+      final observer2 = addObserver(u2, MockSimpleObserver());
+
+      final u3 = factory();
+      final observer3 = addObserver(u3, MockSimpleObserver());
+
+      factory().removeObserver(observer1);
+      factory().removeObserver(observer2);
+      factory().removeObserver(observer3);
+
+      observeCell(u2);
+
+      verify(resource.init()).called(2);
+      verify(resource.dispose()).called(1);
+    });
+
+    test('MutableCell.unique().value returns actual cell value', () {
+      final a = MutableCell(1);
+      factory() => MutableCell.unique('strA', () => a.mutableString());
+
+      expect(factory().value, '1');
+
+      a.value = 2;
+      expect(factory().value, '2');
+    });
+
+    test('Setting MutableCell.unique().value sets value of argument cells', () {
+      final a = MutableCell(1);
+      factory() => MutableCell.unique('strA', () => a.mutableString());
+
+      expect(factory().value, '1');
+
+      factory().value = '2';
+      expect(a.value, 2);
+      expect(factory().value, '2');
+    });
+
+    test('Setting MutableCell.unique().value sets value of argument cells in batch update', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+      final sum = ValueCell.computed(() => a() + b());
+
+      fa() => MutableCell.unique('strA', () => a.mutableString());
+      fb() => MutableCell.unique('strB', () => b.mutableString());
+
+      final observer = addObserver(sum, MockValueObserver());
+
+      fa().value = '10';
+      fb().value = '5';
+
+      MutableCell.batch(() {
+        fa().value = '3';
+        fb().value = '27';
+      });
+
+      expect(observer.values, equals([12, 15, 30]));
+    });
+
+    test('MutableCell.unique().call() returns value and only creates cell on first call', () {
+      final resource = MockResource();
+      final arg = MutableCell(1);
+
+      factory() => MutableCell.unique('factoryKey', () => TestMutableManagedCell(resource, 10));
+      final computed = ValueCell.computed(() => arg() + factory()());
+
+      final observer = addObserver(computed, MockSimpleObserver());
+      expect(computed.value, 11);
+
+      arg.value = 20;
+      expect(computed.value, 30);
+
+      verify(resource.init()).called(1);
+      verifyNever(resource.dispose());
+
+      computed.removeObserver(observer);
+      verify(resource.dispose()).called(1);
+    });
+
+    test('MutableCell.unique().eq() produces correct behaviour', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+
+      f1() => MutableCell.unique('f1', () => a.mutableString());
+      f2() => MutableCell.unique('f2', () => b.mutableString());
+
+      expect(f1().eq(f2()).value, isTrue);
+
+      a.value = 2;
+      expect(f1().eq(f2()).value, isFalse);
+
+      b.value = 2;
+      expect(f1().eq(f1()).value, isTrue);
+    });
+
+    test('MutableCell.unique().neq() produces correct behaviour', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+
+      f1() => MutableCell.unique('f1', () => a.mutableString());
+      f2() => MutableCell.unique('f2', () => b.mutableString());
+
+      expect(f1().neq(f2()).value, isFalse);
+
+      a.value = 2;
+      expect(f1().neq(f2()).value, isTrue);
+
+      b.value = 2;
       expect(f1().neq(f1()).value, isFalse);
     });
   });
