@@ -3,6 +3,8 @@ import 'base/exceptions.dart';
 import 'cell_watch/cell_watcher.dart';
 import 'compute_cell/dynamic_compute_cell.dart';
 import 'base/cell_observer.dart';
+import 'unique_cell/cell_table.dart';
+import 'unique_cell/proxy_cell.dart';
 
 part 'constant_cell.dart';
 part 'base/dependent_cell.dart';
@@ -37,6 +39,15 @@ abstract class ValueCell<T> {
   /// of either `a` or `b` changes, the value of `sum` is recomputed.
   factory ValueCell.computed(T Function() compute) =>
       DynamicComputeCell(compute);
+
+  /// Create a cell uniquely identified by [key]
+  ///
+  /// This constructor creates a cell, using the function [create], and guarantees
+  /// that only a single instance of the cell, for a given [key] is active at a
+  /// time.
+  /// ```
+  factory ValueCell.unique(key, CellCreator<T> create) =>
+      ProxyCell(key: key, create: create);
 
   /// Register a callback function to be called whenever the values of the referenced cells change.
   ///
