@@ -11,43 +11,43 @@ extension DurationCellExtension on ValueCell<Duration> {
   ///
   /// A cell is returned which accesses this property of the value held in
   /// [this] cell.
-  ValueCell<int> get inDays => apply((value) => value.inDays);
+  ValueCell<int> get inDays => _getProp('inDays', (d) => d.inDays);
 
   /// The duration in units of hours, see [Duration.inHours]
   ///
   /// A cell is returned which accesses this property of the value held in
   /// [this] cell.
-  ValueCell<int> get inHours => apply((value) => value.inHours);
+  ValueCell<int> get inHours => _getProp('inHours', (d) => d.inHours);
 
   /// The duration in units of minutes, see [Duration.inMinutes]
   ///
   /// A cell is returned which accesses this property of the value held in
   /// [this] cell.
-  ValueCell<int> get inMinutes => apply((value) => value.inMinutes);
+  ValueCell<int> get inMinutes => _getProp('inMinutes', (d) => d.inMinutes);
 
   /// The duration in units of seconds, see [Duration.inSeconds]
   ///
   /// A cell is returned which accesses this property of the value held in
   /// [this] cell.
-  ValueCell<int> get inSeconds => apply((value) => value.inSeconds);
+  ValueCell<int> get inSeconds => _getProp('inSeconds', (d) => d.inSeconds);
 
   /// The duration in units of milliseconds, see [Duration.inMilliseconds]
   ///
   /// A cell is returned which accesses this property of the value held in
   /// [this] cell.
-  ValueCell<int> get inMilliseconds => apply((value) => value.inMilliseconds);
+  ValueCell<int> get inMilliseconds => _getProp('inMilliseconds', (d) => d.inMilliseconds);
 
   /// The duration in units of microseconds, see [Duration.inMicroseconds]
   ///
   /// A cell is returned which accesses this property of the value held in
   /// [this] cell.
-  ValueCell<int> get inMicroseconds => apply((value) => value.inMicroseconds);
+  ValueCell<int> get inMicroseconds => _getProp('inMicroseconds', (d) => d.inMicroseconds);
 
   /// Returns a cell, the value of which is true if [this] is negative, see [Duration.isNegative].
-  ValueCell<bool> get isNegative => apply((value) => value.isNegative);
+  ValueCell<bool> get isNegative => _getProp('isNegative', (d) => d.isNegative);
 
   /// Returns a cell holding a [Duration] of the same length as this but positive, see [Duration.abs].
-  ValueCell<Duration> abs() => apply((value) => value.abs());
+  ValueCell<Duration> abs() => _getProp('abs()', (d) => d.abs());
 
   /// Returns a cell which holds the sum of [this] and [other].
   ValueCell<Duration> operator +(ValueCell<Duration> other) =>
@@ -66,7 +66,7 @@ extension DurationCellExtension on ValueCell<Duration> {
       [this, quotient].computeCell(() => value ~/ quotient.value);
 
   /// Returns a cell which holds the negation of [this].
-  ValueCell<Duration> operator -() => apply((value) => -value);
+  ValueCell<Duration> operator -() => _getProp('-()', (d) => -d);
 
   /// Returns a cell of which the value is true if [this] is less than [other]
   ValueCell<bool> operator <(ValueCell<Duration> other) =>
@@ -83,6 +83,15 @@ extension DurationCellExtension on ValueCell<Duration> {
   /// Returns a cell of which the value is true if [this] is greater than or equal to [other]
   ValueCell<bool> operator >=(ValueCell<Duration> other) =>
       [this, other].computeCell(() => value >= other.value);
+
+  // Private
+
+  /// Generate the property cell key for property [prop].
+  dynamic _key(String prop) => (this, prop);
+
+  /// Create a unique cell which references the property [prop] using [get].
+  ValueCell<T> _getProp<T>(String prop, T Function(Duration) get) =>
+      ValueCell.unique(_key(prop), () => apply(get));
 }
 
 /// Provides accessors for [Duration] properties on cells holding a [Duration].
