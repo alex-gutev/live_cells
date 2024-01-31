@@ -1,3 +1,4 @@
+import '../base/cell_equality_factory.dart';
 import '../base/cell_observer.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
 import '../value_cell.dart';
@@ -25,18 +26,11 @@ class ProxyCell<T> implements ValueCell<T> {
   int get hashCode => key.hashCode;
 
   @override
-  T get value {
-    try {
-      return _acquireCell().value;
-    }
-    finally {
-      _releaseCell();
-    }
-  }
+  T get value => _useCell((cell) => cell.value);
 
   @override
   void addObserver(CellObserver observer) {
-    _acquireCell().addObserver(observer);
+    CellTable().addObserver(key, create, observer);
   }
 
   @override
@@ -46,10 +40,10 @@ class ProxyCell<T> implements ValueCell<T> {
 
   @override
   T call() {
-    try {
-      var tracked = false;;
+    return _useCell((cell) {
+      var tracked = false;
 
-      final value = ComputeArgumentsTracker.computeWithTracker(_acquireCell().call, (_) {
+      final value = ComputeArgumentsTracker.computeWithTracker(cell.call, (_) {
         tracked = true;
       });
 
@@ -58,34 +52,33 @@ class ProxyCell<T> implements ValueCell<T> {
       }
 
       return value;
-    }
-    finally {
-      _releaseCell();
-    }
+    });
   }
 
-  @override
-  ValueCell<bool> eq<U>(ValueCell<U> other) =>
-      ValueCell.unique(_ProxyEqCellKey(this, other), () => _acquireCell().eq(other));
 
   @override
-  ValueCell<bool> neq<U>(ValueCell<U> other) =>
-      ValueCell.unique(_ProxyNeqCellKey(this, other), () => _acquireCell().neq(other));
+  ValueCell<bool> eq<U>(ValueCell<U> other) => ValueCell.unique(
+      _ProxyEqCellKey(this, other),
+      () => equalityCellFactory.makeEq(this, other)
+  );
+
+  @override
+  ValueCell<bool> neq<U>(ValueCell<U> other) => ValueCell.unique(
+      _ProxyNeqCellKey(this, other),
+      () => equalityCellFactory.makeNeq(this, other)
+  );
+
+  @override
+  EqualityCellFactory get equalityCellFactory =>
+      _useCell((cell) => cell.equalityCellFactory);
 
   /// Private
 
   final dynamic key;
   final CellCreator<T> create;
 
-  /// Acquire the instance to the cell identified by [key].
-  ///
-  /// This tells [CellTable] to increment the reference count for the cell.
-  ValueCell<T> _acquireCell() => CellTable().acquire(key, create);
-
-  /// Release the instance of the cell
-  ///
-  /// This tells [CellTable] to decrement the reference count for the cell.
-  void _releaseCell() => CellTable().release(key);
+  R _useCell<R>(R Function(ValueCell<T> cell) fn) =>
+      CellTable().useCell(key, create, fn);
 }
 
 /// Key for indexing an equality comparison cell of ProxyCell
@@ -103,7 +96,6 @@ class _ProxyEqCellKey {
   @override
   int get hashCode => Object.hash(runtimeType, a, b);
 }
-
 
 /// Key for indexing an inequality comparison cell of ProxyCell
 class _ProxyNeqCellKey {

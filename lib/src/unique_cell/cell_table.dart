@@ -11,31 +11,28 @@ class CellTable {
   /// Get the singleton instance
   factory CellTable() => _instance;
 
-  /// Get the cell referenced by [key] and increment its reference count.
-  ///
-  /// If there is no cell corresponding to [key], a new one is created
-  /// using [create] with an initial reference count of 1.
-  ValueCell<T> acquire<T>(key, CellCreator<T> create) {
-    final ref = _cells.update(
-        key, _incRef,
-        ifAbsent: () => CellRef(cell: create())
-    );
-
-    return ref.cell as ValueCell<T>;
+  /// Call [fn] with an acquired instance of the cell identified by [key].
+  /// 
+  /// 1. The instance of the cell identified by [key] is created if it doesn't exist
+  ///    or its reference count is incremented if it does.
+  ///    
+  /// 2. [fn] is called with the acquired instance
+  /// 
+  /// 3. The reference count of the instance is decremented
+  R useCell<R,T>(key, CellCreator<T> create, R Function(ValueCell<T> cell) fn) {
+    try {
+      return fn(_acquire(key, create));
+    }
+    finally {
+      _release(key);
+    }
   }
 
-  /// Decrement the reference count of the cell referenced by [key].
+  /// Add an observer to the cell identified by [key].
   /// 
-  /// Once the reference count of a cell becomes 0, it is removed from the
-  /// table.
-  bool release(key) {
-    final ref = _cells[key];
-
-    if (ref != null && --ref.count == 0) {
-      return _cells.remove(key) == null;
-    }
-
-    return false;
+  /// The reference count of the cell is incremented.
+  void addObserver<T>(key, CellCreator<T> create, CellObserver observer) {
+    _acquire(key, create).addObserver(observer);
   }
 
   /// Remove an observer from the cell identified by [key].
@@ -46,7 +43,7 @@ class CellTable {
     final ref = _cells[key];
 
     if (ref?.cell.removeObserver(observer) ?? false) {
-      release(key);
+      _release(key);
       return true;
     }
 
@@ -59,23 +56,50 @@ class CellTable {
 
   CellTable._internal();
 
-  /// Maps keys to [CellRef]'s
-  final Map<dynamic, CellRef> _cells = HashMap();
+  /// Maps keys to [_CellRef]'s
+  final Map<dynamic, _CellRef> _cells = HashMap();
+
+  /// Get the cell referenced by [key] and increment its reference count.
+  ///
+  /// If there is no cell corresponding to [key], a new one is created
+  /// using [create] with an initial reference count of 1.
+  ValueCell<T> _acquire<T>(key, CellCreator<T> create) {
+    final ref = _cells.update(
+        key, _incRef,
+        ifAbsent: () => _CellRef(cell: create())
+    );
+
+    return ref.cell as ValueCell<T>;
+  }
+
+  /// Decrement the reference count of the cell referenced by [key].
+  ///
+  /// Once the reference count of a cell becomes 0, it is removed from the
+  /// table.
+  bool _release(key) {
+    final ref = _cells[key];
+
+    if (ref != null && --ref.count == 0) {
+      return _cells.remove(key) == null;
+    }
+
+    return false;
+  }
 
   /// Increment the reference count of the cell held by [ref]
-  CellRef _incRef(CellRef ref) {
+  _CellRef _incRef(_CellRef ref) {
     ref.count++;
     return ref;
   }
 }
 
 /// Holds a [ValueCell] and its reference count
-class CellRef {
+class _CellRef {
   /// The cell
   final ValueCell cell;
 
   /// Cell reference count
-  int count;
+  var count = 1;
 
-  CellRef({required this.cell, this.count = 1});
+  _CellRef({required this.cell});
 }
