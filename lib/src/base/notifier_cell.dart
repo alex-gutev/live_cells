@@ -8,7 +8,7 @@ import 'managed_cell.dart';
 ///
 /// This class should be subclassed when a cell is required to store its value
 /// rather than computing it on demand.
-abstract class NotifierCell<T> extends ManagedCell<T> with CellEquality<T>, CellListeners<T> {
+abstract class NotifierCell<T> extends ManagedCell<T> with CellListeners<T> {
   /// Creates a [NotifierCell] with an initial value.
   NotifierCell(this._value);
 
@@ -40,7 +40,7 @@ abstract class NotifierCell<T> extends ManagedCell<T> with CellEquality<T>, Cell
     _value = value;
   }
 
-  /// Private
+  // Private
 
   /// The cell's value
   T _value;

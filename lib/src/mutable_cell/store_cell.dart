@@ -11,7 +11,7 @@ import '../value_cell.dart';
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
 class StoreCell<T> extends ManagedCell<T>
-    with CellListeners<T>, CellEquality<T>, ObserverCell<T>
+    with CellListeners<T>, ObserverCell<T>
     implements CellObserver, RestorableCell<T> {
 
   /// Create a [StoreCell] which observes and saves the value of [valueCell]
@@ -62,7 +62,7 @@ class StoreCell<T> extends ManagedCell<T>
     return _value;
   }
 
-  /// Private
+  // Private
 
   /// The observed cell
   final ValueCell<T> valueCell;

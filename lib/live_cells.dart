@@ -1,7 +1,10 @@
 library live_cells;
 
 export 'src/value_cell.dart'
-    show ValueCell, ConstantCell, DependentCell, CellEquality, EqCell, NeqCell;
+    show ValueCell, ConstantCell, DependentCell, EqCell, NeqCell;
+
+export 'src/base/cell_equality_factory.dart'
+    show EqualityCellFactory, DefaultCellEqualityFactory;
 
 export 'src/base/cell_observer.dart' show CellObserver;
 export 'src/base/cell_listenable.dart' show CellListenableExtension;

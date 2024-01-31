@@ -19,7 +19,7 @@ import '../value_cell.dart';
 /// final sum = DyanmicComputeCell(() => a() + b());
 /// ```
 class DynamicComputeCell<T> extends ManagedCell<T>
-    with CellListeners<T>, CellEquality<T>, ObserverCell<T>
+    with CellListeners<T>, ObserverCell<T>
     implements CellObserver, RestorableCell<T> {
 
   /// Create a cell which computes its value using [compute].
@@ -65,7 +65,7 @@ class DynamicComputeCell<T> extends ManagedCell<T>
   }
 
 
-  /// Private
+  // Private
 
   /// Value computation function
   final T Function() _compute;

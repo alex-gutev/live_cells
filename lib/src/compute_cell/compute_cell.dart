@@ -1,7 +1,7 @@
 import '../value_cell.dart';
 
 /// A cell, of which the value is computed by a user provided function.
-class ComputeCell<T> extends DependentCell<T> with CellEquality<T> {
+class ComputeCell<T> extends DependentCell<T> {
   /// Create a [ComputeCell] with a given compute function.
   ///
   /// The [compute] function is called with no arguments whenever
@@ -31,7 +31,7 @@ class ComputeCell<T> extends DependentCell<T> with CellEquality<T> {
   @override
   T get value => compute();
   
-  /// Private
+  // Private
 
   final T Function() compute;
 }

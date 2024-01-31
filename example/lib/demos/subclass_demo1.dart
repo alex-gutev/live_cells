@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
-class ClampCell<T extends num> extends DependentCell<T> with CellEquality<T> {
+class ClampCell<T extends num> extends DependentCell<T> {
   final ValueCell<T> argValue;
   final ValueCell<T> argMin;
   final ValueCell<T> argMax;

@@ -24,7 +24,7 @@ import 'mutable_cell.dart';
 /// which is called whenever the value of the cell is set. This method should
 /// update the values of the argument cells.
 abstract class MutableDependentCell<T> extends ManagedCell<T>
-    with CellEquality<T>, CellListeners<T>, ObserverCell<T>
+    with CellListeners<T>, ObserverCell<T>
     implements CellObserver, MutableCell<T>, RestorableCell<T> {
 
   /// List of argument cells.
@@ -116,7 +116,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
     _reverse = false;
   }
 
-  /// Private
+  // Private
 
   late T _value;
 

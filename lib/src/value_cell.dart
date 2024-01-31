@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'base/cell_equality_factory.dart';
 import 'base/exceptions.dart';
 import 'cell_watch/cell_watcher.dart';
 import 'compute_cell/dynamic_compute_cell.dart';
@@ -8,7 +9,6 @@ import 'unique_cell/proxy_cell.dart';
 
 part 'constant_cell.dart';
 part 'base/dependent_cell.dart';
-part 'equality/cell_equality.dart';
 part 'equality/eq_cell.dart';
 part 'equality/neq_cell.dart';
 
@@ -88,7 +88,7 @@ abstract class ValueCell<T> {
   ///
   /// The observers of the returned [ValueCell] are notified when either the value of this cell
   /// or [other] changes.
-  ValueCell<bool> eq<U>(ValueCell<U> other);
+  ValueCell<bool> eq<U>(ValueCell<U> other) => equalityCellFactory.makeEq(this, other);
 
   /// Returns a new [ValueCell] which compares the value of this cell to another cell for inequality.
   ///
@@ -97,7 +97,10 @@ abstract class ValueCell<T> {
   ///
   /// The observers of the returned [ValueCell] are notified when either the value of this cell
   /// or [other] changes.
-  ValueCell<bool> neq<U>(ValueCell<U> other);
+  ValueCell<bool> neq<U>(ValueCell<U> other) => equalityCellFactory.makeNeq(this, other);
+
+  /// Return a factory for creating equality and inequality comparison cells.
+  EqualityCellFactory get equalityCellFactory => DefaultCellEqualityFactory();
 
   /// Register an observer of the cell to be called when the cell's value changes.
   void addObserver(CellObserver observer);

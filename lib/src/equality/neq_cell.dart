@@ -10,13 +10,7 @@ class NeqCell<T,U> extends DependentCell<bool> {
   @override
   bool get value => _cellA.value != _cellB.value;
 
-  @override
-  ValueCell<bool> eq<P>(ValueCell<P> other) => EqCell(this, other);
-
-  @override
-  ValueCell<bool> neq<P>(ValueCell<P> other) => NeqCell(this, other);
-
-  /// Private
+  // Private
 
   final ValueCell<T> _cellA;
   final ValueCell<U> _cellB;

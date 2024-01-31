@@ -14,7 +14,7 @@ class UninitializedCellError implements Exception {
 
 /// A cell which records the stores previous value of another cell at a given time.
 class PrevValueCell<T> extends ManagedCell<T>
-    with CellEquality<T>, CellListeners<T>, ObserverCell<T>
+    with CellListeners<T>, ObserverCell<T>
     implements RestorableCell<T> {
 
   /// Create a cell which records the previous value of [cell].
