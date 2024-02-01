@@ -18,7 +18,9 @@ class ConstantCell<T> extends ValueCell<T> {
   }
 
   @override
-  bool removeObserver(CellObserver observer) => false;
+  void removeObserver(CellObserver observer) {
+    // Do nothing since the cell never has any observers
+  }
 
   @override
   bool operator ==(other) => other is ConstantCell && value == other.value;
