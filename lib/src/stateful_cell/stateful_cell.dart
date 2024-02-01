@@ -47,7 +47,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   ///
   /// Returns null if the cell is inactive.
   @protected
-  S? currentState<S>() => _getState() as S;
+  S? currentState<S>() => _getState() as S?;
 
   /// Create the [CellState] for this cell.
   ///
