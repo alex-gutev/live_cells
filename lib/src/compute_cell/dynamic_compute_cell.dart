@@ -1,12 +1,11 @@
 import 'dart:collection';
 
-import '../base/cell_listeners.dart';
-import '../base/cell_observer.dart';
+import '../base/cell_state.dart';
 import '../base/exceptions.dart';
-import '../base/managed_cell.dart';
-import '../base/observer_cell.dart';
 import '../restoration/restoration.dart';
+import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
+import 'compute_cell_state.dart';
 
 /// A computational cell which determines its dependencies at runtime
 /// 
@@ -18,88 +17,51 @@ import '../value_cell.dart';
 /// ```dart
 /// final sum = DyanmicComputeCell(() => a() + b());
 /// ```
-class DynamicComputeCell<T> extends ManagedCell<T>
-    with CellListeners<T>, ObserverCell<T>
-    implements CellObserver, RestorableCell<T> {
-
+class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// Create a cell which computes its value using [compute].
-  DynamicComputeCell(this._compute) {
-    try {
-      _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
-        _arguments.add(cell);
-      });
-    }
-    on StopComputeException catch (e) {
-      _value = e.defaultValue;
-    }
-    catch (e) {
-      // Set stale to true so that exception is reproduced when value is
-      // accessed
-
-      stale = true;
-    }
-  }
+  DynamicComputeCell(this._compute);
 
   @override
   T get value {
-    if (stale) {
+    final state = _state;
+
+    if (state == null) {
       try {
-        _value = ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
-          if (!_arguments.contains(cell)) {
-            _arguments.add(cell);
-
-            if (isInitialized) {
-              cell.addObserver(this);
-            }
-          }
-        });
+        return _untrackedCompute();
       }
-      on StopComputeException {
-        /// Keep the previous value and reset stale if necessary
+      on StopComputeException catch (e) {
+        return e.defaultValue;
       }
-
-      stale = !isInitialized;
     }
 
-    return _value;
+    return state.value;
   }
 
 
   // Private
 
+  _DynamicComputeCellState<T>? get _state => currentState<_DynamicComputeCellState<T>>();
+
   /// Value computation function
   final T Function() _compute;
-  
-  /// Set of argument cells
-  final Set<ValueCell> _arguments = HashSet();
-  
-  /// The value
-  late T _value;
+
+  /// State restored by restoreState();
+  late CellState? _restoredState;
 
   @override
-  void init() {
-    super.init();
+  CellState createState() {
+    if (_restoredState != null) {
+      final state = _restoredState;
+      _restoredState = null;
 
-    stale = true;
-
-    for (final argument in _arguments) {
-      argument.addObserver(this);
-    }
-  }
-
-  @override
-  void dispose() {
-    stale = true;
-
-    for (final argument in _arguments) {
-      argument.removeObserver(this);
+      return state!;
     }
 
-    super.dispose();
+    return _DynamicComputeCellState(
+      cell: this,
+      key: key,
+    );
   }
-
-  @override
-  bool get shouldNotifyAlways => false;
 
   @override
   Object? dumpState(CellValueCoder coder) {
@@ -108,8 +70,16 @@ class DynamicComputeCell<T> extends ManagedCell<T>
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
-    _value = coder.decode(state);
+    final restoredState = _state ?? createState() as _DynamicComputeCellState<T>;
+    restoredState.restoreValue(coder.decode(state));
   }
+
+  /// Call [_compute] without tracking referenced argument cells.
+  ///
+  /// This is to ensure that the referenced cells do not leak up to other
+  /// cells referencing this cells [value].
+  T _untrackedCompute() =>
+      ComputeArgumentsTracker.computeWithTracker(_compute, (_) { });
 }
 
 /// Provides static methods for tracking computational cell arguments at runtime.
@@ -141,4 +111,21 @@ extension ComputeArgumentsTracker<T> on ValueCell<T> {
 
   /// Callback function to call whenever a the value of a cell is referenced.
   static void Function(ValueCell dep)? _onUseArgument;
+}
+
+class _DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<T>> {
+  _DynamicComputeCellState({
+    required super.cell,
+    required super.key,
+  }) : super(arguments: HashSet());
+
+  void restoreValue(T value) {
+    setValue(value);
+  }
+
+  @override
+  T compute() => ComputeArgumentsTracker.computeWithTracker(cell._compute, (arg) {
+    arg.addObserver(this);
+    arguments.add(arg);
+  });
 }
