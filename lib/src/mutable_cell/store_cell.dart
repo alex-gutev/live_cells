@@ -50,7 +50,7 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
       return state!;
     }
 
-    return _StoreCellState(
+    return _StoreCellState<T>(
         cell: this,
         key: key
     );
@@ -94,4 +94,17 @@ class _StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
 
   @override
   T compute() => cell.argCell.value;
+
+  @override
+  void init() {
+    super.init();
+    cell.argCell.addObserver(this);
+    setValue(cell.value);
+  }
+
+  @override
+  void dispose() {
+    cell.argCell.removeObserver(this);
+    super.dispose();
+  }
 }
