@@ -47,7 +47,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   ///
   /// Returns null if the cell is inactive.
   @protected
-  S? currentState<S>() => _getState() as S?;
+  S? currentState<S>() => _getState(false) as S?;
 
   /// Create the [CellState] for this cell.
   ///
@@ -57,12 +57,12 @@ abstract class StatefulCell<T> extends ValueCell<T> {
 
   @override
   void addObserver(CellObserver observer) {
-    _ensureState().addObserver(observer);
+    _getState(true)!.addObserver(observer);
   }
 
   @override
   void removeObserver(CellObserver observer) {
-    _ensureState().removeObserver(observer);
+    _getState(false)?.removeObserver(observer);
   }
 
 
@@ -74,7 +74,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
   void notifyWillUpdate([bool isEqual = false]) {
-    _getState()?.notifyWillUpdate(isEqual);
+    _getState(false)?.notifyWillUpdate(isEqual);
   }
 
   /// Notify the observers of the cell that the cell's value has changed.
@@ -86,7 +86,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
   void notifyUpdate([bool isEqual = false]) {
-    _getState()?.notifyUpdate(isEqual);
+    _getState(false)?.notifyUpdate(isEqual);
   }
 
   /// Private
@@ -99,7 +99,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
 
   /// Return the current state, creating a new state if the cell is inactive.
   CellState _ensureState() {
-    if (_getState() == null) {
+    if (_currentState?.isDisposed ?? true) {
       _currentState = CellState.getState(key, createState);
     }
 
@@ -107,7 +107,13 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   }
 
   /// Returns the current state or null if the cell is inactive.
-  CellState? _getState() {
-    return _currentState?.isDisposed ?? true ? null : _currentState;
+  CellState? _getState(bool create) {
+    if (_currentState?.isDisposed ?? true) {
+      _currentState = create
+          ? CellState.getState(key, createState)
+          : CellState.maybeGetState(key);
+    }
+
+    return _currentState;
   }
 }
