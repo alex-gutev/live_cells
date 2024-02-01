@@ -7,26 +7,9 @@ class CountCell extends NotifierCell<int> {
   final int end;
   final Duration interval;
 
-  Timer? _timer;
-
   CountCell(this.end, {
     this.interval = const Duration(seconds: 1)
   }) : super(0);
-
-  @override
-  void init() {
-    super.init();
-
-    _timer = Timer.periodic(interval,_timerTick);
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _timer = null;
-
-    super.dispose();
-  }
 
   void _timerTick(Timer timer) {
     if (value >= end) {
@@ -35,6 +18,30 @@ class CountCell extends NotifierCell<int> {
     else {
       value++;
     }
+  }
+}
+
+class CountCellState extends CellState<CountCell> {
+  CountCellState({
+    required super.cell,
+    required super.key
+  });
+
+  Timer? _timer;
+
+  @override
+  void init() {
+    super.init();
+
+    _timer = Timer.periodic(cell.interval, cell._timerTick);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+
+    super.dispose();
   }
 }
 
