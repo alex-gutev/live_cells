@@ -9,10 +9,11 @@ extension ComputeExtension<T> on ValueCell<T> {
   ///
   /// The value of the returned cell is the return value of [fn], a function of one argument,
   /// when applied on the this cell's value.
-  ValueCell<U> apply<U>(U Function(T value) fn) =>
+  ValueCell<U> apply<U>(U Function(T value) fn, {key}) =>
       ComputeCell(
           compute: () => fn(value),
-          arguments: [this]
+          arguments: [this],
+          key: key
       );
 }
 
@@ -24,8 +25,12 @@ extension ListComputeExtension on List {
   /// A [ValueCell] is returned of which the value is the result returned by [fn].
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> computeCell<U>(U Function() fn) =>
-      ComputeCell(compute: fn, arguments: cast<ValueCell>());
+  ValueCell<U> computeCell<U>(U Function() fn, {key}) =>
+      ComputeCell(
+          compute: fn,
+          arguments: cast<ValueCell>(),
+          key: key
+      );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and argument cell list [this].
   ///
@@ -42,10 +47,11 @@ extension ListComputeExtension on List {
   /// that the values of the argument cells are set simultaneously.
   ///
   /// **NOTE:** Every element of [this] should be a [MutableCell].
-  MutableCell<U> mutableComputeCell<U>(U Function() compute, void Function(U) reverse) =>
+  MutableCell<U> mutableComputeCell<U>(U Function() compute, void Function(U) reverse, {key}) =>
       MutableComputeCell(
           compute: compute,
           reverseCompute: reverse,
-          arguments: cast<MutableCell>().toSet()
+          arguments: cast<MutableCell>().toSet(),
+          key: key
       );
 }
