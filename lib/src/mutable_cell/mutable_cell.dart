@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import '../base/notifier_cell.dart';
 import '../compute_cell/dynamic_mutable_compute_cell.dart';
 import '../restoration/restoration.dart';
-import '../unique_cell/proxy_cell.dart';
 import '../value_cell.dart';
 
 /// Interface for a [ValueCell] of which the [value] property can be set explicitly
@@ -42,36 +41,6 @@ abstract class MutableCell<T> extends ValueCell<T> {
       DynamicMutableComputeCell(
           compute: compute,
           reverseCompute: reverse
-      );
-
-  /// Create a mutable cell uniquely identified by [key]
-  ///
-  /// This constructor creates a cell, using the function [create], and guarantees
-  /// that only a single instance of the cell, for a given [key] is active at a
-  /// time.
-  ///
-  /// **WARNING**:
-  ///
-  /// Cells created using this method only exist while they have at least one
-  /// observer. If all of the cell's observers are removed, the cell is
-  /// destroyed and whatever value it was set to is forgotten.
-  ///
-  /// Thus this method is reserved only for mutable computed cells, created with
-  /// [MutableCell.computed] or [MutableDependentCell], which compute their
-  /// values from their arguments.
-  factory MutableCell.unique(key, MutableCell<T> Function() create) =>
-      MutableProxyCell(
-          key: key,
-          create: !kDebugMode ? create : () {
-            final cell = create();
-            assert(
-              cell is! _MutableCellImpl,
-              'MutableCell.unique may only be used with mutable computed cells '
-                  'created with MutableCell.computed or MutableDependentCell. '
-            );
-
-            return cell;
-          }
       );
 
   /// Set the value of the cell.
