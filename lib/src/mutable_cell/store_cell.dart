@@ -110,7 +110,7 @@ class _StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
 }
 
 class _StoreCellKey {
-  final dynamic cell;
+  final ValueCell cell;
 
   _StoreCellKey(this.cell);
 
