@@ -35,6 +35,14 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   /// Create a cell identified by [key].
   StatefulCell({this.key});
 
+  @override
+  bool operator ==(Object other) => other is StatefulCell && key != null
+      ? key == other.key
+      : super == other;
+
+  @override
+  int get hashCode => key != null ? key.hashCode : super.hashCode;
+
   /// Get the current state of the cell.
   ///
   /// Returns null if the cell is inactive.
