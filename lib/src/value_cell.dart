@@ -18,7 +18,7 @@ abstract class ValueCell<T> {
   const ValueCell();
 
   /// Create a value cell with a constant value
-  const factory ValueCell.value(T value) = ConstantCell;
+  const factory ValueCell.value(T value) = ConstantCell<T>;
 
   /// Create a cell which computes its value using the function [compute].
   ///
