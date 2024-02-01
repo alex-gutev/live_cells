@@ -4,8 +4,10 @@ part of '../value_cell.dart';
 ///
 /// [T] is the value type of the first cell, and [U] is the value type of the second cell.
 class EqCell<T,U> extends DependentCell<bool> {
-  EqCell(this._cellA, this._cellB) :
-      super([_cellA, _cellB]);
+  EqCell(this._cellA, this._cellB) : super(
+      [_cellA, _cellB],
+      key: _EqCellKey(_cellA, _cellB)
+  );
   
   @override
   bool get value => _cellA.value == _cellB.value;
@@ -14,4 +16,19 @@ class EqCell<T,U> extends DependentCell<bool> {
 
   final ValueCell<T> _cellA;
   final ValueCell<U> _cellB;
+}
+
+class _EqCellKey {
+  final dynamic a;
+  final dynamic b;
+
+  _EqCellKey(this.a, this.b);
+
+  @override
+  bool operator ==(Object other) => other is _EqCellKey &&
+      a == other.a &&
+      b == other.b;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, a, b);
 }
