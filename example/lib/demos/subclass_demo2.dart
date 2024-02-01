@@ -3,43 +3,50 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
-class CountCell extends NotifierCell<int> {
+class CountCell extends StatefulCell<int> {
+  final int start;
   final int end;
   final Duration interval;
 
   CountCell(this.end, {
-    this.interval = const Duration(seconds: 1)
-  }) : super(0);
+    this.interval = const Duration(seconds: 1),
+    this.start = 0
+  });
+
+  @override
+  int get value {
+    final state = currentState<CountCellState>();
+
+    if (state == null) {
+      throw UninitializedCellError();
+    }
+
+    return state.value;
+  }
 
   @override
   CellState<StatefulCell> createState() => CountCellState(
       cell: this,
       key: key
   );
-
-  void _timerTick(Timer timer) {
-    if (value >= end) {
-      timer.cancel();
-    }
-    else {
-      value++;
-    }
-  }
 }
 
 class CountCellState extends CellState<CountCell> {
   CountCellState({
     required super.cell,
     required super.key
-  });
+  }) : _value = cell.start;
 
+  int _value;
   Timer? _timer;
+
+  int get value => _value;
 
   @override
   void init() {
     super.init();
 
-    _timer = Timer.periodic(cell.interval, cell._timerTick);
+    _timer = Timer.periodic(cell.interval, _timerTick);
   }
 
   @override
@@ -48,6 +55,16 @@ class CountCellState extends CellState<CountCell> {
     _timer = null;
 
     super.dispose();
+  }
+
+
+  void _timerTick(Timer timer) {
+    if (value >= cell.end) {
+      timer.cancel();
+    }
+    else {
+      _value++;
+    }
   }
 }
 
