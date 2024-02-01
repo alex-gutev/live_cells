@@ -1,78 +1,61 @@
-import '../base/cell_listeners.dart';
+import '../base/cell_state.dart';
 import '../base/exceptions.dart';
-import '../base/managed_cell.dart';
-import '../base/observer_cell.dart';
-import '../base/cell_observer.dart';
+import '../compute_cell/compute_cell_state.dart';
 import '../restoration/restoration.dart';
+import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 
 /// Value cell which stores the computed value of another [ValueCell] in memory.
 ///
 /// This class can be used to avoid expensive recomputations of cell values when
 /// the values of the argument cells have not changed.
-class StoreCell<T> extends ManagedCell<T>
-    with CellListeners<T>, ObserverCell<T>
-    implements CellObserver, RestorableCell<T> {
+class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
-  /// Create a [StoreCell] which observes and saves the value of [valueCell]
-  StoreCell(this.valueCell) {
-    try {
-      _value = valueCell.value;
-    }
-    on StopComputeException catch (e) {
-      _value = e.defaultValue;
-    }
-    catch (e) {
-      // Set stale to true so that exception is reproduced when value is
-      // accessed
-
-      stale = true;
-    }
-  }
-
-  @override
-  void init() {
-    super.init();
-    valueCell.addObserver(this);
-
-    stale = true;
-  }
-
-  @override
-  void dispose() {
-    stale = true;
-    valueCell.removeObserver(this);
-
-    super.dispose();
-  }
+  /// Create a [StoreCell] which observes and saves the value of [argCell]
+  StoreCell(this.argCell);
 
   @override
   T get value {
-    if (stale) {
-      try {
-        _value = valueCell.value;
-      }
-      on StopComputeException {
-        // Keep previous value and reset stale if necessary
-      }
+    final state = currentState<_StoreCellState<T>>();
 
-      stale = !isInitialized;
+    if (state == null) {
+      try {
+        return argCell.value;
+      }
+      on StopComputeException catch (e) {
+        return e.defaultValue;
+      }
     }
 
-    return _value;
+    return state.value;
   }
 
   // Private
 
   /// The observed cell
-  final ValueCell<T> valueCell;
+  final ValueCell<T> argCell;
 
-  /// The saved value of the cell
-  late T _value;
+  /// State restored by restoreState();
+  late CellState? _restoredState;
+
+  _StoreCellState<T>? get _state =>
+      currentState<_StoreCellState<T>>();
 
   @override
-  bool get shouldNotifyAlways => false;
+  CellState<StatefulCell> createState() {
+    if (_restoredState != null) {
+      final state = _restoredState;
+      _restoredState = null;
 
+      return state!;
+    }
+
+    return _StoreCellState(
+        cell: this,
+        key: key
+    );
+  }
+  
   @override
   Object? dumpState(CellValueCoder coder) {
     return coder.encode(value);
@@ -80,7 +63,8 @@ class StoreCell<T> extends ManagedCell<T>
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
-    _value = coder.decode(state);
+    final restoredState = _state ?? createState() as _StoreCellState<T>;
+    restoredState.restoreValue(coder.decode(state));
   }
 }
 
@@ -94,4 +78,18 @@ extension StoreCellExtension<T> on ValueCell<T> {
   /// changes. Further references to the returned cell's value retrieve the
   /// stored value rather than running the computation function again.
   StoreCell<T> store() => StoreCell(this);
+}
+
+class _StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
+  _StoreCellState({
+    required super.cell,
+    required super.key,
+  }) : super(arguments: {cell.argCell});
+
+  void restoreValue(T value) {
+    setValue(value);
+  }
+
+  @override
+  T compute() => cell.argCell.value;
 }
