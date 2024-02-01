@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../base/cell_state.dart';
 import '../base/exceptions.dart';
 import '../base/observer_cell_state.dart';
+import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 
 /// A cell state with a computed value.
@@ -11,7 +12,8 @@ import '../value_cell.dart';
 /// method, which is called when the cell's value should be recomputed.
 ///
 /// The [value] property of this state object retrieves the cell's value.
-abstract class ComputeCellState<T> extends CellState with ObserverCellState {
+abstract class ComputeCellState<T, S extends StatefulCell> extends CellState<S>
+    with ObserverCellState<S> {
   /// Set of argument cells
   final Set<ValueCell> arguments;
 
@@ -55,6 +57,15 @@ abstract class ComputeCellState<T> extends CellState with ObserverCellState {
     }
 
     return _value;
+  }
+
+  /// Set the value directly.
+  ///
+  /// This is provided to allow for implementing cells which function both
+  /// as mutable cells and computed cells.
+  @protected
+  void setValue(T value) {
+    _value = value;
   }
 
   @override
