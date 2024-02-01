@@ -36,7 +36,7 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   final ValueCell<T> argCell;
 
   /// State restored by restoreState();
-  late CellState? _restoredState;
+  CellState? _restoredState;
 
   _StoreCellState<T>? get _state =>
       currentState<_StoreCellState<T>>();
@@ -65,6 +65,8 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   void restoreState(Object? state, CellValueCoder coder) {
     final restoredState = _state ?? createState() as _StoreCellState<T>;
     restoredState.restoreValue(coder.decode(state));
+
+    _restoredState = restoredState;
   }
 }
 

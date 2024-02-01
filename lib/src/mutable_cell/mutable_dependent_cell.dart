@@ -119,6 +119,8 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
     if (state != null) {
       final restoredState = _state ?? createState() as MutableComputedCellState;
       restoredState.restoreState(state, coder);
+
+      _restoredState = restoredState;
     }
   }
 }

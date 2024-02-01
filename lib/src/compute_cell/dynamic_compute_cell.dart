@@ -46,7 +46,7 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
   final T Function() _compute;
 
   /// State restored by restoreState();
-  late CellState? _restoredState;
+  CellState? _restoredState;
 
   @override
   CellState createState() {
@@ -72,6 +72,8 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
   void restoreState(Object? state, CellValueCoder coder) {
     final restoredState = _state ?? createState() as _DynamicComputeCellState<T>;
     restoredState.restoreValue(coder.decode(state));
+
+    _restoredState = restoredState;
   }
 
   /// Call [_compute] without tracking referenced argument cells.
