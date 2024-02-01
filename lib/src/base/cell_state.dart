@@ -19,7 +19,6 @@ class CellState<T extends StatefulCell> {
   /// Has this state been disposed.
   ///
   /// After a state has been disposed it should no longer be used
-  @protected
   bool get isDisposed => _isDisposed;
 
   /// Create a state for [cell] identified by [key].
