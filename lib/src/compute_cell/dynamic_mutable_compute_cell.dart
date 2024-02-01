@@ -1,7 +1,5 @@
 import 'dart:collection';
 
-import '../base/cell_state.dart';
-import '../stateful_cell/stateful_cell.dart';
 import 'dynamic_compute_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import 'mutable_computed_cell_state.dart';
@@ -40,10 +38,11 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   final void Function(T) _reverseCompute;
 
   @override
-  CellState<StatefulCell> createState() => _DynamicMutableComputeCellState<T>(
-      cell: this,
-      key: key
-  );
+  MutableComputedCellState<T, MutableDependentCell> createState() =>
+      _DynamicMutableComputeCellState<T>(
+          cell: this,
+          key: key
+      );
 }
 
 class _DynamicMutableComputeCellState<T>

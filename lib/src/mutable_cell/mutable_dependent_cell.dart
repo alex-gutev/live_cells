@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-import '../base/cell_state.dart';
-import '../base/exceptions.dart';
 import '../compute_cell/mutable_computed_cell_state.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/stateful_cell.dart';
@@ -52,51 +50,22 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
   void reverseCompute(T value);
 
   @override
-  T get value {
-    final state = _state;
-
-    if (state == null) {
-      try {
-        return compute();
-      }
-      on StopComputeException catch (e) {
-        return e.defaultValue;
-      }
-    }
-
-    return state.value;
-  }
+  T get value => _state.value;
 
   @override
   set value(T value) {
-    final state = _state;
-
-    if (state == null) {
-      MutableCell.batch(() {
-        try {
-          reverseCompute(value);
-        }
-        catch (e, st) {
-          if (kDebugMode) {
-            print('Exception in MutableDependentCell reverse computation function: $e - $st');
-          }
-        }
-      });
-    }
-    else {
-      state.value = value;
-    }
+    _state.value = value;
   }
 
   // Private
 
-  CellState? _restoredState;
+  MutableComputedCellState<T, MutableDependentCell>? _restoredState;
 
-  MutableComputedCellState<T, MutableDependentCell>? get _state =>
-      currentState<MutableComputedCellState<T, MutableDependentCell>>();
+  MutableComputedCellState<T, MutableDependentCell> get _state =>
+      currentState() ?? _restoredState ?? (_restoredState = createState());
 
   @override
-  CellState<StatefulCell> createState() {
+  MutableComputedCellState<T, MutableDependentCell> createState() {
     if (_restoredState != null) {
       final state = _restoredState;
       _restoredState = null;
@@ -112,15 +81,12 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
   }
 
   @override
-  Object? dumpState(CellValueCoder coder) => _state?.dumpState(coder);
+  Object? dumpState(CellValueCoder coder) => _state.dumpState(coder);
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
     if (state != null) {
-      final restoredState = _state ?? createState() as MutableComputedCellState;
-      restoredState.restoreState(state, coder);
-
-      _restoredState = restoredState;
+      _state.restoreState(state, coder);
     }
   }
 }
