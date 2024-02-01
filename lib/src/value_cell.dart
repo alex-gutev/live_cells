@@ -114,8 +114,5 @@ abstract class ValueCell<T> {
   ///
   /// If [observer] is not a registered observer of the cell, this method does
   /// nothing.
-  ///
-  /// Returns true if [observer] was an observer of the cell, prior to calling
-  /// this method.
-  bool removeObserver(CellObserver observer);
+  void removeObserver(CellObserver observer);
 }

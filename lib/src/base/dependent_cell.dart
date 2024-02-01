@@ -10,6 +10,13 @@ part of '../value_cell.dart';
 /// be computed on demand when accessed, whilst observers are added directly
 /// on the argument cells.
 abstract class DependentCell<T> extends ValueCell<T> {
+  /// Key that uniquely identifies this cell.
+  ///
+  /// Since [DependentCell] is a stateless cell that always computes its value
+  /// when referenced, this just ensures that [DependentCell]'s with the same
+  /// key compare equal under [==].
+  final dynamic key;
+
   /// List of argument cells.
   @protected
   final List<ValueCell> arguments;
@@ -18,7 +25,18 @@ abstract class DependentCell<T> extends ValueCell<T> {
   ///
   /// [arguments] is the list of all the argument cells on which the value
   /// of this cell depends.
-  DependentCell(this.arguments);
+  ///
+  /// If [key] is non-null, the returned [DependentCell] object will compare
+  /// [==] to all [DependentCell] objects with the same [key] under [==].
+  DependentCell(this.arguments, {this.key});
+
+  @override
+  bool operator ==(other) => other is DependentCell && key != null
+      ? key == other.key
+      : super == other;
+
+  @override
+  int get hashCode => key != null ? key.hashCode : super.hashCode;
 
   @override
   void addObserver(CellObserver observer) {
@@ -28,14 +46,10 @@ abstract class DependentCell<T> extends ValueCell<T> {
   }
 
   @override
-  bool removeObserver(CellObserver observer) {
-    var removed = true;
-
+  void removeObserver(CellObserver observer) {
     for (final dependency in arguments) {
-      removed = removed && dependency.removeObserver(_CellObserverWrapper(this, observer));
+      dependency.removeObserver(_CellObserverWrapper(this, observer));
     }
-
-    return removed;
   }
 }
 
