@@ -91,10 +91,11 @@ class ManagedCellState extends CellState {
   }
 }
 
-class TestManagedCell<T> extends NotifierCell<T> {
+class TestManagedCell<T> extends StatefulCell<T> {
   final TestResource _resource;
+  final T value;
 
-  TestManagedCell(this._resource, super.value);
+  TestManagedCell(this._resource, this.value);
 
   @override
   CellState<StatefulCell> createState() => ManagedCellState(

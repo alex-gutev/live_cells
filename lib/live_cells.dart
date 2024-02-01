@@ -10,7 +10,6 @@ export 'src/base/cell_observer.dart' show CellObserver;
 export 'src/base/cell_listenable.dart' show CellListenableExtension;
 
 export 'src/stateful_cell/cell_state.dart' show CellState;
-export 'src/stateful_cell/notifier_cell.dart' show NotifierCell;
 export 'src/stateful_cell/observer_cell_state.dart' show ObserverCellState;
 export 'src/stateful_cell/stateful_cell.dart' show StatefulCell;
 
@@ -72,9 +71,7 @@ export 'src/cell_widget/cell_widget.dart'
 export 'src/cell_watch/cell_watcher.dart' show CellWatcher;
 
 export 'src/restoration/restoration.dart' show RestorableCell, CellValueCoder;
-
 export 'src/restoration/restorable_cell_widget.dart' show RestorableCellWidget;
 
 export 'src/utilities/cell_observer_model.dart' show CellObserverModel;
-
 export 'src/annotations/annotations.dart' show CellExtension;
