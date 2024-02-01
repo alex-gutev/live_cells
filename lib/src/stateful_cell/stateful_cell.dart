@@ -47,7 +47,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   ///
   /// Returns null if the cell is inactive.
   @protected
-  S? currentState<S>() => _getState(false) as S?;
+  S? currentState<S>() => _getState() as S?;
 
   /// Create the [CellState] for this cell.
   ///
@@ -57,12 +57,12 @@ abstract class StatefulCell<T> extends ValueCell<T> {
 
   @override
   void addObserver(CellObserver observer) {
-    _getState(true)!.addObserver(observer);
+    _ensureState().addObserver(observer);
   }
 
   @override
   void removeObserver(CellObserver observer) {
-    _getState(false)?.removeObserver(observer);
+    _getState()?.removeObserver(observer);
   }
 
 
@@ -74,7 +74,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
   void notifyWillUpdate([bool isEqual = false]) {
-    _getState(false)?.notifyWillUpdate(isEqual);
+    _getState()?.notifyWillUpdate(isEqual);
   }
 
   /// Notify the observers of the cell that the cell's value has changed.
@@ -86,7 +86,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
   void notifyUpdate([bool isEqual = false]) {
-    _getState(false)?.notifyUpdate(isEqual);
+    _getState()?.notifyUpdate(isEqual);
   }
 
   /// Private
@@ -107,11 +107,9 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   }
 
   /// Returns the current state or null if the cell is inactive.
-  CellState? _getState(bool create) {
+  CellState? _getState() {
     if (_currentState?.isDisposed ?? true) {
-      _currentState = create
-          ? CellState.getState(key, createState)
-          : CellState.maybeGetState(key);
+      _currentState = CellState.maybeGetState(key);
     }
 
     return _currentState;
