@@ -12,7 +12,7 @@ import '../value_cell.dart';
 class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   /// Create a [StoreCell] which observes and saves the value of [argCell]
-  StoreCell(this.argCell);
+  StoreCell(this.argCell) : super(key: _StoreCellKey(argCell));
 
   @override
   T get value {
@@ -107,4 +107,17 @@ class _StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
     cell.argCell.removeObserver(this);
     super.dispose();
   }
+}
+
+class _StoreCellKey {
+  final dynamic cell;
+
+  _StoreCellKey(this.cell);
+
+  @override
+  bool operator ==(Object other) =>
+      other is _StoreCellKey && cell == other.cell;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, cell);
 }
