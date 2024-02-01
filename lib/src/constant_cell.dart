@@ -4,6 +4,8 @@ part of 'value_cell.dart';
 ///
 /// This class implements the [ValueCell] interface but its observers
 /// are never called since the cell's value does not change.
+///
+/// [ConstantCell]'s compare [==] if their [value]'s are [==].
 class ConstantCell<T> extends ValueCell<T> {
   const ConstantCell(this._value);
 
@@ -17,6 +19,12 @@ class ConstantCell<T> extends ValueCell<T> {
 
   @override
   bool removeObserver(CellObserver observer) => false;
+
+  @override
+  bool operator ==(other) => other is ConstantCell && value == other.value;
+
+  @override
+  int get hashCode => _value.hashCode;
 
   // Private
 
