@@ -7,10 +7,12 @@ export 'src/base/cell_equality_factory.dart'
     show EqualityCellFactory, DefaultCellEqualityFactory;
 
 export 'src/base/cell_observer.dart' show CellObserver;
-export 'src/base/cell_listenable.dart' show CellListenableExtension;
-
+export 'src/base/cell_state.dart' show CellState;
 export 'src/base/notifier_cell.dart' show NotifierCell;
 export 'src/base/observer_cell_state.dart' show ObserverCellState;
+export 'src/base/cell_listenable.dart' show CellListenableExtension;
+export 'src/stateful_cell/stateful_cell.dart' show StatefulCell;
+
 export 'src/mutable_cell/store_cell.dart' show StoreCell, StoreCellExtension;
 export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
 export 'src/mutable_cell/mutable_dependent_cell.dart' show MutableDependentCell;
