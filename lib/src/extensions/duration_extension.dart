@@ -91,7 +91,7 @@ extension DurationCellExtension on ValueCell<Duration> {
 
   /// Create a unique cell which references the property [prop] using [get].
   ValueCell<T> _getProp<T>(String prop, T Function(Duration) get) =>
-      ValueCell.unique(_key(prop), () => apply(get));
+      apply(get, key: _key(prop));
 }
 
 /// Provides accessors for [Duration] properties on cells holding a [Duration].
@@ -161,7 +161,7 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
 
   /// Create a unique cell which references the property [prop] using [get] and sets it using [set].
   MutableCell<T> _getProp<T>(String prop, T Function() get, void Function(T) set) =>
-      MutableCell.unique(_key(prop), () => [this].mutableComputeCell(get, set));
+      [this].mutableComputeCell(get, set, key: _key(prop));
 }
 
 /// Extends [Duration] with a [cell] property to create a [ValueCell] holding a [Duration].
