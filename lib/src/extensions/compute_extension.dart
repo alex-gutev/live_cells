@@ -51,7 +51,7 @@ extension ListComputeExtension on List {
       MutableComputeCell(
           compute: compute,
           reverseCompute: reverse,
-          arguments: cast<MutableCell>().toSet(),
+          arguments: cast<ValueCell>().toSet(),
           key: key
       );
 }
