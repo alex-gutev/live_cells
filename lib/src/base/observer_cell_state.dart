@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
-import '../value_cell.dart';
-import 'cell_listeners.dart';
+import 'cell_state.dart';
 import 'cell_observer.dart';
+import '../value_cell.dart';
 
 /// Implements the [CellObserver] interface for cells of which the value depends on other cells.
 ///
@@ -10,9 +10,9 @@ import 'cell_observer.dart';
 /// [CellObserver.update] which keep track of whether the cells value should
 /// be recomputed.
 ///
-/// Classes which make use of this mixin, should check the [stale] property
-/// within [value]. If [stale] is true, the cell's value should be recomputed.
-mixin ObserverCell<T> on CellListeners<T> implements CellObserver {
+/// Classes which make use of this mixin, should check the [stale] property.
+/// If [stale] is true, the cell's value should be recomputed.
+mixin ObserverCellState on CellState implements CellObserver {
   /// Should the cell's value be recomputed
   @protected
   var stale = true;
