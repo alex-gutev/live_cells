@@ -1,5 +1,10 @@
+import 'dart:collection';
+
+import '../base/cell_state.dart';
+import '../stateful_cell/stateful_cell.dart';
 import 'dynamic_compute_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
+import 'mutable_computed_cell_state.dart';
 
 /// A mutable computational cell which determines is dependencies at runtime
 ///
@@ -22,17 +27,7 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   }) : _compute = compute, _reverseCompute = reverseCompute, super({});
 
   @override
-  T compute() {
-    return ComputeArgumentsTracker.computeWithTracker(_compute, (cell) {
-      if (!arguments.contains(cell)) {
-        arguments.add(cell);
-
-        if (isInitialized) {
-          cell.addObserver(this);
-        }
-      }
-    });
-  }
+  T compute() => ComputeArgumentsTracker.computeWithTracker(_compute, (_) {});
 
   @override
   void reverseCompute(T value) {
@@ -43,4 +38,24 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
 
   final T Function() _compute;
   final void Function(T) _reverseCompute;
+
+  @override
+  CellState<StatefulCell> createState() => _DynamicMutableComputeCellState(
+      cell: this,
+      key: key
+  );
+}
+
+class _DynamicMutableComputeCellState<T>
+    extends MutableComputedCellState<T, DynamicMutableComputeCell<T>> {
+  _DynamicMutableComputeCellState({
+    required super.cell,
+    required super.key,
+  }) : super(arguments: HashSet());
+
+  @override
+  T compute() => ComputeArgumentsTracker.computeWithTracker(cell._compute, (arg) {
+    arg.addObserver(this);
+    arguments.add(arg);
+  });
 }

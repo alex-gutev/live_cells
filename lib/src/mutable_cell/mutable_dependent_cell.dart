@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 
+import '../base/cell_state.dart';
 import '../base/exceptions.dart';
-import '../base/observer_cell.dart';
-import '../base/cell_listeners.dart';
-import '../base/cell_observer.dart';
-import '../base/managed_cell.dart';
+import '../compute_cell/mutable_computed_cell_state.dart';
 import '../restoration/restoration.dart';
+import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 import 'mutable_cell.dart';
 
@@ -23,9 +22,8 @@ import 'mutable_cell.dart';
 /// Additionally, subclasses must also implement the [reverseCompute] method,
 /// which is called whenever the value of the cell is set. This method should
 /// update the values of the argument cells.
-abstract class MutableDependentCell<T> extends ManagedCell<T>
-    with CellListeners<T>, ObserverCell<T>
-    implements CellObserver, MutableCell<T>, RestorableCell<T> {
+abstract class MutableDependentCell<T> extends StatefulCell<T>
+    implements MutableCell<T>, RestorableCell<T> {
 
   /// List of argument cells.
   @protected
@@ -35,20 +33,7 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
   ///
   /// Every cell of which the value is referenced in [compute] must be
   /// included in [arguments].
-  MutableDependentCell(this.arguments) {
-    try {
-      _value = compute();
-    }
-    on StopComputeException catch (e) {
-      _value = e.defaultValue;
-    }
-    catch (e) {
-      // Set stale to true so that exception is reproduced when value is
-      // accessed
-
-      stale = true;
-    }
-  }
+  MutableDependentCell(this.arguments, {super.key});
 
   /// Compute the value of the cell.
   ///
@@ -68,116 +53,72 @@ abstract class MutableDependentCell<T> extends ManagedCell<T>
 
   @override
   T get value {
-    if (stale) {
-      try {
-        _value = compute();
-      }
-      on StopComputeException {
-        // Keep previous value and reset stale and _computed
-      }
+    final state = _state;
 
-      stale = false;
-      _computed = true;
+    if (state == null) {
+      try {
+        return compute();
+      }
+      on StopComputeException catch (e) {
+        return e.defaultValue;
+      }
     }
 
-    return _value;
+    return state.value;
   }
 
   @override
   set value(T value) {
-    final isEqual = _value == value;
+    final state = _state;
 
-    _reverse = true;
-    notifyWillUpdate(isEqual);
-
-    updating = false;
-    stale = false;
-    _computed = false;
-    _value = value;
-
-    MutableCell.batch(() {
-      try {
-        reverseCompute(value);
-      }
-      catch (e, st) {
-        if (kDebugMode) {
-          print('Exception in MutableDependentCell reverse computation function: $e - $st');
+    if (state == null) {
+      MutableCell.batch(() {
+        try {
+          reverseCompute(value);
         }
-      }
-    });
-
-    if (MutableCell.isBatchUpdate) {
-      MutableCell.addToBatch(this, isEqual);
+        catch (e, st) {
+          if (kDebugMode) {
+            print('Exception in MutableDependentCell reverse computation function: $e - $st');
+          }
+        }
+      });
     }
     else {
-      notifyUpdate(isEqual);
+      state.value = value;
     }
-
-    _reverse = false;
   }
 
   // Private
 
-  late T _value;
+  CellState? _restoredState;
 
-  /// Is a reverse computation being performed?
-  var _reverse = false;
-
-  /// Is the current value computed or assigned using the [value] property.
-  var _computed = true;
+  MutableComputedCellState<T, MutableDependentCell>? get _state =>
+      currentState<MutableComputedCellState<T, MutableDependentCell>>();
 
   @override
-  void init() {
-    super.init();
+  CellState<StatefulCell> createState() {
+    if (_restoredState != null) {
+      final state = _restoredState;
+      _restoredState = null;
 
-    if (_computed) {
-      stale = true;
+      return state!;
     }
 
-    for (final dependency in arguments) {
-      dependency.addObserver(this);
-    }
+    return MutableComputedCellState(
+        cell: this,
+        key: key,
+        arguments: arguments
+    );
   }
 
   @override
-  void dispose() {
-    for (final dependency in arguments) {
-      dependency.removeObserver(this);
-    }
-
-    super.dispose();
-  }
-
-  @override
-  void willUpdate(ValueCell cell) {
-    if (!_reverse) {
-      super.willUpdate(cell);
-    }
-  }
-  
-  @override
-  bool get shouldNotifyAlways => true;
-
-  @override
-  Object? dumpState(CellValueCoder coder) {
-    final currentValue = value;
-
-    return {
-      'computed': _computed,
-      'value': coder.encode(currentValue)
-    };
-  }
+  Object? dumpState(CellValueCoder coder) => _state?.dumpState(coder);
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
-    final map = state as Map;
-
-    if (map['computed']) {
-      _computed = true;
-      _value = coder.decode(map['value']);
-    }
-    else {
-      value = coder.decode(map['value']);
+    if (state != null) {
+      final restoredState = _state ?? createState() as MutableComputedCellState;
+      restoredState.restoreState(state, coder);
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../mutable_cell/mutable_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
+import '../restoration/restoration.dart';
 import '../value_cell.dart';
 import 'compute_cell_state.dart';
 
@@ -15,6 +16,27 @@ class MutableComputedCellState<T, S extends MutableDependentCell> extends Comput
     required super.key,
     required super.arguments
   });
+
+  Object dumpState(CellValueCoder coder) {
+    final currentValue = value;
+
+    return {
+      'computed': _computed,
+      'value': coder.encode(currentValue)
+    };
+  }
+
+  void restoreState(Object? state, CellValueCoder coder) {
+    final map = state as Map;
+
+    if (map['computed']) {
+      _computed = true;
+      setValue(coder.decode(map['value']));
+    }
+    else {
+      value = coder.decode(map['value']);
+    }
+  }
 
   @override
   T compute() => cell.compute();

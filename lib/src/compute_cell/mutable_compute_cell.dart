@@ -38,7 +38,8 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
   MutableComputeCell({
     required T Function() compute,
     required void Function(T) reverseCompute,
-    required Set<ValueCell> arguments
+    required Set<ValueCell> arguments,
+    super.key
   }) : _compute = compute, _reverseCompute = reverseCompute, super(arguments);
 
   @override
