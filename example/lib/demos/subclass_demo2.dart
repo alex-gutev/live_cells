@@ -63,7 +63,9 @@ class CountCellState extends CellState<CountCell> {
       timer.cancel();
     }
     else {
+      notifyWillUpdate();
       _value++;
+      notifyUpdate();
     }
   }
 }
