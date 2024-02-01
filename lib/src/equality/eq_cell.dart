@@ -19,8 +19,8 @@ class EqCell<T,U> extends DependentCell<bool> {
 }
 
 class _EqCellKey {
-  final dynamic a;
-  final dynamic b;
+  final ValueCell a;
+  final ValueCell b;
 
   _EqCellKey(this.a, this.b);
 

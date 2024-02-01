@@ -19,8 +19,8 @@ class NeqCell<T,U> extends DependentCell<bool> {
 }
 
 class _NeqCellKey {
-  final dynamic a;
-  final dynamic b;
+  final ValueCell a;
+  final ValueCell b;
 
   _NeqCellKey(this.a, this.b);
 
