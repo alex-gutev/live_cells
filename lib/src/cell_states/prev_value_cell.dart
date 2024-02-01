@@ -19,7 +19,7 @@ class PrevValueCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   ///
   /// When [value] is accessed it will always return the previous value
   /// of [cell].
-  PrevValueCell(this.cell);
+  PrevValueCell(this.cell) : super(key: _PrevValueCellKey(cell));
 
   /// Retrieve the previous value of [cell].
   ///
@@ -177,4 +177,17 @@ class _PrevValueState<T> extends CellState with ObserverCellState {
 
     stale = false;
   }
+}
+
+class _PrevValueCellKey {
+  final ValueCell cell;
+
+  _PrevValueCellKey(this.cell);
+
+  @override
+  bool operator ==(Object other) =>
+      other is _PrevValueCellKey && cell == other.cell;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, cell);
 }
