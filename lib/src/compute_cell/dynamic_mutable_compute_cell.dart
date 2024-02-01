@@ -22,7 +22,6 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   DynamicMutableComputeCell({
     required T Function() compute,
     required void Function(T) reverseCompute,
-    super.key
   }) : _compute = compute, _reverseCompute = reverseCompute, super({});
 
   @override

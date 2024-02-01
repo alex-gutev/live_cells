@@ -2293,75 +2293,6 @@ void main() {
 
       expect(() => cell.value, throwsException);
     });
-
-    test("MutableComputeCell's compare == if they have the same keys", () {
-      final a = MutableCell(0);
-
-      final b1 = [a].mutableComputeCell(() => a.value + 1, (b) => a.value = b - 1,
-          key: 'theKey'
-      );
-
-      final b2 = [a].mutableComputeCell(() => a.value + 1, (b) => a.value = b - 1,
-          key: 'theKey'
-      );
-
-      expect(b1 == b2, isTrue);
-      expect(b1.hashCode == b2.hashCode, isTrue);
-    });
-
-    test("MutableComputeCell's compare != if they have different keys", () {
-      final a = MutableCell(0);
-
-      final b1 = [a].mutableComputeCell(() => a.value + 1, (b) => a.value = b - 1,
-          key: 'theKey1'
-      );
-
-      final b2 = [a].mutableComputeCell(() => a.value + 1, (b) => a.value = b - 1,
-          key: 'theKey2'
-      );
-
-      expect(b1 != b2, isTrue);
-    });
-
-    test("MutableComputeCell's compare != if they have null keys", () {
-      final a = MutableCell(0);
-
-      final b1 = [a].mutableComputeCell(() => a.value + 1, (b) => a.value = b - 1);
-      final b2 = [a].mutableComputeCell(() => a.value + 1, (b) => a.value = b - 1);
-
-      expect(b1 != b2, isTrue);
-      expect(b1 == b1, isTrue);
-    });
-
-    test("Keyed MutableComputeCell's manage the same set of observers", () {
-      final resource = MockResource();
-      final a = TestManagedCell(resource, 0);
-      f() => [a].mutableComputeCell(() => a.value + 1, (_) {}, key: 'theKey');
-
-      verifyNever(resource.init());
-
-      final observer = addObserver(f(), MockSimpleObserver());
-      f().removeObserver(observer);
-
-      verify(resource.init()).called(1);
-      verify(resource.dispose()).called(1);
-    });
-
-    test('MutableComputeCell state recreated on adding observer after dispose', () {
-      final resource = MockResource();
-      final a = TestManagedCell(resource, 0);
-      f() => [a].mutableComputeCell(() => a.value + 1, (_) {}, key: 'theKey');
-
-      verifyNever(resource.init());
-
-      final observer = addObserver(f(), MockSimpleObserver());
-      f().removeObserver(observer);
-
-      observeCell(f());
-
-      verify(resource.init()).called(2);
-      verify(resource.dispose()).called(1);
-    });
   });
 
   group('DynamicMutableComputeCell', () {
@@ -2837,15 +2768,239 @@ void main() {
 
       expect(() => cell.value, throwsException);
     });
+  });
 
-    test("DynamicMutableComputeCell's compare == if they have the same keys", () {
+  group('MutableCellView', () {
+    test('MutableCellView.value computed on construction', () {
+      final a = MutableCell(1);
+      final b = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (b) {
+        a.value = b - 1;
+      });
+
+      expect(b.value, equals(2));
+    });
+
+    test('MutableCellView.value recomputed when value of argument cell changes', () {
+      final a = MutableCell(1);
+      final b = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (b) {
+        a.value = b - 1;
+      });
+
+      observeCell(b);
+      a.value = 5;
+
+      expect(b.value, equals(6));
+    });
+
+    test('MutableCellView observers notified when value is recomputed', () {
+      final a = MutableCell(1);
+
+      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final observer = addObserver(c, MockSimpleObserver());
+
+      a.value = 6;
+      a.value = 10;
+
+      verify(observer.update(c)).called(2);
+    });
+
+    test('MutableCellView observer not called after it is removed', () {
+      final a = MutableCell(1);
+
+      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final observer1 = addObserver(c, MockSimpleObserver());
+      final observer2 = addObserver(c, MockSimpleObserver());
+
+      a.value = 9;
+
+      c.removeObserver(observer1);
+      a.value = 10;
+
+      verify(observer1.update(c)).called(1);
+      verify(observer2.update(c)).called(2);
+    });
+
+    test('Setting MutableCellView.value updates values of argument cell', () {
+      final a = MutableCell(1);
+
+      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      c.value = 10;
+
+      expect(a.value, equals(9));
+      expect(c.value, equals(10));
+    });
+
+    test('Setting MutableCellView.value calls observers of MutableCell and argument cells', () {
+      final a = MutableCell(1);
+
+      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final observerA = addObserver(a, MockSimpleObserver());
+      final observerC = addObserver(c, MockSimpleObserver());
+
+      c.value = 10;
+
+      verify(observerA.update(a)).called(1);
+      verify(observerC.update(c)).called(1);
+    });
+
+    test('Observers of MutableCellView and argument cells called every time value is set', () {
+      final a = MutableCell(1);
+
+      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final observerA = addObserver(a, MockSimpleObserver());
+      final observerC = addObserver(c, MockSimpleObserver());
+
+      c.value = 10;
+      c.value = 12;
+
+      verify(observerA.update(a)).called(2);
+      verify(observerC.update(c)).called(2);
+    });
+
+    test('Consistency of values maintained when setting MutableCellView.value in batch update', () {
+      final a = MutableCell(1);
+
+      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final d = MutableCell(50);
+      final e = ValueCell.computed(() => c() + d());
+
+      final observerA = addObserver(a, MockValueObserver());
+      final observerC = addObserver(c, MockValueObserver());
+      final observerE = addObserver(e, MockValueObserver());
+
+      MutableCell.batch(() {
+        c.value = 10;
+        d.value = 9;
+      });
+
+      expect(observerA.values, equals([9]));
+      expect(observerC.values, equals([10]));
+      expect(observerE.values, equals([19]));
+    });
+
+    test('Observers notified correct number of times when setting MutableCellView.value in batch update', () {
+      final a = MutableCell(1);
+
+      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final d = MutableCell(50);
+      final e = ValueCell.computed(() => c() + d());
+
+      final observerA = addObserver(a, MockValueObserver());
+      final observerC = addObserver(c, MockValueObserver());
+      final observerE = addObserver(e, MockValueObserver());
+
+      MutableCell.batch(() {
+        c.value = 10;
+        d.value = 9;
+      });
+
+      verify(observerA.update(a)).called(1);
+      verify(observerC.update(c)).called(1);
+      verify(observerE.update(e)).called(1);
+    });
+
+    test('All MutableCellView observers called correct number of times', () {
+      final a = MutableCell(1);
+
+      final sum = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final c = (a + sum).store();
+      final d = sum + 2.cell;
+
+      final observerC = addObserver(c, MockSimpleObserver());
+      final observerD = addObserver(d, MockSimpleObserver());
+
+      MutableCell.batch(() {
+        a.value = 2;
+      });
+
+      MutableCell.batch(() {
+        a.value = 3;
+      });
+
+      MutableCell.batch(() {
+        a.value = 10;
+      });
+
+      verify(observerC.update(c)).called(3);
+      verify(observerD.update(d)).called(3);
+    });
+
+    test('Correct values produced with MutableCellView across all observer cells', () {
+      final a = MutableCell(1);
+
+      final sum = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
+        a.value = c - 1;
+      });
+
+      final c = ValueCell.computed(() => a() + sum());
+      final d = ValueCell.computed(() => sum() + 2);
+
+      final observerC = addObserver(c, MockValueObserver());
+      final observerD = addObserver(d, MockValueObserver());
+
+      MutableCell.batch(() {
+        a.value = 2;
+      });
+
+      MutableCell.batch(() {
+        a.value = 3;
+      });
+
+      MutableCell.batch(() {
+        a.value = 10;
+      });
+
+      expect(observerC.values, equals([5, 7, 21]));
+      expect(observerD.values, equals([5, 6, 13]));
+    });
+
+    test('Exception on initialization of value reproduced on value access', () {
+      final a = MutableCell(0);
+      final cell = MutableCellView(argument: a, compute: () => a() == 0 ? throw Exception() : a(), reverse: (val) {
+        a.value = val;
+      });
+
+      expect(() => cell.value, throwsException);
+    });
+
+    test("MutableCellView's compare == if they have the same keys", () {
       final a = MutableCell(0);
 
-      final b1 = MutableCell.computed(() => a.value + 1, (b) => a.value = b - 1,
+      final b1 = MutableCellView(
+          argument: a,
+          compute: () => a.value + 1,
+          reverse: (b) => a.value = b - 1,
           key: 'theKey'
       );
 
-      final b2 = MutableCell.computed(() => a.value + 1, (b) => a.value = b - 1,
+      final b2 = MutableCellView(
+          argument: a,
+          compute: () => a.value + 1,
+          reverse: (b) => a.value = b - 1,
           key: 'theKey'
       );
 
@@ -2853,58 +3008,43 @@ void main() {
       expect(b1.hashCode == b2.hashCode, isTrue);
     });
 
-    test("MutableComputeCell's compare != if they have different keys", () {
+    test("MutableCellView's compare != if they have different keys", () {
       final a = MutableCell(0);
 
-      final b1 = MutableCell.computed(() => a() + 1, (b) => a.value = b - 1,
-          key: 'theKey1'
+      final b1 = MutableCellView(
+          argument: a,
+          compute: () => a.value + 1,
+          reverse: (b) => a.value = b - 1,
+          key: 'theKey'
       );
 
-      final b2 = MutableCell.computed(() => a() + 1, (b) => a.value = b - 1,
+      final b2 = MutableCellView(
+          argument: a,
+          compute: () => a.value + 1,
+          reverse: (b) => a.value = b - 1,
           key: 'theKey2'
       );
 
       expect(b1 != b2, isTrue);
     });
 
-    test("DynamicMutableComputeCell's compare != if they have null keys", () {
+    test("MutableCellView's compare != if they have null keys", () {
       final a = MutableCell(0);
 
-      final b1 = MutableCell.computed(() => a() + 1, (b) => a.value = b - 1);
-      final b2 = MutableCell.computed(() => a() + 1, (b) => a.value = b - 1);
+      final b1 = MutableCellView(
+          argument: a,
+          compute: () => a.value + 1,
+          reverse: (b) => a.value = b - 1
+      );
+
+      final b2 = MutableCellView(
+          argument: a,
+          compute: () => a.value + 1,
+          reverse: (b) => a.value = b - 1
+      );
 
       expect(b1 != b2, isTrue);
       expect(b1 == b1, isTrue);
-    });
-
-    test("Keyed DynamicMutableComputeCell's manage the same set of observers", () {
-      final resource = MockResource();
-      final a = TestManagedCell(resource, 0);
-      f() => MutableCell.computed(() => a() + 1, (_) {}, key: 'theKey');
-
-      verifyNever(resource.init());
-
-      final observer = addObserver(f(), MockSimpleObserver());
-      f().removeObserver(observer);
-
-      verify(resource.init()).called(1);
-      verify(resource.dispose()).called(1);
-    });
-
-    test('DynamicMutableComputeCell state recreated on adding observer after dispose', () {
-      final resource = MockResource();
-      final a = TestManagedCell(resource, 0);
-      f() => MutableCell.computed(() => a() + 1, (_) {}, key: 'theKey');
-
-      verifyNever(resource.init());
-
-      final observer = addObserver(f(), MockSimpleObserver());
-      f().removeObserver(observer);
-
-      observeCell(f());
-
-      verify(resource.init()).called(2);
-      verify(resource.dispose()).called(1);
     });
   });
 

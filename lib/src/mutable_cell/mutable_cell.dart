@@ -37,11 +37,10 @@ abstract class MutableCell<T> extends ValueCell<T> {
   ///   a.value = b - 1;
   /// });
   /// ```
-  factory MutableCell.computed(T Function() compute, void Function(T value) reverse, {key}) =>
+  factory MutableCell.computed(T Function() compute, void Function(T value) reverse) =>
       DynamicMutableComputeCell(
           compute: compute,
           reverseCompute: reverse,
-          key: key
       );
 
   /// Set the value of the cell.

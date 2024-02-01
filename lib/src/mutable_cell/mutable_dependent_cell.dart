@@ -31,7 +31,7 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
   ///
   /// Every cell of which the value is referenced in [compute] must be
   /// included in [arguments].
-  MutableDependentCell(this.arguments, {super.key});
+  MutableDependentCell(this.arguments);
 
   /// Compute the value of the cell.
   ///

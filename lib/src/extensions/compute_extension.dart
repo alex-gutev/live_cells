@@ -47,11 +47,10 @@ extension ListComputeExtension on List {
   /// that the values of the argument cells are set simultaneously.
   ///
   /// **NOTE:** Every element of [this] should be a [MutableCell].
-  MutableCell<U> mutableComputeCell<U>(U Function() compute, void Function(U) reverse, {key}) =>
+  MutableCell<U> mutableComputeCell<U>(U Function() compute, void Function(U) reverse) =>
       MutableComputeCell(
           compute: compute,
           reverseCompute: reverse,
           arguments: cast<ValueCell>().toSet(),
-          key: key
       );
 }
