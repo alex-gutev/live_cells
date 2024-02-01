@@ -164,3 +164,23 @@ New features:
 ## 0.9.1
 
 * Fixed bug with accessing previous cell values
+
+## 0.10.0
+
+New features:
+
+* Keyed cells, cells with the same key reference a shared state.
+* Lightweight mutable computed cells.
+* `CellExtension` annotation for automatically generating `ValueCell` accessors for classes, using
+  the `live_cell_extension` package (which will be released soon).
+
+This release also comes with major changes to the implementation. These changes are only breaking to
+code which creates user-defined `ValueCell` subclasses:
+
+* Removed the following internal implementation classes and mixins from the public API:
+  * `EqCell`
+  * `NeqCell`
+  * `NotifierCell`
+  * `CellEquality`
+  * `CellListeners`
+  * `ObserverCell`
