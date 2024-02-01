@@ -11,6 +11,12 @@ class CountCell extends NotifierCell<int> {
     this.interval = const Duration(seconds: 1)
   }) : super(0);
 
+  @override
+  CellState<StatefulCell> createState() => CountCellState(
+      cell: this,
+      key: key
+  );
+
   void _timerTick(Timer timer) {
     if (value >= end) {
       timer.cancel();
