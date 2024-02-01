@@ -54,7 +54,6 @@ abstract class MutableCell<T> extends ValueCell<T> {
   set value(T value);
 
   /// Is a batch update of cells currently in progress, *see [MutableCell.batch]*.
-  @protected
   static bool get isBatchUpdate => _batched;
 
   /// Notify the observers of the cell that the cell's value will change.
@@ -108,7 +107,6 @@ abstract class MutableCell<T> extends ValueCell<T> {
   ///
   /// If [isEqual] is true it indicates that the new value is equal to the
   /// previous value.
-  @protected
   static void addToBatch(MutableCell cell, bool isEqual) {
     _batchList.update(cell, (value) => value && isEqual, ifAbsent: () => isEqual);
   }
