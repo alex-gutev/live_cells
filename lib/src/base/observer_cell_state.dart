@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../stateful_cell/stateful_cell.dart';
 import 'cell_state.dart';
 import 'cell_observer.dart';
 import '../value_cell.dart';
@@ -12,7 +13,7 @@ import '../value_cell.dart';
 ///
 /// Classes which make use of this mixin, should check the [stale] property.
 /// If [stale] is true, the cell's value should be recomputed.
-mixin ObserverCellState on CellState implements CellObserver {
+mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellObserver {
   /// Should the cell's value be recomputed
   @protected
   var stale = true;
