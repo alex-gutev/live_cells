@@ -57,7 +57,7 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
       return state!;
     }
 
-    return _DynamicComputeCellState(
+    return _DynamicComputeCellState<T>(
       cell: this,
       key: key,
     );
@@ -127,7 +127,15 @@ class _DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell
 
   @override
   T compute() => ComputeArgumentsTracker.computeWithTracker(cell._compute, (arg) {
-    arg.addObserver(this);
-    arguments.add(arg);
+    if (!arguments.contains(arg)) {
+      arg.addObserver(this);
+      arguments.add(arg);
+    }
   });
+
+  @override
+  void init() {
+    super.init();
+    setValue(value);
+  }
 }
