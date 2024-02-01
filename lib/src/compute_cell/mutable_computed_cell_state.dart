@@ -100,4 +100,10 @@ class MutableComputedCellState<T, S extends MutableDependentCell> extends Comput
       super.willUpdate(cell);
     }
   }
+  
+  @override
+  void init() {
+    super.init();
+    setValue(value);
+  }
 }

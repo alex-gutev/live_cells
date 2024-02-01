@@ -40,7 +40,7 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   final void Function(T) _reverseCompute;
 
   @override
-  CellState<StatefulCell> createState() => _DynamicMutableComputeCellState(
+  CellState<StatefulCell> createState() => _DynamicMutableComputeCellState<T>(
       cell: this,
       key: key
   );

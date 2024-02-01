@@ -104,7 +104,7 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
       return state!;
     }
 
-    return MutableComputedCellState(
+    return MutableComputedCellState<T, MutableDependentCell>(
         cell: this,
         key: key,
         arguments: arguments
