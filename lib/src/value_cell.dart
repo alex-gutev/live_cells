@@ -35,8 +35,8 @@ abstract class ValueCell<T> {
   ///
   /// The cell `sum` computes the sum of cells `a` and `b`. Whenever the value
   /// of either `a` or `b` changes, the value of `sum` is recomputed.
-  factory ValueCell.computed(T Function() compute) =>
-      DynamicComputeCell(compute);
+  factory ValueCell.computed(T Function() compute, {key}) =>
+      DynamicComputeCell(compute, key: key);
 
   /// Register a callback function to be called whenever the values of the referenced cells change.
   ///

@@ -19,7 +19,7 @@ import 'compute_cell_state.dart';
 /// ```
 class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// Create a cell which computes its value using [compute].
-  DynamicComputeCell(this._compute);
+  DynamicComputeCell(this._compute, {super.key});
 
   @override
   T get value {
