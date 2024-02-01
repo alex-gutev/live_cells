@@ -9,10 +9,8 @@ export 'src/base/cell_equality_factory.dart'
 export 'src/base/cell_observer.dart' show CellObserver;
 export 'src/base/cell_listenable.dart' show CellListenableExtension;
 
-export 'src/base/managed_cell.dart' show ManagedCell;
-export 'src/base/cell_listeners.dart' show CellListeners;
 export 'src/base/notifier_cell.dart' show NotifierCell;
-export 'src/base/observer_cell.dart' show ObserverCell;
+export 'src/base/observer_cell_state.dart' show ObserverCellState;
 export 'src/mutable_cell/store_cell.dart' show StoreCell, StoreCellExtension;
 export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
 export 'src/mutable_cell/mutable_dependent_cell.dart' show MutableDependentCell;
