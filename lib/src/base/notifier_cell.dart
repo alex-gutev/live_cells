@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 
+import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
-import 'cell_listeners.dart';
-import 'managed_cell.dart';
+import 'cell_state.dart';
 
 /// A [ValueCell] that stores its own value and manages its own observers.
 ///
 /// This class should be subclassed when a cell is required to store its value
 /// rather than computing it on demand.
-abstract class NotifierCell<T> extends ManagedCell<T> with CellListeners<T> {
+abstract class NotifierCell<T> extends StatefulCell<T> {
   /// Creates a [NotifierCell] with an initial value.
   NotifierCell(this._value);
 
@@ -39,6 +39,12 @@ abstract class NotifierCell<T> extends ManagedCell<T> with CellListeners<T> {
   void setValue(T value) {
     _value = value;
   }
+
+  @override
+  CellState createState() => CellState(
+      cell: this,
+      key: key
+  );
 
   // Private
 
