@@ -2,8 +2,8 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
-import 'cell_observer.dart';
-import '../stateful_cell/stateful_cell.dart';
+import '../base/cell_observer.dart';
+import 'stateful_cell.dart';
 
 /// Holds the state of a [StatefulCell].
 ///

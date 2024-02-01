@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../base/notifier_cell.dart';
+import '../stateful_cell/notifier_cell.dart';
 import '../compute_cell/dynamic_mutable_compute_cell.dart';
 import '../restoration/restoration.dart';
 import '../value_cell.dart';

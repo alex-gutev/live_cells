@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../base/cell_observer.dart';
-import '../base/cell_state.dart';
+import 'cell_state.dart';
 import '../value_cell.dart';
 
 /// A cell with the state managed by a [CellState] object.

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
-import '../stateful_cell/stateful_cell.dart';
+import 'stateful_cell.dart';
 import 'cell_state.dart';
-import 'cell_observer.dart';
+import '../base/cell_observer.dart';
 import '../value_cell.dart';
 
 /// Implements the [CellObserver] interface for cells of which the value depends on other cells.

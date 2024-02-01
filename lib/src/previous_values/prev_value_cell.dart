@@ -1,5 +1,5 @@
-import '../base/cell_state.dart';
-import '../base/observer_cell_state.dart';
+import '../stateful_cell/cell_state.dart';
+import '../stateful_cell/observer_cell_state.dart';
 import '../maybe_cell/maybe.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/stateful_cell.dart';

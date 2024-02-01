@@ -1,6 +1,6 @@
 import '../base/cell_observer.dart';
-import '../base/cell_state.dart';
-import '../base/notifier_cell.dart';
+import '../stateful_cell/cell_state.dart';
+import '../stateful_cell/notifier_cell.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 

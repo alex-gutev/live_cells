@@ -1,4 +1,4 @@
-import '../base/cell_state.dart';
+import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import '../compute_cell/compute_cell_state.dart';
 import '../restoration/restoration.dart';

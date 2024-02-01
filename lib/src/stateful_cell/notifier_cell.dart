@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../stateful_cell/stateful_cell.dart';
+import 'stateful_cell.dart';
 import '../value_cell.dart';
 import 'cell_state.dart';
 

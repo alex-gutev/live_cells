@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import '../base/cell_state.dart';
+import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/stateful_cell.dart';
