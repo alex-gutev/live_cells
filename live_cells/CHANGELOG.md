@@ -184,3 +184,7 @@ code which creates user-defined `ValueCell` subclasses:
   * `CellEquality`
   * `CellListeners`
   * `ObserverCell`
+
+## 0.10.1
+
+* Move annotations into separate package: [https://pub.dev/packages/live_cell_annotations](live_cell_annotations).
