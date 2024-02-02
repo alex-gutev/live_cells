@@ -1,13 +1,13 @@
-/// Annotation for generatin an extension on [ValueCell]'s holding values of this type.
+/// Annotation used to specify a class for which to generate a [ValueCell] extension.
 ///
 /// When this annotation is applied to a class, an extension is generated for
-/// [ValueCell]'s holding instances of the class. The extension adds
-/// accessors for each property of the class directly to [ValueCell]. Each
-/// accessor returns a *computed cell* which accesses the corresponding property
-/// of the value held in the cell on which the accessor was used.
+/// [ValueCell]'s holding instances of the class. The extension extends
+/// [ValueCell] with an accessor for each property of the class. Each
+/// accessor returns a *computed cell* that accesses the property
+/// of the instance held in the cell on which the accessor was used.
 ///
-/// **NOTE**: For the actual code to be generated, the live_cell_extension
-/// package is required.
+/// **NOTE**: The [live_cell_extension](https://pub.dev/packages/live_cell_extension)
+/// package does the actual code generation.
 ///
 /// For example when the annotation is applied on the following class:
 ///
@@ -24,7 +24,7 @@
 /// }
 /// ```
 ///
-/// ValueCell<Person> will be extended with accessors for the `name` and `age`
+/// `ValueCell<Person>` will be extended with accessors for the `name` and `age`
 /// properties:
 ///
 ///
@@ -52,11 +52,10 @@
 /// If [mutable] is true, [MutableCell] is also extended with accessors for the
 /// properties. Unlike the accessors created on [ValueCell], these accessors
 /// return [MutableCell]'s, which modify the value of the property of the object
-/// held in the cell on which the accessor was used. This is achieved by creating
-/// a new instance of the class with the new value of the modified property
-/// and the same values for the remaining properties.
+/// held in the cell on which the accessor was used. This is achieved by copying
+/// the instance with a new value for the modified property.
 ///
-/// If the `Person` class were annotated with `@CellExtension(mutable: true)`,
+/// If the `Person` class was annotated with `@CellExtension(mutable: true)`,
 /// the following accessors would be generated:
 ///
 /// ```dart
