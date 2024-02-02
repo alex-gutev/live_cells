@@ -74,3 +74,5 @@ export 'src/restoration/restoration.dart' show RestorableCell, CellValueCoder;
 export 'src/restoration/restorable_cell_widget.dart' show RestorableCellWidget;
 
 export 'src/utilities/cell_observer_model.dart' show CellObserverModel;
+
+export 'package:live_cell_annotations/live_cell_annotations.dart';

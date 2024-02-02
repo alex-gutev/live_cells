@@ -10,6 +10,7 @@ environment:
 
 dependencies:
   collection: ^1.16.0
+  live_cell_annotations: ^0.1.0
   flutter:
     sdk: flutter
 
