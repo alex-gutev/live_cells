@@ -102,7 +102,13 @@ class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
   void init() {
     super.init();
     cell.argCell.addObserver(this);
-    setValue(cell.value);
+
+    try {
+      setValue(value);
+    }
+    catch (e) {
+      // Prevent exception from being propagated to caller
+    }
   }
 
   @override
