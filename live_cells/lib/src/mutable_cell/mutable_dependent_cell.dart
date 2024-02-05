@@ -70,6 +70,7 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
     );
   }
 
+  @override
   MutableComputedCellState<T, MutableDependentCell<T>> get state =>
       super.state as MutableComputedCellState<T, MutableDependentCell<T>>;
 
