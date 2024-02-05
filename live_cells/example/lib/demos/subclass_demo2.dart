@@ -15,7 +15,7 @@ class CountCell extends StatefulCell<int> {
 
   @override
   int get value {
-    final state = currentState<CountCellState>();
+    final state = this.state;
 
     if (state == null) {
       throw UninitializedCellError();
@@ -23,6 +23,10 @@ class CountCell extends StatefulCell<int> {
 
     return state.value;
   }
+
+  @override
+  @protected
+  CountCellState? get state => super.state as CountCellState?;
 
   @override
   CellState<StatefulCell> createState() => CountCellState(

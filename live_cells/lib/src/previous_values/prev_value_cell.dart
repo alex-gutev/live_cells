@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../stateful_cell/cell_state.dart';
 import '../stateful_cell/observer_cell_state.dart';
 import '../maybe_cell/maybe.dart';
@@ -27,7 +29,7 @@ class PrevValueCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// of this cell, an [UninitializedCellError] exception is thrown.
   @override
   T get value {
-    final state = _state;
+    final state = this.state;
 
     if (state == null) {
       throw UninitializedCellError();
@@ -40,7 +42,9 @@ class PrevValueCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   final ValueCell<T> cell;
 
-  _PrevValueState<T>? get _state => currentState<_PrevValueState<T>>();
+  @protected
+  @override
+  PrevValueState<T>? get state => super.state as PrevValueState<T>?;
 
   CellState? _restoredState;
 
@@ -53,7 +57,7 @@ class PrevValueCell<T> extends StatefulCell<T> implements RestorableCell<T> {
       return state!;
     }
 
-    return _PrevValueState(
+    return PrevValueState(
         cell: this,
         key: key,
         arg: cell
@@ -61,12 +65,12 @@ class PrevValueCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   }
 
   @override
-  Object? dumpState(CellValueCoder coder) => _state?.dumpState(coder);
+  Object? dumpState(CellValueCoder coder) => state?.dumpState(coder);
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
     if (state != null) {
-      final restoredState = _state ?? createState() as _PrevValueState;
+      final restoredState = this.state ?? createState() as PrevValueState;
       restoredState.restoreState(state, coder);
 
       _restoredState = restoredState;
@@ -84,14 +88,14 @@ extension PrevValueCellExtension<T> on ValueCell<T> {
   ValueCell<T> get previous => PrevValueCell<T>(this);
 }
 
-class _PrevValueState<T> extends CellState with ObserverCellState {
+class PrevValueState<T> extends CellState with ObserverCellState {
   final ValueCell<T> arg;
 
   var _hasValue = false;
   late Maybe<T> _prevValue;
   Maybe<T> _currentValue;
 
-  _PrevValueState({
+  PrevValueState({
     required super.cell,
     required super.key,
     required this.arg

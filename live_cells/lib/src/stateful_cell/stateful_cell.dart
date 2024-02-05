@@ -43,11 +43,9 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   @override
   int get hashCode => key != null ? key.hashCode : super.hashCode;
 
-  /// Get the current state of the cell.
-  ///
-  /// Returns null if the cell is inactive.
+  /// The current state of the cell, or null if the cell is inactive.
   @protected
-  S? currentState<S>() => _getState() as S?;
+  CellState? get state => _getState();
 
   /// Create the [CellState] for this cell.
   ///

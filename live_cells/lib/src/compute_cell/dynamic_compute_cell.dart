@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
+
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import '../restoration/restoration.dart';
@@ -23,7 +25,7 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
 
   @override
   T get value {
-    final state = _state;
+    final state = this.state;
 
     if (state == null) {
       try {
@@ -40,7 +42,9 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
 
   // Private
 
-  _DynamicComputeCellState<T>? get _state => currentState<_DynamicComputeCellState<T>>();
+  @override
+  @protected
+  DynamicComputeCellState<T>? get state => super.state as DynamicComputeCellState<T>?;
 
   /// Value computation function
   final T Function() _compute;
@@ -57,7 +61,7 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
       return state!;
     }
 
-    return _DynamicComputeCellState<T>(
+    return DynamicComputeCellState<T>(
       cell: this,
       key: key,
     );
@@ -70,7 +74,7 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
-    final restoredState = _state ?? createState() as _DynamicComputeCellState<T>;
+    final restoredState = this.state ?? createState() as DynamicComputeCellState<T>;
     restoredState.restoreValue(coder.decode(state));
 
     _restoredState = restoredState;
@@ -115,8 +119,8 @@ extension ComputeArgumentsTracker<T> on ValueCell<T> {
   static void Function(ValueCell dep)? _onUseArgument;
 }
 
-class _DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<T>> {
-  _DynamicComputeCellState({
+class DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<T>> {
+  DynamicComputeCellState({
     required super.cell,
     required super.key,
   }) : super(arguments: HashSet());

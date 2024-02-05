@@ -50,19 +50,23 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
   void reverseCompute(T value);
 
   @override
-  T get value => _state.value;
+  T get value => state.value;
 
   @override
   set value(T value) {
-    _state.value = value;
+    state.value = value;
   }
 
   // Private
 
   MutableComputedCellState<T, MutableDependentCell>? _restoredState;
 
-  MutableComputedCellState<T, MutableDependentCell> get _state =>
-      currentState() ?? _restoredState ?? (_restoredState = createState());
+  @protected
+  @override
+  MutableComputedCellState<T, MutableDependentCell> get state =>
+      (super.state as MutableComputedCellState<T, MutableDependentCell>?) ??
+          _restoredState ??
+          (_restoredState = createState());
 
   @override
   MutableComputedCellState<T, MutableDependentCell> createState() {
@@ -81,12 +85,12 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
   }
 
   @override
-  Object? dumpState(CellValueCoder coder) => _state.dumpState(coder);
+  Object? dumpState(CellValueCoder coder) => state.dumpState(coder);
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
     if (state != null) {
-      _state.restoreState(state, coder);
+      this.state.restoreState(state, coder);
     }
   }
 }

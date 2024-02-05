@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import 'compute_cell_state.dart';
@@ -16,7 +18,7 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   @override
   T get value {
-    final state = currentState<_StoreCellState<T>>();
+    final state = this.state;
 
     if (state == null) {
       try {
@@ -38,8 +40,9 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// State restored by restoreState();
   CellState? _restoredState;
 
-  _StoreCellState<T>? get _state =>
-      currentState<_StoreCellState<T>>();
+  @override
+  @protected
+  StoreCellState<T>? get state => super.state as StoreCellState<T>?;
 
   @override
   CellState<StatefulCell> createState() {
@@ -50,7 +53,7 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
       return state!;
     }
 
-    return _StoreCellState<T>(
+    return StoreCellState<T>(
         cell: this,
         key: key
     );
@@ -63,7 +66,7 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
-    final restoredState = _state ?? createState() as _StoreCellState<T>;
+    final restoredState = this.state ?? createState() as StoreCellState<T>;
     restoredState.restoreValue(coder.decode(state));
 
     _restoredState = restoredState;
@@ -82,8 +85,8 @@ extension StoreCellExtension<T> on ValueCell<T> {
   StoreCell<T> store() => StoreCell(this);
 }
 
-class _StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
-  _StoreCellState({
+class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
+  StoreCellState({
     required super.cell,
     required super.key,
   }) : super(arguments: {cell.argCell});
