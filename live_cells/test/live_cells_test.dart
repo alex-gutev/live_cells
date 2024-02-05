@@ -800,6 +800,13 @@ void main() {
       expect(() => cell.value, throwsException);
     });
 
+    test('Exception on initialization of value reproduced on value access while observed', () {
+      final cell = ValueCell.computed(() => throw Exception());
+      observeCell(cell);
+
+      expect(() => cell.value, throwsException);
+    });
+
     test("DynamicComputeCell's compare == if they have the same keys", () {
       final a = MutableCell(0);
       final b = MutableCell(0);
@@ -973,6 +980,16 @@ void main() {
       final a = MutableCell(0);
       final cell = [a].computeCell(() => a() == 0 ? throw Exception() : a());
       final store = cell.store();
+
+      expect(() => store.value, throwsException);
+    });
+
+    test('Exception on initialization of value reproduced on value access while observed', () {
+      final a = MutableCell(0);
+      final cell = [a].computeCell(() => a() == 0 ? throw Exception() : a());
+      final store = cell.store();
+
+      observeCell(store);
 
       expect(() => store.value, throwsException);
     });
@@ -2294,6 +2311,16 @@ void main() {
 
       expect(() => cell.value, throwsException);
     });
+
+    test('Exception on initialization of value reproduced on value access while observed', () {
+      final a = MutableCell(0);
+      final cell = [a].mutableComputeCell(() => a() == 0 ? throw Exception() : a(), (val) {
+        a.value = val;
+      });
+
+      observeCell(cell);
+      expect(() => cell.value, throwsException);
+    });
   });
 
   group('DynamicMutableComputeCell', () {
@@ -2769,6 +2796,16 @@ void main() {
 
       expect(() => cell.value, throwsException);
     });
+
+    test('Exception on initialization of value reproduced on value access while observed', () {
+      final a = MutableCell(0);
+      final cell = MutableCell.computed(() => a() == 0 ? throw Exception() : a(), (val) {
+        a.value = val;
+      });
+
+      observeCell(cell);
+      expect(() => cell.value, throwsException);
+    });
   });
 
   group('MutableCellView', () {
@@ -2985,6 +3022,16 @@ void main() {
         a.value = val;
       });
 
+      expect(() => cell.value, throwsException);
+    });
+
+    test('Exception on initialization of value reproduced on value access while observed', () {
+      final a = MutableCell(0);
+      final cell = MutableCellView(argument: a, compute: () => a() == 0 ? throw Exception() : a(), reverse: (val) {
+        a.value = val;
+      });
+
+      observeCell(cell);
       expect(() => cell.value, throwsException);
     });
 
