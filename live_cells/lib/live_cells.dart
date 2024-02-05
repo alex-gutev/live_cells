@@ -13,12 +13,12 @@ export 'src/stateful_cell/cell_state.dart' show CellState;
 export 'src/stateful_cell/observer_cell_state.dart' show ObserverCellState;
 export 'src/stateful_cell/stateful_cell.dart' show StatefulCell;
 
-export 'src/mutable_cell/store_cell.dart' show StoreCell, StoreCellExtension;
 export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
 export 'src/mutable_cell/mutable_dependent_cell.dart' show MutableDependentCell;
 export 'src/mutable_cell/mutable_cell_view.dart' show MutableCellView;
 
 export 'src/compute_cell/compute_cell.dart' show ComputeCell;
+export 'src/compute_cell/store_cell.dart' show StoreCell, StoreCellExtension;
 export 'src/extensions/compute_extension.dart'
     show ComputeExtension, ListComputeExtension;
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
