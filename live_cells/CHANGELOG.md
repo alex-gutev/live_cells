@@ -1,3 +1,7 @@
+## 0.10.2
+
+* Fix bug: Handle exceptions thrown during computation of the initial values of cells.
+
 ## 0.10.1
 
 * Move annotations into separate package: [https://pub.dev/packages/live_cell_annotations](live_cell_annotations).
