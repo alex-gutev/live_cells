@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 
 import '../compute_cell/mutable_computed_cell_state.dart';
 import '../restoration/restoration.dart';
-import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 import 'mutable_cell.dart';
 
@@ -20,8 +19,8 @@ import 'mutable_cell.dart';
 /// Additionally, subclasses must also implement the [reverseCompute] method,
 /// which is called whenever the value of the cell is set. This method should
 /// update the values of the argument cells.
-abstract class MutableDependentCell<T> extends StatefulCell<T>
-    implements MutableCell<T>, RestorableCell<T> {
+abstract class MutableDependentCell<T> extends MutableCellBase<T>
+    implements RestorableCell<T> {
 
   /// List of argument cells.
   @protected
@@ -59,30 +58,20 @@ abstract class MutableDependentCell<T> extends StatefulCell<T>
 
   // Private
 
-  MutableComputedCellState<T, MutableDependentCell>? _restoredState;
-
-  @protected
   @override
-  MutableComputedCellState<T, MutableDependentCell> get state =>
-      (super.state as MutableComputedCellState<T, MutableDependentCell>?) ??
-          _restoredState ??
-          (_restoredState = createState());
-
-  @override
-  MutableComputedCellState<T, MutableDependentCell> createState() {
-    if (_restoredState != null) {
-      final state = _restoredState;
-      _restoredState = null;
-
-      return state!;
-    }
-
-    return MutableComputedCellState<T, MutableDependentCell>(
+  MutableComputedCellState<T, MutableDependentCell<T>> createMutableState({
+    covariant MutableComputedCellState<T, MutableDependentCell<T>>? oldState
+  }) {
+    return MutableComputedCellState(
         cell: this,
         key: key,
-        arguments: arguments
+        arguments: arguments,
+        oldState: oldState
     );
   }
+
+  MutableComputedCellState<T, MutableDependentCell<T>> get state =>
+      super.state as MutableComputedCellState<T, MutableDependentCell<T>>;
 
   @override
   Object? dumpState(CellValueCoder coder) => state.dumpState(coder);

@@ -23,16 +23,6 @@ class MutableCellView<T> extends ComputeCell<T> implements MutableCell<T> {
     reverse(value);
   }
 
-  @override
-  void notifyUpdate([bool isEqual = false]) {
-    argument.notifyUpdate(isEqual);
-  }
-
-  @override
-  void notifyWillUpdate([bool isEqual = false]) {
-    argument.notifyWillUpdate(isEqual);
-  }
-
   // Private
 
   /// Argument cell

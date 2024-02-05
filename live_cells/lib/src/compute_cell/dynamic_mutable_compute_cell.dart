@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'dynamic_compute_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import 'mutable_computed_cell_state.dart';
@@ -38,11 +36,13 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   final void Function(T) _reverseCompute;
 
   @override
-  MutableComputedCellState<T, MutableDependentCell> createState() =>
-      _DynamicMutableComputeCellState<T>(
-          cell: this,
-          key: key
-      );
+  MutableComputedCellState<T, DynamicMutableComputeCell<T>> createMutableState({
+    covariant MutableComputedCellState<T, DynamicMutableComputeCell<T>>? oldState
+  }) => _DynamicMutableComputeCellState(
+      cell: this,
+      key: key,
+      oldState: oldState
+  );
 }
 
 class _DynamicMutableComputeCellState<T>
@@ -50,11 +50,14 @@ class _DynamicMutableComputeCellState<T>
   _DynamicMutableComputeCellState({
     required super.cell,
     required super.key,
-  }) : super(arguments: HashSet());
+    super.oldState
+  }) : super(arguments: {});
 
   @override
   T compute() => ComputeArgumentsTracker.computeWithTracker(cell._compute, (arg) {
-    arg.addObserver(this);
-    arguments.add(arg);
+    if (!arguments.contains(arg)) {
+      arg.addObserver(this);
+      arguments.add(arg);
+    }
   });
 }

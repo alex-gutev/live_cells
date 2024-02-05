@@ -1,9 +1,14 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 
-import '../stateful_cell/notifier_cell.dart';
 import '../compute_cell/dynamic_mutable_compute_cell.dart';
 import '../restoration/restoration.dart';
+import '../stateful_cell/cell_state.dart';
+import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
+
+part 'mutable_cell_base.dart';
 
 /// Interface for a [ValueCell] of which the [value] property can be set explicitly
 abstract class MutableCell<T> extends ValueCell<T> {
@@ -53,30 +58,6 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// 3. [CellObserver.update()]
   set value(T value);
 
-  /// Is a batch update of cells currently in progress, *see [MutableCell.batch]*.
-  static bool get isBatchUpdate => _batched;
-
-  /// Notify the observers of the cell that the cell's value will change.
-  ///
-  /// If [isEqual] is true it indicates that the new value is equal to the
-  /// previous value.
-  ///
-  /// This is called before the value of the cell has been set during a batch
-  /// update, *see [MutableCell.batch]*.
-  @protected
-  void notifyWillUpdate([bool isEqual = false]);
-
-  /// Notify the observers of the cell that the cell's value has change.
-  ///
-  /// If [isEqual] is true it indicates that the new value is equal to the
-  /// previous value.
-  ///
-  /// This is called after the value of a batch update of cells,
-  /// *see [MutableCell.batch]*. At this point the value of the [value] property
-  /// will have been set to the new value of the cell.
-  @protected
-  void notifyUpdate([bool isEqual = false]);
-
   /// Set the value of multiple [MutableCell]'s simultaneously.
   ///
   /// [fn] is called. Within [fn] setting [MutableCell.value] sets the value
@@ -99,28 +80,27 @@ abstract class MutableCell<T> extends ValueCell<T> {
     }
   }
 
-  /// Add a cell to the batch update list.
-  ///
-  /// This method should be called by subclasses of [MutableCell] when
-  /// [value] is being set while [isBatchUpdate] is true. The observers of [cell]
-  /// are notified, by [notifyUpdate] after the batch update is complete.
-  ///
-  /// If [isEqual] is true it indicates that the new value is equal to the
-  /// previous value.
-  static void addToBatch(MutableCell cell, bool isEqual) {
-    _batchList.update(cell, (value) => value && isEqual, ifAbsent: () => isEqual);
-  }
-
-  /// Private
+  // Private
 
   /// Is a batch update currently ongoing?
   static var _batched = false;
 
-  /// Set of cells of which the observers should be notified after the current batch update.
+  /// Set of cell states of which the observers should be notified after the current batch update.
   ///
-  /// The map is indexed by the cell object, with the value being a boolean
+  /// The map is indexed by the cell stat object, with the value being a boolean
   /// which is true if the new value of the cell is equal to the previous value.
-  static final Map<MutableCell, bool> _batchList = {};
+  static final Map<CellState, bool> _batchList = HashMap(
+    equals: identical,
+    hashCode: identityHashCode
+  );
+
+  /// Add a cell state to the batch update list.
+  ///
+  /// If [isEqual] is true it indicates that the new value is equal to the
+  /// previous value.
+  static void _addToBatch(CellState state, bool isEqual) {
+    _batchList.update(state, (value) => value && isEqual, ifAbsent: () => isEqual);
+  }
 
   /// Begin a update update.
   static void _beginBatch() {
@@ -140,23 +120,11 @@ abstract class MutableCell<T> extends ValueCell<T> {
   }
 }
 
-class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T>, RestorableCell<T> {
-  _MutableCellImpl(super.value);
+class _MutableCellImpl<T> extends MutableCellBase<T> implements RestorableCell<T> {
+  _MutableCellImpl(this._initialValue);
 
-  @override
-  set value(T value) {
-    if (MutableCell.isBatchUpdate) {
-      final isEqual = value == this.value;
-
-      notifyWillUpdate(isEqual);
-      setValue(value);
-
-      MutableCell.addToBatch(this, isEqual);
-    }
-    else {
-      super.value = value;
-    }
-  }
+  /// The initial value
+  final T _initialValue;
 
   @override
   Object? dumpState(CellValueCoder coder) {
@@ -165,6 +133,13 @@ class _MutableCellImpl<T> extends NotifierCell<T> implements MutableCell<T>, Res
 
   @override
   void restoreState(Object? state, CellValueCoder coder) {
-    setValue(coder.decode(state));
+    this.state.setValue(coder.decode(state));
   }
+
+  @override
+  MutableCellState<T, MutableCellBase<T>> createMutableState({
+    MutableCellState<T, MutableCellBase<T>>? oldState
+  }) => MutableCellState(cell: this, key: key)..setValue(
+      oldState?.value ?? _initialValue
+  );
 }
