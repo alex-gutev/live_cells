@@ -140,6 +140,12 @@ class DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<
   @override
   void init() {
     super.init();
-    setValue(value);
+
+    try {
+      setValue(value);
+    }
+    catch (e) {
+      // Prevent exception from being propagated to caller
+    }
   }
 }
