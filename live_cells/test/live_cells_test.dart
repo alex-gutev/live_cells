@@ -1764,6 +1764,89 @@ void main() {
     });
   });
 
+  group('Peek cell values', () {
+    test('ValueCell.peek.value == ValueCell.value', () {
+      final cell = MutableCell(0);
+      final peek = cell.peek;
+
+      expect(peek.value, equals(0));
+
+      cell.value = 2;
+      expect(peek.value, equals(2));
+    });
+
+    test('ValueCell.peek does not notify observers when cell value changed', () {
+      final a = MutableCell(0);
+      final b = MutableCell(1);
+
+      final sum = ValueCell.computed(() => a.peek() + b());
+      final observer = addObserver(sum, MockValueObserver());
+
+      a.value = 1;
+      a.value = 2;
+      a.value = 3;
+      b.value = 5;
+      b.value = 10;
+      a.value = 2;
+      b.value = 13;
+
+      expect(observer.values, equals([8, 13, 15]));
+    });
+
+    test("PeekCell's compare == if they have the same argument cell", () {
+      final a = MutableCell(0);
+
+      final p1 = a.peek;
+      final p2 = a.peek;
+
+      expect(p1 == p2, isTrue);
+      expect(p1.hashCode == p2.hashCode, isTrue);
+    });
+
+    test("PeekCell's compare != if they different same argument cells", () {
+      final a = MutableCell(0);
+      final b = MutableCell(1);
+
+      final p1 = a.peek;
+      final p2 = b.peek;
+
+      expect(p1 != p2, isTrue);
+      expect(p1 == p1, isTrue);
+    });
+
+    test("PeekCell's manage the same set of observers", () {
+      final resource = MockResource();
+      final a = TestManagedCell(resource, 1);
+
+      p() => a.peek;
+
+      verifyNever(resource.init());
+
+      final observer = addObserver(p(), MockSimpleObserver());
+      p().removeObserver(observer);
+
+      verify(resource.init()).called(1);
+      verify(resource.dispose()).called(1);
+    });
+
+    test("Removing PeekCell observer removes correct observer", () {
+      final resource = MockResource();
+      final a = TestManagedCell(resource, 1);
+
+      p() => a.peek;
+
+      verifyNever(resource.init());
+
+      addObserver(p(), MockSimpleObserver());
+      final observer2 = MockSimpleObserver();
+
+      p().removeObserver(observer2);
+
+      verify(resource.init()).called(1);
+      verifyNever(resource.dispose());
+    });
+  });
+
   group('Cell initialization and cleanup', () {
     test('init() not called if no observers added', () {
       final resource = MockResource();

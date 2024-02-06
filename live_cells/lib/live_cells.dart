@@ -22,6 +22,7 @@ export 'src/compute_cell/store_cell.dart' show StoreCell, StoreCellExtension;
 export 'src/extensions/compute_extension.dart'
     show ComputeExtension, ListComputeExtension;
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
+export 'src/compute_cell/peek_cell.dart' show PeekCellExtension;
 export 'src/maybe_cell/maybe.dart'
     show Maybe, MaybeCell, CellMaybeExtension, MaybeCellExtension;
 
