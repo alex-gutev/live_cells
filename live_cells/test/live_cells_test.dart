@@ -2,23 +2,16 @@ import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:live_cells/live_cells.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+
+@GenerateNiceMocks([MockSpec<CellObserver>(as: #MockSimpleObserver)])
+import 'live_cells_test.mocks.dart';
 
 /// Mock class interface for recording the value of a cell at the time an observer was called
 abstract class ValueObserver {
   /// Mock method called by listener to record cell value
   void gotValue(value);
-}
-
-/// Mock class implementing [CellObserver]
-///
-/// Usage:
-///
-///   - Add instance as an observer of a cell
-///   - verify(instance.update())
-class MockSimpleObserver extends Mock implements CellObserver {
-  @override
-  bool get shouldNotifyAlways => false;
 }
 
 /// Mock class implementing [ValueObserver]
@@ -32,7 +25,7 @@ class MockValueObserver extends MockSimpleObserver implements ValueObserver {
   final values = [];
 
   @override
-  void update(ValueCell cell) {
+  void update(covariant ValueCell cell) {
     final value = cell.value;
 
     if (values.lastOrNull != value) {
@@ -2633,10 +2626,10 @@ void main() {
       final d = MutableCell(50);
       final e = ValueCell.computed(() => c() + d());
 
-      final observerA = MockValueObserver();
-      final observerB = MockValueObserver();
-      final observerC = MockValueObserver();
-      final observerE = MockValueObserver();
+      final observerA = MockSimpleObserver();
+      final observerB = MockSimpleObserver();
+      final observerC = MockSimpleObserver();
+      final observerE = MockSimpleObserver();
 
       a.addObserver(observerA);
       b.addObserver(observerB);
@@ -3027,9 +3020,9 @@ void main() {
       final d = MutableCell(50);
       final e = ValueCell.computed(() => c() + d());
 
-      final observerA = addObserver(a, MockValueObserver());
-      final observerC = addObserver(c, MockValueObserver());
-      final observerE = addObserver(e, MockValueObserver());
+      final observerA = addObserver(a, MockSimpleObserver());
+      final observerC = addObserver(c, MockSimpleObserver());
+      final observerE = addObserver(e, MockSimpleObserver());
 
       MutableCell.batch(() {
         c.value = 10;
