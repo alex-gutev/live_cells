@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../value_cell.dart';
-import 'cell_observer.dart';
+import '../base/cell_observer.dart';
 
 /// Provides a method for creating a [ValueListenable] from a cell
 extension CellListenableExtension<T> on ValueCell<T> {

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../base/cell_listenable.dart';
+import 'cell_listenable.dart';
 import 'compute_extension.dart';
 import '../value_cell.dart';
 
