@@ -37,13 +37,44 @@ class WidgetSpec<T extends Object> {
   /// is used instead of the declared type in the widget class constructor.
   final Map<Symbol, String> propertyTypes;
 
+  /// List of properties to add to generated wrapper class.
+  final List<WidgetPropertySpec> addProperties;
+
   const WidgetSpec({
     this.as,
     this.typeArguments = const [],
     this.mutableProperties = const [],
     this.excludeProperties = const [],
     this.propertyValues = const {},
-    this.propertyTypes = const {}
+    this.propertyTypes = const {},
+    this.addProperties = const []
+  });
+}
+
+/// Specifier for an additional property to add to a widget wrapper class.
+///
+/// **NOTE**: This is currently only for internal use by the `live_cells`
+/// package.
+///
+/// A property of type `ValueCell` holding a [T] is generated.
+class WidgetPropertySpec<T extends Object> {
+  /// Property name
+  final Symbol name;
+
+  /// Default value to assign to property
+  final String? defaultValue;
+
+  /// Is this property optional?
+  final bool optional;
+
+  /// Should this property be held in a `MutableCell`?
+  final bool mutable;
+
+  const WidgetPropertySpec({
+    required this.name,
+    required this.defaultValue,
+    this.optional = true,
+    this.mutable = false
   });
 }
 
