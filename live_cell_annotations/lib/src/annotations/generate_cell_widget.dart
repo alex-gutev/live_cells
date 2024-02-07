@@ -14,6 +14,9 @@ class WidgetSpec<T extends Object> {
   /// If [null] the class is
   final Symbol? as;
 
+  /// List of type arguments to add to generated class
+  final List<String> typeArguments;
+
   /// List of property names which should be `MutableCell`'s
   final List<Symbol> mutableProperties;
 
@@ -28,11 +31,19 @@ class WidgetSpec<T extends Object> {
   /// class is used.
   final Map<Symbol, String> propertyValues;
 
+  /// Map from property names to property types.
+  ///
+  /// If a property is a key in this map, the type in the corresponding value
+  /// is used instead of the declared type in the widget class constructor.
+  final Map<Symbol, String> propertyTypes;
+
   const WidgetSpec({
     this.as,
+    this.typeArguments = const [],
     this.mutableProperties = const [],
     this.excludeProperties = const [],
     this.propertyValues = const {},
+    this.propertyTypes = const {}
   });
 }
 
