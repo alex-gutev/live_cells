@@ -30,7 +30,7 @@ class CellCheckboxDemo extends CellWidget with CellInitializer {
               // A checkbox with its state controlled by the cell `state`
               CellCheckbox(
                 value: state,
-                tristate: true,
+                tristate: true.cell,
               ),
               CellWidget.builder((_) {
                 if (state() != null) {

@@ -32,7 +32,7 @@ class CellTextFieldDemo1 extends CellWidget with CellInitializer {
               ),
               const SizedBox(height: 10),
               // The content of the text field is retrieved using the `input` cell
-              CellWidget.builder((_) => Text(input())),
+              CellText(data: input),
               // This button clears the text field by assigning the empty string
               // to the `input` cell
               ElevatedButton(

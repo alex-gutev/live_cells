@@ -100,8 +100,8 @@ class CellRestorationDemo extends RestorableCellWidget {
                   CellWidget.builder((context) => Text(sliderValue().toStringAsFixed(2))),
                   Expanded(
                       child: CellSlider(
-                          min: 0.0,
-                          max: 10,
+                          min: 0.0.cell,
+                          max: 10.0.cell,
                           value: sliderValue
                       ),
                   )
@@ -110,12 +110,12 @@ class CellRestorationDemo extends RestorableCellWidget {
               const SizedBox(height: 5),
               CellSwitchListTile(
                 value: switchValue,
-                title: const Text('A Switch'),
+                title: const Text('A Switch').cell,
               ),
               const SizedBox(height: 5),
               CellCheckboxListTile(
                 value: checkboxValue,
-                title: const Text('A checkbox'),
+                title: const Text('A checkbox').cell,
               ),
               const SizedBox(height: 5),
               const Text(
@@ -130,18 +130,18 @@ class CellRestorationDemo extends RestorableCellWidget {
                 children: [
                   CellRadioListTile(
                     groupValue: radioValue,
-                    value: RadioValue.value1,
-                    title: const Text('value1'),
+                    value: RadioValue.value1.cell,
+                    title: const Text('value1').cell,
                   ),
                   CellRadioListTile(
                     groupValue: radioValue,
-                    value: RadioValue.value2,
-                    title: const Text('value2'),
+                    value: RadioValue.value2.cell,
+                    title: const Text('value2').cell,
                   ),
                   CellRadioListTile(
                     groupValue: radioValue,
-                    value: RadioValue.value3,
-                    title: const Text('value3'),
+                    value: RadioValue.value3.cell,
+                    title: const Text('value3').cell,
                   ),
                 ],
               ),

@@ -30,8 +30,8 @@ class CellSliderDemo extends CellWidget with CellInitializer {
               // A slider with a value controlled by the `n` cell.
               CellSlider(
                 value: n,
-                min: 0,
-                max: 5,
+                min: 0.0.cell,
+                max: 5.0.cell,
               ),
               CellWidget.builder((_) => Text('Slider value is: ${n().toStringAsFixed(2)}')),
               // The following button resets the value of the slider to 2

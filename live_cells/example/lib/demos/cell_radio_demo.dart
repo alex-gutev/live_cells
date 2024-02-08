@@ -51,19 +51,19 @@ class CellRadioDemo extends CellWidget with CellInitializer {
               // Three radio buttons with the group value controlled by the
               // `option` cell
               CellRadioListTile(
-                value: RadioOption.optionA,
+                value: RadioOption.optionA.cell,
                 groupValue: option,
-                title: const Text('Option A'),
+                title: const Text('Option A').cell,
               ),
               CellRadioListTile(
-                value: RadioOption.optionB,
+                value: RadioOption.optionB.cell,
                 groupValue: option,
-                title: const Text('Option B'),
+                title: const Text('Option B').cell,
               ),
               CellRadioListTile(
-                value: RadioOption.optionC,
+                value: RadioOption.optionC.cell,
                 groupValue: option,
-                title: const Text('Option C'),
+                title: const Text('Option C').cell,
               ),
               CellWidget.builder((_) => Text('Selected option: ${option()?.prettyName ?? 'None'}')),
               // The following buttons change the selected radio button by
