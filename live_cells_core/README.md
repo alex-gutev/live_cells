@@ -4,4 +4,4 @@ related functionality. Visit the mother package
 of the **Live Cells** library.
 
 *For the time being this package depends on Flutter. In a future release the dependency will be
-removed so that the package can be used in dart code without Flutter.*.
+removed so that the package can be used in pure dart code without Flutter.*.
