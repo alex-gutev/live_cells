@@ -77,13 +77,36 @@
 /// print('${person.value.name} - ${person.value.age}'); // Prints Bob 49
 /// ```
 class CellExtension {
+  /// Name of the `ValueCell` extension to generate.
+  /// 
+  /// If not given the name of the generated extension is the name of the class
+  /// followed by `CellExtension`.
+  final Symbol? name;
+
+  /// Name of the `MutableCell` extension to generate.
+  ///
+  /// If not given the name of the generated extension is the name of the class
+  /// followed by `MutableCellExtension`.
+  ///
+  /// This property is ignored if [mutable] is false.
+  final Symbol? mutableName;
+  
   /// Should an extension on [MutableCell] be generated?
   final bool mutable;
 
   /// Annotate a class to generate an extension on [ValueCell] for the class's properties.
   ///
   /// If [mutable] is true an extension on [MutableCell] is also generated.
+  ///
+  /// The name of the generated `ValueCell` extension is [name] and the name
+  /// of the `MutableCell` extension, if one is generated, is [mutableName]. If
+  /// these are [null] the name of the `ValueCell` extension is the name of
+  /// the annotated class followed by `CellExtension` and the name of the
+  /// `MutableCell` extension is the name of the class followed by
+  /// `MutableCellExtension`.
   const CellExtension({
+    this.name,
+    this.mutableName,
     this.mutable = false
   });
 }
