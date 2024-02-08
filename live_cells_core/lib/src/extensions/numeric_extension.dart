@@ -1,4 +1,5 @@
-import 'package:live_cells/live_cells.dart';
+import 'compute_extension.dart';
+import '../value_cell.dart';
 
 /// Extends [ValueCell] with numeric operators for cells holding [num] values.
 ///

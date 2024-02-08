@@ -1,11 +1,8 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
-
-import '../base/cell_observer.dart';
-import '../cell_watch/cell_watcher.dart';
-import '../compute_cell/dynamic_compute_cell.dart';
-import '../value_cell.dart';
+import 'package:live_cells_core/live_cells_core.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 
 part 'cell_initializer.dart';
 part 'cell_observer_state.dart';

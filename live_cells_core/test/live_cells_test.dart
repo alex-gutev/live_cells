@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_cells_core/live_cells_core.dart';
 
-import 'package:live_cells/live_cells.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 

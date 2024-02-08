@@ -1,8 +1,5 @@
 import 'package:flutter/widgets.dart';
-
-import 'cell_listenable.dart';
-import 'compute_extension.dart';
-import '../value_cell.dart';
+import 'package:live_cells_core/live_cells_core.dart';
 
 /// Provides functionality for creating [Widget]'s from [ValueCell]'s
 extension WidgetExtension<T> on ValueCell<T> {
