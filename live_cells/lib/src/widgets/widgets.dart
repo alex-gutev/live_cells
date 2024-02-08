@@ -4,6 +4,102 @@ import 'package:live_cells/live_cells.dart';
 import 'package:live_cell_annotations/live_cell_annotations.dart';
 
 @GenerateCellWidgets([
+  WidgetSpec<Align>(
+    includeSuperProperties: [#child],
+
+    documentation: '''An [Align] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Align],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedAlign>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedAlign] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedAlign],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedContainer>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedContainer] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedContainer],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedDefaultTextStyle>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedDefaultTextStyle] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedDefaultTextStyle],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedOpacity>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedOpacity] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedOpacity],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedPhysicalModel>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedPhysicalModel] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedPhysicalModel],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedPositioned>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedPositioned] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedPositioned],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedSize>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedSize] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedSize],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
   WidgetSpec<Text>(
     as: #CellText,
     documentation: '''A [Text] widget with its properties controlled by [ValueCell]'s.
