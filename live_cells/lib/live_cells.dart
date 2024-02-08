@@ -1,7 +1,6 @@
 library live_cells;
 
-export 'src/value_cell.dart'
-    show ValueCell, ConstantCell, DependentCell;
+export 'src/value_cell.dart' show ValueCell, ConstantCell, DependentCell;
 
 export 'src/base/cell_equality_factory.dart'
     show EqualityCellFactory, DefaultCellEqualityFactory;
@@ -76,4 +75,5 @@ export 'src/restoration/restorable_cell_widget.dart' show RestorableCellWidget;
 
 export 'src/utilities/cell_observer_model.dart' show CellObserverModel;
 
-export 'package:live_cell_annotations/live_cell_annotations.dart';
+export 'package:live_cell_annotations/live_cell_annotations.dart'
+    show CellExtension;
