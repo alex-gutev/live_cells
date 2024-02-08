@@ -402,6 +402,88 @@ user, the value of the cell is updated to reflect the state.
 
   ),
 
+  WidgetSpec<DecoratedBox>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [DecoratedBox] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [DecoratedBox],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<DefaultTextStyle>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [DefaultTextStyle] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [DefaultTextStyle],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<Divider>(
+      documentation: '''A [Divider] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Divider],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<ExcludeSemantics>(
+      includeSuperProperties: [#child],
+
+      documentation: '''An [ExcludeSemantics] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [ExcludeSemantics],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<FittedBox>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [FittedBox] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [FittedBox],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<FractionalTranslation>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [FractionalTranslation] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [FractionalTranslation],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<FractionallySizedBox>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [FractionallySizedBox] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [FractionallySizedBox],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
   WidgetSpec<Text>(
     as: #CellText,
     documentation: '''A [Text] widget with its properties controlled by [ValueCell]'s.
