@@ -484,6 +484,88 @@ property to which it is bound is automatically updated to reflect the value of
 the cell.'''
   ),
 
+  WidgetSpec<Icon>(
+      documentation: '''An [Icon] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Icon],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<IgnorePointer>(
+      includeSuperProperties: [#child],
+      documentation: '''An [IgnorePointer] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [IgnorePointer],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<IntrinsicHeight>(
+      includeSuperProperties: [#child],
+      documentation: '''An [IntrinsicHeight] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [IntrinsicHeight],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<IntrinsicWidth>(
+      includeSuperProperties: [#child],
+      documentation: '''An [IntrinsicWidth] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [IntrinsicWidth],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<LimitedBox>(
+      includeSuperProperties: [#child],
+      documentation: '''A [LimitedBox] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [LimitedBox],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<LinearProgressIndicator>(
+      includeSuperProperties: [
+        #value,
+        #backgroundColor,
+        #color,
+        #semanticsLabel,
+        #semanticsValue
+      ],
+
+      documentation: '''A [LinearProgressIndicator] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [LinearProgressIndicator],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<ListTile>(
+      documentation: '''A [ListTile] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [ListTile],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
   WidgetSpec<Text>(
     as: #CellText,
     documentation: '''A [Text] widget with its properties controlled by [ValueCell]'s.
