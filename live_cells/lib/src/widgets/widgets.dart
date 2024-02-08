@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
@@ -100,36 +103,90 @@ property to which it is bound is automatically updated to reflect the value of
 the cell.'''
   ),
 
-  WidgetSpec<Text>(
-    as: #CellText,
-    documentation: '''A [Text] widget with its properties controlled by [ValueCell]'s.
+  WidgetSpec<AspectRatio>(
+    includeSuperProperties: [#child],
+    documentation: '''An [AspectRatio] widget with its properties controlled by [ValueCell]'s.
 
-The constructor takes the same arguments as the unnamed constructor of [Text],
+The constructor takes the same arguments as the unnamed constructor of [AspectRatio],
 but as [ValueCell]'s. This binds each property value to the [ValueCell] given
 in the constructor. If the cell value is changed, the value of the corresponding
 property to which it is bound is automatically updated to reflect the value of
-the cell.
-'''
+the cell.'''
+  ),
+
+  WidgetSpec<BackdropFilter>(
+    includeSuperProperties: [#child],
+
+    documentation: '''A [BackdropFilter] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [BackdropFilter],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<Badge>(
+    documentation: '''A [Badge] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Badge],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<Baseline>(
+    includeSuperProperties: [#child],
+    documentation: '''A [Baseline] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Baseline],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<Card>(
+    documentation: '''A [Card] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Card],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<Center>(
+    includeSuperProperties: [#widthFactor, #heightFactor, #child],
+
+    documentation: '''A [Center] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Center],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
   ),
 
   WidgetSpec<Checkbox>(
-    as: #CellCheckbox,
-    mutableProperties: [#value],
-    excludeProperties: [#onChanged],
-    propertyValues: {
-      #onChanged: 'enabled() ? (v) => value.value = v : null',
-    },
-    addProperties: [
-      WidgetPropertySpec<bool>(
-          name: #enabled,
-          optional: false,
-          defaultValue: 'true',
+      as: #CellCheckbox,
+      mutableProperties: [#value],
+      excludeProperties: [#onChanged],
+      propertyValues: {
+        #onChanged: 'enabled() ? (v) => value.value = v : null',
+      },
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            optional: false,
+            defaultValue: 'true',
 
-          documentation: 'Is the widget enabled for user input?'
-      )
-    ],
+            documentation: 'Is the widget enabled for user input?'
+        )
+      ],
 
-    documentation: '''A [Checkbox] widget with the [value] controlled by a [ValueCell].
+      documentation: '''A [Checkbox] widget with the [value] controlled by a [ValueCell].
 
 The [value] is controlled by a [MutableCell] which is passed on construction.
 When the value of the cell changes, the checkbox state is updated to reflect the
@@ -149,6 +206,211 @@ user, the value of the cell is updated to reflect the state.
       documentation: '''A [ListTile] with a [CellCheckbox], akin to [CheckboxListTile].
 
 See [CellCheckbox] for a more detailed explanation.
+'''
+  ),
+
+  WidgetSpec<Chip>(
+    documentation: '''A [Chip] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Chip],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<CircularProgressIndicator>(
+      includeSuperProperties: [
+        #value,
+        #backgroundColor,
+        #color,
+        #valueColor,
+        #semanticsLabel,
+        #semanticsValue
+      ],
+
+      propertyDefaultValues: {
+        #strokeAlign: '0.0'
+      },
+
+      documentation: '''A [CircularProgressIndicator] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [CircularProgressIndicator],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<ClipOval>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [ClipOval] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [ClipOval],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<ClipPath>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [ClipPath] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [ClipPath],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<ClipRect>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [ClipRect] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [ClipRect],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<ConstrainedBox>(
+      includeSuperProperties: [#child],
+
+      documentation: '''A [ConstrainedBox] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [ConstrainedBox],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<Container>(
+      documentation: '''A [Container] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Container],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<CupertinoActivityIndicator>(
+      propertyDefaultValues: {
+        #radius: '10.0'
+      },
+
+      documentation: '''A [CupertinoActivityIndicator] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [CupertinoActivityIndicator],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<CupertinoListSection>(
+      propertyDefaultValues: {
+        #margin: 'EdgeInsets.only(bottom: 8.0)',
+        #dividerMargin: '20.0',
+        #topMargin: '22.0',
+      },
+
+      documentation: '''A [CupertinoListSection] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [CupertinoListSection],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+  
+  WidgetSpec<CupertinoPageScaffold>(
+      documentation: '''A [CupertinoPageScaffold] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [CupertinoPageScaffold],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<CupertinoPopupSurface>(
+      documentation: '''A [CupertinoPopupSurface] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [CupertinoPopupSurface],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<CupertinoSlider>(
+      mutableProperties: [#value],
+      excludeProperties: [#onChanged],
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            optional: false,
+            defaultValue: 'true',
+
+            documentation: 'Is the widget enabled for user input?'
+        )
+      ],
+
+      propertyValues: {
+        #onChanged: 'enabled() ? (v) => value.value = v : null'
+      },
+
+      documentation: '''A [CupertinoSlider] with its [value] controlled by a [ValueCell].
+
+The [value] is controlled by a [MutableCell] which is passed on construction. 
+When the value of the cell changes, the slider position is updated to reflect 
+the value of the cell. Similarly when the slider is moved by the user, the 
+value of the cell is updated to reflect the slider position.'''
+  ),
+
+  WidgetSpec<CupertinoSwitch>(
+      mutableProperties: [#value],
+      excludeProperties: [#onChanged],
+      propertyValues: {
+        #onChanged: 'enabled() ? (v) => value.value = v : null',
+      },
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            optional: false,
+            defaultValue: 'true',
+
+            documentation: 'Is the widget enabled for user input?'
+        )
+      ],
+
+      documentation: '''A [CupertinoSwitch] widget with its [value] controlled by a [ValueCell].
+
+The [value] is controlled by a [MutableCell] which is passed on construction.
+When the value of the cell changes, the switch state is updated to reflect the
+value of the cell. Similarly when the state of the switch is changed by the
+user, the value of the cell is updated to reflect the state.
+'''
+
+  ),
+
+  WidgetSpec<Text>(
+    as: #CellText,
+    documentation: '''A [Text] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Text],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.
 '''
   ),
 
