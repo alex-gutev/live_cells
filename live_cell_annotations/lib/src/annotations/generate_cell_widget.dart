@@ -40,6 +40,10 @@ class WidgetSpec<T extends Object> {
   /// List of properties to add to generated wrapper class.
   final List<WidgetPropertySpec> addProperties;
 
+  /// List of super formal constructor parameters to include in generated class
+  /// properties.
+  final List<Symbol> includeSuperProperties;
+
   /// Documentation comment for the generated class.
   final String? documentation;
 
@@ -51,6 +55,7 @@ class WidgetSpec<T extends Object> {
     this.propertyValues = const {},
     this.propertyTypes = const {},
     this.addProperties = const [],
+    this.includeSuperProperties = const [],
     this.documentation
   });
 }
