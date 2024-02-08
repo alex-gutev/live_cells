@@ -1,3 +1,7 @@
+## 0.10.3
+
+* Change `live_cell_annotations` version to `0.2.0`.
+
 ## 0.10.2
 
 * Fix bug: Handle exceptions thrown during computation of the initial values of cells.
