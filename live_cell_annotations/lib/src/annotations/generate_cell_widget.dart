@@ -31,6 +31,12 @@ class WidgetSpec<T extends Object> {
   /// class is used.
   final Map<Symbol, String> propertyValues;
 
+  /// Map from property names to code which computes the default property values.
+  ///
+  /// If a property is a key in this map, the code in the corresponding value
+  /// is used as the default value in the generated constructor.
+  final Map<Symbol, String> propertyDefaultValues;
+
   /// Map from property names to property types.
   ///
   /// If a property is a key in this map, the type in the corresponding value
@@ -53,6 +59,7 @@ class WidgetSpec<T extends Object> {
     this.mutableProperties = const [],
     this.excludeProperties = const [],
     this.propertyValues = const {},
+    this.propertyDefaultValues = const {},
     this.propertyTypes = const {},
     this.addProperties = const [],
     this.includeSuperProperties = const [],
