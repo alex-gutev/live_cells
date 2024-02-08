@@ -40,6 +40,9 @@ class WidgetSpec<T extends Object> {
   /// List of properties to add to generated wrapper class.
   final List<WidgetPropertySpec> addProperties;
 
+  /// Documentation comment for the generated class.
+  final String? documentation;
+
   const WidgetSpec({
     this.as,
     this.typeArguments = const [],
@@ -47,7 +50,8 @@ class WidgetSpec<T extends Object> {
     this.excludeProperties = const [],
     this.propertyValues = const {},
     this.propertyTypes = const {},
-    this.addProperties = const []
+    this.addProperties = const [],
+    this.documentation
   });
 }
 
@@ -70,11 +74,15 @@ class WidgetPropertySpec<T extends Object> {
   /// Should this property be held in a `MutableCell`?
   final bool mutable;
 
+  /// Documentation comment for this property
+  final String? documentation;
+
   const WidgetPropertySpec({
     required this.name,
     required this.defaultValue,
     this.optional = true,
-    this.mutable = false
+    this.mutable = false,
+    this.documentation
   });
 }
 
