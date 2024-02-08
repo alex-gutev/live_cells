@@ -12,3 +12,15 @@ export 'src/widgets/widgets.dart'
         CellSwitchListTile;
 
 export 'src/widgets/cell_text_field.dart' show CellTextField;
+
+export 'src/widgets/extensions.dart'
+    show
+        WidgetCellValueExtension,
+        TextStyleCellValueExtension,
+        StrutStyleCellValueExtension,
+        TextAlignCellValueExtension,
+        LocaleCellValueExtension,
+        TextOverflowCellValueExtension,
+        TextScalerCellValueExtension,
+        TextWidthBasisCellValueExtension,
+        TextHeightBehaviorCellValueExtension;
