@@ -3,8 +3,10 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cells.dart';
+import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cell_annotations/live_cell_annotations.dart';
+
+import '../cell_widget/cell_widget.dart';
 
 @GenerateCellWidgets([
   WidgetSpec<Align>(

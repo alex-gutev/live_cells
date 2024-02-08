@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:live_cells/live_cells.dart';
+import 'package:live_cells_core/live_cells_core.dart';
 
 /// Extends [Widget] with a [cell] property to wrap the [Widget] in a [ValueCell].
 extension WidgetCellValueExtension<T extends Widget> on T {

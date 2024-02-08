@@ -3,8 +3,7 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../live_cells.dart';
+import 'package:live_cells_core/live_cells_core.dart';
 
 /// A text field widget, similar to [TextField], with content controlled by a [ValueCell].
 ///
