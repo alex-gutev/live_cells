@@ -111,3 +111,27 @@ class GenerateCellWidgets {
 
   const GenerateCellWidgets(this.specs);
 }
+
+/// Specifies that an extensions with the `.cell` property should be generated for the given value types.
+///
+/// **NOTE**: This annotation is currently only for internal use by the `live_cells`
+/// package.
+///
+/// An extension which provides the `.cell` property is generated for every
+/// specification in [specs]. This annotation can be applied to any element.
+class GenerateValueExtensions {
+  /// Specifications of the extensions to generate
+  final List<ExtensionSpec> specs;
+
+  const GenerateValueExtensions(this.specs);
+}
+
+/// Specifier for a cell value extension for [T]
+class ExtensionSpec<T> {
+  /// Should this extension be applied to subclasses of [T] or just [T]
+  final bool forSubclasses;
+
+  const ExtensionSpec({
+    this.forSubclasses = false
+  });
+}
