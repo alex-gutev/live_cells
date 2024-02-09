@@ -1,5 +1,6 @@
 {
-    "name": "docs.page",
+    "name": "Live Cells",
+    "description": "A reactive programming library for Flutter",
     "theme": "#36B9B9",
     "sidebar": [
       ["Home", "/"],
