@@ -1,0 +1,127 @@
+---
+title: Cells
+description: The basic building block of LiveCells.
+---
+
+# Cells
+
+A cell, denoted by the base type `ValueCell`, is an object with a
+value and a set of observers that react to changes in its value,
+you'll see exactly what that means in a moment.
+
+<CodeGroup title="Creating cells">
+```dart
+final a = 1.cell;
+final b = 'hello world'.cell;
+final c = ValueCell.value(someValue);
+```
+</CodeGroup>
+
+The above is an example of *constant cells*, which can be created
+either using the `.cell` property, which is added to the value types
+built into Dart, or the `ValueCell.value` constructor which takes a
+value and wraps it in a `ValueCell`. A constant cell has a value that
+does not change throughout its lifetime. 
+
+The value of any cell is accessed using the `value` property.
+
+<CodeGroup title="Accessing cell values">
+```dart
+print(a.value); // Prints: 1
+print(b.value); // Prints: 'hello world'
+print(c.value); // Prints the value of `someValue`
+```
+</CodeGroup>
+
+## Mutable Cells
+
+Mutable cells, created with the `MutableCell` constructor, hold a
+value that can be set directly.
+
+<CodeGroup title="Creating mutable cells">
+```dart
+final a = MutableCell(0);
+
+print(a.value); // Prints: 0
+
+a.value = 3;
+print(a.value); // Prints: 3
+```
+</CodeGroup>
+
+## Observing Cells
+
+When the value of a cell changes, its observers are notified of the
+change. The simplest way to demonstrate this is to set up an *watch
+function* using `ValueCell.watch`:
+
+<CodeGroup title="Observing cells">
+```dart
+final a = MutableCell(0);
+final b = MutableCell(1);
+
+final watcher = ValueCell.watch(() {
+	print('${a()} + ${b()} = ${a() + b()}');
+});
+
+a.value = 5;  // Prints: 5 + 1 = 6
+b.value = 10; // Prints: 5 + 10 = 15
+```
+</CodeGroup>
+
+
+In the above example a watch function that prints the values of cells
+`a` and `b` to the console, along with their sum, is defined. This
+function is called automatically when the value of either `a` or `b`
+change. **Note**, the value of a cell is referenced using the function
+call syntax, within a watch function, rather than accessing he value
+property directly.
+
+<info>
+
+When you no longer need the watch function to be called, call `stop`
+on the `CellWatcher` object returned by `ValueCell.watch`.
+
+</info>
+
+
+A few things to note from the above example:
+
+1. `ValueCell.watch` registers a watch function which is called
+   automatically when the values of the cells referenced within it, in
+   this case `a` and `b` change.
+   
+   In this case the watch function prints the value of `a` and `b` to
+   the console.
+   
+2. The value of a cell is referenced using the function call synt
+
+## Computed Cells
+
+A *computed cell*, defined using `ValueCell.compute`, is a cell of
+which the value is a function of the values of one or more argument
+cells. Whenever the value of an argument cell changes, the value of
+the computed cell is recomputed.
+
+<CodeGroup title="Computed cells">
+```dart
+final a = MutableCell(1);
+final b = MutableCell(2);
+final sum = ValueCell.computed(() => a() + b());
+```
+</CodeGroup>
+
+In the above example, `sum` is a computed cell of which the value is
+the sum of cells `a` and `b`. The value of `sum` is recomputed
+whenever the values of either `a` or `b` change.
+
+<CodeGroup title="Computed cells">
+```dart
+final watcher = ValueCell.watch(() {
+	print('The sum is ${sum()}');
+});
+
+a.value = 3; // Prints: The sum is 5
+b.value = 4; // Prints: The sum is 7
+```
+</CodeGroup>
