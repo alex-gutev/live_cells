@@ -7,10 +7,10 @@ description: Using cells in widgets
 
 Cells would be pretty boring if you could not use them in widgets.
 
-The simplest way to use the value of a cell is with
+The simplest way to use the value of a cell in a widget is with
 `CellWidget.builder`, which creates a widget that observes one or more
 cells. Whenever the values of the observed cells change, the widget is
-rebuilt.
+rebuilt and the new value of `count` is displayed.
 
 <CodeGroup title="CellWidget.builder">
 ```dart
@@ -70,7 +70,7 @@ directly in the widget builder function. The `cell` method, of the
 `context` parameter passed to the widget builder function, creates a
 cell which is persisted between builds of the widget.
 
-This allows us to reimplement the counter example using the following:
+Using `CellWidget.builder`, the counter can be implemented as follows:
 
 <CodeGroup title="Defining cells using context.cell">
 ```dart
@@ -85,14 +85,14 @@ Widget counter() => CellWidget.builder((context) {
 ```
 </CodeGroup>
 
-In the example above the the `count` cell is defined directly in the
-build function of `CellWidget.builder`, using `context.cell`.
+The `count` cell is defined directly in the build function of
+`CellWidget.builder`, using `context.cell`.
 
 The `cell` method takes a function which defines the cell. This
 function is called the first time the widget is built. On subsequent
 builds, the cell created during the first build is returned.
 
-This is functionally equivalent to the example using
+This is functionally equivalent to the implementation using
 `StatefulWidget`, however much more succinct.
 
 The `cell` method can be used to define multiple cells in a single
@@ -120,7 +120,7 @@ CellWidget.builder((context) {
 ```
 </CodeGroup>
 
-In the example above, are two separate cells are defined in a single
+In the example above, two separate cells are defined in a single
 build function using `context.cell`, each representing a different
 counter.
 
@@ -140,10 +140,10 @@ mixes in `CellInitializer`, more on this in the next section.
 </Warning>
 
 You can also define watch functions within `CellWidget.builder` using
-`context.watch`. Like `context.cell`, the watch function is only setup
+`context.watch`. Like `context.cell`, the watch function is only set up
 during the first build. Unlike a watch function defined using
 `ValueCell.watch`, the watch function is automatically stopped when
-the widget in which it is defined is removed from the tree.
+the widget, in which it is defined, is removed from the tree.
 
 <CodeGroup>
 ```dart
@@ -167,7 +167,7 @@ its build method, instead of passing a build function to
 `CellWidget.builder`.
 
 **NOTE**: To use the `cell` and `watch` methods, the mixin
-`CellInitializer` has to be included by the subclasses. This mixin
+`CellInitializer` has to be included by the subclass. This mixin
 also provides `cell` and `watch` methods directly to the subclass.
 
 The counter example using a `CellWidget` subclass:
