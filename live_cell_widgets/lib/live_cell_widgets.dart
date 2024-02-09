@@ -20,9 +20,13 @@ export 'src/widgets/extensions.dart'
         WidgetCellValueExtension,
         TextStyleCellValueExtension,
         StrutStyleCellValueExtension,
-        TextAlignCellValueExtension,
         LocaleCellValueExtension,
-        TextOverflowCellValueExtension,
         TextScalerCellValueExtension,
-        TextWidthBasisCellValueExtension,
-        TextHeightBehaviorCellValueExtension;
+        TextHeightBehaviorCellValueExtension,
+        ColorCellValueExtension,
+        InputDecorationCellValueExtension,
+        TextAlignVerticalCellValueExtension,
+        RadiusCellValueExtension,
+        EdgeInsetsCellValueExtension,
+        TextSelectionControlsCellValueExtension,
+        TextInputTypeCellValueExtension;
