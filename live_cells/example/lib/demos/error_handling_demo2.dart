@@ -10,13 +10,13 @@ import 'package:live_cells/live_cells.dart';
 ///
 /// The purpose of this example is to demonstrate how the text field validation
 /// functionality can be packaged in a reusable function.
-class ErrorHandlingDemo2 extends CellWidget with CellInitializer {
+class ErrorHandlingDemo2 extends StaticWidget {
   @override
   Widget build(BuildContext context) {
-    final a = cell(() => MutableCell<num>(0));
-    final b = cell(() => MutableCell<num>(0));
+    final a = MutableCell<num>(0);
+    final b = MutableCell<num>(0);
 
-    final sum = cell(() => a + b);
+    final sum = a + b;
 
     return Scaffold(
       appBar: AppBar(
@@ -75,26 +75,22 @@ class ErrorHandlingDemo2 extends CellWidget with CellInitializer {
   /// The field also displays an error message if it is empty or the entered
   /// text is not a valid number
   static Widget inputField(MutableCell<num> cell) {
-    return CellWidget.builder((context) {
-      // Note the use of `context.cell` to persist the cell definitions between
-      // builds of the widget
-      final maybe = context.cell(() => cell.maybe());
-      final content = context.cell(() => maybe.mutableString());
-      final error = context.cell(() => maybe.error);
+    final maybe = cell.maybe();
+    final content = maybe.mutableString();
+    final error = maybe.error;
 
-      final isEmpty = context.cell(() => ValueCell.computed(() => content().isEmpty));
+    final isEmpty = ValueCell.computed(() => content().isEmpty);
 
-      return CellTextField(
-        content: content,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
+    return CellTextField(
+      content: content,
+      keyboardType: TextInputType.number.cell,
+      decoration: ValueCell.computed(() => InputDecoration(
           errorText: isEmpty()
               ? 'Cannot be empty'
               : error() != null
               ? 'Not a valid number'
               : null
-        ),
-      );
-    });
+      )),
+    );
   }
 }

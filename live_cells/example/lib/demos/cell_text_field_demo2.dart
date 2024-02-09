@@ -37,9 +37,9 @@ class CellTextFieldDemo2 extends CellWidget with CellInitializer {
                       child: CellTextField(
                         content: input,
                         selection: selection,
-                        maxLines: null,
-                        expands: true,
-                        decoration: const InputDecoration(border: OutlineInputBorder()),
+                        maxLines: null.cell,
+                        expands: true.cell,
+                        decoration: const InputDecoration(border: OutlineInputBorder()).cell,
                       ),
                     ),
                     const SizedBox(height: 10),

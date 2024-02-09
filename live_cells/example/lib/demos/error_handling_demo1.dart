@@ -8,20 +8,20 @@ import 'package:live_cells/live_cells.dart';
 /// Specifically the example uses `mutableString` and `CellTextField` to
 /// retrieve numeric input from a text field whilst handling invalid input by
 /// displaying and error message under the field.
-class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
+class ErrorHandlingDemo1 extends StaticWidget {
   @override
   Widget build(BuildContext context) {
     // Cells holding the parsed `num` values from fields `a` and `b`
     // These can also be used to reset the content of the fields
-    final a = cell(() => MutableCell<num>(0));
-    final b = cell(() => MutableCell<num>(0));
+    final a = MutableCell<num>(0);
+    final b = MutableCell<num>(0);
 
     // Maybe cells for cells `a` and `b`.
     //
     // The purpose of the Maybe is to capture any errors which occur during
     // parsing of `a` and `b` and store these cells so they can be handled.
-    final maybeA = cell(() => a.maybe());
-    final maybeB = cell(() => b.maybe());
+    final maybeA = a.maybe();
+    final maybeB = b.maybe();
 
     // String cells for fields `a` and b`.
     //
@@ -32,17 +32,17 @@ class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
     //
     // These cells are passed to the `content` parameter of the [CellTextField]
     // constructor.
-    final strA = cell(() => maybeA.mutableString());
-    final strB = cell(() => maybeB.mutableString());
+    final strA = maybeA.mutableString();
+    final strB = maybeB.mutableString();
 
     // Cells holding the errors assigned to `maybeA` and `maybeB`. If there
     // was no error during parsing, these cells hold `null`.
-    final errorA = cell(() => maybeA.error);
-    final errorB = cell(() => maybeB.error);
+    final errorA = maybeA.error;
+    final errorB = maybeB.error;
 
     // A computed cell demonstrating that `a` and `b` can be used as any other
     // cell
-    final sum = cell(() => a + b);
+    final sum = a + b;
 
     return Scaffold(
       appBar: AppBar(
@@ -60,12 +60,12 @@ class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
                   Expanded(
                     child: CellTextField(
                       content: strA,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      keyboardType: TextInputType.number.cell,
+                      decoration: ValueCell.computed(() => InputDecoration(
                         errorText: errorA() != null
                             ? 'Please enter a valid number'
                             : null
-                      ),
+                      )),
                     ),
                   ),
                   const SizedBox(width: 5),
@@ -74,12 +74,12 @@ class ErrorHandlingDemo1 extends CellWidget with CellInitializer {
                   Expanded(
                     child: CellTextField(
                       content: strB,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      keyboardType: TextInputType.number.cell,
+                      decoration: ValueCell.computed(() => InputDecoration(
                           errorText: errorB() != null
                               ? 'Please enter a valid number'
                               : null
-                      ),
+                      )),
                     ),
                   ),
                 ],

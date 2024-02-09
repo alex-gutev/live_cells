@@ -46,7 +46,7 @@ class MutableComputedCellDemo extends CellWidget with CellInitializer {
                   Expanded(
                     child: CellTextField(
                       content: strA,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.number.cell,
                     ),
                   ),
                   const SizedBox(width: 5),
@@ -55,7 +55,7 @@ class MutableComputedCellDemo extends CellWidget with CellInitializer {
                   Expanded(
                     child: CellTextField(
                       content: strB,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.number.cell,
                     ),
                   ),
                 ],

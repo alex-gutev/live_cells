@@ -154,11 +154,11 @@ class CellRestorationDemo extends RestorableCellWidget {
               const Text('Text field for numeric input:'),
               CellTextField(
                 content: cell(() => numMaybe.mutableString()),
-                decoration: InputDecoration(
+                decoration: cell(() => ValueCell.computed(() => InputDecoration(
                   errorText: numError() != null
                       ? 'Not a valid number'
                       : null
-                ),
+                )), restorable: false),
               ),
               const SizedBox(height: 10),
 
