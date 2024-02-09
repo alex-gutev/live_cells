@@ -126,7 +126,10 @@ class GenerateValueExtensions {
   const GenerateValueExtensions(this.specs);
 }
 
-/// Specifier for a cell value extension for [T]
+/// Specifier for a cell value extension for [T].
+///
+/// **NOTE**: This is currently only for internal use by the `live_cells`
+/// package.
 class ExtensionSpec<T> {
   /// Should this extension be applied to subclasses of [T] or just [T]
   final bool forSubclasses;
