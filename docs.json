@@ -7,6 +7,7 @@
         ["Cells", "/cells"],
         ["Cells in Widgets", "/cell-widgets"],
         ["Cell Expressions", "/cell-expressions"],
-        ["Live Cell Widgets", "/live-cell-widgets"]
+        ["Live Cell Widgets", "/live-cell-widgets"],
+        ["Two-way Data Flow", "/two-way-data-flow"]
     ]
 }
