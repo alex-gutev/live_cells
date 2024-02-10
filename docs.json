@@ -10,6 +10,7 @@
         ["Live Cell Widgets", "/live-cell-widgets"],
         ["Two-Way Data Flow", "/two-way-data-flow"],
         ["Error Handling", "/error-handling"],
-        ["State Restoration", "/state-restoration"]
+        ["State Restoration", "/state-restoration"],
+        ["User Defined Types", "/user-defined-types"]
     ]
 }
