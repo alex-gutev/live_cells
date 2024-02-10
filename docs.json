@@ -6,6 +6,7 @@
         ["Home", "/"],
         ["Cells", "/cells"],
         ["Cells in Widgets", "/cell-widgets"],
-        ["Cell Expressions", "/cell-expressions"]
+        ["Cell Expressions", "/cell-expressions"],
+        ["Live Cell Widgets", "/live-cell-widgets"]
     ]
 }
