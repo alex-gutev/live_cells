@@ -9,6 +9,7 @@
         ["Cell Expressions", "/cell-expressions"],
         ["Live Cell Widgets", "/live-cell-widgets"],
         ["Two-Way Data Flow", "/two-way-data-flow"],
-        ["Error Handling", "/error-handling"]
+        ["Error Handling", "/error-handling"],
+        ["State Restoration", "/state-restoration"]
     ]
 }
