@@ -8,6 +8,7 @@
         ["Cells in Widgets", "/cell-widgets"],
         ["Cell Expressions", "/cell-expressions"],
         ["Live Cell Widgets", "/live-cell-widgets"],
-        ["Two-Way Data Flow", "/two-way-data-flow"]
+        ["Two-Way Data Flow", "/two-way-data-flow"],
+        ["Error Handling", "/error-handling"]
     ]
 }
