@@ -5,6 +5,7 @@
     "sidebar": [
         ["Home", "/"],
         ["Cells", "/cells"],
-        ["Cells in Widgets", "/cell-widgets"]
+        ["Cells in Widgets", "/cell-widgets"],
+        ["Cell Expressions", "/expressions"]
     ]
 }

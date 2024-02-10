@@ -1,0 +1,334 @@
+---
+title: Cell Expressions
+description: Using cells in expressions
+---
+
+# Cell Expressions
+
+This library provides a number of tools for building expressions of
+cells without requiring a computed cell to be created explicitly using
+`ValueCell.computed`.
+
+## Arithmetic
+
+The arithmetic and relational (`<`, `<=`, `>`, `>=`) operators, when
+applied to cells holding numeric value, return cells which compute the
+result of the expression.
+
+This allows a computation to be defined directly as an expression of
+cells. For example the following cell computes the sum of two cells:
+
+<CodeGroup title="Arithmetic Expressions">
+```dart
+final a = MutableCell(1);
+final b = MutableCell(2);
+
+final sum = a + b;
+```
+</CodeGroup>
+
+<Info>
+This definition of the sum cell is not only simpler than the
+definition using `ValueCell.computed` but is also more efficient since
+the argument cells are determined at compile-time.
+</Info>
+
+The `sum` cell is a cell like any other, and can be observed by a
+watch function, observed by a widget (using `CellWidget`) and can
+appear as an argument in a computed cell.
+
+<CodeGroup title="Observing expression cells">
+```dart
+final watcher = ValueCell.watch(() => print('${sum()}'));
+
+a.value = 5; // Prints: 7
+b.value = 4; // Prints: 9
+```
+</CodeGroup>
+
+Expressions of cells can be arbitrarily complex:
+
+<CodeGroup>
+```dart
+final x = a * b + c / d;
+final y = x < e;
+```
+</CodeGroup>
+
+<Info>
+To include a constant in a cell expression, use the `.cell` property
+on the constant if available or wrap it in a cell using
+`ValueCell.value`.
+</Info>
+
+## Equality
+
+Every cell provides the `eq` and `neq` methods for comparing the cell
+to another cell for equality. Like the arithmetic operators, these
+methods return cells which perform the comparison.
+
+<CodeGroup title="Equality Comparison">
+```dart
+final eq = a.eq(b);   // eq() == true when a() == b()
+final neq = a.neq(b); // neq() == true when a() != b()
+```
+</CodeGroup>
+
+## Logic and selection
+
+Cells holding `bool` values are extended with the following methods:
+
+<dl>
+<dt>`and`</dt>
+<dd>Creates a cell with a value that is the logical and of two cells</dd>
+<dt>`or`</dt>
+<dd>Creates a cell with a value that is the logical or of two cells</dd>
+<dt>`not`</dt>
+<dd>Creates a cell with a value which is the logical `not` of a cell</dd>
+<dt>`select`</dt>
+<dd>Creates a cell which selects between the values of two cells based on a condition</dd>
+</dl>
+
+<CodeGroup title="Logic and selection expressions">
+```dart
+final cond = a.or(b);           // cond() is true when a() || b() is true
+final cell = cond.select(c, d); // when cond() is true, cell() == c() else cell() == d()
+
+a.value = true;
+c.value = 1;
+d.value = 2;
+
+print(cell.value); // Prints: 1
+
+a.value = false;
+b.value = false;
+
+print(cell.value); // Prints: 2
+```
+</CodeGroup>
+
+The second argument of `select` can be omitted, in which case the
+cell's value will not be updated if the condition is false:
+
+<CodeGroup title="Single argument select">
+```dart
+final cell = cond.select(c);
+
+cond.value = true;
+a.value = 2;
+
+print(cell.value); // Prints 2
+
+cond.value = false;
+a.value = 4;
+
+print(cell.value); // Prints 2
+```
+</CodeGroup>
+
+## Aborting a computation
+
+In the previous section we saw that the `select` method creates a cell
+which does not update its argument when the condition cell is `false`
+and its only given one argument. Under the hood, `select` isn't some
+special kind of cell but uses `ValueCell.none` to abort the
+computation.
+
+When `ValueCell.none` is called inside a computed cell, the
+computation of the cell's value is aborted and its current value is
+preserved. This can be used to prevent a cell's value from being
+recomputed when a condition is not met:
+
+<CodeGroup title="Example of ValueCell.none()">
+```dart
+final a = MutableCell(4);
+final b = ValueCell.computed(() => a() < 10 ? a() : ValueCell.none());
+
+a.value = 6;
+print(b.value); // Prints 6
+
+a.value = 15;
+print(b.value); // Prints 6
+
+a.value = 8;
+print(b.value); // Prints 8
+```
+</CodeGroup>
+
+If `ValueCell.none()` is called during the computation of the cell's
+first value, the cell's value is assigned to `null` by default. If a
+different default value is desired, `ValueCell.none` takes an optional
+argument which is the default value to assign to the cell in this
+case. For example `ValueCell.none(3)` will assign the value `3` by
+default.
+
+<Warning>
+The value of a computed cell is only computed if it is actually
+referenced. `ValueCell.none` only preserves the current value of the
+cell, but this might not be the latest value of the cell if the cell's
+value is only referenced conditionally. A good rule of thumb is to use
+`ValueCell.none` only for preventing a cell from holding an invalid
+value.
+</Warning>
+
+## Exception Handling
+
+If an exception is thrown during the computation of a cell's value, it will be propagated to all 
+points where the value is referenced. This allows exceptions to be handled using `try` and `catch`
+inside computed cells:
+
+<CodeGroup title="Exception handling in computed cells">
+```dart
+final str = MutableCell('0');
+final n = ValueCell.computed(() => int.parse(str()));
+
+final isValid = ValueCell.computed(() {
+  try {
+    return n() > 0;
+  }
+  catch (e) {
+    return false;
+  }
+});
+
+print(isValid.value); // Prints false
+
+str.value = '5';
+print(isValid.value); // Prints true
+
+str.value = 'not a number';
+print(isValid.value); // Prints false
+```
+</CodeGroup>
+
+This library provides two utility methods, `onError` and `error`, for
+handling exceptions thrown in computed cells.
+
+The `onError` method creates a cell that selects the value of another
+cell when an exception is thrown. The `error` method creates a cell
+which holds the exception thrown or `null` if no exception is thrown.
+
+<Codegroup title="Example of onError">
+```dart
+final str = MutableCell('0');
+final m = MutableCell(2);
+final n = ValueCell.computed(() => int.parse(str()));
+
+final result = n.onError(m); // Equal to n(). If n() throws, equal to m();
+
+str.value = '3';
+print(result.value); // Prints 3
+
+str.value = 'not a number';
+print(result.value); // Prints 2
+```
+</CodeGroup>
+
+`onError` is a generic method with a type argument which when given, only exceptions of the given
+type are handled.
+
+<CodeGroup title="Handling specific exceptions with onError">
+```dart
+final result = n.onError<FormatException>(m); // Only handles FormatException
+```
+</CodeGroup>
+
+The above validation logic can be implemented more succinctly using:
+
+<CodeGroup title="Putting it all together">
+```dart
+final str = MutableCell('0');
+final n = ValueCell.computed(() => int.parse(str()));
+final isValid = (n > 0.cell).onError(false.cell);
+```
+</CodeGroup>
+
+<Info>
+We used `0.cell` and `false.cell` to create constant cells that hold
+the values `0` and `false`, respectively.
+</Info>
+
+## Previous Values
+
+The `previous` property can be used to retrieve the previous values of cells:
+
+<CodeGroup title="Retrieving previous cell values">
+```dart
+final a = MutableCell(0);
+final prev = a.previous;
+
+final sum = ValueCell.computed(() => a() + prev());
+
+a.value = 1;
+print(a.value);    // Prints 1
+print(prev.value); // Prints 0
+print(sum.value);  // Prints 1
+
+a.value = 5;
+print(a.value);    // Prints 5
+print(prev.value); // Prints 1
+print(sum.value);  // Prints 6
+```
+</CodeGroup>
+
+<Info>
+The `previous` property returns a cell, which can be used like any
+other cell. This is also a keyed cell. Keyed cells share a common
+state identified by a key. This allows you to call the `previous`
+property multiple times and even though a new cell instance is
+returned every time it is called, every instance created by `previous`
+on the same cell, shares the same state.
+</Info>
+
+<Warning>
+* On creation `prev` does not hold a value. Accessing it will throw an `UninitializedCellError`.
+* For `prev` to actually keep track of the previous value of `a`, `prev` must be observed, either
+  by another cell, a `CellWidget` or a *watch function*.
+</Warning>
+
+## Peeking Cells
+
+What if you want to use the value of a cell in a computed cell but
+don't want changes to that cell's value triggering a
+recomputation. The peek property allows you to do exactly that.
+
+<CodeGroup title="Example of .peek">
+```dart
+final a = MutableCell(0);
+final b = MutableCell(1);
+
+final c = ValueCell.computed(() => a() + b.peek());
+
+final watch = ValueCell.watch(() => print('${c()}'));
+
+a.value = 3; // Prints: 4
+b.value = 5; // Doesn't print anything
+a.value = 7; // Prints: 13
+```
+</CodeGroup>
+
+In the above example cell `c` is a computed cell referencing the value
+of `a` and *peeks* the value of `b`. Changing the value of `a`
+triggers a recomputation of `c`, and hence triggers the watch function
+which prints to the console, but changing the value of `b` doesn't
+trigger a recomputation of `c`.
+
+<Info>
+`peek` returns a cell.
+</Info>
+
+You may be asking why do we need `peek` here instead of just accessing
+the value of `b` directly `b.value`. Something we've glossed over till
+this point is the lifecycle of cells. Cells are only active while they
+are actually observed, and are activated when the first observer is
+added. While active cells react to changes in their argument
+cells. When the last observer is removed, cell's are deactivated and
+stop observing their argument cells. When a new observer is added,
+they are reactivated again. Essentially, this means that the value of
+a cell may no longer be current if it doesn't have at least one
+observer. For a computed cells this is not a problem, since when it is
+inactive it computes its value on demand, but it may cause issues with
+other cells, such as the `previous` cells. The `peek` property takes
+care of adding an observer to the peeked cell, so that it remains
+active, but at the same time prevents the observers, added through
+`peek`, from being notified of the change in value.
