@@ -109,8 +109,8 @@ a widget which displays the sum of the two numbers entered and a
 <CodeGroup title="Text field for numeric input">
 ```dart
 Widget example() => StaticWidget.builder((_) {
-    final a = MutableCell(0);
-    final b = MutableCell(0);
+    final a = MutableCell<num>(0);
+    final b = MutableCell<num>(0);
     
     final sum = a + b;
     
