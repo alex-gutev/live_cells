@@ -7,6 +7,11 @@
             "title": "Pub.dev Package",
             "icon": "cube",
             "link": "https://pub.dev/packages/live_cells"
+        },
+        {
+            "title": "Live Cell Extension",
+            "icon": "cube",
+            "link": "https://pub.dev/packages/live_cell_extension"
         }
     ],
     "sidebar": [
