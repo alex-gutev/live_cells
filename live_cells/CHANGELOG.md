@@ -1,3 +1,22 @@
+## 0.11.0
+
+This release divides the functionality of this package among component packages:
+
+* [live_cell_core](https://pub.dev/packages/live_cells_core)
+* [live_cell_widgets](https://pub.dev/packages/live_cell_widgets)
+
+Additionally the full documentation is now available at: <https://docs.page/alex-gutev/live_cells>.
+
+New Features:
+
+* Wrapper classes for more widgets
+* `.peek` property for accessing the value of a cell without triggering a recomputation
+
+Breaking Changes:
+
+* Minimum SDK version increased to 3.0.0
+* All properties of the widgets provided by `live_cell_widgets` are now cells
+
 ## 0.10.3
 
 * Change `live_cell_annotations` version to `0.2.0`.
