@@ -146,7 +146,7 @@ final isValid = (n > 0.cell).onError(false.cell);
 
 ### Previous Values
 
-The previous value of a cell can be accessed using `.previous`, which is itslef a cell:
+The previous value of a cell can be accessed using `.previous`, which is itself a cell:
 
 ```dart
 final a = MutableCell(0);
@@ -217,7 +217,7 @@ return CellTextField(
 
 ### Property Accessors for your own types:
 
-With [live_cell_extension](https://pub.dev/packages/live_cell_extension) you can generated cell
+With [live_cell_extension](https://pub.dev/packages/live_cell_extension) you can generate cell
 accessors for your own classes:
 
 ```dart
