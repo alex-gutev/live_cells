@@ -12,7 +12,7 @@ environment:
 
 dependencies:
   collection: ^1.18.0
-  live_cell_annotations: ^0.3.0
+  live_cell_annotations: ^0.4.0
   live_cells_core: 0.11.0
 
   flutter:
@@ -23,4 +23,4 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   build_runner: ^2.4.8
-  live_cell_extension: 0.2.0
+  live_cell_extension: ^0.3.0
