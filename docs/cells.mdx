@@ -111,7 +111,7 @@ on the `CellWatcher` object returned by `ValueCell.watch`.
 
 ## Computed Cells
 
-A *computed cell*, defined using `ValueCell.compute`, is a cell of
+A *computed cell*, defined using `ValueCell.computed`, is a cell
 with a value that is defined as a function of the values of one or
 more argument cells. Whenever the value of an argument cell changes,
 the value of the computed cell is recomputed.
@@ -146,7 +146,7 @@ In this example:
 2. The value of `a` is set to `3`, which:
    1. Causes the value of `sum` to be recomputed
    2. Calls the watch function set up in 1.
-3. The value of `a` is set to `4`, which likewise also results in the
+3. The value of `b` is set to `4`, which likewise also results in the
    sum being recomputed and the watch function being called.
 
 ## Batch Updates
