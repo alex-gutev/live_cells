@@ -254,9 +254,8 @@ void main() {
       final op = MutableCell('');
 
       final sum = a + b;
-      final msg = [a, b, op, sum].computeCell(
-              () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
-      );
+      final msg = (a, b, op, sum)
+          .apply((a, b, op, sum) => '$a $op $b = $sum');
 
       final observer = MockSimpleObserver();
       msg.addObserver(observer);
@@ -456,7 +455,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = [a,b].computeCell(() => a.value + b.value);
+      final c = (a,b).apply((a, b) => a + b);
 
       a.value = 5;
 
@@ -467,7 +466,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = [a,b].computeCell(() => a.value + b.value);
+      final c = (a,b).apply((a, b) => a + b);
 
       b.value = 8;
 
@@ -478,7 +477,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = [a,b].computeCell(() => a.value + b.value);
+      final c = (a,b).apply((a, b) => a + b);
 
       final observer = MockSimpleObserver();
       c.addObserver(observer);
@@ -492,7 +491,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = [a,b].computeCell(() => a.value + b.value);
+      final c = (a,b).apply((a, b) => a + b);
 
       final observer = MockSimpleObserver();
       c.addObserver(observer);
@@ -506,7 +505,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = [a,b].computeCell(() => a.value + b.value);
+      final c = (a,b).apply((a, b) => a + b);
 
       final observer = MockSimpleObserver();
       c.addObserver(observer);
@@ -522,7 +521,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = [a,b].computeCell(() => a.value + b.value);
+      final c = (a,b).apply((a, b) => a + b);
 
       final observer = MockSimpleObserver();
 
@@ -540,7 +539,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final c = [a,b].computeCell(() => a.value + b.value);
+      final c = (a,b).apply((a, b) => a + b);
 
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
@@ -560,8 +559,8 @@ void main() {
       final a = MutableCell(0);
       final b = MutableCell(1);
 
-      final c1 = [a, b].computeCell(() => a.value + b.value, key: 'theKey');
-      final c2 = [a, b].computeCell(() => a.value + b.value, key: 'theKey');
+      final c1 = (a, b).apply((a, b) => a + b, key: 'theKey');
+      final c2 = (a, b).apply((a, b) => a + b, key: 'theKey');
 
       expect(c1 == c2, isTrue);
       expect(c1.hashCode == c2.hashCode, isTrue);
@@ -571,8 +570,8 @@ void main() {
       final a = MutableCell(0);
       final b = MutableCell(1);
 
-      final c1 = [a, b].computeCell(() => a.value + b.value, key: 'theKey1');
-      final c2 = [a, b].computeCell(() => a.value + b.value, key: 'theKey2');
+      final c1 = (a, b).apply((a, b) => a + b, key: 'theKey1');
+      final c2 = (a, b).apply((a, b) => a + b, key: 'theKey2');
 
       expect(c1 != c2, isTrue);
     });
@@ -581,8 +580,8 @@ void main() {
       final a = MutableCell(0);
       final b = MutableCell(1);
 
-      final c1 = [a, b].computeCell(() => a.value + b.value);
-      final c2 = [a, b].computeCell(() => a.value + b.value);
+      final c1 = (a, b).apply((a, b) => a + b);
+      final c2 = (a, b).apply((a, b) => a + b);
 
       expect(c1 != c2, isTrue);
       expect(c1 == c1, isTrue);
@@ -942,7 +941,7 @@ void main() {
 
     test('Previous StoreCell.value preserved if ValueCell.none is used', () {
       final a = MutableCell(0);
-      final evens = [a].computeCell(() => a.value.isEven ? a.value : ValueCell.none()).store();
+      final evens = a.apply((a) => a.isEven ? a : ValueCell.none()).store();
 
       final observer = addObserver(evens, MockValueObserver());
 
@@ -957,7 +956,7 @@ void main() {
 
     test('StoreCell.value initialized to defaultValue if ValueCell.none is used', () {
       final a = MutableCell(1);
-      final evens = [a].computeCell(() => a.value.isEven ? a.value : ValueCell.none(10)).store();
+      final evens = a.apply((a) => a.isEven ? a : ValueCell.none(10)).store();
 
       final observer = addObserver(evens, MockValueObserver());
 
@@ -971,7 +970,7 @@ void main() {
 
     test('Exception on initialization of value reproduced on value access', () {
       final a = MutableCell(0);
-      final cell = [a].computeCell(() => a() == 0 ? throw Exception() : a());
+      final cell = (a).apply((a) => a == 0 ? throw Exception() : a);
       final store = cell.store();
 
       expect(() => store.value, throwsException);
@@ -979,7 +978,7 @@ void main() {
 
     test('Exception on initialization of value reproduced on value access while observed', () {
       final a = MutableCell(0);
-      final cell = [a].computeCell(() => a() == 0 ? throw Exception() : a());
+      final cell = a.apply((a) => a == 0 ? throw Exception() : a);
       final store = cell.store();
 
       observeCell(store);
@@ -1608,9 +1607,8 @@ void main() {
       final op = MutableCell('');
 
       final sum = a + b;
-      final msg = [a, b, op, sum].computeCell(
-              () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
-      );
+      final msg = (a, b, op, sum)
+          .apply((a, b, op, sum) => '$a $op $b = $sum');
 
       final observer = MockValueObserver();
       msg.addObserver(observer);
@@ -1639,9 +1637,8 @@ void main() {
       final op = MutableCell('');
 
       final sum = (a + b).store();
-      final msg = [a, b, op, sum].computeCell(
-              () => '${a.value} ${op.value} ${b.value} = ${sum.value}'
-      );
+      final msg = (a, b, op, sum)
+          .apply((a, b, op, sum) => '$a $op $b = $sum');
 
       final observer = MockValueObserver();
       msg.addObserver(observer);

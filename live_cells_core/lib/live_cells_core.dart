@@ -20,8 +20,21 @@ export 'src/mutable_cell/mutable_cell_view.dart' show MutableCellView;
 
 export 'src/compute_cell/compute_cell.dart' show ComputeCell;
 export 'src/compute_cell/store_cell.dart' show StoreCell, StoreCellExtension;
+
 export 'src/extensions/compute_extension.dart'
-    show ComputeExtension, ListComputeExtension;
+    show
+        ComputeExtension,
+        ListComputeExtension,
+        RecordComputeExtension2,
+        RecordComputeExtension3,
+        RecordComputeExtension4,
+        RecordComputeExtension5,
+        RecordComputeExtension6,
+        RecordComputeExtension7,
+        RecordComputeExtension8,
+        RecordComputeExtension9,
+        RecordComputeExtension10;
+
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
 export 'src/compute_cell/peek_cell.dart' show PeekCellExtension;
 export 'src/maybe_cell/maybe.dart'
@@ -33,30 +46,30 @@ export 'src/previous_values/prev_value_cell.dart'
 export 'src/extensions/numeric_extension.dart' show NumericExtension;
 export 'src/extensions/values_extension.dart'
     show
-    NumValueCellExtension,
-    StringValueCellExtension,
-    BoolValueCellExtension,
-    NullValueCellExtension,
-    EnumValueCellExtension;
+        NumValueCellExtension,
+        StringValueCellExtension,
+        BoolValueCellExtension,
+        NullValueCellExtension,
+        EnumValueCellExtension;
 
 export 'src/extensions/duration_extension.dart'
     show
-    DurationCellExtension,
-    MutableDurationCellExtension,
-    DurationCellConstructorExtension;
+        DurationCellExtension,
+        MutableDurationCellExtension,
+        DurationCellConstructorExtension;
 
 export 'src/extensions/bool_extension.dart' show BoolCellExtension;
 export 'src/extensions/error_handling_extension.dart' show ErrorCellExtension;
 
 export 'src/extensions/conversion_extensions.dart'
     show
-    ParseIntExtension,
-    ParseDoubleExtension,
-    ParseNumExtension,
-    ParseMaybeIntExtension,
-    ParseMaybeDoubleExtension,
-    ParseMaybeNumExtension,
-    ConvertStringExtension;
+        ParseIntExtension,
+        ParseDoubleExtension,
+        ParseNumExtension,
+        ParseMaybeIntExtension,
+        ParseMaybeDoubleExtension,
+        ParseMaybeNumExtension,
+        ConvertStringExtension;
 
 export 'src/async_cell/delay_cell.dart' show DelayCell;
 

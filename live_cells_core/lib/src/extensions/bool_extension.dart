@@ -1,18 +1,23 @@
+import '../compute_cell/compute_cell.dart';
 import 'compute_extension.dart';
 import '../value_cell.dart';
 
 /// Extends [bool] cells with logical and selection operators
 extension BoolCellExtension on ValueCell<bool> {
   /// Create a new cell which is the logical and of [this] and [other].
-  ValueCell<bool> and(ValueCell<bool> other) =>
-      [this, other].computeCell(() => value && other.value);
+  ValueCell<bool> and(ValueCell<bool> other) => ComputeCell(
+      compute: () => value && other.value,
+      arguments: [this, other]
+  );
 
   /// Create a new cell which is the logical or of [this] and [other].
-  ValueCell<bool> or(ValueCell<bool> other) =>
-      [this, other].computeCell(() => value || other.value);
+  ValueCell<bool> or(ValueCell<bool> other) => ComputeCell(
+      compute: () => value && other.value,
+      arguments: [this, other]
+  );
 
   /// Create a new cell which is the logical not of [this].
-  ValueCell<bool> not() => [this].computeCell(() => !value);
+  ValueCell<bool> not() => apply((value) => !value);
 
   /// Create a new cell which selects between the values of two cells based on [this].
   ///

@@ -52,38 +52,38 @@ extension DurationCellExtension on ValueCell<Duration> {
 
   /// Returns a cell which holds the sum of [this] and [other].
   ValueCell<Duration> operator +(ValueCell<Duration> other) =>
-      [this, other].computeCell(() => value + other.value);
+      (this, other).apply((a, b) => a + b);
 
   /// Returns a cell which holds the subtraction of [other] from [this].
   ValueCell<Duration> operator -(ValueCell<Duration> other) =>
-      [this, other].computeCell(() => value - other.value);
+      (this, other).apply((a, b) => a - b);
 
   /// Returns a cell which holds the multiplication of [this] by [factor].
   ValueCell<Duration> operator *(ValueCell<num> factor) =>
-      [this, factor].computeCell(() => value * factor.value);
+      (this, factor).apply((a, f) => a * f);
 
   /// Returns a cell which holds the division of [this] by [quotient].
   ValueCell<Duration> operator ~/(ValueCell<int> quotient) =>
-      [this, quotient].computeCell(() => value ~/ quotient.value);
+      (this, quotient).apply((a, q) => a ~/ q);
 
   /// Returns a cell which holds the negation of [this].
   ValueCell<Duration> operator -() => _getProp('-()', (d) => -d);
 
   /// Returns a cell of which the value is true if [this] is less than [other]
   ValueCell<bool> operator <(ValueCell<Duration> other) =>
-      [this, other].computeCell(() => value < other.value);
+      (this, other).apply((a, b) => a < b);
 
   /// Returns a cell of which the value is true if [this] is greater than [other]
   ValueCell<bool> operator >(ValueCell<Duration> other) =>
-      [this, other].computeCell(() => value > other.value);
+      (this, other).apply((a, b) => a > b);
 
   /// Returns a cell of which the value is true if [this] is less than or equal to [other]
   ValueCell<bool> operator <=(ValueCell<Duration> other) =>
-      [this, other].computeCell(() => value <= other.value);
+      (this, other).apply((a, b) => a <= b);
 
   /// Returns a cell of which the value is true if [this] is greater than or equal to [other]
   ValueCell<bool> operator >=(ValueCell<Duration> other) =>
-      [this, other].computeCell(() => value >= other.value);
+      (this, other).apply((a, b) => a >= b);
 
   // Private
 

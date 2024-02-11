@@ -74,8 +74,8 @@ extension CellMaybeExtension<T> on MutableCell<T> {
 /// Extends [MaybeCell] with [Maybe] property accessors.
 extension MaybeCellExtension<T> on ValueCell<Maybe<T>> {
   /// A cell which evaluates to the [error] of the [Maybe].
-  ValueCell get error => [this].computeCell(() => value.error);
+  ValueCell get error => apply((value) => value.error);
 
   /// A cell which evaluates to the unwrapped value (by [Maybe.unwrap]) of the [Maybe].
-  ValueCell get unwrap => [this].computeCell(() => value.unwrap);
+  ValueCell get unwrap => apply((value) => value.unwrap);
 }

@@ -10,39 +10,39 @@ import '../value_cell.dart';
 /// whenever the value of one of the argument cells changes.
 extension NumericExtension on ValueCell<num> {
   ValueCell<num> operator + (ValueCell<num> other) =>
-      [this, other].computeCell(() => value + other.value);
+      (this, other).apply((a, b) => a + b);
 
   ValueCell<num> operator - (ValueCell<num> other) =>
-      [this, other].computeCell(() => value - other.value);
+      (this, other).apply((a, b) => a - b);
 
   ValueCell<num> operator - () => apply((value) => -value);
 
   ValueCell<num> operator * (ValueCell<num> other) =>
-      [this, other].computeCell(() => value * other.value);
+      (this, other).apply((a, b) => a * b);
 
   ValueCell<num> operator / (ValueCell<num> other) =>
-      [this, other].computeCell(() => value / other.value);
+      (this, other).apply((a, b) => a / b);
 
   ValueCell<num> operator ~/ (ValueCell<num> arg) =>
-      [this, arg].computeCell(() => value ~/ arg.value);
+      (this, arg).apply((a, b) => a ~/ b);
 
   ValueCell<num> operator % (ValueCell<num> other) =>
-      [this, other].computeCell(() => value % other.value);
+      (this, other).apply((a, b) => a % b);
 
   ValueCell<num> remainder(ValueCell<num> other) =>
-      [this, other].computeCell(() => value.remainder(other.value));
+      (this, other).apply((a, b) => a.remainder(b));
 
   ValueCell<bool> operator < (ValueCell<num> other) =>
-      [this, other].computeCell(() => value < other.value);
+      (this, other).apply((a, b) => a < b);
 
   ValueCell<bool> operator <= (ValueCell<num> other) =>
-      [this, other].computeCell(() => value <= other.value);
+      (this, other).apply((a, b) => a <= b);
 
   ValueCell<bool> operator > (ValueCell<num> other) =>
-      [this, other].computeCell(() => value > other.value);
+      (this, other).apply((a, b) => a > b);
 
   ValueCell<bool> operator >= (ValueCell<num> other) =>
-      [this, other].computeCell(() => value >= other.value);
+      (this, other).apply((a, b) => a >= b);
 
   ValueCell<bool> get isNaN => apply((value) => value.isNaN);
 
