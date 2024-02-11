@@ -6,7 +6,7 @@ description: Live cell widgets library
 # Live Cell Widgets
 
 Besides the core cell functionality, this library also comes with a
-collection of widgets which extend the stock Flutter widgets with
+collection of widgets that extend the stock Flutter widgets with
 functionality which allows their properties to be accessed and
 controlled by cells.
 
@@ -43,7 +43,7 @@ Widget example() => CellWidget.builder((c) {
 ```
 </CodeGroup>
 
-In the example above a `CellText` with its data property bound to the
+In the example above a `CellText` is created with its data property bound to the
 cell `content`, which initially holds the empty string. The button
 below sets the value of `content` to the string "Hi!". This value is
 then displayed in the `CellText` widget.
@@ -78,12 +78,12 @@ Cells can be used for more than just setting and automatically
 updating the values of widget properties. They can also be used to
 retrieve and observe the values of widget properties.
 
-Widgets which are used to for retrieving input from the user, take
-mutable cells for the properties which represents the user input. For
+Widgets which are used for retrieving input from the user, take
+mutable cells for the properties which represent the user input. For
 example `CellSwitch`, the Live Cells equivalent of Flutter's `Switch`
 takes a mutable cell for its `value` property, which represents the
 state of the switch. Setting the value of the cell updates the state
-of the switch, similarly when the user changes changes the state of
+of the switch, similarly when the user changes the state of
 the switch, the value of the cell is changed to reflect the state.
 
 <CodeGroup title="CellSwitch example">
@@ -118,7 +118,7 @@ widget.
 
 Notice how user input was handled in a declarative manner entirely
 using cells. There was no need for `onChanged` callbacks, in-fact
-`CellSwitch` doesn't take an `onChanged` callback.
+`CellSwitch` doesn't even take an `onChanged` argument.
 
 `CellTextField` is another widget which uses cells to handle user
 input. Unlike `TextField` which takes a `TextEditingController`,
@@ -227,7 +227,7 @@ Widget example() => StaticWidget.builder((c) {
 </CodeGroup>
 
 <Info>
-Like `CellWidget`, subclass `StaticWidget` and overriding the `build`
+Like `CellWidget`, subclassing `StaticWidget` and overriding the `build`
 method is equivalent to using `StaticWidget.builder`.
 </Info>
 
