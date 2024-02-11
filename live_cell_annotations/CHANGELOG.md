@@ -1,3 +1,10 @@
+## 0.4.0
+
+This release doesn't bring any new user-facing features.
+
+* Add `GenerateValueExtensions` annotation for generated extensions which provide the `.cell`
+  property.
+
 ## 0.3.0
 
 This release doesn't bring any new user-facing features.
