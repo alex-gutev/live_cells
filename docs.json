@@ -2,18 +2,6 @@
     "name": "Live Cells",
     "description": "A reactive programming library for Flutter",
     "theme": "#36B9B9",
-    "anchors": [
-        {
-            "title": "Pub.dev Package",
-            "icon": "cube",
-            "link": "https://pub.dev/packages/live_cells",
-        },
-        {
-            "title": "Sponsor Project",
-            "icon": "hand-holding-dollar",
-            "link": "https://github.com/sponsors/alex-gutev"
-        }
-    ],
     "sidebar": [
         ["Home", "/"],
         ["Cells", "/cells"],
