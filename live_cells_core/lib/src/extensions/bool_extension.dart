@@ -12,7 +12,7 @@ extension BoolCellExtension on ValueCell<bool> {
 
   /// Create a new cell which is the logical or of [this] and [other].
   ValueCell<bool> or(ValueCell<bool> other) => ComputeCell(
-      compute: () => value && other.value,
+      compute: () => value || other.value,
       arguments: [this, other]
   );
 

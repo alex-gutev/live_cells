@@ -1276,21 +1276,21 @@ void main() {
     test('BoolCellExtension.or produces cell which is the logical or of its arguments', () {
       final a = MutableCell(true);
       final b = MutableCell(true);
-      final and = a.or(b);
+      final or = a.or(b);
 
-      expect(and.value, isTrue);
+      expect(or.value, isTrue);
 
       a.value = false;
-      expect(and.value, isTrue);
+      expect(or.value, isTrue);
 
       b.value = false;
-      expect(and.value, isFalse);
+      expect(or.value, isFalse);
 
       a.value = true;
-      expect(and.value, isTrue);
+      expect(or.value, isTrue);
 
       b.value = true;
-      expect(and.value, isTrue);
+      expect(or.value, isTrue);
     });
 
     test('BoolCellExtension.not produces cell which is the logical not of itself', () {
