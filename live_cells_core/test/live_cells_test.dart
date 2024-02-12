@@ -86,6 +86,8 @@ class ManagedCellState extends CellState {
 
 class TestManagedCell<T> extends StatefulCell<T> {
   final TestResource _resource;
+
+  @override
   final T value;
 
   TestManagedCell(this._resource, this.value);
