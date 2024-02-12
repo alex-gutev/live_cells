@@ -2019,8 +2019,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2041,8 +2041,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2063,8 +2063,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2086,8 +2086,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a,b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2114,8 +2114,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2135,8 +2135,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2164,8 +2164,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2194,8 +2194,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2232,8 +2232,8 @@ void main() {
       final a = MutableCell(1.0);
       final b = MutableCell(3.0);
 
-      final c = [a, b].mutableComputeCell(
-          () => a.value + b.value,
+      final c = (a, b).mutableApply(
+          (a, b) => a + b,
           (c) {
             final half = c / 2;
 
@@ -2270,7 +2270,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final sum = [a, b].mutableComputeCell(() => a.value + b.value, (sum) {
+      final sum = (a, b).mutableApply((a, b) => a + b, (sum) {
         final half = sum ~/ 2;
         a.value = half;
         b.value = half;
@@ -2308,7 +2308,7 @@ void main() {
       final a = MutableCell(1);
       final b = MutableCell(2);
 
-      final sum = [a, b].mutableComputeCell(() => a.value + b.value, (sum) {
+      final sum = (a, b).mutableApply((a, b) => a + b, (sum) {
         final half = sum ~/ 2;
         a.value = half;
         b.value = half;
