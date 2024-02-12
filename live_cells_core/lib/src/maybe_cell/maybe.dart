@@ -1,3 +1,4 @@
+import '../compute_cell/mutable_compute_cell.dart';
 import '../extensions/compute_extension.dart';
 import '../mutable_cell/mutable_cell.dart';
 import '../value_cell.dart';
@@ -60,7 +61,7 @@ extension CellMaybeExtension<T> on MutableCell<T> {
   /// to the value wrapped by the [Maybe] if the [Maybe] is holding a value. If
   /// the [Maybe] holds an exception, the value of this cell is unchanged.
   MaybeCell<T> maybe() {
-    return [this].mutableComputeCell(() => Maybe(value), (maybe) {
+    return MutableComputeCell(arguments: {this}, compute: () => Maybe(value), reverseCompute: (maybe) {
       try {
         value = maybe.unwrap;
       }

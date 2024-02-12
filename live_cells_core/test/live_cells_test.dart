@@ -1988,9 +1988,10 @@ void main() {
   group('MutableComputeCell', () {
     test('MutableComputeCell.value computed on construction', () {
       final a = MutableCell(1);
-      final b = [a].mutableComputeCell(
-        () => a.value + 1,
-        (b) {
+      final b = MutableComputeCell(
+        arguments: {a},
+        compute: () => a.value + 1,
+        reverseCompute: (b) {
           a.value = b - 1;
         }
       );
@@ -2000,9 +2001,10 @@ void main() {
 
     test('MutableComputeCell.value recomputed when value of argument cell changes', () {
       final a = MutableCell(1);
-      final b = [a].mutableComputeCell(
-          () => a.value + 1,
-          (b) {
+      final b = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (b) {
             a.value = b - 1;
           }
       );
@@ -2344,7 +2346,7 @@ void main() {
 
     test('Previous MutableComputeCell.value preserved if ValueCell.none is used', () {
       final a = MutableCell(0);
-      final evens = [a].mutableComputeCell(() => a().isEven ? a() : ValueCell.none(), (a) {
+      final evens = MutableComputeCell(arguments: {a}, compute: () => a().isEven ? a() : ValueCell.none(), reverseCompute: (a) {
         a.value = a;
       });
 
@@ -2362,7 +2364,7 @@ void main() {
 
     test('MutableComputeCell.value initialized to defaultValue if ValueCell.none is used', () {
       final a = MutableCell(1);
-      final evens = [a].mutableComputeCell(() => a().isEven ? a() : ValueCell.none(10), (a) {
+      final evens = MutableComputeCell(arguments: {a}, compute: () => a().isEven ? a() : ValueCell.none(10), reverseCompute: (a) {
         a.value = a;
       });
 
@@ -2378,7 +2380,7 @@ void main() {
 
     test('Exception on initialization of value reproduced on value access', () {
       final a = MutableCell(0);
-      final cell = [a].mutableComputeCell(() => a() == 0 ? throw Exception() : a(), (val) {
+      final cell = MutableComputeCell(arguments: {a}, compute: () => a() == 0 ? throw Exception() : a(), reverseCompute: (val) {
         a.value = val;
       });
 
@@ -2387,7 +2389,7 @@ void main() {
 
     test('Exception on initialization of value reproduced on value access while observed', () {
       final a = MutableCell(0);
-      final cell = [a].mutableComputeCell(() => a() == 0 ? throw Exception() : a(), (val) {
+      final cell = MutableComputeCell(arguments: {a}, compute: () => a() == 0 ? throw Exception() : a(), reverseCompute: (val) {
         a.value = val;
       });
 
