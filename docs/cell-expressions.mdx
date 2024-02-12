@@ -12,7 +12,7 @@ cells without requiring a computed cell to be created explicitly using
 ## Arithmetic
 
 The arithmetic and relational (`<`, `<=`, `>`, `>=`) operators, when
-applied to cells holding numeric value, return cells which compute the
+applied to cells holding numeric values, return cells which compute the
 result of the expression.
 
 This allows a computation to be defined directly as an expression of
@@ -48,7 +48,7 @@ b.value = 4; // Prints: 9
 
 Expressions of cells can be arbitrarily complex:
 
-<CodeGroup>
+<CodeGroup title="Complex Cell Expressions">
 ```dart
 final x = a * b + c / d;
 final y = x < e;
@@ -63,8 +63,8 @@ on the constant if available or wrap it in a cell using
 
 ## Equality
 
-Every cell provides the `eq` and `neq` methods for comparing the cell
-to another cell for equality. Like the arithmetic operators, these
+Every cell provides the `eq` and `neq` methods which compare whether the cell
+is equal or not equal to another cell, respectively. Like the arithmetic operators, these
 methods return cells which perform the comparison.
 
 <CodeGroup title="Equality Comparison">
@@ -84,7 +84,7 @@ Cells holding `bool` values are extended with the following methods:
 <dt>`or`</dt>
 <dd>Creates a cell with a value that is the logical or of two cells</dd>
 <dt>`not`</dt>
-<dd>Creates a cell with a value which is the logical `not` of a cell</dd>
+<dd>Creates a cell with a value which is the logical not of a cell</dd>
 <dt>`select`</dt>
 <dd>Creates a cell which selects between the values of two cells based on a condition</dd>
 </dl>
@@ -321,14 +321,14 @@ You may be asking why do we need `peek` here instead of just accessing
 the value of `b` directly `b.value`. Something we've glossed over till
 this point is the lifecycle of cells. Cells are only active while they
 are actually observed, and are activated when the first observer is
-added. While active cells react to changes in their argument
-cells. When the last observer is removed, cell's are deactivated and
+added. While active, cells react to changes in their argument
+cells. When the last observer is removed, cells are deactivated and
 stop observing their argument cells. When a new observer is added,
 they are reactivated again. Essentially, this means that the value of
 a cell may no longer be current if it doesn't have at least one
-observer. For a computed cells this is not a problem, since when it is
+observer. For a computed cell this is not a problem, since when it is
 inactive it computes its value on demand, but it may cause issues with
-other cells, such as the `previous` cells. The `peek` property takes
+other cells, such as `previous` cells. The `peek` property takes
 care of adding an observer to the peeked cell, so that it remains
 active, but at the same time prevents the observers, added through
-`peek`, from being notified of the change in value.
+`peek`, from being notified of the changes in its value.
