@@ -1,5 +1,6 @@
 import '../compute_cell/mutable_compute_cell.dart';
 import '../mutable_cell/mutable_cell.dart';
+import '../mutable_cell/mutable_cell_view.dart';
 import '../value_cell.dart';
 import '../compute_cell/compute_cell.dart';
 
@@ -13,6 +14,28 @@ extension ComputeExtension<T> on ValueCell<T> {
       ComputeCell(
           compute: () => fn(value),
           arguments: [this],
+          key: key
+      );
+}
+
+/// Provides a method for creating a mutable computed cell of a mutable cell cell.
+extension MutableComputeExtension<T> on MutableCell<T> {
+  /// Create a new mutable cell, with a value that is a function of this cell's value.
+  ///
+  /// The value of the returned cell is computed by [fn], which is applied on
+  /// the value of this cell. The [reverse] function is called when the value
+  /// of the return cell is set. It should set the value of this cell accordingly
+  /// such that calling [fn] again will produce the same value that was passed to
+  /// [reverse].
+  ///
+  /// The returned cell is identified by [key] if non-null. **NOTE**: A key
+  /// argument is accepted since a [MutableCellView] is returned rather than
+  /// a full mutable computed cell.
+  MutableCell<U> mutableApply<U>(U Function(T) fn, void Function(U) reverse, {key}) =>
+      MutableCellView(
+          argument: this,
+          compute: () => fn(value),
+          reverse: reverse,
           key: key
       );
 }
@@ -39,12 +62,12 @@ extension ListComputeExtension on List {
   /// the value of at least one cell in [this] changes. It should return
   /// the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
   /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
   /// **NOTE:** Every element of [this] should be a [MutableCell].
@@ -76,16 +99,16 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -118,16 +141,16 @@ extension RecordComputeExtension3<T1, T2, T3> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -160,16 +183,16 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -204,16 +227,16 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -249,16 +272,16 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -295,16 +318,16 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -342,16 +365,16 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -390,16 +413,16 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, void Function(U) reverse) =>
       MutableComputeCell(
@@ -439,16 +462,16 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
-  /// The [compute] function is called with the values of the cells in this
+  /// The [fn] function is called with the values of the cells in this
   /// passed as arguments whenever the value of at least one cell in [this]
   /// changes. It should return the cell's value.
   ///
-  /// The [reverseCompute] function is called when the [value] of the cell is
+  /// The [reverse] function is called when the [value] of the cell is
   /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverseCompute].
+  /// set the values of the argument cells accordingly such that calling [fn]
+  /// again will produce the same value that was passed to [reverse].
   ///
-  /// [reverseCompute] is called in a batch update, by [MutableCell.batch], so
+  /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   MutableCell<U> mutableAPply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, void Function(U) reverse) =>
       MutableComputeCell(
