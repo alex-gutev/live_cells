@@ -163,9 +163,13 @@ retrieved using the generated accessors, to the appropriate widgets.
 Widget personForm(MutableCell<Person> person) => Column(
 	children: [
 		Text('First Name:'),
-		CellText(data: person.firstName),
+		CellTextField(
+			content: person.firstName
+		),
 		Text('Last Name:'),
-		CellText(data: person.lastName),
+		CellTextField(
+			content: person.lastName
+		),
 		Text('Age:'),
 		numberField(person.age)
 	]
