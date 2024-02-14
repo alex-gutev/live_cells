@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
+import '../base/types.dart';
 import '../compute_cell/dynamic_mutable_compute_cell.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/cell_state.dart';
@@ -34,6 +35,10 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// [reverse] is called in a batch update, by [batch], so that the values of
   /// the argument cells are set simultaneously.
   ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
   /// Example:
   ///
   /// ```dart
@@ -42,10 +47,13 @@ abstract class MutableCell<T> extends ValueCell<T> {
   ///   a.value = b - 1;
   /// });
   /// ```
-  factory MutableCell.computed(T Function() compute, void Function(T value) reverse) =>
+  factory MutableCell.computed(T Function() compute, void Function(T value) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) =>
       DynamicMutableComputeCell(
           compute: compute,
           reverseCompute: reverse,
+          shouldNotify: shouldNotify
       );
 
   /// Set the value of the cell.

@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
+import '../base/types.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import '../restoration/restoration.dart';
@@ -21,7 +22,14 @@ import 'compute_cell_state.dart';
 /// ```
 class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// Create a cell which computes its value using [compute].
-  DynamicComputeCell(this._compute, {super.key});
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  DynamicComputeCell(this._compute, {
+    super.key,
+    this.shouldNotify
+  });
 
   @override
   T get value {
@@ -49,6 +57,9 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
   /// Value computation function
   final T Function() _compute;
 
+  /// Callback function called to determine whether observers should be notified
+  final ShouldNotifyCallback? shouldNotify;
+
   /// State restored by restoreState();
   CellState? _restoredState;
 
@@ -59,6 +70,14 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
       _restoredState = null;
 
       return state!;
+    }
+
+    if (shouldNotify != null) {
+      return DynamicComputeCellStateNotifierCheck<T>(
+          cell: this,
+          key: key,
+          shouldNotify: shouldNotify!
+      );
     }
 
     return DynamicComputeCellState<T>(
@@ -148,4 +167,18 @@ class DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<
       // Prevent exception from being propagated to caller
     }
   }
+}
+
+/// A [DynamicComputeCellState] with [shouldNotify] defined by a callback function.
+class DynamicComputeCellStateNotifierCheck<T> extends DynamicComputeCellState<T> {
+  final ShouldNotifyCallback _shouldNotify;
+
+  DynamicComputeCellStateNotifierCheck({
+    required super.cell,
+    required super.key,
+    required ShouldNotifyCallback shouldNotify
+  }) : _shouldNotify = shouldNotify;
+
+  @override
+  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
 }

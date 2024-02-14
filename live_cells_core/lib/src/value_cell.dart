@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'base/cell_equality_factory.dart';
 import 'base/exceptions.dart';
+import 'base/types.dart';
 import 'cell_watch/cell_watcher.dart';
 import 'compute_cell/dynamic_compute_cell.dart';
 import 'base/cell_observer.dart';
@@ -26,6 +27,10 @@ abstract class ValueCell<T> {
   /// argument cell. Any change in the value of an argument cell will result
   /// in the value of the returned cell being recomputed.
   ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
   /// Example:
   ///
   /// ```dart
@@ -35,8 +40,14 @@ abstract class ValueCell<T> {
   ///
   /// The cell `sum` computes the sum of cells `a` and `b`. Whenever the value
   /// of either `a` or `b` changes, the value of `sum` is recomputed.
-  factory ValueCell.computed(T Function() compute, {key}) =>
-      DynamicComputeCell(compute, key: key);
+  factory ValueCell.computed(T Function() compute, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) =>
+      DynamicComputeCell(
+          compute, key: key,
+          shouldNotify: shouldNotify
+      );
 
   /// Register a callback function to be called whenever the values of the referenced cells change.
   ///

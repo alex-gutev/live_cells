@@ -153,6 +153,9 @@ class PrevValueState<T> extends CellState with ObserverCellState {
   bool get shouldNotifyAlways => false;
 
   @override
+  bool shouldNotify(ValueCell cell, newValue) => true;
+
+  @override
   void init() {
     super.init();
     arg.addObserver(this);

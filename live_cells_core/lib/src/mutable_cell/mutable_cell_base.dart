@@ -91,13 +91,21 @@ class MutableCellState<T, S extends MutableCellBase<T>> extends CellState<S> {
     final isEqual = value == _value;
 
     if (MutableCell._batched) {
-      notifyWillUpdate(isEqual);
+      notifyWillUpdate(
+          isEqual: isEqual,
+          hasNewValue: true,
+          newValue: value
+      );
       _value = value;
 
       MutableCell._addToBatch(this, isEqual);
     }
     else {
-      notifyWillUpdate(isEqual);
+      notifyWillUpdate(
+          isEqual: isEqual,
+          hasNewValue: true,
+          newValue: value
+      );
       _value = value;
       notifyUpdate(isEqual);
     }

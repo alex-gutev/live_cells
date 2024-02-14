@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../base/exceptions.dart';
+import '../base/types.dart';
 import '../mutable_cell/mutable_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import '../restoration/restoration.dart';
@@ -78,7 +79,11 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
     final isEqual = _hasValue && super.value == value;
 
     _reverse = true;
-    notifyWillUpdate(isEqual);
+    notifyWillUpdate(
+        isEqual: isEqual,
+        hasNewValue: true,
+        newValue: value
+    );
 
     updating = false;
     stale = false;
@@ -122,6 +127,9 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
   bool get shouldNotifyAlways => true;
 
   @override
+  bool shouldNotify(ValueCell cell, newValue) => true;
+
+  @override
   void willUpdate(ValueCell cell) {
     if (!_reverse) {
       super.willUpdate(cell);
@@ -152,4 +160,21 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
 
     super.dispose();
   }
+}
+
+/// A [MutableComputedCellState] with [shouldNotify] defined by a callback function.
+class MutableComputedCellStateNotifierCheck<T, S extends MutableDependentCell<T>>
+    extends MutableComputedCellState<T,S> {
+
+  final ShouldNotifyCallback _shouldNotify;
+
+  MutableComputedCellStateNotifierCheck({
+    required super.cell,
+    required super.key,
+    required super.arguments,
+    required ShouldNotifyCallback shouldNotify
+  }) : _shouldNotify = shouldNotify;
+
+  @override
+  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
 }

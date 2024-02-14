@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../base/types.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import 'compute_cell_state.dart';
@@ -14,7 +15,13 @@ import '../value_cell.dart';
 class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   /// Create a [StoreCell] which observes and saves the value of [argCell]
-  StoreCell(this.argCell) : super(key: _StoreCellKey(argCell));
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  StoreCell(this.argCell, {
+    this.shouldNotify
+  }) : super(key: _StoreCellKey(argCell));
 
   @override
   T get value {
@@ -37,6 +44,12 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// The observed cell
   final ValueCell<T> argCell;
 
+  ///
+  /// Function that is called, if non-null, to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  final ShouldNotifyCallback? shouldNotify;
+  
   /// State restored by restoreState();
   CellState? _restoredState;
 
@@ -51,6 +64,14 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
       _restoredState = null;
 
       return state!;
+    }
+
+    if (shouldNotify != null) {
+      return StoreCellStateNotifyCheck<T>(
+          cell: this,
+          key: key,
+          shouldNotify: shouldNotify!
+      );
     }
 
     return StoreCellState<T>(
@@ -82,7 +103,13 @@ extension StoreCellExtension<T> on ValueCell<T> {
   /// The returned [StoreCell] stores the value of this cell in memory whenever it
   /// changes. Further references to the returned cell's value retrieve the
   /// stored value rather than running the computation function again.
-  StoreCell<T> store() => StoreCell(this);
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  StoreCell<T> store({
+    ShouldNotifyCallback? shouldNotify
+  }) => StoreCell(this, shouldNotify: shouldNotify);
 }
 
 class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
@@ -116,6 +143,20 @@ class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
     cell.argCell.removeObserver(this);
     super.dispose();
   }
+}
+
+/// A [StoreCellState] with [shouldNotify] defined by a callback function
+class StoreCellStateNotifyCheck<T> extends StoreCellState<T> {
+  final ShouldNotifyCallback _shouldNotify;
+
+  StoreCellStateNotifyCheck({
+    required super.cell,
+    required super.key,
+    required ShouldNotifyCallback shouldNotify
+  }) : _shouldNotify = shouldNotify;
+
+  @override
+  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
 }
 
 class _StoreCellKey {

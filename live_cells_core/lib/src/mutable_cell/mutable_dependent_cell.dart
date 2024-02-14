@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../base/types.dart';
 import '../compute_cell/mutable_computed_cell_state.dart';
 import '../restoration/restoration.dart';
 import '../value_cell.dart';
@@ -26,11 +27,22 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   @protected
   final Set<ValueCell> arguments;
 
+  /// Function that is called, if non-null, to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  final ShouldNotifyCallback? shouldNotify;
+
   /// Construct a [MutableDependentCell] which depends on the cells in [arguments]
   ///
   /// Every cell of which the value is referenced in [compute] must be
   /// included in [arguments].
-  MutableDependentCell(this.arguments);
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableDependentCell(this.arguments, {
+    this.shouldNotify
+  });
 
   /// Compute the value of the cell.
   ///
@@ -62,6 +74,14 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   MutableComputedCellState<T, MutableDependentCell<T>> createMutableState({
     covariant MutableComputedCellState<T, MutableDependentCell<T>>? oldState
   }) {
+    if (shouldNotify != null) {
+      return MutableComputedCellStateNotifierCheck(
+          cell: this,
+          key: key,
+          arguments: arguments,
+          shouldNotify: shouldNotify!
+      );
+    }
     return MutableComputedCellState(
         cell: this,
         key: key,

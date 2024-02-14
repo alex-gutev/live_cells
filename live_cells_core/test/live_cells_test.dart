@@ -5,8 +5,13 @@ import 'package:live_cells_core/live_cells_core.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-@GenerateNiceMocks([MockSpec<CellObserver>(as: #MockSimpleObserver)])
+@GenerateNiceMocks([MockSpec<CellObserver>(as: #MockSimpleObserver, fallbackGenerators: {
+  #shouldNotify: shouldNotifyFallback
+})])
 import 'live_cells_test.mocks.dart';
+
+bool shouldNotifyFallback(_, __) => true;
+
 
 /// Mock class interface for recording the value of a cell at the time an observer was called
 abstract class ValueObserver {
@@ -1518,6 +1523,7 @@ void main() {
       cell.value = 15;
 
       verifyInOrder([
+        observer.shouldNotify(any, any),
         observer.willUpdate(cell),
         observer.update(cell)
       ]);
@@ -3816,6 +3822,609 @@ void main() {
     });
   });
 
+  group('CellObserver.shouldNotify()', () {
+    test('CellObserver not notified when shouldNotify() returns false', () {
+      final a = MutableCell(0);
+      final b = ValueCell.computed(() => a() + 1, shouldNotify: (_,__) => false);
+
+      final observer = MockSimpleObserver();
+      addObserver(b, observer);
+
+      a.value = 10;
+      verifyNever(observer.willUpdate(b));
+      verifyNever(observer.update(b));
+    });
+
+    test('CellObserver notified when shouldNotify() returns true', () {
+      final a = MutableCell(0);
+      final b = ValueCell.computed(() => a() + 1, shouldNotify: (_,__) => true);
+
+      final observer = MockSimpleObserver();
+      addObserver(b, observer);
+
+      a.value = 10;
+      verify(observer.willUpdate(b)).called(1);
+      verify(observer.update(b)).called(1);
+    });
+
+    test('shouldNotify() passed correct previous value 1', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final observer = MockSimpleObserver();
+      addObserver(b, observer);
+
+      a.value = [4, 2, 6];
+      verifyNever(observer.willUpdate(b));
+      verifyNever(observer.update(b));
+    });
+
+    test('shouldNotify() passed correct previous value 2', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final observer = MockSimpleObserver();
+      addObserver(b, observer);
+
+      a.value = [7, 8, 9];
+      verify(observer.willUpdate(b)).called(1);
+      verify(observer.update(b)).called(1);
+    });
+
+    test('Watch function not called when shouldNotify() returns false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+
+      verify(listener()).called(1);
+    });
+
+    test('Watch function not called when shouldNotify() returns false in MutableCell.batch', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+      });
+
+      verify(listener()).called(1);
+    });
+
+    test('Watch function called when shouldNotify() returns true after returning false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 8, 9];
+
+      verify(listener()).called(2);
+    });
+
+    test('Watch function called when shouldNotify() returns true for at least one argument', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final c = MutableCell(3);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+        c.value = 5;
+      });
+
+      verify(listener()).called(2);
+    });
+
+    test('Value listener function not called when shouldNotify() returns false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final listener = MockSimpleListener();
+      b.listenable.addListener(listener);
+
+      addTearDown(() => b.listenable.removeListener(listener));
+
+      a.value = [4, 2, 6];
+
+      verifyNever(listener());
+    });
+
+    test('Value listener function not called when shouldNotify() returns false in MutableCell.batch', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final listener = MockSimpleListener();
+      b.listenable.addListener(listener);
+
+      addTearDown(() => b.listenable.removeListener(listener));
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+      });
+
+      verifyNever(listener());
+    });
+
+    test('Value listener function called when shouldNotify() returns true after returning false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final listener = MockSimpleListener();
+      b.listenable.addListener(listener);
+
+      addTearDown(() => b.listenable.removeListener(listener));
+
+      a.value = [4, 2, 6];
+      a.value = [7, 8, 9];
+
+      verify(listener()).called(1);
+    });
+
+    test('Value listener function called when shouldNotify() returns true for at least one argument', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final c = MutableCell(3);
+      final d = b + c;
+
+      final listener = MockSimpleListener();
+      d.listenable.addListener(listener);
+
+      addTearDown(() => d.listenable.removeListener(listener));
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+        c.value = 5;
+      });
+
+      verify(listener()).called(1);
+    });
+
+    test('Computed cell not recomputed when shouldNotify() returns false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = ValueCell.computed(() => b() * 10);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+
+      verify(listener()).called(1);
+    });
+
+    test('Computed cell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = ValueCell.computed(() => b() * 10);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+      });
+
+      verify(listener()).called(1);
+    });
+
+    test('Computed cell recomputed when shouldNotify() returns true after returning false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = ValueCell.computed(() => b() * 10);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 8, 9];
+
+      verify(listener()).called(2);
+    });
+
+    test('Computed cell recomputed when shouldNotify() returns true for at least one argument', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final c = MutableCell(3);
+      final d = ValueCell.computed(() => b() * c());
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        d();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+        c.value = 5;
+      });
+
+      verify(listener()).called(2);
+    });
+
+    test('StoreCell not recomputed when shouldNotify() returns false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = (b * 10.cell).store();
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+
+      verify(listener()).called(1);
+    });
+
+    test('StoreCell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = (b * 10.cell).store();
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+      });
+
+      verify(listener()).called(1);
+    });
+
+    test('StoreCell recomputed when shouldNotify() returns true after returning false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = (b * 10.cell).store();
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 8, 9];
+
+      verify(listener()).called(2);
+    });
+
+    test('StoreCell recomputed when shouldNotify() returns true for at least one argument', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final c = MutableCell(3);
+      final d = (b * c).store();
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        d();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+        c.value = 5;
+      });
+
+      verify(listener()).called(2);
+    });
+
+    test('MutableComputeCell not recomputed when shouldNotify() returns false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = (b, 10.cell).mutableApply((a1, a2) => a1 * a2, (_) {});
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+
+      verify(listener()).called(1);
+    });
+
+    test('MutableComputeCell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = (b, 10.cell).mutableApply((a1, a2) => a1 * a2, (_) {});
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+      });
+
+      verify(listener()).called(1);
+    });
+
+    test('MutableComputeCell recomputed when shouldNotify() returns true after returning false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = (b, 10.cell).mutableApply((a1, a2) => a1 * a2, (_) {});
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 8, 9];
+
+      verify(listener()).called(2);
+    });
+
+    test('MutableComputeCell recomputed when shouldNotify() returns true for at least one argument', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final c = MutableCell(3);
+      final d = (b, c).mutableApply((b, c) => b * c, (_) {});
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        d();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+        c.value = 5;
+      });
+
+      verify(listener()).called(2);
+    });
+
+    test('DynamicMutableComputeCell not recomputed when shouldNotify() returns false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = MutableCell.computed(() => b() * 10, (_) { });
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+
+      verify(listener()).called(1);
+    });
+
+    test('DynamicMutableComputeCell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = MutableCell.computed(() => b() * 10, (_) { });
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+      });
+
+      verify(listener()).called(1);
+    });
+
+    test('DynamicMutableComputeCell recomputed when shouldNotify() returns true after returning false', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final c = MutableCell.computed(() => b() * 10, (_) { });
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        c();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 8, 9];
+
+      verify(listener()).called(2);
+    });
+
+    test('DynamicMutableComputeCell recomputed when shouldNotify() returns true for at least one argument', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+
+      final c = MutableCell(3);
+      final d = MutableCell.computed(() => b() * c(), (_) { });
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        d();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      MutableCell.batch(() {
+        a.value = [4, 2, 6];
+        c.value = 5;
+      });
+
+      verify(listener()).called(2);
+    });
+
+    test('MutableComputedCell implements shouldNotify correctly', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = MutableComputeCell(
+          compute: () => a.value[1],
+          reverseCompute: (_) {},
+          arguments: {a},
+          shouldNotify: (a,newValue) => a.value[1] != newValue[1]
+      );
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 2, 8];
+      a.value = [9, 10, 11];
+
+      verify(listener()).called(2);
+    });
+
+    test('DynamicMutableComputedCell implements shouldNotify correctly', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = MutableCell.computed(() => a()[1], (_) {}, shouldNotify: (a,b) => a.value[1] != b[1]);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 2, 8];
+      a.value = [9, 10, 11];
+
+      verify(listener()).called(2);
+    });
+
+    test('StoreCell implements shouldNotify correctly', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = MutableCellView(
+          argument: a.store(
+              shouldNotify: (a, newValue) => a.value[1] != newValue[1]
+          ),
+          reverse: (_) {},
+          compute: () => a.value[1]
+      );
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 2, 8];
+      a.value = [9, 10, 11];
+
+      verify(listener()).called(2);
+    });
+  });
+
   group('PrevValueCell', () {
     test('PrevValueCell.value holds error on initialization', () {
       final a = MutableCell(0);
@@ -3964,6 +4573,27 @@ void main() {
 
       verify(resource.init()).called(2);
       verify(resource.dispose()).called(1);
+    });
+
+    test("PrevValueCell does not track value that hasn't changed", () {
+      final a = MutableCell([0, 0, 0]);
+      final b = ValueCell.computed(() => a()[1], shouldNotify: (a,v) => a.value[1] != v[1]);
+      final prev = b.previous;
+
+      observeCell(prev);
+
+      a.value = [1, 2, 3];
+      a.value = [4, 2, 6];
+      expect(prev.value, 0);
+
+      a.value = [7, 8, 9];
+      expect(prev.value, 2);
+
+      a.value = [10, 8, 11];
+      expect(prev.value, 2);
+
+      a.value = [12, 13, 14];
+      expect(prev.value, 8);
     });
   });
 }

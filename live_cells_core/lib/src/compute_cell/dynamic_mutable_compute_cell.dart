@@ -1,3 +1,5 @@
+import '../base/types.dart';
+import '../value_cell.dart';
 import 'dynamic_compute_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import 'mutable_computed_cell_state.dart';
@@ -20,6 +22,7 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   DynamicMutableComputeCell({
     required T Function() compute,
     required void Function(T) reverseCompute,
+    super.shouldNotify
   }) : _compute = compute, _reverseCompute = reverseCompute, super({});
 
   @override
@@ -38,11 +41,21 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   @override
   MutableComputedCellState<T, DynamicMutableComputeCell<T>> createMutableState({
     covariant MutableComputedCellState<T, DynamicMutableComputeCell<T>>? oldState
-  }) => _DynamicMutableComputeCellState(
-      cell: this,
-      key: key,
-      oldState: oldState
-  );
+  }) {
+    if (shouldNotify != null) {
+      return _DynamicMutableComputedCellStateNotifierCheck(
+          cell: this,
+          key: key,
+          shouldNotify: shouldNotify!
+      );
+    }
+
+    return _DynamicMutableComputeCellState(
+        cell: this,
+        key: key,
+        oldState: oldState
+    );
+  }
 }
 
 class _DynamicMutableComputeCellState<T>
@@ -60,4 +73,20 @@ class _DynamicMutableComputeCellState<T>
       arguments.add(arg);
     }
   });
+}
+
+/// A [_DynamicMutableComputeCellState] with [shouldNotify] defined by a callback function.
+class _DynamicMutableComputedCellStateNotifierCheck<T>
+    extends _DynamicMutableComputeCellState<T> {
+
+  final ShouldNotifyCallback _shouldNotify;
+
+  _DynamicMutableComputedCellStateNotifierCheck({
+    required super.cell,
+    required super.key,
+    required ShouldNotifyCallback shouldNotify
+  }) : _shouldNotify = shouldNotify;
+
+  @override
+  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
 }

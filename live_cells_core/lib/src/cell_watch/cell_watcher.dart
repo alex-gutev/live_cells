@@ -72,6 +72,9 @@ class _CellWatchObserver implements CellObserver {
   bool get shouldNotifyAlways => false;
 
   @override
+  bool shouldNotify(ValueCell cell, newValue) => true;
+
+  @override
   void update(ValueCell cell) {
     if (_isUpdating) {
       _isUpdating = false;

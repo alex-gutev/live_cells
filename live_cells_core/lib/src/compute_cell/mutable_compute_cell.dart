@@ -21,6 +21,10 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
   /// [arguments] is a list of argument cells on which the value of the cell
   /// depends.
   ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
   /// Example:
   ///
   /// ```dart
@@ -39,6 +43,7 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
     required T Function() compute,
     required void Function(T) reverseCompute,
     required Set<ValueCell> arguments,
+    super.shouldNotify
   }) : _compute = compute, _reverseCompute = reverseCompute, super(arguments);
 
   @override
