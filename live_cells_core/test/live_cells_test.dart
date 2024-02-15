@@ -4616,6 +4616,406 @@ void main() {
       expect(prev.value, 8);
     });
   });
+
+  group('List Cell Extensions', () {
+    group('.first', () {
+      test('ValueCell.first retrieves first element', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f = l.first;
+
+        expect(f.value, 1);
+      });
+
+      test('MutableCell.first retrieves first element', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.first;
+
+        expect(f.value, 1);
+      });
+
+      test('ValueCell.first notifies observers when first element changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = l;
+        final observer = addObserver(l2.first, MockValueObserver());
+        
+        l.value = [4, 5, 6];
+        l.value = [7, 8, 9];
+        l.value = [10, 11, 12];
+
+        expect(observer.values, equals([4, 7, 10]));
+      });
+
+      test('Mutable.first notifies observers when first element changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l.first, MockValueObserver());
+
+        l.value = [4, 5, 6];
+        l.value = [7, 8, 9];
+        l.value = [10, 11, 12];
+
+        expect(observer.values, equals([4, 7, 10]));
+      });
+
+      test('ValueCell.first does not notify observers when first element not changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = l;
+        final f = l2.first;
+
+        final listener = MockSimpleListener();
+
+        f.listenable.addListener(listener);
+        addTearDown(() => f.listenable.removeListener(listener));
+
+        l.value = [1, 4, 5];
+        l.value = [1, 6, 7];
+        l.value = [8, 9, 10];
+        l.value = [11, 12, 13];
+        l.value = [11, 14, 15];
+        l.value = [16, 17, 18];
+
+        verify(listener()).called(3);
+      });
+
+      test('MutableCell.first does not notify observers when first element not changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.first;
+
+        final listener = MockSimpleListener();
+
+        f.listenable.addListener(listener);
+        addTearDown(() => f.listenable.removeListener(listener));
+
+        l.value = [1, 4, 5];
+        l.value = [1, 6, 7];
+        l.value = [8, 9, 10];
+        l.value = [11, 12, 13];
+        l.value = [11, 14, 15];
+        l.value = [16, 17, 18];
+
+        verify(listener()).called(3);
+      });
+
+      test('Setting MutableCell.first.value, updates list cell value', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.first;
+
+        f.value = 10;
+        expect(l.value, equals([10, 2, 3]));
+
+        f.value = 20;
+        expect(l.value, equals([20, 2, 3]));
+      });
+
+      test('ValueCell.first compares == when same list cell', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f1 = l.first;
+        final f2 = l.first;
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('ValueCell.first compares != when different list cells', () {
+        final ValueCell<List<int>> l1 = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = MutableCell([1, 2, 3]);
+
+        final f1 = l1.first;
+        final f2 = l2.first;
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+
+      test('MutableCell.first compares == when same list cell', () {
+        final l = MutableCell([1, 2, 3]);
+        final f1 = l.first;
+        final f2 = l.first;
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('MutableCell.first compares != when different list cells', () {
+        final l1 = MutableCell([1, 2, 3]);
+        final l2 = MutableCell([1, 2, 3]);
+
+        final f1 = l1.first;
+        final f2 = l2.first;
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+    });
+
+    group('.last', () {
+      test('ValueCell.last retrieves last element', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f = l.last;
+
+        expect(f.value, 3);
+      });
+
+      test('MutableCell.last retrieves last element', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.last;
+
+        expect(f.value, 3);
+      });
+
+      test('ValueCell.last notifies observers when last element changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = l;
+        final observer = addObserver(l2.last, MockValueObserver());
+
+        l.value = [4, 5, 6];
+        l.value = [7, 8, 9];
+        l.value = [10, 11, 12];
+
+        expect(observer.values, equals([6, 9, 12]));
+      });
+
+      test('Mutable.last notifies observers when last element changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l.last, MockValueObserver());
+
+        l.value = [4, 5, 6];
+        l.value = [7, 8, 9];
+        l.value = [10, 11, 12];
+
+        expect(observer.values, equals([6, 9, 12]));
+      });
+
+      test('ValueCell.last does not notify observers when last element not changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = l;
+        final f = l2.last;
+
+        final listener = MockSimpleListener();
+
+        f.listenable.addListener(listener);
+        addTearDown(() => f.listenable.removeListener(listener));
+
+        l.value = [4, 5, 3];
+        l.value = [6, 7, 3];
+        l.value = [8, 9, 10];
+        l.value = [11, 12, 13];
+        l.value = [14, 15, 13];
+        l.value = [16, 17, 18];
+
+        verify(listener()).called(3);
+      });
+
+      test('MutableCell.last does not notify observers when last element not changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.last;
+
+        final listener = MockSimpleListener();
+
+        f.listenable.addListener(listener);
+        addTearDown(() => f.listenable.removeListener(listener));
+
+        l.value = [4, 5, 3];
+        l.value = [6, 7, 3];
+        l.value = [8, 9, 10];
+        l.value = [11, 12, 13];
+        l.value = [14, 15, 13];
+        l.value = [16, 17, 18];
+
+        verify(listener()).called(3);
+      });
+
+      test('Setting MutableCell.last.value, updates list cell value', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.last;
+
+        f.value = 10;
+        expect(l.value, equals([1, 2, 10]));
+
+        f.value = 20;
+        expect(l.value, equals([1, 2, 20]));
+      });
+
+      test('ValueCell.last compares == when same list cell', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f1 = l.last;
+        final f2 = l.last;
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('ValueCell.last compares != when different list cells', () {
+        final ValueCell<List<int>> l1 = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = MutableCell([1, 2, 3]);
+
+        final f1 = l1.last;
+        final f2 = l2.last;
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+
+      test('MutableCell.last compares == when same list cell', () {
+        final l = MutableCell([1, 2, 3]);
+        final f1 = l.last;
+        final f2 = l.last;
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('MutableCell.last compares != when different list cells', () {
+        final l1 = MutableCell([1, 2, 3]);
+        final l2 = MutableCell([1, 2, 3]);
+
+        final f1 = l1.last;
+        final f2 = l2.last;
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+    });
+
+    group('.isEmpty', () {
+      test('ValueCell.isEmpty is true when list is empty', () {
+        const l = ValueCell.value([]);
+        final f = l.isEmpty;
+
+        expect(f.value, isTrue);
+      });
+
+      test('ValueCell.isEmpty is false when list is not empty', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f = l.isEmpty;
+
+        expect(f.value, isFalse);
+      });
+
+      test('ValueCell.isEmpty notifies observers when list length changes', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l.isEmpty, MockValueObserver());
+
+        l.value = [];
+        l.value = [4, 5, 6];
+        l.value = [7, 8, 9];
+        l.value = [];
+
+        expect(observer.values, equals([true, false, true]));
+      });
+
+      test('ValueCell.isEmpty does not notify observers when value has not changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.isEmpty;
+
+        final listener = MockSimpleListener();
+
+        f.listenable.addListener(listener);
+        addTearDown(() => f.listenable.removeListener(listener));
+
+        l.value = [4, 5, 3];
+        l.value = [6, 7, 3];
+        l.value = [];
+        l.value = [];
+        l.value = [];
+        l.value = [8, 9, 10];
+        l.value = [11, 12, 13];
+        l.value = [14, 15, 13];
+        l.value = [16, 17, 18];
+
+        verify(listener()).called(2);
+      });
+
+      test('ValueCell.isEmpty compares == when same list cell', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f1 = l.isEmpty;
+        final f2 = l.isEmpty;
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('ValueCell.isEmpty compares != when different list cells', () {
+        final ValueCell<List<int>> l1 = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = MutableCell([1, 2, 3]);
+
+        final f1 = l1.isEmpty;
+        final f2 = l2.isEmpty;
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+    });
+
+    group('.isNotEmpty', () {
+      test('ValueCell.isNotEmpty is false when list is empty', () {
+        const l = ValueCell.value([]);
+        final f = l.isNotEmpty;
+
+        expect(f.value, isFalse);
+      });
+
+      test('ValueCell.isNotEmpty is true when list is not empty', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f = l.isNotEmpty;
+
+        expect(f.value, isTrue);
+      });
+
+      test('ValueCell.isNotEmpty notifies observers when list length changes', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l.isNotEmpty, MockValueObserver());
+
+        l.value = [];
+        l.value = [4, 5, 6];
+        l.value = [7, 8, 9];
+        l.value = [];
+
+        expect(observer.values, equals([false, true, false]));
+      });
+
+      test('ValueCell.isNotEmpty does not notify observers when value has not changed', () {
+        final l = MutableCell([1, 2, 3]);
+        final f = l.isNotEmpty;
+
+        final listener = MockSimpleListener();
+
+        f.listenable.addListener(listener);
+        addTearDown(() => f.listenable.removeListener(listener));
+
+        l.value = [4, 5, 3];
+        l.value = [6, 7, 3];
+        l.value = [];
+        l.value = [];
+        l.value = [];
+        l.value = [8, 9, 10];
+        l.value = [11, 12, 13];
+        l.value = [14, 15, 13];
+        l.value = [16, 17, 18];
+
+        verify(listener()).called(2);
+      });
+
+      test('ValueCell.isNotEmpty compares == when same list cell', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f1 = l.isNotEmpty;
+        final f2 = l.isNotEmpty;
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('ValueCell.isNotEmpty compares != when different list cells', () {
+        final ValueCell<List<int>> l1 = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = MutableCell([1, 2, 3]);
+
+        final f1 = l1.isNotEmpty;
+        final f2 = l2.isNotEmpty;
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+    });
+  });
 }
 
 // Test utility functions
