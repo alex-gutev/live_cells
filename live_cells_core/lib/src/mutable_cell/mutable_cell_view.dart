@@ -1,19 +1,16 @@
 import '../compute_cell/compute_cell.dart';
-import '../value_cell.dart';
 import 'mutable_cell.dart';
 
-/// A lightweight mutable computed cell that doesn't store its only value.
-///
-/// **NOTE**: This cell is restricted to a single argument only
+/// A lightweight mutable computed cell that doesn't store its own value.
 class MutableCellView<T> extends ComputeCell<T> implements MutableCell<T> {
   /// Create a lightweight mutable computed cell.
   ///
-  /// The created cell has computation function [compute] of the argument cell
-  /// [argument] and reverse computation function [reverse].
+  /// The created cell has computation function [compute] of the argument cells
+  /// [arguments] and reverse computation function [reverse].
   ///
-  /// [argument] does not have to be a [MutableCell] but in general it should
-  /// either be the same cell that is set in [reverse] or an immediate
-  /// successor of it.
+  /// The cells in [arguments] do not have to be [MutableCell]s but in general
+  /// they should either be the same cells that are set in [reverse] or immediate
+  /// successors of them.
   ///
   /// A [key] can also be supplied that uniquely identifies this cell
   ///
@@ -24,23 +21,28 @@ class MutableCellView<T> extends ComputeCell<T> implements MutableCell<T> {
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// **CAUTION**: This cell has slightly different semantics from
+  /// [MutableComputeCell]. Its value is always recomputed from the argument
+  /// cells, even after it is set explicitly. Thus, it is even more important
+  /// that [reverse] assigns values to the argument cells that will result in
+  /// the same value being computed as the value that was assigned.
   MutableCellView({
-    required this.argument,
-    required this.reverse,
+    required super.arguments,
     required super.compute,
+    required this.reverse,
     super.key,
     super.willChange
-  }) : super(arguments: [argument]);
+  });
 
   @override
   set value(T value) {
-    reverse(value);
+    MutableCell.batch(() {
+      reverse(value);
+    });
   }
 
   // Private
-
-  /// Argument cell
-  final ValueCell argument;
 
   /// Reverse computation function
   final void Function(T) reverse;

@@ -56,7 +56,7 @@ extension ComputeExtension<T> on ValueCell<T> {
     key,
     WillChangeCallback<T>? willChange
   }) => MutableCellView(
-      argument: this,
+      arguments: [this],
       compute: () => fn(value),
       reverse: reverse,
       key: key,

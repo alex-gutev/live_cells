@@ -2894,18 +2894,14 @@ void main() {
   group('MutableCellView', () {
     test('MutableCellView.value computed on construction', () {
       final a = MutableCell(1);
-      final b = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (b) {
-        a.value = b - 1;
-      });
+      final b = a.mutableApply((a) => a + 1, (b) => a.value = b - 1);
 
       expect(b.value, equals(2));
     });
 
     test('MutableCellView.value recomputed when value of argument cell changes', () {
       final a = MutableCell(1);
-      final b = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (b) {
-        a.value = b - 1;
-      });
+      final b = a.mutableApply((a) => a + 1, (b) => a.value = b - 1);
 
       observeCell(b);
       a.value = 5;
@@ -2915,10 +2911,7 @@ void main() {
 
     test('MutableCellView observers notified when value is recomputed', () {
       final a = MutableCell(1);
-
-      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
 
       final observer = addObserver(c, MockSimpleObserver());
 
@@ -2930,10 +2923,7 @@ void main() {
 
     test('MutableCellView observer not called after it is removed', () {
       final a = MutableCell(1);
-
-      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
 
       final observer1 = addObserver(c, MockSimpleObserver());
       final observer2 = addObserver(c, MockSimpleObserver());
@@ -2949,10 +2939,7 @@ void main() {
 
     test('Setting MutableCellView.value updates values of argument cell', () {
       final a = MutableCell(1);
-
-      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
 
       c.value = 10;
 
@@ -2962,10 +2949,7 @@ void main() {
 
     test('Setting MutableCellView.value calls observers of MutableCell and argument cells', () {
       final a = MutableCell(1);
-
-      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
 
       final observerA = addObserver(a, MockSimpleObserver());
       final observerC = addObserver(c, MockSimpleObserver());
@@ -2978,10 +2962,7 @@ void main() {
 
     test('Observers of MutableCellView and argument cells called every time value is set', () {
       final a = MutableCell(1);
-
-      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
 
       final observerA = addObserver(a, MockSimpleObserver());
       final observerC = addObserver(c, MockSimpleObserver());
@@ -2995,10 +2976,7 @@ void main() {
 
     test('Consistency of values maintained when setting MutableCellView.value in batch update', () {
       final a = MutableCell(1);
-
-      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
 
       final d = MutableCell(50);
       final e = ValueCell.computed(() => c() + d());
@@ -3019,10 +2997,7 @@ void main() {
 
     test('Observers notified correct number of times when setting MutableCellView.value in batch update', () {
       final a = MutableCell(1);
-
-      final c = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
 
       final d = MutableCell(50);
       final e = ValueCell.computed(() => c() + d());
@@ -3043,10 +3018,7 @@ void main() {
 
     test('All MutableCellView observers called correct number of times', () {
       final a = MutableCell(1);
-
-      final sum = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final sum = a.mutableApply((a) => a + 1, (sum) => a.value = sum - 1);
 
       final c = (a + sum).store();
       final d = sum + 2.cell;
@@ -3072,10 +3044,7 @@ void main() {
 
     test('Correct values produced with MutableCellView across all observer cells', () {
       final a = MutableCell(1);
-
-      final sum = MutableCellView(argument: a, compute: () => a.value + 1, reverse: (c) {
-        a.value = c - 1;
-      });
+      final sum = a.mutableApply((a) => a + 1, (sum) => a.value = sum - 1);
 
       final c = ValueCell.computed(() => a() + sum());
       final d = ValueCell.computed(() => sum() + 2);
@@ -3101,18 +3070,14 @@ void main() {
 
     test('Exception on initialization of value reproduced on value access', () {
       final a = MutableCell(0);
-      final cell = MutableCellView(argument: a, compute: () => a() == 0 ? throw Exception() : a(), reverse: (val) {
-        a.value = val;
-      });
+      final cell = a.mutableApply((a) => a == 0 ? throw Exception() : a, (v) => a.value = v);
 
       expect(() => cell.value, throwsException);
     });
 
     test('Exception on initialization of value reproduced on value access while observed', () {
       final a = MutableCell(0);
-      final cell = MutableCellView(argument: a, compute: () => a() == 0 ? throw Exception() : a(), reverse: (val) {
-        a.value = val;
-      });
+      final cell = a.mutableApply((a) => a == 0 ? throw Exception() : a, (v) => a.value = v);
 
       observeCell(cell);
       expect(() => cell.value, throwsException);
@@ -3121,19 +3086,8 @@ void main() {
     test("MutableCellView's compare == if they have the same keys", () {
       final a = MutableCell(0);
 
-      final b1 = MutableCellView(
-          argument: a,
-          compute: () => a.value + 1,
-          reverse: (b) => a.value = b - 1,
-          key: 'theKey'
-      );
-
-      final b2 = MutableCellView(
-          argument: a,
-          compute: () => a.value + 1,
-          reverse: (b) => a.value = b - 1,
-          key: 'theKey'
-      );
+      final b1 = a.mutableApply((a) => a + 1, (v) => v - 1, key: 'theKey');
+      final b2 = a.mutableApply((a) => a + 1, (v) => v - 1, key: 'theKey');
 
       expect(b1 == b2, isTrue);
       expect(b1.hashCode == b2.hashCode, isTrue);
@@ -3142,19 +3096,8 @@ void main() {
     test("MutableCellView's compare != if they have different keys", () {
       final a = MutableCell(0);
 
-      final b1 = MutableCellView(
-          argument: a,
-          compute: () => a.value + 1,
-          reverse: (b) => a.value = b - 1,
-          key: 'theKey'
-      );
-
-      final b2 = MutableCellView(
-          argument: a,
-          compute: () => a.value + 1,
-          reverse: (b) => a.value = b - 1,
-          key: 'theKey2'
-      );
+      final b1 = a.mutableApply((a) => a + 1, (v) => v - 1, key: 'theKey');
+      final b2 = a.mutableApply((a) => a + 1, (v) => v - 1, key: 'theKey1');
 
       expect(b1 != b2, isTrue);
     });
@@ -3162,17 +3105,8 @@ void main() {
     test("MutableCellView's compare != if they have null keys", () {
       final a = MutableCell(0);
 
-      final b1 = MutableCellView(
-          argument: a,
-          compute: () => a.value + 1,
-          reverse: (b) => a.value = b - 1
-      );
-
-      final b2 = MutableCellView(
-          argument: a,
-          compute: () => a.value + 1,
-          reverse: (b) => a.value = b - 1
-      );
+      final b1 = a.mutableApply((a) => a + 1, (v) => v - 1);
+      final b2 = a.mutableApply((a) => a + 1, (v) => v - 1);
 
       expect(b1 != b2, isTrue);
       expect(b1 == b1, isTrue);
@@ -4400,13 +4334,8 @@ void main() {
 
     test('StoreCell implements shouldNotify correctly', () {
       final a = MutableCell([1, 2, 3]);
-      final b = MutableCellView(
-          argument: a.store(
-              willChange: (a, newValue) => a.value[1] != newValue[1]
-          ),
-          reverse: (_) {},
-          compute: () => a.value[1]
-      );
+      final b = a.store(willChange: (a, newValue) => a.value[1] != newValue[1])
+          .mutableApply((a) => a, (_) {});
 
       final listener = MockSimpleListener();
 
