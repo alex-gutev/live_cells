@@ -23,12 +23,14 @@ extension ComputeExtension<T> on ValueCell<T> {
   /// [CellObserver.willChange] for more information.
   ValueCell<U> apply<U>(U Function(T value) fn, {
     key,
-    WillChangeCallback? willChange
+    WillChangeCallback<T>? willChange
   }) => ComputeCell(
       compute: () => fn(value),
       arguments: [this],
       key: key,
-      willChange: willChange
+      willChange: willChange != null
+          ? (cell, value) => willChange(cell as ValueCell<T>, value as T)
+          : null
   );
 
   /// Create a new mutable cell, with a value that is a function of this cell's value.
@@ -52,13 +54,15 @@ extension ComputeExtension<T> on ValueCell<T> {
   /// a full mutable computed cell.
   MutableCell<U> mutableApply<U>(U Function(T) fn, void Function(U) reverse, {
     key,
-    WillChangeCallback? willChange
+    WillChangeCallback<T>? willChange
   }) => MutableCellView(
       argument: this,
       compute: () => fn(value),
       reverse: reverse,
       key: key,
-      willChange: willChange
+      willChange: willChange != null
+          ? (cell, value) => willChange(cell as ValueCell<T>, value as T)
+          : null
   );
 }
 

@@ -7,4 +7,4 @@ import '../value_cell.dart';
 ///
 /// The function should return true if the cell's value may change and
 /// false if it is known with certainty that it wont.
-typedef WillChangeCallback = bool Function(ValueCell cell, dynamic newValue);
+typedef WillChangeCallback<T> = bool Function(ValueCell cell, T newValue);
