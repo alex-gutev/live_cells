@@ -2909,26 +2909,72 @@ void main() {
       expect(b.value, equals(6));
     });
 
+    test('MutableCellView.value recomputed when value of 1st argument cell changes', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
+
+      a.value = 5;
+
+      expect(c.value, equals(8));
+    });
+
+    test('MutableCellView.value recomputed when value of 2nd argument cell changes', () {
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
+
+      b.value = 9;
+
+      expect(c.value, equals(10));
+    });
+
     test('MutableCellView observers notified when value is recomputed', () {
-      final a = MutableCell(1);
-      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
 
       final observer = addObserver(c, MockSimpleObserver());
 
       a.value = 6;
-      a.value = 10;
+      b.value = 10;
 
       verify(observer.update(c)).called(2);
     });
 
     test('MutableCellView observer not called after it is removed', () {
-      final a = MutableCell(1);
-      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
 
       final observer1 = addObserver(c, MockSimpleObserver());
       final observer2 = addObserver(c, MockSimpleObserver());
 
-      a.value = 9;
+      b.value = 9;
 
       c.removeObserver(observer1);
       a.value = 10;
@@ -2938,50 +2984,84 @@ void main() {
     });
 
     test('Setting MutableCellView.value updates values of argument cell', () {
-      final a = MutableCell(1);
-      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
 
       c.value = 10;
 
-      expect(a.value, equals(9));
+      expect(a.value, equals(5));
+      expect(b.value, equals(5));
       expect(c.value, equals(10));
     });
 
     test('Setting MutableCellView.value calls observers of MutableCell and argument cells', () {
-      final a = MutableCell(1);
-      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
 
-      final observerA = addObserver(a, MockSimpleObserver());
-      final observerC = addObserver(c, MockSimpleObserver());
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
+
+      final observerA = addListener(a, MockSimpleListener());
+      final observerB = addListener(b, MockSimpleListener());
+      final observerC = addListener(c, MockSimpleListener());
 
       c.value = 10;
 
-      verify(observerA.update(a)).called(1);
-      verify(observerC.update(c)).called(1);
+      verify(observerA()).called(1);
+      verify(observerB()).called(1);
+      verify(observerC()).called(1);
     });
 
     test('Observers of MutableCellView and argument cells called every time value is set', () {
-      final a = MutableCell(1);
-      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
 
-      final observerA = addObserver(a, MockSimpleObserver());
-      final observerC = addObserver(c, MockSimpleObserver());
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
+
+      final observerA = addListener(a, MockSimpleListener());
+      final observerB = addListener(b, MockSimpleListener());
+      final observerC = addListener(c, MockSimpleListener());
 
       c.value = 10;
       c.value = 12;
 
-      verify(observerA.update(a)).called(2);
-      verify(observerC.update(c)).called(2);
+      verify(observerA()).called(2);
+      verify(observerB()).called(2);
+      verify(observerC()).called(2);
     });
 
     test('Consistency of values maintained when setting MutableCellView.value in batch update', () {
-      final a = MutableCell(1);
-      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
 
       final d = MutableCell(50);
       final e = ValueCell.computed(() => c() + d());
 
       final observerA = addObserver(a, MockValueObserver());
+      final observerB = addObserver(b, MockValueObserver());
       final observerC = addObserver(c, MockValueObserver());
       final observerE = addObserver(e, MockValueObserver());
 
@@ -2990,61 +3070,86 @@ void main() {
         d.value = 9;
       });
 
-      expect(observerA.values, equals([9]));
+      expect(observerA.values, equals([5]));
+      expect(observerB.values, equals([5]));
       expect(observerC.values, equals([10]));
       expect(observerE.values, equals([19]));
     });
 
     test('Observers notified correct number of times when setting MutableCellView.value in batch update', () {
-      final a = MutableCell(1);
-      final c = a.mutableApply((a) => a + 1, (c) => a.value = c - 1);
+      final a = MutableCell(1.0);
+      final b = MutableCell(3.0);
+
+      final c = (a, b).mutableApply((a, b) => a + b, (c) {
+        final half = c / 2;
+
+        a.value = half;
+        b.value = half;
+      }, key: 'key'); // A non-null key to create a MutableCellView
 
       final d = MutableCell(50);
       final e = ValueCell.computed(() => c() + d());
 
-      final observerA = addObserver(a, MockSimpleObserver());
-      final observerC = addObserver(c, MockSimpleObserver());
-      final observerE = addObserver(e, MockSimpleObserver());
+      final observerA = addListener(a, MockSimpleListener());
+      final observerB = addListener(b, MockSimpleListener());
+      final observerC = addListener(c, MockSimpleListener());
+      final observerE = addListener(e, MockSimpleListener());
 
       MutableCell.batch(() {
         c.value = 10;
         d.value = 9;
       });
 
-      verify(observerA.update(a)).called(1);
-      verify(observerC.update(c)).called(1);
-      verify(observerE.update(e)).called(1);
+      verify(observerA()).called(1);
+      verify(observerB()).called(1);
+      verify(observerC()).called(1);
+      verify(observerE()).called(1);
     });
 
     test('All MutableCellView observers called correct number of times', () {
       final a = MutableCell(1);
-      final sum = a.mutableApply((a) => a + 1, (sum) => a.value = sum - 1);
+      final b = MutableCell(2);
+
+      final sum = (a, b).mutableApply((a, b) => a + b, (sum) {
+        final half = sum ~/ 2;
+        a.value = half;
+        b.value = half;
+      }, key: 'A key'); // A non-null key to create a MutableCellView
 
       final c = (a + sum).store();
       final d = sum + 2.cell;
 
-      final observerC = addObserver(c, MockSimpleObserver());
-      final observerD = addObserver(d, MockSimpleObserver());
+      final observerC = addListener(c, MockSimpleListener());
+      final observerD = addListener(d, MockSimpleListener());
 
       MutableCell.batch(() {
         a.value = 2;
+        b.value = 3;
       });
 
       MutableCell.batch(() {
         a.value = 3;
+        b.value = 2;
       });
 
       MutableCell.batch(() {
         a.value = 10;
+        b.value = 20;
       });
 
-      verify(observerC.update(c)).called(3);
-      verify(observerD.update(d)).called(3);
+      verify(observerC()).called(3);
+      verify(observerD()).called(3);
     });
 
     test('Correct values produced with MutableCellView across all observer cells', () {
       final a = MutableCell(1);
-      final sum = a.mutableApply((a) => a + 1, (sum) => a.value = sum - 1);
+      final b = MutableCell(2);
+
+      final sum = (a, b).mutableApply((a, b) => a + b, (sum) {
+        final half = sum ~/ 2;
+        a.value = half;
+        b.value = half;
+      }, key: 'A key'); // A non-null key to create a MutableCellView
 
       final c = ValueCell.computed(() => a() + sum());
       final d = ValueCell.computed(() => sum() + 2);
@@ -3054,18 +3159,21 @@ void main() {
 
       MutableCell.batch(() {
         a.value = 2;
+        b.value = 3;
       });
 
       MutableCell.batch(() {
         a.value = 3;
+        b.value = 2;
       });
 
       MutableCell.batch(() {
         a.value = 10;
+        b.value = 20;
       });
 
-      expect(observerC.values, equals([5, 7, 21]));
-      expect(observerD.values, equals([5, 6, 13]));
+      expect(observerC.values, equals([7, 8, 40]));
+      expect(observerD.values, equals([7, 32]));
     });
 
     test('Exception on initialization of value reproduced on value access', () {
