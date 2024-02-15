@@ -1,7 +1,9 @@
 import '../base/keys.dart';
+import '../compute_cell/store_cell.dart';
 import 'compute_extension.dart';
 import '../value_cell.dart';
 
+/// Provides [Iterable] properties and methods directly on cells holding [Iterables]s.
 extension IterableCellExtension<T> on ValueCell<Iterable<T>> {
   /// Returns a cell which evaluates to [Iterable.first] applied on the [value] in this cell.
   ValueCell<T> get first => apply((value) => value.first,
@@ -37,6 +39,16 @@ extension IterableCellExtension<T> on ValueCell<Iterable<T>> {
   ValueCell<T> get single => apply((value) => value.single,
       key: _IterablePropKey(this, #single)
   );
+
+  /// Returns a cell which evaluates to [Iterable.toList] applied on the [value] in this cell.
+  ValueCell<List<T>> toList() => apply((value) => value.toList(),
+      key: _IterablePropKey(this, #toList)
+  ).store();
+
+  /// Returns a cell which evaluates to [Iterable.toSet] applied on the [value] in this cell.
+  ValueCell<Set<T>> toSet() => apply((value) => value.toSet(),
+      key: _IterablePropKey(this, #toSet)
+  ).store();
 }
 
 /// Key identifying a [ValueCell], which accesses an [Iterable] property.
