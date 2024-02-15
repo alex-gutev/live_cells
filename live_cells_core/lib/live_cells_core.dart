@@ -74,6 +74,8 @@ export 'src/extensions/conversion_extensions.dart'
 export 'src/extensions/list_cell_extension.dart'
     show ListCellExtension, MutableListCellExtension;
 
+export 'src/extensions/iterable_cell_extension.dart' show IterableCellExtension;
+
 export 'src/async_cell/delay_cell.dart' show DelayCell;
 
 export 'src/cell_watch/cell_watcher.dart' show CellWatcher;

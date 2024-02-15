@@ -7,44 +7,9 @@ import '../value_cell.dart';
 
 /// Provides [List] methods directly on cells holding [List]s.
 extension ListCellExtension<T> on ValueCell<List<T>> {
-  /// Returns a cell which evaluates to [List.first] applied on the [value] in this cell.
-  ValueCell<T> get first => apply((value) => value.first,
-      willChange: (_, v) => value.first != v.first,
-      key: _ListPropKey(this, #first)
-  );
-
-  /// Returns a cell which evaluates to [List.isEmpty] applied on the [value] in this cell.
-  ValueCell<bool> get isEmpty => apply((value) => value.isEmpty,
-      willChange: (_, v) => value.isEmpty != v.isEmpty,
-      key: _ListPropKey(this, #isEmpty)
-  );
-
-  /// Returns a cell which evaluates to [List.isNotEmpty] applied on the [value] in this cell.
-  ValueCell<bool> get isNotEmpty => apply((value) => value.isNotEmpty,
-      willChange: (_, v) => value.isNotEmpty != v.isNotEmpty,
-      key: _ListPropKey(this, #isNotEmpty)
-  );
-
-  /// Returns a cell which evaluates to [List.last] applied on the [value] in this cell.
-  ValueCell<T> get last => apply((value) => value.last,
-      willChange: (_, v) => value.last != v.last,
-      key: _ListPropKey(this, #last)
-  );
-
-  /// Returns a cell which evaluates to [List.length] applied on the [value] in this cell.
-  ValueCell<int> get length => apply((value) => value.length,
-      willChange: (_, v) => value.length != v.length,
-      key: _ListPropKey(this, #length)
-  );
-
   /// Returns a cell which evaluates to [List.reversed] applied on the [value] in this cell.
   ValueCell<Iterable<T>> get reversed => apply((value) => value.reversed,
     key: _ListPropKey(this, #reversed)
-  );
-
-  /// Returns a cell which evaluates to [List.single] applied on the [value] in this cell.
-  ValueCell<T> get single => apply((value) => value.single,
-    key: _ListPropKey(this, #single)
   );
 
   /// Returns a cell with a value equal the element at [index] in the [List] held in this cell.
