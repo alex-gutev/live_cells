@@ -4423,6 +4423,26 @@ void main() {
 
       verify(listener()).called(2);
     });
+
+    test('MutableCellView implements shouldNotify correctly', () {
+      final a = MutableCell([1, 2, 3]);
+      final b = a.mutableApply((a) => a[1], (_) {}, shouldNotify: (a, newValue) => a.value[1] != newValue[1]);
+
+      final listener = MockSimpleListener();
+
+      final watcher = ValueCell.watch(() {
+        b();
+        listener();
+      });
+
+      addTearDown(watcher.stop);
+
+      a.value = [4, 2, 6];
+      a.value = [7, 2, 8];
+      a.value = [9, 10, 11];
+
+      verify(listener()).called(2);
+    });
   });
 
   group('PrevValueCell', () {

@@ -26,10 +26,7 @@ extension ComputeExtension<T> on ValueCell<T> {
       key: key,
       shouldNotify: shouldNotify
   );
-}
 
-/// Provides a method for creating a mutable computed cell of a mutable cell cell.
-extension MutableComputeExtension<T> on MutableCell<T> {
   /// Create a new mutable cell, with a value that is a function of this cell's value.
   ///
   /// The value of the returned cell is computed by [fn], which is applied on
