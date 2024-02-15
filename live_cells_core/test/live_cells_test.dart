@@ -5418,6 +5418,123 @@ void main() {
       });
     });
   });
+
+  group('Iterable Cell Extensions', () {
+    group('.toList()', () {
+      test('ValueCell.toList() returns iterable elements in list', () {
+        final it = ValueCell.value(Iterable.generate(5, (i) => i));
+        final l = it.toList();
+
+        expect(l.value, equals([0, 1, 2, 3, 4]));
+      });
+
+      test('ValueCell.toList() reevaluated when list changes', () {
+        final it = MutableCell(Iterable.generate(5, (i) => i));
+        final l = it.toList();
+
+        observeCell(l);
+        expect(l.value, equals([0, 1, 2, 3, 4]));
+
+        it.value = Iterable.generate(3, (i) => 2 + i);
+        expect(l.value, equals([2, 3, 4]));
+      });
+
+      test('ValueCell.toList() notifies observers when list changes', () {
+        final it = MutableCell(Iterable.generate(5, (i) => i));
+        final l = it.toList();
+
+        final listener = MockSimpleListener();
+
+        l.listenable.addListener(listener);
+        addTearDown(() => l.listenable.removeListener(listener));
+
+        it.value = Iterable.generate(3, (i) => 2 + i);
+        it.value = Iterable.generate(10, (i) => 2 * i);
+        it.value = Iterable.generate(5, (_) => 0);
+
+        verify(listener()).called(3);
+      });
+
+      test('ValueCell.toList() compares == when same list cell', () {
+        final it = MutableCell(Iterable.generate(5, (i) => i));
+        final f1 = it.toList();
+        final f2 = it.toList();
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('ValueCell.toList() compares != when different list cells', () {
+        final it1 = MutableCell(Iterable.generate(5, (i) => i));
+        final it2 = MutableCell(Iterable.generate(5, (i) => i));
+
+        final f1 = it1.toList();
+        final f2 = it2.toList();
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+    });
+
+    group('.toSet()', () {
+      test('ValueCell.toSet() returns iterable elements in list', () {
+        final it = ValueCell.value(Iterable.generate(5, (i) => i));
+        final l = it.toSet();
+
+        expect(l.value, equals({0, 1, 2, 3, 4}));
+      });
+
+      test('ValueCell.toSet() reevaluated when list changes', () {
+        final it = MutableCell(Iterable.generate(5, (i) => i));
+        final l = it.toSet();
+
+        observeCell(l);
+        expect(l.value, equals({0, 1, 2, 3, 4}));
+
+        it.value = Iterable.generate(3, (i) => 2 + i);
+        expect(l.value, equals({2, 3, 4}));
+
+        it.value = Iterable.generate(15, (i) => i % 2);
+        expect(l.value, {0, 1});
+      });
+
+      test('ValueCell.toSet() notifies observers when list changes', () {
+        final it = MutableCell(Iterable.generate(5, (i) => i));
+        final l = it.toSet();
+
+        final listener = MockSimpleListener();
+
+        l.listenable.addListener(listener);
+        addTearDown(() => l.listenable.removeListener(listener));
+
+        it.value = Iterable.generate(3, (i) => 2 + i);
+        it.value = Iterable.generate(10, (i) => 2 * i);
+        it.value = Iterable.generate(5, (_) => 0);
+
+        verify(listener()).called(3);
+      });
+
+      test('ValueCell.toSet() compares == when same list cell', () {
+        final it = MutableCell(Iterable.generate(5, (i) => i));
+        final f1 = it.toSet();
+        final f2 = it.toSet();
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('ValueCell.toSet() compares != when different list cells', () {
+        final it1 = MutableCell(Iterable.generate(5, (i) => i));
+        final it2 = MutableCell(Iterable.generate(5, (i) => i));
+
+        final f1 = it1.toSet();
+        final f2 = it2.toSet();
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+    });
+  });
 }
 
 // Test utility functions
