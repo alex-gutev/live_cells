@@ -26,7 +26,8 @@ class ComputeCell<T> extends DependentCell<T> {
   ComputeCell({
     required this.compute,
     required List<ValueCell> arguments,
-    super.key
+    super.key,
+    super.shouldNotify
   }) : super(arguments);
 
   @override

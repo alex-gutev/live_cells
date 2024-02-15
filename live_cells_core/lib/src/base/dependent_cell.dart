@@ -21,6 +21,10 @@ abstract class DependentCell<T> extends ValueCell<T> {
   @protected
   final List<ValueCell> arguments;
 
+  /// Callback function called to determine whether observers of the cell should be notified
+  @protected
+  final ShouldNotifyCallback? shouldNotify;
+  
   /// Create a cell, of which the value depends on a list of argument cells.
   ///
   /// [arguments] is the list of all the argument cells on which the value
@@ -28,7 +32,14 @@ abstract class DependentCell<T> extends ValueCell<T> {
   ///
   /// If [key] is non-null, the returned [DependentCell] object will compare
   /// [==] to all [DependentCell] objects with the same [key] under [==].
-  DependentCell(this.arguments, {this.key});
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  DependentCell(this.arguments, {
+    this.key,
+    this.shouldNotify
+  });
 
   @override
   bool operator ==(other) => other is DependentCell && key != null
@@ -41,14 +52,20 @@ abstract class DependentCell<T> extends ValueCell<T> {
   @override
   void addObserver(CellObserver observer) {
     for (final dependency in arguments) {
-      dependency.addObserver(_CellObserverWrapper(this, observer));
+      dependency.addObserver(shouldNotify == null
+          ? _CellObserverWrapper(this, observer)
+          : _CellObserverCheckNotifyWrapper(this, observer, shouldNotify!)
+      );
     }
   }
 
   @override
   void removeObserver(CellObserver observer) {
     for (final dependency in arguments) {
-      dependency.removeObserver(_CellObserverWrapper(this, observer));
+      dependency.removeObserver(shouldNotify == null
+          ? _CellObserverWrapper(this, observer)
+          : _CellObserverCheckNotifyWrapper(this, observer, shouldNotify!)
+      );
     }
   }
 }
@@ -82,4 +99,13 @@ class _CellObserverWrapper extends CellObserver {
 
   @override
   bool get shouldNotifyAlways => observer.shouldNotifyAlways;
+}
+
+class _CellObserverCheckNotifyWrapper extends _CellObserverWrapper {
+  final ShouldNotifyCallback _shouldNotify;
+
+  _CellObserverCheckNotifyWrapper(super.observedCell, super.observer, this._shouldNotify);
+
+  @override
+  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
 }

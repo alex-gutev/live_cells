@@ -31,6 +31,8 @@ abstract class ValueCell<T> {
   /// observers of the cell should be notified for a given value change. If
   /// true, the observers are notified, otherwise they are not notified.
   ///
+  /// The created cell is identified by [key] if non-null.
+  ///
   /// Example:
   ///
   /// ```dart

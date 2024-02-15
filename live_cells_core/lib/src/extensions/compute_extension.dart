@@ -1,3 +1,4 @@
+import '../base/types.dart';
 import '../compute_cell/mutable_compute_cell.dart';
 import '../mutable_cell/mutable_cell.dart';
 import '../mutable_cell/mutable_cell_view.dart';
@@ -10,12 +11,21 @@ extension ComputeExtension<T> on ValueCell<T> {
   ///
   /// The value of the returned cell is the return value of [fn], a function of one argument,
   /// when applied on the this cell's value.
-  ValueCell<U> apply<U>(U Function(T value) fn, {key}) =>
-      ComputeCell(
-          compute: () => fn(value),
-          arguments: [this],
-          key: key
-      );
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ValueCell<U> apply<U>(U Function(T value) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      compute: () => fn(value),
+      arguments: [this],
+      key: key,
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Provides a method for creating a mutable computed cell of a mutable cell cell.
@@ -28,16 +38,23 @@ extension MutableComputeExtension<T> on MutableCell<T> {
   /// such that calling [fn] again will produce the same value that was passed to
   /// [reverse].
   ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
   /// The returned cell is identified by [key] if non-null. **NOTE**: A key
   /// argument is accepted since a [MutableCellView] is returned rather than
   /// a full mutable computed cell.
-  MutableCell<U> mutableApply<U>(U Function(T) fn, void Function(U) reverse, {key}) =>
-      MutableCellView(
-          argument: this,
-          compute: () => fn(value),
-          reverse: reverse,
-          key: key
-      );
+  MutableCell<U> mutableApply<U>(U Function(T) fn, void Function(U) reverse, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableCellView(
+      argument: this,
+      compute: () => fn(value),
+      reverse: reverse,
+      key: key,
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends [List] with a method for creating a [ComputeCell] with the argument
@@ -90,12 +107,21 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value),
-          arguments: [$1, $2]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value),
+      arguments: [$1, $2],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -110,12 +136,18 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -132,12 +164,21 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value, $3.value),
-          arguments: [$1, $2, $3]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value, $3.value),
+      arguments: [$1, $2, $3],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -152,12 +193,18 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -175,10 +222,20 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4) fn, {key}) => ComputeCell(
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value),
-      arguments: [$1, $2, $3, $4]
+      arguments: [$1, $2, $3, $4],
+      shouldNotify: shouldNotify
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -194,12 +251,18 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value, $4.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3, $4}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value, $4.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3, $4},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -218,12 +281,21 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
-          arguments: [$1, $2, $3, $4, $5]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
+      arguments: [$1, $2, $3, $4, $5],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -238,12 +310,18 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3, $4, $5}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3, $4, $5},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -263,12 +341,21 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
-          arguments: [$1, $2, $3, $4, $5, $6]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
+      arguments: [$1, $2, $3, $4, $5, $6],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -283,12 +370,18 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3, $4, $5, $6}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3, $4, $5, $6},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -309,12 +402,21 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
-          arguments: [$1, $2, $3, $4, $5, $6, $7]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
+      arguments: [$1, $2, $3, $4, $5, $6, $7],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -329,12 +431,18 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3, $4, $5, $6, $7}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3, $4, $5, $6, $7},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -356,12 +464,21 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
-          arguments: [$1, $2, $3, $4, $5, $6, $7, $8]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
+      arguments: [$1, $2, $3, $4, $5, $6, $7, $8],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -376,12 +493,18 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3, $4, $5, $6, $7, $8}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -404,12 +527,21 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
-          arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
+      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -424,12 +556,18 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9},
+      shouldNotify: shouldNotify
+  );
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -453,12 +591,21 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   ///
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
-  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, {key}) =>
-      ComputeCell(
-          key: key,
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
-          arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10]
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  ///
+  /// The created cell is identified by [key] if non-null.
+  ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, {
+    key,
+    ShouldNotifyCallback? shouldNotify
+  }) => ComputeCell(
+      key: key,
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
+      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10],
+      shouldNotify: shouldNotify
+  );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
   ///
@@ -473,10 +620,16 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   ///
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
-  MutableCell<U> mutableAPply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
-          reverseCompute: reverse,
-          arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10}
-      );
+  ///
+  /// If [shouldNotify] is non-null, it is called to determine whether the
+  /// observers of the cell should be notified for a given value change. If
+  /// true, the observers are notified, otherwise they are not notified.
+  MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, void Function(U) reverse, {
+    ShouldNotifyCallback? shouldNotify
+  }) => MutableComputeCell(
+      compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
+      reverseCompute: reverse,
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
+      shouldNotify: shouldNotify
+  );
 }

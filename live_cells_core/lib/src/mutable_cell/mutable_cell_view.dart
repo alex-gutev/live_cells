@@ -20,7 +20,8 @@ class MutableCellView<T> extends ComputeCell<T> implements MutableCell<T> {
     required this.argument,
     required this.reverse,
     required super.compute,
-    super.key
+    super.key,
+    super.shouldNotify
   }) : super(arguments: [argument]);
 
   @override
