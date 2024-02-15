@@ -157,14 +157,30 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2},
+      reverse: reverse,
+      arguments: [$1, $2],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -222,14 +238,30 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3},
+      reverse: reverse,
+      arguments: [$1, $2, $3],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -288,14 +320,30 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value, $4.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3, $4},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3, $4},
+      reverse: reverse,
+      arguments: [$1, $2, $3, $4],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -355,14 +403,30 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3, $4, $5},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3, $4, $5},
+      reverse: reverse,
+      arguments: [$1, $2, $3, $4, $5],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -423,14 +487,30 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3, $4, $5, $6},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3, $4, $5, $6},
+      reverse: reverse,
+      arguments: [$1, $2, $3, $4, $5, $6],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -492,14 +572,30 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3, $4, $5, $6, $7},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3, $4, $5, $6, $7},
+      reverse: reverse,
+      arguments: [$1, $2, $3, $4, $5, $6, $7],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -562,14 +658,30 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3, $4, $5, $6, $7, $8},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3, $4, $5, $6, $7, $8},
+      reverse: reverse,
+      arguments: [$1, $2, $3, $4, $5, $6, $7, $8],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -633,14 +745,30 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9},
+      reverse: reverse,
+      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9],
       willChange: willChange
-  );
+    );
+  }
 }
 
 /// Extends a record with a method for creating a [ComputeCell] by applying a
@@ -705,12 +833,28 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   /// it can be determined with certainty that it wont. **NOTE**: this function
   /// is only called if the new value of the argument cell is known, see
   /// [CellObserver.willChange] for more information.
+  ///
+  /// If [key] is non-null a [MutableCellView] identified by [key] is returned.
+  /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, void Function(U) reverse, {
-    WillChangeCallback? willChange
-  }) => MutableComputeCell(
+      WillChangeCallback? willChange,
+      key
+  }) {
+    if (key == null) {
+      return MutableComputeCell(
+        compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
+        reverseCompute: reverse,
+        arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
+        willChange: willChange
+      );
+    }
+
+    return MutableCellView(
+      key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
-      reverseCompute: reverse,
-      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
+      reverse: reverse,
+      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10],
       willChange: willChange
-  );
+    );
+  }
 }
