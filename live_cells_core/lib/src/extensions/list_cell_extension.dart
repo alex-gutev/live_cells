@@ -1,7 +1,6 @@
 import 'dart:collection';
 
-import 'package:live_cells_core/live_cells_core.dart';
-
+import 'iterable_cell_extension.dart';
 import '../base/keys.dart';
 import '../mutable_cell/mutable_cell.dart';
 import 'compute_extension.dart';
