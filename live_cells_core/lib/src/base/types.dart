@@ -1,7 +1,10 @@
 import '../value_cell.dart';
 
-/// Should notify observers callback function type
+/// Will cell value change callback function type.
 ///
 /// [cell] is the argument cell which is about to change its value to
 /// [newValue].
-typedef ShouldNotifyCallback = bool Function(ValueCell cell, dynamic newValue);
+///
+/// The function should return true if the cell's value may change and
+/// false if it is known with certainty that it wont.
+typedef WillChangeCallback = bool Function(ValueCell cell, dynamic newValue);

@@ -27,21 +27,23 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   @protected
   final Set<ValueCell> arguments;
 
-  /// Function that is called, if non-null, to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
-  final ShouldNotifyCallback? shouldNotify;
+  /// Callback function called to determine whether the cell's will change.
+  final WillChangeCallback? willChange;
 
   /// Construct a [MutableDependentCell] which depends on the cells in [arguments]
   ///
   /// Every cell of which the value is referenced in [compute] must be
   /// included in [arguments].
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableDependentCell(this.arguments, {
-    this.shouldNotify
+    this.willChange
   });
 
   /// Compute the value of the cell.
@@ -74,12 +76,12 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   MutableComputedCellState<T, MutableDependentCell<T>> createMutableState({
     covariant MutableComputedCellState<T, MutableDependentCell<T>>? oldState
   }) {
-    if (shouldNotify != null) {
+    if (willChange != null) {
       return MutableComputedCellStateNotifierCheck(
           cell: this,
           key: key,
           arguments: arguments,
-          shouldNotify: shouldNotify!
+          willChange: willChange!
       );
     }
     return MutableComputedCellState(

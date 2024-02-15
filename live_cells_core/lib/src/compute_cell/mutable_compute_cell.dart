@@ -21,9 +21,13 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
   /// [arguments] is a list of argument cells on which the value of the cell
   /// depends.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// Example:
   ///
@@ -43,7 +47,7 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
     required T Function() compute,
     required void Function(T) reverseCompute,
     required Set<ValueCell> arguments,
-    super.shouldNotify
+    super.willChange
   }) : _compute = compute, _reverseCompute = reverseCompute, super(arguments);
 
   @override

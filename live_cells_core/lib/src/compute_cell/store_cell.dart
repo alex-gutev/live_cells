@@ -16,11 +16,15 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   /// Create a [StoreCell] which observes and saves the value of [argCell]
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.shouldNotify] for more information.
   StoreCell(this.argCell, {
-    this.shouldNotify
+    this.willChange
   }) : super(key: _StoreCellKey(argCell));
 
   @override
@@ -44,11 +48,8 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// The observed cell
   final ValueCell<T> argCell;
 
-  ///
-  /// Function that is called, if non-null, to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
-  final ShouldNotifyCallback? shouldNotify;
+  /// Callback function called to determine whether the cell's value will change.
+  final WillChangeCallback? willChange;
   
   /// State restored by restoreState();
   CellState? _restoredState;
@@ -66,11 +67,11 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
       return state!;
     }
 
-    if (shouldNotify != null) {
+    if (willChange != null) {
       return StoreCellStateNotifyCheck<T>(
           cell: this,
           key: key,
-          shouldNotify: shouldNotify!
+          willChange: willChange!
       );
     }
 
@@ -104,12 +105,16 @@ extension StoreCellExtension<T> on ValueCell<T> {
   /// changes. Further references to the returned cell's value retrieve the
   /// stored value rather than running the computation function again.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.shouldNotify] for more information.
   StoreCell<T> store({
-    ShouldNotifyCallback? shouldNotify
-  }) => StoreCell(this, shouldNotify: shouldNotify);
+    WillChangeCallback? willChange
+  }) => StoreCell(this, willChange: willChange);
 }
 
 class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
@@ -147,16 +152,16 @@ class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
 
 /// A [StoreCellState] with [shouldNotify] defined by a callback function
 class StoreCellStateNotifyCheck<T> extends StoreCellState<T> {
-  final ShouldNotifyCallback _shouldNotify;
+  final WillChangeCallback _willChange;
 
   StoreCellStateNotifyCheck({
     required super.cell,
     required super.key,
-    required ShouldNotifyCallback shouldNotify
-  }) : _shouldNotify = shouldNotify;
+    required WillChangeCallback willChange
+  }) : _willChange = willChange;
 
   @override
-  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
+  bool shouldNotify(ValueCell cell, newValue) => _willChange(cell, newValue);
 }
 
 class _StoreCellKey {

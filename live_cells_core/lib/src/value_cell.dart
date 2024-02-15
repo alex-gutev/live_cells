@@ -27,9 +27,13 @@ abstract class ValueCell<T> {
   /// argument cell. Any change in the value of an argument cell will result
   /// in the value of the returned cell being recomputed.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.shouldNotify] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ///
@@ -44,12 +48,11 @@ abstract class ValueCell<T> {
   /// of either `a` or `b` changes, the value of `sum` is recomputed.
   factory ValueCell.computed(T Function() compute, {
     key,
-    ShouldNotifyCallback? shouldNotify
-  }) =>
-      DynamicComputeCell(
-          compute, key: key,
-          shouldNotify: shouldNotify
-      );
+    WillChangeCallback? willChange
+  }) => DynamicComputeCell(
+      compute, key: key,
+      willChange: willChange
+  );
 
   /// Register a callback function to be called whenever the values of the referenced cells change.
   ///

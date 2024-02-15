@@ -166,15 +166,15 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
 class MutableComputedCellStateNotifierCheck<T, S extends MutableDependentCell<T>>
     extends MutableComputedCellState<T,S> {
 
-  final ShouldNotifyCallback _shouldNotify;
+  final WillChangeCallback _willChange;
 
   MutableComputedCellStateNotifierCheck({
     required super.cell,
     required super.key,
     required super.arguments,
-    required ShouldNotifyCallback shouldNotify
-  }) : _shouldNotify = shouldNotify;
+    required WillChangeCallback willChange
+  }) : _willChange = willChange;
 
   @override
-  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
+  bool shouldNotify(ValueCell cell, newValue) => _willChange(cell, newValue);
 }

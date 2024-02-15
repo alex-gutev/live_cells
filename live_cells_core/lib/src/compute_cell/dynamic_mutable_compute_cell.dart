@@ -22,7 +22,7 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   DynamicMutableComputeCell({
     required T Function() compute,
     required void Function(T) reverseCompute,
-    super.shouldNotify
+    super.willChange
   }) : _compute = compute, _reverseCompute = reverseCompute, super({});
 
   @override
@@ -42,11 +42,11 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   MutableComputedCellState<T, DynamicMutableComputeCell<T>> createMutableState({
     covariant MutableComputedCellState<T, DynamicMutableComputeCell<T>>? oldState
   }) {
-    if (shouldNotify != null) {
+    if (willChange != null) {
       return _DynamicMutableComputedCellStateNotifierCheck(
           cell: this,
           key: key,
-          shouldNotify: shouldNotify!
+          willChange: willChange!
       );
     }
 
@@ -79,14 +79,14 @@ class _DynamicMutableComputeCellState<T>
 class _DynamicMutableComputedCellStateNotifierCheck<T>
     extends _DynamicMutableComputeCellState<T> {
 
-  final ShouldNotifyCallback _shouldNotify;
+  final WillChangeCallback _willChange;
 
   _DynamicMutableComputedCellStateNotifierCheck({
     required super.cell,
     required super.key,
-    required ShouldNotifyCallback shouldNotify
-  }) : _shouldNotify = shouldNotify;
+    required WillChangeCallback willChange
+  }) : _willChange = willChange;
 
   @override
-  bool shouldNotify(ValueCell cell, newValue) => _shouldNotify(cell, newValue);
+  bool shouldNotify(ValueCell cell, newValue) => _willChange(cell, newValue);
 }

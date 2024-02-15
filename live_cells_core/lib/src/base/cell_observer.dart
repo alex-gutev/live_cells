@@ -13,8 +13,8 @@ abstract class CellObserver {
   /// This method is called prior to calling [willUpdate] and its return value
   /// determines whether [willUpdate] will be called (true) or not (false).
   ///
-  /// [newValue] is the value to which the cell will be set after [willUpdate]
-  /// is called on all its observers.
+  /// [cell] is the observed cell, of which the value will be set to [newValue]
+  /// after [willUpdate] is called on all its observers.
   ///
   /// **NOTE**: This function is only called if [newValue] is known, which is
   /// generally only the case when setting the value of a [MutableCell].

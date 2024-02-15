@@ -14,17 +14,21 @@ extension ComputeExtension<T> on ValueCell<T> {
   ///
   /// The created cell is identified by [key] if non-null.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ValueCell<U> apply<U>(U Function(T value) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       compute: () => fn(value),
       arguments: [this],
       key: key,
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a new mutable cell, with a value that is a function of this cell's value.
@@ -35,22 +39,26 @@ extension ComputeExtension<T> on ValueCell<T> {
   /// such that calling [fn] again will produce the same value that was passed to
   /// [reverse].
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The returned cell is identified by [key] if non-null. **NOTE**: A key
   /// argument is accepted since a [MutableCellView] is returned rather than
   /// a full mutable computed cell.
   MutableCell<U> mutableApply<U>(U Function(T) fn, void Function(U) reverse, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableCellView(
       argument: this,
       compute: () => fn(value),
       reverse: reverse,
       key: key,
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -105,19 +113,23 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value),
       arguments: [$1, $2],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -134,16 +146,20 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value),
       reverseCompute: reverse,
       arguments: {$1, $2},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -162,19 +178,23 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value),
       arguments: [$1, $2, $3],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -191,16 +211,20 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -220,19 +244,23 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value),
       arguments: [$1, $2, $3, $4],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -249,16 +277,20 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value, $4.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3, $4},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -279,19 +311,23 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
       arguments: [$1, $2, $3, $4, $5],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -308,16 +344,20 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3, $4, $5},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -339,19 +379,23 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
       arguments: [$1, $2, $3, $4, $5, $6],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -368,16 +412,20 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3, $4, $5, $6},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -400,19 +448,23 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
       arguments: [$1, $2, $3, $4, $5, $6, $7],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -429,16 +481,20 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3, $4, $5, $6, $7},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -462,19 +518,23 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
       arguments: [$1, $2, $3, $4, $5, $6, $7, $8],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -491,16 +551,20 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3, $4, $5, $6, $7, $8},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -525,19 +589,23 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
       arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -554,16 +622,20 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }
 
@@ -589,19 +661,23 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   /// Whenever the value of one of the elements of [this] changes, [fn] is called
   /// again to compute the new value of the cell.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, {
     key,
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
       arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10],
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -618,15 +694,19 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, void Function(U) reverse, {
-    ShouldNotifyCallback? shouldNotify
+    WillChangeCallback? willChange
   }) => MutableComputeCell(
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
       reverseCompute: reverse,
       arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
-      shouldNotify: shouldNotify
+      willChange: willChange
   );
 }

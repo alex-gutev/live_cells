@@ -35,9 +35,13 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// [reverse] is called in a batch update, by [batch], so that the values of
   /// the argument cells are set simultaneously.
   ///
-  /// If [shouldNotify] is non-null, it is called to determine whether the
-  /// observers of the cell should be notified for a given value change. If
-  /// true, the observers are notified, otherwise they are not notified.
+  /// If [willChange] is non-null, it is called to determine whether the cell's
+  /// value will change for a change in the value of an argument cell. It is
+  /// called with the argument cell and its new value passed as arguments. The
+  /// function should return true if the cell's value may change, and false if
+  /// it can be determined with certainty that it wont. **NOTE**: this function
+  /// is only called if the new value of the argument cell is known, see
+  /// [CellObserver.willChange] for more information.
   ///
   /// Example:
   ///
@@ -48,13 +52,12 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// });
   /// ```
   factory MutableCell.computed(T Function() compute, void Function(T value) reverse, {
-    ShouldNotifyCallback? shouldNotify
-  }) =>
-      DynamicMutableComputeCell(
-          compute: compute,
-          reverseCompute: reverse,
-          shouldNotify: shouldNotify
-      );
+    WillChangeCallback? willChange
+  }) => DynamicMutableComputeCell(
+      compute: compute,
+      reverseCompute: reverse,
+      willChange: willChange
+  );
 
   /// Set the value of the cell.
   ///
