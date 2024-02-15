@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:live_cells_core/live_cells_core.dart';
+
 import '../base/keys.dart';
 import '../mutable_cell/mutable_cell.dart';
 import 'compute_extension.dart';
@@ -17,6 +19,22 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
     willChange: (_, v) => value[index] != v[index],
     key: _ListIndexKey(this, index)
   );
+
+  /// Returns a cell which wraps the elements of the [List] held in this cell in [ValueCell]s.
+  ///
+  /// The value of the returned cell is a list of cells, where each cell accesses
+  /// the element at the corresponding index of the list.
+  ///
+  /// The returned cell is only recomputed when the length of the list held in
+  /// this cell changes. It is not recomputed when the individual elements
+  /// change.
+  ///
+  /// A keyed cell is returned so that all accesses to this property, for a given
+  /// [List] cell, will return an equivalent cell.
+  ValueCell<Iterable<ValueCell<T>>> get cells =>
+      length.apply((length) => Iterable.generate(length, (i) => this[i]),
+        key: _ListPropKey(this, #cells)
+      );
 }
 
 /// Provides variants which return [MutableCell] of the methods provided by [ListCellExtension].

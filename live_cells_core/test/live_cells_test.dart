@@ -5417,6 +5417,82 @@ void main() {
         expect(observer.values, equals([[1, 10, 3], [1, 10, 20]]));
       });
     });
+
+    group('.cells', () {
+      test('ValueCell.cells returns list of cells observing each element', () {
+        const list = ValueCell.value(['a', 'b', 'c']);
+        final cells = list.cells.value.toList();
+
+        expect(cells[0].value, 'a');
+        expect(cells[1].value, 'b');
+        expect(cells[2].value, 'c');
+      });
+
+      test('ValueCell.cells notifies observer when list length changed', () {
+        final list = MutableCell([1, 2, 3, 4]);
+        final cells = list.cells;
+
+        final l = addListener(cells, MockSimpleListener());
+
+        list.value = [5, 6, 7, 8];
+        list.value = [1, 2];
+        list.value = [0];
+        list.value = [100];
+
+        verify(l()).called(2);
+      });
+
+      test('ValueCell.cells returns list of cells which notify observer when element changed', () {
+        final list = MutableCell([1, 2, 3, 4]);
+        final cells = list.cells.value.toList();
+
+        final o1 = addObserver(cells[0], MockValueObserver());
+        final o2 = addObserver(cells[2], MockValueObserver());
+
+        list.value = [5, 6, 7, 8];
+        list.value = [5, 10, 15, 20];
+        list.value = [100, 101, 102, 103, 104, 105, 106];
+
+        expect(o1.values, equals([5, 100]));
+        expect(o2.values, equals([7, 15, 102]));
+      });
+
+      test('ValueCell.cells returns list of cells which do not notify observer when element not changed', () {
+        final list = MutableCell([1, 2, 3, 4]);
+        final cells = list.cells.value.toList();
+
+        final l1 = addListener(cells[0], MockSimpleListener());
+        final l2 = addListener(cells[2], MockSimpleListener());
+
+        list.value = [5, 6, 7, 8];
+        list.value = [5, 10, 15, 20];
+        list.value = [100, 101, 102, 103, 104, 105, 106];
+        list.value = [100, 0, 102];
+
+        verify(l1()).called(2);
+        verify(l2()).called(3);
+      });
+
+      test('ValueCell.cells compares == when same list cell', () {
+        const l = ValueCell.value([1, 2, 3]);
+        final f1 = l.cells;
+        final f2 = l.cells;
+
+        expect(f1 == f2, isTrue);
+        expect(f1.hashCode == f2.hashCode, isTrue);
+      });
+
+      test('ValueCell.cells compares != when different list cells', () {
+        final ValueCell<List<int>> l1 = MutableCell([1, 2, 3]);
+        final ValueCell<List<int>> l2 = MutableCell([1, 2, 3]);
+
+        final f1 = l1.cells;
+        final f2 = l2.cells;
+
+        expect(f1 != f2, isTrue);
+        expect(f1 == f1, isTrue);
+      });
+    });
   });
 
   group('Iterable Cell Extensions', () {
@@ -5555,4 +5631,17 @@ T addObserver<T extends CellObserver>(ValueCell cell, T observer) {
   addTearDown(() => cell.removeObserver(observer));
 
   return observer;
+}
+
+/// Add a listener to a cell via (ValueCell.listenable).
+///
+/// This function also adds a teardown to the current test which removes
+/// the [listener] from [cell], after the current test runs.
+T addListener<T extends SimpleListener>(ValueCell cell, T? listener) {
+  listener ??= MockSimpleListener() as T?;
+
+  cell.listenable.addListener(listener!.call);
+  addTearDown(() => cell.listenable.removeListener(listener!.call));
+
+  return listener;
 }
