@@ -5382,6 +5382,97 @@ void main() {
         expect(l.value, equals([1, 20, 3]));
       });
 
+      test('ValueCell.operator[] notifies observers when index changed', () {
+        const l = ValueCell.value([2, 4, 8, 16, 32]);
+        final i = MutableCell(2);
+        final e = l[i];
+        
+        final observer = addObserver(e, MockValueObserver());
+
+        i.value = 0;
+        i.value = 3;
+        i.value = 1;
+
+        expect(observer.values, equals([2, 16, 4]));
+      });
+
+      test('Mutable.operator[] notifies observers when index changed', () {
+        final l = MutableCell([2, 4, 8, 16, 32]);
+        final i = MutableCell(2);
+        final e = l[i];
+
+        final observer = addObserver(e, MockValueObserver());
+
+        i.value = 0;
+        i.value = 3;
+        i.value = 1;
+
+        expect(observer.values, equals([2, 16, 4]));
+      });
+
+      test('ValueCell.operator[] does not notify observers when index not changed', () {
+        const l = ValueCell.value([2, 4, 8, 16, 32]);
+        final i = MutableCell(2);
+        final e = l[i];
+
+        final listener = addListener(e, MockSimpleListener());
+
+        i.value = 2;
+        i.value = 2;
+        i.value = 1;
+        i.value = 1;
+        i.value = 0;
+
+        verify(listener()).called(2);
+      });
+
+      test('Mutable.operator[] does not notify observers when index not changed', () {
+        final l = MutableCell([2, 4, 8, 16, 32]);
+        final i = MutableCell(2);
+        final e = l[i];
+
+        final listener = addListener(e, MockSimpleListener());
+
+        i.value = 2;
+        i.value = 2;
+        i.value = 1;
+        i.value = 1;
+        i.value = 0;
+
+        verify(listener()).called(2);
+      });
+
+      test('ValueCell.operator[] gets has correct value in batch update', () {
+        final l1 = MutableCell([2, 4, 8]);
+        final ValueCell<List<int>> l2 = l1;
+        final i = MutableCell(2);
+        final e = l2[i];
+
+        final observer = addObserver(e, MockValueObserver());
+
+        MutableCell.batch(() {
+          i.value = 4;
+          l1.value = [16, 32, 64, 128, 256, 512];
+        });
+
+        expect(observer.values, equals([256]));
+      });
+
+      test('MutableCell.operator[] gets has correct value in batch update', () {
+        final l = MutableCell([2, 4, 8]);
+        final i = MutableCell(2);
+        final e = l[i];
+
+        final observer = addObserver(e, MockValueObserver());
+
+        MutableCell.batch(() {
+          i.value = 4;
+          l.value = [16, 32, 64, 128, 256, 512];
+        });
+
+        expect(observer.values, equals([256]));
+      });
+
       test('ValueCell.operator[] compares == when same list cell and same index', () {
         const l = ValueCell.value([1, 2, 3]);
         final f1 = l[2.cell];
