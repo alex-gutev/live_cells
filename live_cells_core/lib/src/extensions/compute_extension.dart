@@ -1,4 +1,3 @@
-import '../base/types.dart';
 import '../compute_cell/store_cell.dart';
 import '../compute_cell/mutable_compute_cell.dart';
 import '../mutable_cell/mutable_cell.dart';
@@ -700,7 +699,6 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   /// The created cell is identified by [key] if non-null.
   ValueCell<U> apply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, {
     key,
-    WillChangeCallback? willChange
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
