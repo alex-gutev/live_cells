@@ -5,6 +5,7 @@ import '../base/keys.dart';
 import '../mutable_cell/mutable_cell.dart';
 import 'compute_extension.dart';
 import '../value_cell.dart';
+import 'values_extension.dart';
 
 /// Provides [List] methods directly on cells holding [List]s.
 extension ListCellExtension<T> on ValueCell<List<T>> {
@@ -14,9 +15,16 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
   );
 
   /// Returns a cell with a value equal the element at [index] in the [List] held in this cell.
-  ValueCell<T> operator[](int index) => apply((value) => value[index],
-    willChange: (_, v) => value[index] != v[index],
-    key: _ListIndexKey(this, index)
+  ValueCell<T> operator[](ValueCell<int> index) => (this, index).apply((l, i) => l[i],
+    key: _ListIndexKey(this, index),
+    willChange: (cell, v) {
+      if (cell == this) {
+        final i = index.value;
+        return value[i] != v[i];
+      }
+
+      return true;
+    }
   );
 
   /// Returns a cell which wraps the elements of the [List] held in this cell in [ValueCell]s.
@@ -31,7 +39,7 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
   /// A keyed cell is returned so that all accesses to this property, for a given
   /// [List] cell, will return an equivalent cell.
   ValueCell<Iterable<ValueCell<T>>> get cells =>
-      length.apply((length) => Iterable.generate(length, (i) => this[i]),
+      length.apply((length) => Iterable.generate(length, (i) => this[i.cell]),
         key: _ListPropKey(this, #cells)
       );
 }
@@ -80,10 +88,17 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// at [index] in the [List] held in this cell.
   ///
   /// **NOTE**: The actual list is not modified but a new list is created.
-  MutableCell<T> operator[](int index) => mutableApply((value) => value[index],
-      (v) => value = _updatedList(value, index, v),
-      willChange: (_, v) => value[index] != v[index],
-      key: _MutableListIndexKey(this, index)
+  MutableCell<T> operator[](ValueCell<int> index) => (this, index).mutableApply((l, i) => l[i],
+      (v) => value = _updatedList(value, index.value, v),
+      key: _MutableListIndexKey(this, index),
+      willChange: (cell, v) {
+        if (cell == this) {
+          final i = index.value;
+          return value[i] != v[i];
+        }
+
+        return true;
+      }
   );
 
   /// Set the value of element [index] to [elem] in the [List] held in this cell.
@@ -113,20 +128,20 @@ class _MutableListPropKey extends ValueKey2<MutableCell, Symbol> {
 }
 
 /// Key identifying a [ValueCell] which access an element with a [List]
-class _ListIndexKey extends ValueKey2<ValueCell, int> {
+class _ListIndexKey extends ValueKey2<ValueCell, ValueCell> {
   /// Create the key.
   ///
-  /// [value1] is a [ValueCell] holding a list and [value2] is the index of the
-  /// element being accessed.
+  /// [value1] is a [ValueCell] holding a list and [value2] is a [ValueCell]
+  /// holding the index of the element being accessed.
   _ListIndexKey(super.value1, super.value2);
 }
 
 /// Key identifying a [MutableCell] which access an element with a [List]
-class _MutableListIndexKey extends ValueKey2<MutableCell, int> {
+class _MutableListIndexKey extends ValueKey2<MutableCell, ValueCell> {
   /// Create the key.
   ///
-  /// [value1] is a [MutableCell] holding a list and [value2] is the index of the
-  /// element being accessed.
+  /// [value1] is a [ValueCell] holding a list and [value2] is a [ValueCell]
+  /// holding the index of the element being accessed.
   _MutableListIndexKey(super.value1, super.value2);
 }
 

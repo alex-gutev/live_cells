@@ -5297,14 +5297,14 @@ void main() {
     group('.operator[]', () {
       test('ValueCell.operator[] retrieves indexed element', () {
         const l = ValueCell.value([10, 20, 30, 40]);
-        final f = l[2];
+        final f = l[2.cell];
 
         expect(f.value, 30);
       });
 
       test('MutableCell.operator[] retrieves indexed element', () {
         final l = MutableCell([10, 20, 30, 40]);
-        final f = l[1];
+        final f = l[1.cell];
 
         expect(f.value, 20);
       });
@@ -5312,7 +5312,7 @@ void main() {
       test('ValueCell.operator[] notifies observers when indexed element changed', () {
         final l = MutableCell([11, 22, 33, 44, 55]);
         final ValueCell<List<int>> l2 = l;
-        final observer = addObserver(l2[3], MockValueObserver());
+        final observer = addObserver(l2[3.cell], MockValueObserver());
 
         l.value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         l.value = [11, 12, 13, 14];
@@ -5323,7 +5323,7 @@ void main() {
 
       test('Mutable.operator[] notifies observers when indexed element changed', () {
         final l = MutableCell([1, 2, 3]);
-        final observer = addObserver(l[3], MockValueObserver());
+        final observer = addObserver(l[3.cell], MockValueObserver());
 
         l.value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         l.value = [11, 12, 13, 14];
@@ -5335,7 +5335,7 @@ void main() {
       test('ValueCell.operator[] does not notify observers when indexed element not changed', () {
         final l = MutableCell([1, 2, 3, 4, 5, 6, 7]);
         final ValueCell<List<int>> l2 = l;
-        final f = l2[3];
+        final f = l2[3.cell];
 
         final listener = MockSimpleListener();
 
@@ -5354,7 +5354,7 @@ void main() {
 
       test('MutableCell.operator[] does not notify observers when indexed element not changed', () {
         final l = MutableCell([1, 2, 3, 4, 5, 6, 7]);
-        final f = l[3];
+        final f = l[3.cell];
 
         final listener = MockSimpleListener();
 
@@ -5373,7 +5373,7 @@ void main() {
 
       test('Setting MutableCell.operator[].value, updates list cell value', () {
         final l = MutableCell([1, 2, 3]);
-        final f = l[1];
+        final f = l[1.cell];
 
         f.value = 10;
         expect(l.value, equals([1, 10, 3]));
@@ -5384,8 +5384,8 @@ void main() {
 
       test('ValueCell.operator[] compares == when same list cell and same index', () {
         const l = ValueCell.value([1, 2, 3]);
-        final f1 = l[2];
-        final f2 = l[2];
+        final f1 = l[2.cell];
+        final f2 = l[2.cell];
 
         expect(f1 == f2, isTrue);
         expect(f1.hashCode == f2.hashCode, isTrue);
@@ -5395,8 +5395,8 @@ void main() {
         final ValueCell<List<int>> l1 = MutableCell([1, 2, 3]);
         final ValueCell<List<int>> l2 = MutableCell([1, 2, 3]);
 
-        final f1 = l1[1];
-        final f2 = l2[1];
+        final f1 = l1[1.cell];
+        final f2 = l2[1.cell];
 
         expect(f1 != f2, isTrue);
         expect(f1 == f1, isTrue);
@@ -5405,8 +5405,8 @@ void main() {
       test('ValueCell.operator[] compares != when different indices', () {
         final ValueCell<List<int>> l = MutableCell([1, 2, 3]);
 
-        final f1 = l[0];
-        final f2 = l[1];
+        final f1 = l[0.cell];
+        final f2 = l[1.cell];
 
         expect(f1 != f2, isTrue);
         expect(f1 == f1, isTrue);
@@ -5414,8 +5414,8 @@ void main() {
 
       test('MutableCell.operator[] compares == when same list cell and same index', () {
         final l = MutableCell([1, 2, 3]);
-        final f1 = l[2];
-        final f2 = l[2];
+        final f1 = l[2.cell];
+        final f2 = l[2.cell];
 
         expect(f1 == f2, isTrue);
         expect(f1.hashCode == f2.hashCode, isTrue);
@@ -5425,8 +5425,8 @@ void main() {
         final l1 = MutableCell([1, 2, 3]);
         final l2 = MutableCell([1, 2, 3]);
 
-        final f1 = l1[1];
-        final f2 = l2[1];
+        final f1 = l1[1.cell];
+        final f2 = l2[1.cell];
 
         expect(f1 != f2, isTrue);
         expect(f1 == f1, isTrue);
@@ -5435,8 +5435,8 @@ void main() {
       test('Mutable.operator[] compares != when different indices', () {
         final l = MutableCell([1, 2, 3]);
 
-        final f1 = l[0];
-        final f2 = l[1];
+        final f1 = l[0.cell];
+        final f2 = l[1.cell];
 
         expect(f1 != f2, isTrue);
         expect(f1 == f1, isTrue);
