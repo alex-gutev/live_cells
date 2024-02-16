@@ -5833,6 +5833,353 @@ void main() {
       });
     });
   });
+
+  group('Map Cell Extensions', () {
+    group('.operator[]', () {
+      test('ValueCell.operator[] retrieves entry value', () {
+        const m = ValueCell.value({
+          'a': 10,
+          'b': 4,
+          'c': 1
+        });
+        final v = m['b'.cell];
+
+        expect(v.value, 4);
+      });
+
+      test('MutableCell.operator[] retrieves entry value', () {
+        final m = MutableCell({
+          'a': 10,
+          'b': 4,
+          'c': 1
+        });
+        final v = m['b'.cell];
+
+        expect(v.value, 4);
+      });
+
+      test('ValueCell.operator[] notifies observers when entry changes', () {
+        final m1 = MutableCell({
+          'a': 10,
+          'b': 4,
+          'c': 1
+        });
+
+        final ValueCell<Map<String, int>> m2 = m1;
+
+        final v = m2['b'.cell];
+        final observer = addObserver(v, MockValueObserver());
+
+        m1.value = {
+          'a': 0,
+          'b': 34
+        };
+
+        m1.value = {
+          'b': 7
+        };
+
+        m1.value = {
+          'a': 9,
+          'd': 89
+        };
+
+        expect(observer.values, equals([34, 7, null]));
+      });
+
+      test('MutableCell.operator[] notifies observers when entry changes', () {
+        final m = MutableCell({
+          'a': 10,
+          'b': 4,
+          'c': 1
+        });
+
+        final v = m['b'.cell];
+        final observer = addObserver(v, MockValueObserver());
+
+        m.value = {
+          'a': 0,
+          'b': 34
+        };
+
+        m.value = {
+          'b': 7
+        };
+
+        m.value = {
+          'a': 9,
+          'd': 89
+        };
+
+        expect(observer.values, equals([34, 7, null]));
+      });
+
+      test('ValueCell.operator[] does not notify observers when entry does not change', () {
+        final m = MutableCell({
+          'a1': 0,
+          'a2': 3,
+          'b3': 5,
+          'c4': 10
+        });
+
+        final ValueCell<Map<String, int>> m2 = m;
+
+        final e = m2['b3'.cell];
+        final listener = addListener(e, MockSimpleListener());
+
+        m.value = {
+          'a1': -100,
+          'a2': 70,
+          'b3': 5
+        };
+
+        verifyNever(listener());
+
+        m.value = {
+          'b3': 5
+        };
+
+        verifyNever(listener());
+
+        m.value = {
+          'b3': 90
+        };
+
+        verify(listener()).called(1);
+
+        m.value = {
+          'b3': 90,
+          'a': 180
+        };
+
+        verifyNever(listener());
+
+        m.value = {};
+        verify(listener()).called(1);
+      });
+
+      test('MutableCell.operator[] does not notify observers when entry does not change', () {
+        final m = MutableCell({
+          'a1': 0,
+          'a2': 3,
+          'b3': 5,
+          'c4': 10
+        });
+
+        final e = m['b3'.cell];
+        final listener = addListener(e, MockSimpleListener());
+
+        m.value = {
+          'a1': -100,
+          'a2': 70,
+          'b3': 5
+        };
+
+        verifyNever(listener());
+
+        m.value = {
+          'b3': 5
+        };
+
+        verifyNever(listener());
+
+        m.value = {
+          'b3': 90
+        };
+
+        verify(listener()).called(1);
+
+        m.value = {
+          'b3': 90,
+          'a': 180
+        };
+
+        verifyNever(listener());
+
+        m.value = {};
+        verify(listener()).called(1);
+      });
+
+      test('Setting MutableCell.operator[].value updates map cell value', () {
+        final m = MutableCell({
+          'k1': 2,
+          'k2': 4,
+          'k3': 8
+        });
+
+        final e = m['k2'.cell];
+
+        e.value = 64;
+        expect(m.value, equals({
+          'k1': 2,
+          'k2': 64,
+          'k3': 8
+        }));
+
+        e.value = 100;
+        expect(m.value, equals({
+          'k1': 2,
+          'k2': 100,
+          'k3': 8
+        }));
+      });
+
+      test('ValueCell.operator[] notifies observers when key changed', () {
+        const m = ValueCell.value({
+          'a': 3,
+          'b': 9,
+          'c': 27
+        });
+
+        final k = MutableCell('');
+        final e = m[k];
+
+        final observer = addObserver(e, MockValueObserver());
+
+        k.value = 'b';
+        k.value = 'c';
+        k.value = 'something else';
+        k.value = 'a';
+
+        expect(observer.values, equals([9, 27, null, 3]));
+      });
+
+      test('MutableCell.operator[] notifies observers when key changed', () {
+        final m = MutableCell({
+          'a': 3,
+          'b': 9,
+          'c': 27
+        });
+
+        final k = MutableCell('');
+        final e = m[k];
+
+        final observer = addObserver(e, MockValueObserver());
+
+        k.value = 'b';
+        k.value = 'c';
+        k.value = 'something else';
+        k.value = 'a';
+
+        expect(observer.values, equals([9, 27, null, 3]));
+      });
+
+      test('ValueCell.operator[] gets correct value in batch update', () {
+        final m = MutableCell({'1': 100, '2': 300});
+        final ValueCell<Map<String, int>> m2 = m;
+
+        final k = MutableCell('1');
+        final e = m2[k];
+
+        final observer = addObserver(e, MockValueObserver());
+
+        MutableCell.batch(() {
+          k.value = '5';
+          m.value = {
+            '3': 9,
+            '5': 80
+          };
+        });
+
+        expect(observer.values, equals([80]));
+      });
+
+      test('MutableCell.operator[] gets correct value in batch update', () {
+        final m = MutableCell({'1': 100, '2': 300});
+        final k = MutableCell('1');
+        final e = m[k];
+
+        final observer = addObserver(e, MockValueObserver());
+
+        MutableCell.batch(() {
+          k.value = '5';
+          m.value = {
+            '3': 9,
+            '5': 80
+          };
+        });
+
+        expect(observer.values, equals([80]));
+      });
+
+      test('ValueCell.operator[] compares == when same map and key cells', () {
+        const map = ValueCell.value({});
+        final e1 = map['key1'.cell];
+        final e2 = map['key1'.cell];
+
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
+
+      test('ValueCell.operator[] compares != when different map cells', () {
+        const m1 = ValueCell.value({});
+        const m2 = ValueCell.value({ 'a': 0 });
+
+        final e1 = m1['key1'.cell];
+        final e2 = m2['key1'.cell];
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('ValueCell.operator[] compares != when different key cells', () {
+        const map = ValueCell.value({});
+        final e1 = map['key1'.cell];
+        final e2 = map['key2'.cell];
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('MutableCell.operator[] compares == when same map and key cells', () {
+        final map = MutableCell({});
+        final e1 = map['key1'.cell];
+        final e2 = map['key1'.cell];
+
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
+
+      test('MutableCell.operator[] compares != when different map cells', () {
+        final m1 = MutableCell({});
+        final m2 = MutableCell({ 'a': 0 });
+
+        final e1 = m1['key1'.cell];
+        final e2 = m2['key1'.cell];
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('MutableCell.operator[] compares != when different key cells', () {
+        final map = MutableCell({});
+        final e1 = map['key1'.cell];
+        final e2 = map['key2'.cell];
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+    });
+
+    group('.operator[]=', () {
+      test('MutableCell.operator[]= updates map cell value', () {
+        final m = MutableCell({
+          'a': 4,
+          'b': 16
+        });
+
+        final observer = addObserver(m, MockValueObserver());
+
+        m['a'] = 20;
+        m['b'] = 50;
+
+        expect(observer.values, equals([
+          {'a': 20, 'b': 16},
+          {'a': 20, 'b': 50}
+        ]));
+      });
+    });
+  });
 }
 
 // Test utility functions
