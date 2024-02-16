@@ -14,7 +14,7 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
     key: _ListPropKey(this, #reversed)
   );
 
-  /// Returns a cell with a value equal the element at [index] in the [List] held in this cell.
+  /// Returns a cell with a value equal to the element at [index] in the [List] held in this cell.
   ValueCell<T> operator[](ValueCell<int> index) => (this, index).apply((l, i) => l[i],
     key: _ListIndexKey(this, index),
     willChange: (cell, v) {
@@ -82,7 +82,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
       key: _MutableListPropKey(this, #length)
   );
 
-  /// Returns a cell with a value equal the element at [index] in the [List] held in this cell.
+  /// Returns a cell with a value equal to the element at [index] in the [List] held in this cell.
   ///
   /// Changing the value of the returned cell, changes the value of the element
   /// at [index] in the [List] held in this cell.
