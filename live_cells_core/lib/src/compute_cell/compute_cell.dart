@@ -11,14 +11,6 @@ class ComputeCell<T> extends DependentCell<T> {
   /// depends. The observers of this cell are notified whenever the values of
   /// the argument cells change.
   ///
-  /// If [willChange] is non-null, it is called to determine whether the cell's
-  /// value will change for a change in the value of an argument cell. It is
-  /// called with the argument cell and its new value passed as arguments. The
-  /// function should return true if the cell's value may change, and false if
-  /// it can be determined with certainty that it wont. **NOTE**: this function
-  /// is only called if the new value of the argument cell is known, see
-  /// [CellObserver.willChange] for more information.
-  ///
   /// Example:
   ///
   /// ```dart
@@ -35,7 +27,6 @@ class ComputeCell<T> extends DependentCell<T> {
     required this.compute,
     required List<ValueCell> arguments,
     super.key,
-    super.willChange
   }) : super(arguments);
 
   @override

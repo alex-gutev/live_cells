@@ -56,9 +56,6 @@ class _DelayCellState<T> extends CellState<DelayCell> implements CellObserver {
   bool get shouldNotifyAlways => false;
 
   @override
-  bool shouldNotify(ValueCell cell, newValue) => true;
-
-  @override
   void init() {
     super.init();
     cell._initValue(arg.value);
@@ -77,7 +74,7 @@ class _DelayCellState<T> extends CellState<DelayCell> implements CellObserver {
   }
 
   @override
-  void update(ValueCell cell) {
+  void update(ValueCell cell, bool didChange) {
     if (_updating) {
       _updateValue(cell.value);
       _updating = false;

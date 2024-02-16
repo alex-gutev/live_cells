@@ -63,6 +63,9 @@ class _ListenerCellObserverAdapter extends CellObserver {
   /// Is an update currently in progress.
   var _updating = false;
 
+  // Is the listener waiting for [update] to be called with didChange = true?
+  var _waitingForChange = false;
+
   _ListenerCellObserverAdapter(this.listener);
 
   @override
@@ -74,15 +77,22 @@ class _ListenerCellObserverAdapter extends CellObserver {
   int get hashCode => listener.hashCode;
   
   @override
-  void update(ValueCell cell) {
-    if (_updating) {
+  void update(ValueCell cell, bool didChange) {
+    if (_updating || (didChange && _waitingForChange)) {
       _updating = false;
-      listener();
+      _waitingForChange = !didChange;
+
+      if (didChange) {
+        listener();
+      }
     }
   }
 
   @override
   void willUpdate(ValueCell cell) {
-    _updating = true;
+    if (!_updating) {
+      _updating = true;
+      _waitingForChange = false;
+    }
   }
 }

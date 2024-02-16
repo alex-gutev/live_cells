@@ -44,6 +44,9 @@ class _CellWatchObserver implements CellObserver {
   /// Are the referenced cells in the process of updating their values
   var _isUpdating = false;
 
+  /// Is the observer waiting for [update] to be called with didChange equal to true.
+  var _waitingForChange = false;
+
   /// Create a cell observer which calls *cell watcher* [watch]
   _CellWatchObserver(this.watch) {
     _callWatchFn();
@@ -72,18 +75,22 @@ class _CellWatchObserver implements CellObserver {
   bool get shouldNotifyAlways => false;
 
   @override
-  bool shouldNotify(ValueCell cell, newValue) => true;
-
-  @override
-  void update(ValueCell cell) {
-    if (_isUpdating) {
+  void update(ValueCell cell, bool didChange) {
+    if (_isUpdating || (didChange && _waitingForChange)) {
       _isUpdating = false;
-      _callWatchFn();
+      _waitingForChange = !didChange;
+      
+      if (didChange) {
+        _callWatchFn();
+      }
     }
   }
 
   @override
   void willUpdate(ValueCell cell) {
-    _isUpdating = true;
+    if (!_isUpdating) {
+      _isUpdating = true;
+      _waitingForChange = false;
+    }
   }
 }

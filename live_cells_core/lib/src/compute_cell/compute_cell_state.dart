@@ -71,9 +71,6 @@ abstract class ComputeCellState<T, S extends StatefulCell> extends CellState<S>
   @override
   bool get shouldNotifyAlways => false;
 
-  @override
-  bool shouldNotify(ValueCell cell, newValue) => true;
-
   // Private
 
   /// The value

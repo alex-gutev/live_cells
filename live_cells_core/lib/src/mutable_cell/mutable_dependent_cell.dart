@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-import '../base/types.dart';
 import '../compute_cell/mutable_computed_cell_state.dart';
 import '../restoration/restoration.dart';
 import '../value_cell.dart';
@@ -27,23 +26,19 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   @protected
   final Set<ValueCell> arguments;
 
-  /// Callback function called to determine whether the cell's will change.
-  final WillChangeCallback? willChange;
+  /// Should the cell notify its observers only when its value has changed?
+  @protected
+  final bool checkChanges;
 
   /// Construct a [MutableDependentCell] which depends on the cells in [arguments]
   ///
   /// Every cell of which the value is referenced in [compute] must be
   /// included in [arguments].
   ///
-  /// If [willChange] is non-null, it is called to determine whether the cell's
-  /// value will change for a change in the value of an argument cell. It is
-  /// called with the argument cell and its new value passed as arguments. The
-  /// function should return true if the cell's value may change, and false if
-  /// it can be determined with certainty that it wont. **NOTE**: this function
-  /// is only called if the new value of the argument cell is known, see
-  /// [CellObserver.willChange] for more information.
+  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// if its value has actually changed.
   MutableDependentCell(this.arguments, {
-    this.willChange
+    this.checkChanges = false
   });
 
   /// Compute the value of the cell.
@@ -76,12 +71,12 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   MutableComputedCellState<T, MutableDependentCell<T>> createMutableState({
     covariant MutableComputedCellState<T, MutableDependentCell<T>>? oldState
   }) {
-    if (willChange != null) {
-      return MutableComputedCellStateNotifierCheck(
+    if (checkChanges) {
+      return MutableComptedCheckChangesCellState(
           cell: this,
           key: key,
           arguments: arguments,
-          willChange: willChange!
+          oldState: oldState
       );
     }
     return MutableComputedCellState(

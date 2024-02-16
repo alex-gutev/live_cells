@@ -127,8 +127,7 @@ class CellState<T extends StatefulCell> {
 
     for (final observer in _observers.keys.toList(growable: false)) {
       try {
-        if ((!isEqual || observer.shouldNotifyAlways) &&
-            (!hasNewValue || _shouldNotifyObserver(observer, newValue))) {
+        if (!isEqual || observer.shouldNotifyAlways) {
           observer.willUpdate(cell);
         }
       }
@@ -147,13 +146,19 @@ class CellState<T extends StatefulCell> {
   ///
   /// If [isEqual] is true then only the observers, for which
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
-  void notifyUpdate([bool isEqual = false]) {
+  ///
+  /// A value of false for [didChange] indicates that the cell's values has not
+  /// changed. A value of true indicates that it may have changed.
+  void notifyUpdate({
+    bool isEqual = false,
+    bool didChange = true
+  }) {
     assert(!_isDisposed);
 
     for (final observer in _observers.keys.toList(growable: false)) {
       try {
         if (!isEqual || observer.shouldNotifyAlways) {
-          observer.update(cell);
+          observer.update(cell, !isEqual && didChange);
         }
       }
       catch (e, st) {
@@ -179,17 +184,4 @@ class CellState<T extends StatefulCell> {
   /// storing a count of how many times [addObserver] was called for a given
   /// observer.
   final Map<CellObserver, int> _observers = HashMap();
-
-  /// Check whether [observer] should be notified for [newValue].
-  ///
-  /// This calls [CellObserver.shouldNotify], while catching any exceptions
-  /// thrown.
-  bool _shouldNotifyObserver(CellObserver observer, newValue) {
-    try {
-      return observer.shouldNotify(cell, newValue);
-    }
-    catch (e) {
-      return true;
-    }
-  }
 }

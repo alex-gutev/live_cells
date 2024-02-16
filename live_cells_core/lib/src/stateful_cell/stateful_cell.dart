@@ -84,7 +84,7 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
   @protected
   void notifyUpdate([bool isEqual = false]) {
-    _getState()?.notifyUpdate(isEqual);
+    _getState()?.notifyUpdate(isEqual: isEqual);
   }
 
   /// Private

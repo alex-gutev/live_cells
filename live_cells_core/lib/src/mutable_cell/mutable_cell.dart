@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
-import '../base/types.dart';
 import '../compute_cell/dynamic_mutable_compute_cell.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/cell_state.dart';
@@ -35,13 +34,8 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// [reverse] is called in a batch update, by [batch], so that the values of
   /// the argument cells are set simultaneously.
   ///
-  /// If [willChange] is non-null, it is called to determine whether the cell's
-  /// value will change for a change in the value of an argument cell. It is
-  /// called with the argument cell and its new value passed as arguments. The
-  /// function should return true if the cell's value may change, and false if
-  /// it can be determined with certainty that it wont. **NOTE**: this function
-  /// is only called if the new value of the argument cell is known, see
-  /// [CellObserver.willChange] for more information.
+  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// if its value has actually changed.
   ///
   /// Example:
   ///
@@ -52,11 +46,11 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// });
   /// ```
   factory MutableCell.computed(T Function() compute, void Function(T value) reverse, {
-    WillChangeCallback? willChange
+    bool checkChanges = false
   }) => DynamicMutableComputeCell(
       compute: compute,
       reverseCompute: reverse,
-      willChange: willChange
+      checkChanges: checkChanges
   );
 
   /// Set the value of the cell.
@@ -124,7 +118,7 @@ abstract class MutableCell<T> extends ValueCell<T> {
     _batched = false;
 
     for (final entry in _batchList.entries) {
-      entry.key.notifyUpdate(entry.value);
+      entry.key.notifyUpdate(isEqual: entry.value);
     }
 
     _batchList.clear();

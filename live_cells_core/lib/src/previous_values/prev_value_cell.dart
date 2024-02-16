@@ -153,9 +153,6 @@ class PrevValueState<T> extends CellState with ObserverCellState {
   bool get shouldNotifyAlways => false;
 
   @override
-  bool shouldNotify(ValueCell cell, newValue) => true;
-
-  @override
   void init() {
     super.init();
     arg.addObserver(this);
@@ -168,19 +165,26 @@ class PrevValueState<T> extends CellState with ObserverCellState {
   }
 
   @override
-  void update(ValueCell cell) {
+  void update(ValueCell cell, bool didChange) {
     if (stale) {
       _updateCurrentValue();
     }
 
-    super.update(cell);
+    super.update(cell, didChange);
   }
 
   /// Get the current value of the cell and set [_prevValue] to the previous [_currentValue].
   void _updateCurrentValue() {
+    final nextValue = Maybe.wrap(() => arg.value);
+
+    if (_hasValue && _currentValue == nextValue) {
+      stale = false;
+      return;
+    }
+
     _hasValue = true;
     _prevValue = _currentValue;
-    _currentValue = Maybe.wrap(() => arg.value);
+    _currentValue = nextValue;
 
     stale = false;
   }

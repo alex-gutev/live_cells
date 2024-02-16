@@ -22,10 +22,40 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
   @protected
   var updating = false;
 
+  /// Is the observer waiting for [update] to be called with didChange = true?
+  @protected
+  var waitingForChange = false;
+
+  /// Check whether the cell's value has changed.
+  ///
+  /// This method is called when calling [update] on the observers of the cell.
+  /// If false is returned, false is provided as the value of the `didChange`
+  /// argument, otherwise the value of `didChange` received in [update] is
+  /// forwarded to the observer.
+  ///
+  /// This class's implementation simply returns true. Override this method in
+  /// subclasses to actually compare the cell values.
+  @protected
+  bool didChange() => true;
+
+  /// Called when this observer is first notified that the values of the observed cells will change.
+  @protected
+  void preUpdate() {}
+
+  /// Called after the value of the cell has been updated.
+  ///
+  /// NOTE: This method might not be called if none of the observed cell values
+  /// have actually changed.
+  @protected
+  void postUpdate() {}
+
   @override
   void willUpdate(ValueCell cell) {
     if (!updating) {
+      preUpdate();
+
       updating = true;
+      waitingForChange = false;
 
       notifyWillUpdate();
       stale = true;
@@ -33,11 +63,16 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
   }
 
   @override
-  void update(ValueCell cell) {
-    if (updating) {
-      notifyUpdate();
+  void update(ValueCell cell, bool didChange) {
+    if (updating || (didChange && waitingForChange)) {
+      notifyUpdate(didChange: didChange && this.didChange());
 
+      waitingForChange = !didChange;
       updating = false;
+
+      if (didChange) {
+        postUpdate();
+      }
     }
   }
 }

@@ -2,10 +2,10 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
-import '../base/types.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import '../restoration/restoration.dart';
+import '../stateful_cell/check_changes_cell_state.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 import 'compute_cell_state.dart';
@@ -23,17 +23,12 @@ import 'compute_cell_state.dart';
 class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// Create a cell which computes its value using [compute].
   ///
-  /// If [willChange] is non-null, it is called to determine whether the cell's
-  /// value will change for a change in the value of an argument cell. It is
-  /// called with the argument cell and its new value passed as arguments. The
-  /// function should return true if the cell's value may change, and false if
-  /// it can be determined with certainty that it wont. **NOTE**: this function
-  /// is only called if the new value of the argument cell is known, see
-  /// [CellObserver.willChange] for more information.
+  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// if its value has actually changed.
   DynamicComputeCell(this._compute, {
     super.key,
-    this.willChange
-  });
+    bool checkChanges = false
+  }) : _checkChanges = checkChanges;
 
   @override
   T get value {
@@ -61,8 +56,8 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
   /// Value computation function
   final T Function() _compute;
 
-  /// Callback function called to determine whether the cell's value will change.
-  final WillChangeCallback? willChange;
+  /// Should the cell check whether its value has actually changed before notifying observers?
+  final bool _checkChanges;
 
   /// State restored by restoreState();
   CellState? _restoredState;
@@ -76,11 +71,10 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
       return state!;
     }
 
-    if (willChange != null) {
-      return DynamicComputeCellStateNotifierCheck<T>(
+    if (_checkChanges) {
+      return DynamicComputeCheckChangesCellState<T>(
           cell: this,
-          key: key,
-          willChange: willChange!
+          key: key
       );
     }
 
@@ -173,16 +167,11 @@ class DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<
   }
 }
 
-/// A [DynamicComputeCellState] with [shouldNotify] defined by a callback function.
-class DynamicComputeCellStateNotifierCheck<T> extends DynamicComputeCellState<T> {
-  final WillChangeCallback _willChange;
-
-  DynamicComputeCellStateNotifierCheck({
+/// A [DynamicComputeCellState] that checks whether the cell value has changed on updates.
+class DynamicComputeCheckChangesCellState<T> extends DynamicComputeCellState<T>
+    with CheckChangesCellState {
+  DynamicComputeCheckChangesCellState({
     required super.cell,
-    required super.key,
-    required WillChangeCallback willChange
-  }) : _willChange = willChange;
-
-  @override
-  bool shouldNotify(ValueCell cell, newValue) => _willChange(cell, newValue);
+    required super.key
+  });
 }

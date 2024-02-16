@@ -45,6 +45,14 @@ class Maybe<T> {
 
     return value as T;
   }
+
+  @override
+  bool operator ==(Object other) => other is Maybe &&
+      value == other.value &&
+      error == other.error;
+
+  @override
+  int get hashCode => Object.hash(value, error);
 }
 
 /// A [MutableCell] holding a [Maybe] value

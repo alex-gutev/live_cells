@@ -1,8 +1,7 @@
-import '../base/types.dart';
-import '../value_cell.dart';
 import 'dynamic_compute_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import 'mutable_computed_cell_state.dart';
+import '../stateful_cell/check_changes_cell_state.dart';
 
 /// A mutable computational cell which determines is dependencies at runtime
 ///
@@ -22,7 +21,7 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   DynamicMutableComputeCell({
     required T Function() compute,
     required void Function(T) reverseCompute,
-    super.willChange
+    super.checkChanges
   }) : _compute = compute, _reverseCompute = reverseCompute, super({});
 
   @override
@@ -42,11 +41,11 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   MutableComputedCellState<T, DynamicMutableComputeCell<T>> createMutableState({
     covariant MutableComputedCellState<T, DynamicMutableComputeCell<T>>? oldState
   }) {
-    if (willChange != null) {
-      return _DynamicMutableComputedCellStateNotifierCheck(
+    if (checkChanges) {
+      return _DynamicMutableComputeCheckChangesCellState(
           cell: this,
           key: key,
-          willChange: willChange!
+          oldState: oldState
       );
     }
 
@@ -75,18 +74,12 @@ class _DynamicMutableComputeCellState<T>
   });
 }
 
-/// A [_DynamicMutableComputeCellState] with [shouldNotify] defined by a callback function.
-class _DynamicMutableComputedCellStateNotifierCheck<T>
-    extends _DynamicMutableComputeCellState<T> {
-
-  final WillChangeCallback _willChange;
-
-  _DynamicMutableComputedCellStateNotifierCheck({
+/// A [_DynamicMutableComputeCellState] that checks whether the cell state has changed on update.
+class _DynamicMutableComputeCheckChangesCellState<T>
+    extends _DynamicMutableComputeCellState<T> with CheckChangesCellState {
+  _DynamicMutableComputeCheckChangesCellState({
     required super.cell,
     required super.key,
-    required WillChangeCallback willChange
-  }) : _willChange = willChange;
-
-  @override
-  bool shouldNotify(ValueCell cell, newValue) => _willChange(cell, newValue);
+    super.oldState
+  });
 }

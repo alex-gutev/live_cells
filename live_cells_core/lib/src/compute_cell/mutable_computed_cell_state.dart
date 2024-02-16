@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../base/exceptions.dart';
-import '../base/types.dart';
+import '../stateful_cell/check_changes_cell_state.dart';
 import '../mutable_cell/mutable_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import '../restoration/restoration.dart';
@@ -106,7 +106,7 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
       addToBatch(isEqual);
     }
     else {
-      notifyUpdate(isEqual);
+      notifyUpdate(isEqual: isEqual);
     }
 
     _reverse = false;
@@ -125,9 +125,6 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
 
   @override
   bool get shouldNotifyAlways => true;
-
-  @override
-  bool shouldNotify(ValueCell cell, newValue) => true;
 
   @override
   void willUpdate(ValueCell cell) {
@@ -162,19 +159,13 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
   }
 }
 
-/// A [MutableComputedCellState] with [shouldNotify] defined by a callback function.
-class MutableComputedCellStateNotifierCheck<T, S extends MutableDependentCell<T>>
-    extends MutableComputedCellState<T,S> {
-
-  final WillChangeCallback _willChange;
-
-  MutableComputedCellStateNotifierCheck({
+/// A [MutableComputedCellState] which checks if the cell value changed on update.
+class MutableComptedCheckChangesCellState<T, S extends MutableDependentCell<T>>
+    extends MutableComputedCellState<T,S> with CheckChangesCellState<S> {
+  MutableComptedCheckChangesCellState({
     required super.cell,
     required super.key,
     required super.arguments,
-    required WillChangeCallback willChange
-  }) : _willChange = willChange;
-
-  @override
-  bool shouldNotify(ValueCell cell, newValue) => _willChange(cell, newValue);
+    super.oldState
+  });
 }

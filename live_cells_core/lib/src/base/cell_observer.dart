@@ -8,18 +8,6 @@ abstract class CellObserver {
   /// from the previous value.
   bool get shouldNotifyAlways => false;
 
-  /// Should this observer be notified for a given value change?
-  ///
-  /// This method is called prior to calling [willUpdate] and its return value
-  /// determines whether [willUpdate] will be called (true) or not (false).
-  ///
-  /// [cell] is the observed cell, of which the value will be set to [newValue]
-  /// after [willUpdate] is called on all its observers.
-  ///
-  /// **NOTE**: This function is only called if [newValue] is known, which is
-  /// generally only the case when setting the value of a [MutableCell].
-  bool shouldNotify(ValueCell cell, newValue) => true;
-
   /// The observed cell will change its value.
   ///
   /// This method is called when the value of an ancestor of [cell] has been
@@ -33,6 +21,10 @@ abstract class CellObserver {
   /// This method is called after the value of [cell] has been
   /// recomputed.
   ///
+  /// If it is known that the value of [cell] has not changed, [didChange] is
+  /// false otherwise a value of true for [didChange] indicates that [cell]'s
+  /// value may have changed (but necessarily has).
+  ///
   /// [cell.value] now holds the cell's new value.
-  void update(ValueCell cell);
+  void update(ValueCell cell, bool didChange);
 }

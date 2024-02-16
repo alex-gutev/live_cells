@@ -5,13 +5,8 @@ import 'package:live_cells_core/live_cells_core.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-@GenerateNiceMocks([MockSpec<CellObserver>(as: #MockSimpleObserver, fallbackGenerators: {
-  #shouldNotify: shouldNotifyFallback
-})])
+@GenerateNiceMocks([MockSpec<CellObserver>(as: #MockSimpleObserver)])
 import 'live_cells_test.mocks.dart';
-
-bool shouldNotifyFallback(_, __) => true;
-
 
 /// Mock class interface for recording the value of a cell at the time an observer was called
 abstract class ValueObserver {
@@ -30,7 +25,7 @@ class MockValueObserver extends MockSimpleObserver implements ValueObserver {
   final values = [];
 
   @override
-  void update(covariant ValueCell cell) {
+  void update(covariant ValueCell cell, covariant bool didChange) {
     final value = cell.value;
 
     if (values.lastOrNull != value) {
@@ -190,7 +185,7 @@ void main() {
       cell.addObserver(observer);
       cell.value = 23;
 
-      verify(observer.update(cell)).called(1);
+      verify(observer.update(cell, any)).called(1);
     });
 
     test('Setting MutableCell.value twice calls cell listeners twice', () {
@@ -202,7 +197,7 @@ void main() {
       cell.value = 23;
       cell.value = 101;
 
-      verify(observer.update(cell)).called(2);
+      verify(observer.update(cell, any)).called(2);
     });
 
     test('MutableCell observer not called after it is removed', () {
@@ -215,7 +210,7 @@ void main() {
       cell.removeObserver(observer);
       cell.value = 101;
 
-      verify(observer.update(cell)).called(1);
+      verify(observer.update(cell, any)).called(1);
     });
 
     test('MutableCell observer not called if new value is equal to old value', () {
@@ -225,7 +220,7 @@ void main() {
       cell.addObserver(observer);
       cell.value = 56;
 
-      verifyNever(observer.update(cell));
+      verifyNever(observer.update(cell, any));
     });
 
     test('All MutableCell observers called when value changes', () {
@@ -241,8 +236,8 @@ void main() {
       cell.value = 8;
       cell.value = 12;
 
-      verify(observer1.update(cell)).called(3);
-      verify(observer2.update(cell)).called(2);
+      verify(observer1.update(cell, any)).called(3);
+      verify(observer2.update(cell, any)).called(2);
     });
 
     test('MutableCell.value updated when observer called', () {
@@ -334,7 +329,7 @@ void main() {
       eq.addObserver(observer);
       a.value = 4;
 
-      verify(observer.update(eq)).called(1);
+      verify(observer.update(eq, any)).called(1);
     });
 
     test('EqCell observers notified when 2nd argument cell values changes', () {
@@ -347,7 +342,7 @@ void main() {
       eq.addObserver(observer);
       b.value = 3;
 
-      verify(observer.update(eq)).called(1);
+      verify(observer.update(eq, any)).called(1);
     });
 
     test('NeqCell is reevaluated when 1st argument cell value changes', () {
@@ -378,7 +373,7 @@ void main() {
       neq.addObserver(observer);
       a.value = 4;
 
-      verify(observer.update(neq)).called(1);
+      verify(observer.update(neq, any)).called(1);
     });
 
     test('NeqCell observers notified when 2nd argument cell values changes', () {
@@ -391,7 +386,7 @@ void main() {
       neq.addObserver(observer);
       b.value = 3;
 
-      verify(observer.update(neq)).called(1);
+      verify(observer.update(neq, any)).called(1);
     });
 
     test("EqCell's compare == if they compare the same cells", () {
@@ -491,7 +486,7 @@ void main() {
 
       a.value = 8;
 
-      verify(observer.update(c)).called(1);
+      verify(observer.update(c, any)).called(1);
     });
 
     test('ComputeCell observers notified when value of 2nd argument cell changes', () {
@@ -505,7 +500,7 @@ void main() {
 
       b.value = 8;
 
-      verify(observer.update(c)).called(1);
+      verify(observer.update(c, any)).called(1);
     });
 
     test('ComputeCell observers notified for each change of value of argument cell', () {
@@ -521,7 +516,7 @@ void main() {
       a.value = 10;
       b.value = 100;
 
-      verify(observer.update(c)).called(3);
+      verify(observer.update(c, any)).called(3);
     });
 
     test('ComputeCell observer not called after it is removed', () {
@@ -539,7 +534,7 @@ void main() {
       b.value = 10;
       a.value = 100;
 
-      verify(observer.update(c)).called(1);
+      verify(observer.update(c, any)).called(1);
     });
 
     test('All ComputeCell observers called when value changes', () {
@@ -558,8 +553,8 @@ void main() {
       b.value = 10;
       a.value = 100;
 
-      verify(observer1.update(c)).called(3);
-      verify(observer2.update(c)).called(2);
+      verify(observer1.update(c, any)).called(3);
+      verify(observer2.update(c, any)).called(2);
     });
 
     test("ComputeCell's compare == if they have the same key", () {
@@ -654,7 +649,7 @@ void main() {
 
       a.value = 8;
 
-      verify(observer.update(c)).called(1);
+      verify(observer.update(c, any)).called(1);
     });
 
     test('DynamicComputeCell observers notified when value of 2nd argument cell changes', () {
@@ -668,7 +663,7 @@ void main() {
 
       b.value = 8;
 
-      verify(observer.update(c)).called(1);
+      verify(observer.update(c, any)).called(1);
     });
 
     test('DynamicComputeCell observers notified for each change of value of argument cell', () {
@@ -684,7 +679,7 @@ void main() {
       a.value = 10;
       b.value = 100;
 
-      verify(observer.update(c)).called(3);
+      verify(observer.update(c, any)).called(3);
     });
 
     test('DynamicComputeCell observer not called after it is removed', () {
@@ -702,7 +697,7 @@ void main() {
       b.value = 10;
       a.value = 100;
 
-      verify(observer.update(c)).called(1);
+      verify(observer.update(c, any)).called(1);
     });
 
     test('All DynamicComputeCell observers called when value changes', () {
@@ -721,8 +716,8 @@ void main() {
       b.value = 10;
       a.value = 100;
 
-      verify(observer1.update(c)).called(3);
-      verify(observer2.update(c)).called(2);
+      verify(observer1.update(c, any)).called(3);
+      verify(observer2.update(c, any)).called(2);
     });
     
     test('DynamicComputeCell arguments tracked correctly when using conditionals', () {
@@ -899,7 +894,7 @@ void main() {
       a.value = 'bye';
       a.value = 'goodbye';
 
-      verify(observer.update(store)).called(2);
+      verify(observer.update(store, any)).called(2);
     });
 
     test('All StoreCell observers notified when argument cell value changes', () {
@@ -915,8 +910,8 @@ void main() {
       store.addObserver(observer2);
       a.value = 'goodbye';
 
-      verify(observer1.update(store)).called(2);
-      verify(observer2.update(store)).called(1);
+      verify(observer1.update(store, any)).called(2);
+      verify(observer2.update(store, any)).called(1);
     });
 
     test('StoreCell observer not called after it is removed', () {
@@ -931,7 +926,7 @@ void main() {
       store.removeObserver(observer);
       a.value = 'goodbye';
 
-      verify(observer.update(store)).called(1);
+      verify(observer.update(store, any)).called(1);
     });
 
     test('StoreCell.value updated when observer called', () {
@@ -1523,9 +1518,8 @@ void main() {
       cell.value = 15;
 
       verifyInOrder([
-        observer.shouldNotify(any, any),
         observer.willUpdate(cell),
-        observer.update(cell)
+        observer.update(cell, any)
       ]);
 
       verifyNoMoreInteractions(observer);
@@ -1724,8 +1718,8 @@ void main() {
         b.value = 20;
       });
 
-      verify(observerC.update(c)).called(3);
-      verify(observerD.update(d)).called(3);
+      verify(observerC.update(c, any)).called(3);
+      verify(observerD.update(d, any)).called(3);
     });
 
     test('Correct values produced with StoreCell across all observer cells', () {
@@ -2089,7 +2083,7 @@ void main() {
       b.value = 9;
       a.value = 10;
 
-      verify(observer.update(c)).called(2);
+      verify(observer.update(c, any)).called(2);
     });
 
     test('MutableComputeCell observer not called after it is removed', () {
@@ -2116,8 +2110,8 @@ void main() {
       c.removeObserver(observer1);
       a.value = 10;
 
-      verify(observer1.update(c)).called(1);
-      verify(observer2.update(c)).called(2);
+      verify(observer1.update(c, any)).called(1);
+      verify(observer2.update(c, any)).called(2);
     });
 
     test('Setting MutableComputeCell.value updates values of argument cells', () {
@@ -2165,9 +2159,9 @@ void main() {
 
       c.value = 10;
 
-      verify(observerA.update(a)).called(1);
-      verify(observerB.update(b)).called(1);
-      verify(observerC.update(c)).called(1);
+      verify(observerA.update(a, any)).called(1);
+      verify(observerB.update(b, any)).called(1);
+      verify(observerC.update(c, any)).called(1);
     });
 
     test('Observers of MutableComputeCell and argument cells called every time value is set', () {
@@ -2195,9 +2189,9 @@ void main() {
       c.value = 10;
       c.value = 12;
 
-      verify(observerA.update(a)).called(2);
-      verify(observerB.update(b)).called(2);
-      verify(observerC.update(c)).called(2);
+      verify(observerA.update(a, any)).called(2);
+      verify(observerB.update(b, any)).called(2);
+      verify(observerC.update(c, any)).called(2);
     });
 
     test('Consistency of values maintained when setting MutableComputeCell.value in batch update', () {
@@ -2255,10 +2249,10 @@ void main() {
       final d = MutableCell(50);
       final e = (c + d).store();
 
-      final observerA = MockValueObserver();
-      final observerB = MockValueObserver();
-      final observerC = MockValueObserver();
-      final observerE = MockValueObserver();
+      final observerA = MockSimpleObserver();
+      final observerB = MockSimpleObserver();
+      final observerC = MockSimpleObserver();
+      final observerE = MockSimpleObserver();
 
       a.addObserver(observerA);
       b.addObserver(observerB);
@@ -2270,10 +2264,10 @@ void main() {
         d.value = 9;
       });
 
-      verify(observerA.update(a)).called(1);
-      verify(observerB.update(b)).called(1);
-      verify(observerC.update(c)).called(1);
-      verify(observerE.update(e)).called(1);
+      verify(observerA.update(a, any)).called(1);
+      verify(observerB.update(b, any)).called(1);
+      verify(observerC.update(c, any)).called(1);
+      verify(observerE.update(e, any)).called(1);
     });
 
     test('All MutableComputeCell observers called correct number of times', () {
@@ -2310,8 +2304,8 @@ void main() {
         b.value = 20;
       });
 
-      verify(observerC.update(c)).called(3);
-      verify(observerD.update(d)).called(3);
+      verify(observerC.update(c, any)).called(3);
+      verify(observerD.update(d, any)).called(3);
     });
 
     test('Correct values produced with MutableComputeCell across all observer cells', () {
@@ -2485,7 +2479,7 @@ void main() {
       b.value = 9;
       a.value = 10;
 
-      verify(observer.update(c)).called(2);
+      verify(observer.update(c, any)).called(2);
     });
 
     test('DynamicMutableComputeCell observer not called after it is removed', () {
@@ -2509,8 +2503,8 @@ void main() {
       c.removeObserver(observer1);
       a.value = 10;
 
-      verify(observer1.update(c)).called(1);
-      verify(observer2.update(c)).called(2);
+      verify(observer1.update(c, any)).called(1);
+      verify(observer2.update(c, any)).called(2);
     });
 
     test('Setting DynamicMutableComputeCell.value updates values of argument cells', () {
@@ -2552,9 +2546,9 @@ void main() {
 
       c.value = 10;
 
-      verify(observerA.update(a)).called(1);
-      verify(observerB.update(b)).called(1);
-      verify(observerC.update(c)).called(1);
+      verify(observerA.update(a, any)).called(1);
+      verify(observerB.update(b, any)).called(1);
+      verify(observerC.update(c, any)).called(1);
     });
 
     test('Observers of DynamicMutableComputeCell and argument cells called every time value is set', () {
@@ -2579,9 +2573,9 @@ void main() {
       c.value = 10;
       c.value = 12;
 
-      verify(observerA.update(a)).called(2);
-      verify(observerB.update(b)).called(2);
-      verify(observerC.update(c)).called(2);
+      verify(observerA.update(a, any)).called(2);
+      verify(observerB.update(b, any)).called(2);
+      verify(observerC.update(c, any)).called(2);
     });
 
     test('Consistency of values maintained when setting DynamicMutableComputeCell.value in batch update', () {
@@ -2648,10 +2642,10 @@ void main() {
         d.value = 9;
       });
 
-      verify(observerA.update(a)).called(1);
-      verify(observerB.update(b)).called(1);
-      verify(observerC.update(c)).called(1);
-      verify(observerE.update(e)).called(1);
+      verify(observerA.update(a, any)).called(1);
+      verify(observerB.update(b, any)).called(1);
+      verify(observerC.update(c, any)).called(1);
+      verify(observerE.update(e, any)).called(1);
     });
 
     test('All DynamicMutableComputeCell observers called correct number of times', () {
@@ -2688,8 +2682,8 @@ void main() {
         b.value = 20;
       });
 
-      verify(observerC.update(c)).called(3);
-      verify(observerD.update(d)).called(3);
+      verify(observerC.update(c, any)).called(3);
+      verify(observerD.update(d, any)).called(3);
     });
 
     test('Correct values produced with DynamicMutableComputeCell across all observer cells', () {
@@ -2957,7 +2951,7 @@ void main() {
       a.value = 6;
       b.value = 10;
 
-      verify(observer.update(c)).called(2);
+      verify(observer.update(c, any)).called(2);
     });
 
     test('MutableCellView observer not called after it is removed', () {
@@ -2979,8 +2973,8 @@ void main() {
       c.removeObserver(observer1);
       a.value = 10;
 
-      verify(observer1.update(c)).called(1);
-      verify(observer2.update(c)).called(2);
+      verify(observer1.update(c, any)).called(1);
+      verify(observer2.update(c, any)).called(2);
     });
 
     test('Setting MutableCellView.value updates values of argument cell', () {
@@ -3864,58 +3858,35 @@ void main() {
     });
   });
 
-  group('CellObserver.shouldNotify()', () {
-    test('CellObserver not notified when shouldNotify() returns false', () {
-      final a = MutableCell(0);
-      final b = ValueCell.computed(() => a() + 1, willChange: (_,__) => false);
-
-      final observer = MockSimpleObserver();
-      addObserver(b, observer);
-
-      a.value = 10;
-      verifyNever(observer.willUpdate(b));
-      verifyNever(observer.update(b));
-    });
-
-    test('CellObserver notified when shouldNotify() returns true', () {
-      final a = MutableCell(0);
-      final b = ValueCell.computed(() => a() + 1, willChange: (_,__) => true);
-
-      final observer = MockSimpleObserver();
-      addObserver(b, observer);
-
-      a.value = 10;
-      verify(observer.willUpdate(b)).called(1);
-      verify(observer.update(b)).called(1);
-    });
-
-    test('shouldNotify() passed correct previous value 1', () {
+  group('checkChanges cell option', () {
+    test('Observer.update() called with didChange = false, when value unchanged.', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final observer = MockSimpleObserver();
       addObserver(b, observer);
 
       a.value = [4, 2, 6];
-      verifyNever(observer.willUpdate(b));
-      verifyNever(observer.update(b));
+      verify(observer.willUpdate(b)).called(1);
+      verify(observer.update(b, false)).called(1);
+      verifyNoMoreInteractions(observer);
     });
 
-    test('shouldNotify() passed correct previous value 2', () {
+    test('Observer.update() called with didChange = true, when value changed.', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final observer = MockSimpleObserver();
       addObserver(b, observer);
 
       a.value = [7, 8, 9];
       verify(observer.willUpdate(b)).called(1);
-      verify(observer.update(b)).called(1);
+      verify(observer.update(b, any)).called(1);
     });
 
-    test('Watch function not called when shouldNotify() returns false', () {
+    test('Watch function not called when didChange is false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final listener = MockSimpleListener();
 
@@ -3931,9 +3902,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('Watch function not called when shouldNotify() returns false in MutableCell.batch', () {
+    test('Watch function not called when didChange is false in MutableCell.batch', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final listener = MockSimpleListener();
 
@@ -3951,9 +3922,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('Watch function called when shouldNotify() returns true after returning false', () {
+    test('Watch function called when didChange is true after returning false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final listener = MockSimpleListener();
 
@@ -3970,9 +3941,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('Watch function called when shouldNotify() returns true for at least one argument', () {
+    test('Watch function called when didChange is true for at least one argument', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final c = MutableCell(3);
 
@@ -3994,9 +3965,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('Value listener function not called when shouldNotify() returns false', () {
+    test('Value listener function not called when didChange is false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final listener = MockSimpleListener();
       b.listenable.addListener(listener);
@@ -4008,9 +3979,9 @@ void main() {
       verifyNever(listener());
     });
 
-    test('Value listener function not called when shouldNotify() returns false in MutableCell.batch', () {
+    test('Value listener function not called when didChange is false in MutableCell.batch', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final listener = MockSimpleListener();
       b.listenable.addListener(listener);
@@ -4024,9 +3995,9 @@ void main() {
       verifyNever(listener());
     });
 
-    test('Value listener function called when shouldNotify() returns true after returning false', () {
+    test('Value listener function called when didChange is true after returning false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final listener = MockSimpleListener();
       b.listenable.addListener(listener);
@@ -4039,9 +4010,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('Value listener function called when shouldNotify() returns true for at least one argument', () {
+    test('Value listener function called when didChange is true for at least one argument', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final c = MutableCell(3);
       final d = b + c;
@@ -4059,9 +4030,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('Computed cell not recomputed when shouldNotify() returns false', () {
+    test('Computed cell not recomputed when didChange is false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = ValueCell.computed(() => b() * 10);
 
       final listener = MockSimpleListener();
@@ -4078,9 +4049,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('Computed cell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+    test('Computed cell not recomputed when didChange is false in MutableCell.batch', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = ValueCell.computed(() => b() * 10);
 
       final listener = MockSimpleListener();
@@ -4099,9 +4070,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('Computed cell recomputed when shouldNotify() returns true after returning false', () {
+    test('Computed cell recomputed when didChange is true after returning false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = ValueCell.computed(() => b() * 10);
 
       final listener = MockSimpleListener();
@@ -4119,9 +4090,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('Computed cell recomputed when shouldNotify() returns true for at least one argument', () {
+    test('Computed cell recomputed when didChange is true for at least one argument', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final c = MutableCell(3);
       final d = ValueCell.computed(() => b() * c());
@@ -4143,9 +4114,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('StoreCell not recomputed when shouldNotify() returns false', () {
+    test('StoreCell not recomputed when didChange is false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = (b * 10.cell).store();
 
       final listener = MockSimpleListener();
@@ -4162,9 +4133,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('StoreCell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+    test('StoreCell not recomputed when didChange is false in MutableCell.batch', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = (b * 10.cell).store();
 
       final listener = MockSimpleListener();
@@ -4183,9 +4154,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('StoreCell recomputed when shouldNotify() returns true after returning false', () {
+    test('StoreCell recomputed when didChange is true after returning false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = (b * 10.cell).store();
 
       final listener = MockSimpleListener();
@@ -4203,9 +4174,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('StoreCell recomputed when shouldNotify() returns true for at least one argument', () {
+    test('StoreCell recomputed when didChange is true for at least one argument', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final c = MutableCell(3);
       final d = (b * c).store();
@@ -4227,9 +4198,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('MutableComputeCell not recomputed when shouldNotify() returns false', () {
+    test('MutableComputeCell not recomputed when didChange is false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = (b, 10.cell).mutableApply((a1, a2) => a1 * a2, (_) {});
 
       final listener = MockSimpleListener();
@@ -4246,9 +4217,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('MutableComputeCell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+    test('MutableComputeCell not recomputed when didChange is false in MutableCell.batch', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = (b, 10.cell).mutableApply((a1, a2) => a1 * a2, (_) {});
 
       final listener = MockSimpleListener();
@@ -4267,9 +4238,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('MutableComputeCell recomputed when shouldNotify() returns true after returning false', () {
+    test('MutableComputeCell recomputed when didChange is true after returning false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = (b, 10.cell).mutableApply((a1, a2) => a1 * a2, (_) {});
 
       final listener = MockSimpleListener();
@@ -4287,9 +4258,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('MutableComputeCell recomputed when shouldNotify() returns true for at least one argument', () {
+    test('MutableComputeCell recomputed when didChange is true for at least one argument', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final c = MutableCell(3);
       final d = (b, c).mutableApply((b, c) => b * c, (_) {});
@@ -4311,9 +4282,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('DynamicMutableComputeCell not recomputed when shouldNotify() returns false', () {
+    test('DynamicMutableComputeCell not recomputed when didChange is false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = MutableCell.computed(() => b() * 10, (_) { });
 
       final listener = MockSimpleListener();
@@ -4330,9 +4301,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('DynamicMutableComputeCell not recomputed when shouldNotify() returns false in MutableCell.batch', () {
+    test('DynamicMutableComputeCell not recomputed when didChange is false in MutableCell.batch', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = MutableCell.computed(() => b() * 10, (_) { });
 
       final listener = MockSimpleListener();
@@ -4351,9 +4322,9 @@ void main() {
       verify(listener()).called(1);
     });
 
-    test('DynamicMutableComputeCell recomputed when shouldNotify() returns true after returning false', () {
+    test('DynamicMutableComputeCell recomputed when didChange is true after returning false', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final c = MutableCell.computed(() => b() * 10, (_) { });
 
       final listener = MockSimpleListener();
@@ -4371,9 +4342,9 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('DynamicMutableComputeCell recomputed when shouldNotify() returns true for at least one argument', () {
+    test('DynamicMutableComputeCell recomputed when didChange is true for at least one argument', () {
       final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
 
       final c = MutableCell(3);
       final d = MutableCell.computed(() => b() * c(), (_) { });
@@ -4401,7 +4372,7 @@ void main() {
           compute: () => a.value[1],
           reverseCompute: (_) {},
           arguments: {a},
-          willChange: (a,newValue) => a.value[1] != newValue[1]
+          checkChanges: true
       );
 
       final listener = MockSimpleListener();
@@ -4422,7 +4393,7 @@ void main() {
 
     test('DynamicMutableComputedCell implements shouldNotify correctly', () {
       final a = MutableCell([1, 2, 3]);
-      final b = MutableCell.computed(() => a()[1], (_) {}, willChange: (a,b) => a.value[1] != b[1]);
+      final b = MutableCell.computed(() => a()[1], (_) {}, checkChanges: true);
 
       final listener = MockSimpleListener();
 
@@ -4442,8 +4413,7 @@ void main() {
 
     test('StoreCell implements shouldNotify correctly', () {
       final a = MutableCell([1, 2, 3]);
-      final b = a.store(willChange: (a, newValue) => a.value[1] != newValue[1])
-          .mutableApply((a) => a, (_) {});
+      final b = a.apply((a) => a[1]).store(checkChanges: true);
 
       final listener = MockSimpleListener();
 
@@ -4463,7 +4433,7 @@ void main() {
 
     test('MutableCellView implements shouldNotify correctly', () {
       final a = MutableCell([1, 2, 3]);
-      final b = a.mutableApply((a) => a[1], (_) {}, willChange: (a, newValue) => a.value[1] != newValue[1]);
+      final b = a.mutableApply((a) => a[1], (_) {}, checkChanges: true);
 
       final listener = MockSimpleListener();
 
@@ -4634,7 +4604,7 @@ void main() {
 
     test("PrevValueCell does not track value that hasn't changed", () {
       final a = MutableCell([0, 0, 0]);
-      final b = ValueCell.computed(() => a()[1], willChange: (a,v) => a.value[1] != v[1]);
+      final b = ValueCell.computed(() => a()[1], checkChanges: true);
       final prev = b.previous;
 
       observeCell(prev);

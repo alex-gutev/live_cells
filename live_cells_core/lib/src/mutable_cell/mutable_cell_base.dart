@@ -107,7 +107,7 @@ class MutableCellState<T, S extends MutableCellBase<T>> extends CellState<S> {
           newValue: value
       );
       _value = value;
-      notifyUpdate(isEqual);
+      notifyUpdate(isEqual: isEqual);
     }
   }
 

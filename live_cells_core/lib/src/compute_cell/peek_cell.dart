@@ -56,7 +56,7 @@ class _PeekCellObserver extends CellObserver {
   int get hashCode => observer.hashCode;
 
   @override
-  void update(ValueCell cell) {
+  void update(ValueCell cell, bool didChange) {
     // Do nothing
   }
 

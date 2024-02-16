@@ -7,33 +7,28 @@ import '../value_cell.dart';
 extension IterableCellExtension<T> on ValueCell<Iterable<T>> {
   /// Returns a cell which evaluates to [Iterable.first] applied on the [value] in this cell.
   ValueCell<T> get first => apply((value) => value.first,
-      willChange: (_, v) => value.first != v.first,
       key: _IterablePropKey(this, #first)
-  );
+  ).store(checkChanges: true);
 
   /// Returns a cell which evaluates to [Iterable.isEmpty] applied on the [value] in this cell.
   ValueCell<bool> get isEmpty => apply((value) => value.isEmpty,
-      willChange: (_, v) => value.isEmpty != v.isEmpty,
       key: _IterablePropKey(this, #isEmpty)
-  );
+  ).store(checkChanges: true);
 
   /// Returns a cell which evaluates to [Iterable.isNotEmpty] applied on the [value] in this cell.
   ValueCell<bool> get isNotEmpty => apply((value) => value.isNotEmpty,
-      willChange: (_, v) => value.isNotEmpty != v.isNotEmpty,
       key: _IterablePropKey(this, #isNotEmpty)
-  );
+  ).store(checkChanges: true);
 
   /// Returns a cell which evaluates to [Iterable.last] applied on the [value] in this cell.
   ValueCell<T> get last => apply((value) => value.last,
-      willChange: (_, v) => value.last != v.last,
       key: _IterablePropKey(this, #last)
-  );
+  ).store(checkChanges: true);
 
   /// Returns a cell which evaluates to [Iterable.length] applied on the [value] in this cell.
   ValueCell<int> get length => apply((value) => value.length,
-      willChange: (_, v) => value.length != v.length,
       key: _IterablePropKey(this, #length)
-  );
+  ).store(checkChanges: true);
 
   /// Returns a cell which evaluates to [Iterable.single] applied on the [value] in this cell.
   ValueCell<T> get single => apply((value) => value.single,

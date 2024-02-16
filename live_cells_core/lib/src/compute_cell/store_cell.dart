@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
-import '../base/types.dart';
+import '../base/keys.dart';
+import '../stateful_cell/check_changes_cell_state.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import 'compute_cell_state.dart';
@@ -16,15 +17,10 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   /// Create a [StoreCell] which observes and saves the value of [argCell]
   ///
-  /// If [willChange] is non-null, it is called to determine whether the cell's
-  /// value will change for a change in the value of an argument cell. It is
-  /// called with the argument cell and its new value passed as arguments. The
-  /// function should return true if the cell's value may change, and false if
-  /// it can be determined with certainty that it wont. **NOTE**: this function
-  /// is only called if the new value of the argument cell is known, see
-  /// [CellObserver.shouldNotify] for more information.
+  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// if its value has actually changed.
   StoreCell(this.argCell, {
-    this.willChange
+    this.checkChanges = false
   }) : super(key: _StoreCellKey(argCell));
 
   @override
@@ -48,9 +44,9 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// The observed cell
   final ValueCell<T> argCell;
 
-  /// Callback function called to determine whether the cell's value will change.
-  final WillChangeCallback? willChange;
-  
+  /// Should the observers only be notified if this cell's value has changed?
+  final bool checkChanges;
+
   /// State restored by restoreState();
   CellState? _restoredState;
 
@@ -67,11 +63,10 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
       return state!;
     }
 
-    if (willChange != null) {
-      return StoreCellStateNotifyCheck<T>(
+    if (checkChanges) {
+      return StoreCellCheckChangesState<T>(
           cell: this,
-          key: key,
-          willChange: willChange!
+          key: key
       );
     }
 
@@ -105,16 +100,13 @@ extension StoreCellExtension<T> on ValueCell<T> {
   /// changes. Further references to the returned cell's value retrieve the
   /// stored value rather than running the computation function again.
   ///
-  /// If [willChange] is non-null, it is called to determine whether the cell's
-  /// value will change for a change in the value of an argument cell. It is
-  /// called with the argument cell and its new value passed as arguments. The
-  /// function should return true if the cell's value may change, and false if
-  /// it can be determined with certainty that it wont. **NOTE**: this function
-  /// is only called if the new value of the argument cell is known, see
-  /// [CellObserver.shouldNotify] for more information.
+  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// if its value has actually changed.
   StoreCell<T> store({
-    WillChangeCallback? willChange
-  }) => StoreCell(this, willChange: willChange);
+    bool checkChanges = false
+  }) => StoreCell(this,
+      checkChanges: checkChanges
+  );
 }
 
 class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
@@ -150,29 +142,14 @@ class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
   }
 }
 
-/// A [StoreCellState] with [shouldNotify] defined by a callback function
-class StoreCellStateNotifyCheck<T> extends StoreCellState<T> {
-  final WillChangeCallback _willChange;
-
-  StoreCellStateNotifyCheck({
+/// A [StoreCellState] that only notifies observers if the [cell]'s value has changed.
+class StoreCellCheckChangesState<T> extends StoreCellState<T> with CheckChangesCellState<StoreCell<T>> {
+  StoreCellCheckChangesState({
     required super.cell,
-    required super.key,
-    required WillChangeCallback willChange
-  }) : _willChange = willChange;
-
-  @override
-  bool shouldNotify(ValueCell cell, newValue) => _willChange(cell, newValue);
+    required super.key
+  });
 }
 
-class _StoreCellKey {
-  final ValueCell cell;
-
-  _StoreCellKey(this.cell);
-
-  @override
-  bool operator ==(Object other) =>
-      other is _StoreCellKey && cell == other.cell;
-
-  @override
-  int get hashCode => Object.hash(runtimeType, cell);
+class _StoreCellKey extends ValueKey1<ValueCell> {
+  _StoreCellKey(super.value);
 }
