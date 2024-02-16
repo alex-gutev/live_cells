@@ -75,6 +75,10 @@ export 'src/extensions/list_cell_extension.dart'
     show ListCellExtension, MutableListCellExtension;
 
 export 'src/extensions/iterable_cell_extension.dart' show IterableCellExtension;
+export 'src/extensions/set_cell_extension.dart' show SetCellExtension;
+
+export 'src/extensions/map_cell_extension.dart'
+    show MapCellExtension, MutableMapCellExtension;
 
 export 'src/async_cell/delay_cell.dart' show DelayCell;
 
