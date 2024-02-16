@@ -1,5 +1,7 @@
-import 'package:live_cells_core/live_cells_core.dart';
-import 'package:live_cells_core/src/base/keys.dart';
+import '../compute_cell/store_cell.dart';
+import 'compute_extension.dart';
+import '../base/keys.dart';
+import '../value_cell.dart';
 
 /// Provides [Set] methods directly on cells holding [Set]s.
 extension SetCellExtension<T> on ValueCell<Set<T>> {
