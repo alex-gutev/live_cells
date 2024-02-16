@@ -4385,10 +4385,13 @@ void main() {
       addTearDown(watcher.stop);
 
       a.value = [4, 2, 6];
-      a.value = [7, 2, 8];
-      a.value = [9, 10, 11];
+      verify(listener()).called(1);
 
-      verify(listener()).called(2);
+      a.value = [7, 2, 8];
+      verifyNever(listener());
+
+      a.value = [9, 10, 11];
+      verify(listener()).called(1);
     });
 
     test('DynamicMutableComputedCell implements shouldNotify correctly', () {
@@ -4405,10 +4408,13 @@ void main() {
       addTearDown(watcher.stop);
 
       a.value = [4, 2, 6];
-      a.value = [7, 2, 8];
-      a.value = [9, 10, 11];
+      verify(listener()).called(1);
 
-      verify(listener()).called(2);
+      a.value = [7, 2, 8];
+      verifyNever(listener());
+
+      a.value = [9, 10, 11];
+      verify(listener()).called(1);
     });
 
     test('StoreCell implements shouldNotify correctly', () {
@@ -4425,10 +4431,13 @@ void main() {
       addTearDown(watcher.stop);
 
       a.value = [4, 2, 6];
-      a.value = [7, 2, 8];
-      a.value = [9, 10, 11];
+      verify(listener()).called(1);
 
-      verify(listener()).called(2);
+      a.value = [7, 2, 8];
+      verifyNever(listener());
+
+      a.value = [9, 10, 11];
+      verify(listener()).called(1);
     });
 
     test('MutableCellView implements shouldNotify correctly', () {
@@ -4445,10 +4454,13 @@ void main() {
       addTearDown(watcher.stop);
 
       a.value = [4, 2, 6];
-      a.value = [7, 2, 8];
-      a.value = [9, 10, 11];
+      verify(listener()).called(1);
 
-      verify(listener()).called(2);
+      a.value = [7, 2, 8];
+      verifyNever(listener());
+
+      a.value = [9, 10, 11];
+      verify(listener()).called(1);
     });
   });
 
@@ -4674,13 +4686,22 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [1, 4, 5];
-        l.value = [1, 6, 7];
-        l.value = [8, 9, 10];
-        l.value = [11, 12, 13];
-        l.value = [11, 14, 15];
-        l.value = [16, 17, 18];
+        verifyNever(listener());
 
-        verify(listener()).called(3);
+        l.value = [1, 6, 7];
+        verifyNever(listener());
+
+        l.value = [8, 9, 10];
+        verify(listener()).called(1);
+
+        l.value = [11, 12, 13];
+        verify(listener()).called(1);
+
+        l.value = [11, 14, 15];
+        verifyNever(listener());
+
+        l.value = [16, 17, 18];
+        verify(listener()).called(1);
       });
 
       test('MutableCell.first does not notify observers when first element not changed', () {
@@ -4693,13 +4714,22 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [1, 4, 5];
-        l.value = [1, 6, 7];
-        l.value = [8, 9, 10];
-        l.value = [11, 12, 13];
-        l.value = [11, 14, 15];
-        l.value = [16, 17, 18];
+        verifyNever(listener());
 
-        verify(listener()).called(3);
+        l.value = [1, 6, 7];
+        verifyNever(listener());
+
+        l.value = [8, 9, 10];
+        verify(listener()).called(1);
+
+        l.value = [11, 12, 13];
+        verify(listener()).called(1);
+
+        l.value = [11, 14, 15];
+        verifyNever(listener());
+
+        l.value = [16, 17, 18];
+        verify(listener()).called(1);
       });
 
       test('Setting MutableCell.first.value, updates list cell value', () {
@@ -4803,13 +4833,22 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [4, 5, 3];
-        l.value = [6, 7, 3];
-        l.value = [8, 9, 10];
-        l.value = [11, 12, 13];
-        l.value = [14, 15, 13];
-        l.value = [16, 17, 18];
+        verifyNever(listener());
 
-        verify(listener()).called(3);
+        l.value = [6, 7, 3];
+        verifyNever(listener());
+
+        l.value = [8, 9, 10];
+        verify(listener()).called(1);
+
+        l.value = [11, 12, 13];
+        verify(listener()).called(1);
+
+        l.value = [14, 15, 13];
+        verifyNever(listener());
+
+        l.value = [16, 17, 18];
+        verify(listener()).called(1);
       });
 
       test('MutableCell.last does not notify observers when last element not changed', () {
@@ -4822,13 +4861,22 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [4, 5, 3];
-        l.value = [6, 7, 3];
-        l.value = [8, 9, 10];
-        l.value = [11, 12, 13];
-        l.value = [14, 15, 13];
-        l.value = [16, 17, 18];
+        verifyNever(listener());
 
-        verify(listener()).called(3);
+        l.value = [6, 7, 3];
+        verifyNever(listener());
+
+        l.value = [8, 9, 10];
+        verify(listener()).called(1);
+
+        l.value = [11, 12, 13];
+        verify(listener()).called(1);
+
+        l.value = [14, 15, 13];
+        verifyNever(listener());
+
+        l.value = [16, 17, 18];
+        verify(listener()).called(1);
       });
 
       test('Setting MutableCell.last.value, updates list cell value', () {
@@ -4920,16 +4968,31 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [4, 5, 3];
-        l.value = [6, 7, 3];
-        l.value = [];
-        l.value = [];
-        l.value = [];
-        l.value = [8, 9, 10];
-        l.value = [11, 12, 13];
-        l.value = [14, 15, 13];
-        l.value = [16, 17, 18];
+        verifyNever(listener());
 
-        verify(listener()).called(2);
+        l.value = [6, 7, 3];
+        verifyNever(listener());
+
+        l.value = [];
+        verify(listener()).called(1);
+
+        l.value = [];
+        verifyNever(listener());
+
+        l.value = [];
+        verifyNever(listener());
+
+        l.value = [8, 9, 10];
+        verify(listener()).called(1);
+
+        l.value = [11, 12, 13];
+        verifyNever(listener());
+
+        l.value = [14, 15, 13];
+        verifyNever(listener());
+
+        l.value = [16, 17, 18];
+        verifyNever(listener());
       });
 
       test('ValueCell.isEmpty compares == when same list cell', () {
@@ -4990,16 +5053,31 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [4, 5, 3];
-        l.value = [6, 7, 3];
-        l.value = [];
-        l.value = [];
-        l.value = [];
-        l.value = [8, 9, 10];
-        l.value = [11, 12, 13];
-        l.value = [14, 15, 13];
-        l.value = [16, 17, 18];
+        verifyNever(listener());
 
-        verify(listener()).called(2);
+        l.value = [6, 7, 3];
+        verifyNever(listener());
+
+        l.value = [];
+        verify(listener()).called(1);
+
+        l.value = [];
+        verifyNever(listener());
+
+        l.value = [];
+        verifyNever(listener());
+
+        l.value = [8, 9, 10];
+        verify(listener()).called(1);
+
+        l.value = [11, 12, 13];
+        verifyNever(listener());
+
+        l.value = [14, 15, 13];
+        verifyNever(listener());
+
+        l.value = [16, 17, 18];
+        verifyNever(listener());
       });
 
       test('ValueCell.isNotEmpty compares == when same list cell', () {
@@ -5072,12 +5150,19 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [1, 1, 1];
-        l.value = [2, 2, 2];
-        l.value = [1, 1, 1, 1];
-        l.value = [3, 2, 1, 0];
-        l.value = [4, 5, 6, 7, 8];
+        verifyNever(listener());
 
-        verify(listener()).called(2);
+        l.value = [2, 2, 2];
+        verifyNever(listener());
+
+        l.value = [1, 1, 1, 1];
+        verify(listener()).called(1);
+
+        l.value = [3, 2, 1, 0];
+        verifyNever(listener());
+
+        l.value = [4, 5, 6, 7, 8];
+        verify(listener()).called(1);
       });
 
       test('MutableCell.length does not notify observers when list length not changed', () {
@@ -5090,12 +5175,19 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [1, 1, 1];
-        l.value = [2, 2, 2];
-        l.value = [1, 1, 1, 1];
-        l.value = [3, 2, 1, 0];
-        l.value = [4, 5, 6, 7, 8];
+        verifyNever(listener());
 
-        verify(listener()).called(2);
+        l.value = [2, 2, 2];
+        verifyNever(listener());
+
+        l.value = [1, 1, 1, 1];
+        verify(listener()).called(1);
+
+        l.value = [3, 2, 1, 0];
+        verifyNever(listener());
+
+        l.value = [4, 5, 6, 7, 8];
+        verify(listener()).called(1);
       });
 
       test('Setting MutableCell.length.value shrinks list', () {
@@ -5313,13 +5405,22 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [10, 20, 30, 4, 50];
-        l.value = [11, 12, 13, 4, 15, 16, 17, 18];
-        l.value = [22, 33, 44, 55, 66];
-        l.value = [1, 2, 3, 4];
-        l.value = [5, 6, 7, 4, 8];
-        l.value = [9, 10, 11, 12];
+        verifyNever(listener());
 
-        verify(listener()).called(3);
+        l.value = [11, 12, 13, 4, 15, 16, 17, 18];
+        verifyNever(listener());
+
+        l.value = [22, 33, 44, 55, 66];
+        verify(listener()).called(1);
+
+        l.value = [1, 2, 3, 4];
+        verify(listener()).called(1);
+
+        l.value = [5, 6, 7, 4, 8];
+        verifyNever(listener());
+
+        l.value = [9, 10, 11, 12];
+        verify(listener()).called(1);
       });
 
       test('MutableCell.operator[] does not notify observers when indexed element not changed', () {
@@ -5332,13 +5433,22 @@ void main() {
         addTearDown(() => f.listenable.removeListener(listener));
 
         l.value = [10, 20, 30, 4, 50];
-        l.value = [11, 12, 13, 4, 15, 16, 17, 18];
-        l.value = [22, 33, 44, 55, 66];
-        l.value = [1, 2, 3, 4];
-        l.value = [5, 6, 7, 4, 8];
-        l.value = [9, 10, 11, 12];
+        verifyNever(listener());
 
-        verify(listener()).called(3);
+        l.value = [11, 12, 13, 4, 15, 16, 17, 18];
+        verifyNever(listener());
+
+        l.value = [22, 33, 44, 55, 66];
+        verify(listener()).called(1);
+
+        l.value = [1, 2, 3, 4];
+        verify(listener()).called(1);
+
+        l.value = [5, 6, 7, 4, 8];
+        verifyNever(listener());
+
+        l.value = [9, 10, 11, 12];
+        verify(listener()).called(1);
       });
 
       test('Setting MutableCell.operator[].value, updates list cell value', () {
@@ -5388,12 +5498,19 @@ void main() {
         final listener = addListener(e, MockSimpleListener());
 
         i.value = 2;
-        i.value = 2;
-        i.value = 1;
-        i.value = 1;
-        i.value = 0;
+        verifyNever(listener());
 
-        verify(listener()).called(2);
+        i.value = 2;
+        verifyNever(listener());
+
+        i.value = 1;
+        verify(listener()).called(1);
+
+        i.value = 1;
+        verifyNever(listener());
+
+        i.value = 0;
+        verify(listener()).called(1);
       });
 
       test('Mutable.operator[] does not notify observers when index not changed', () {
@@ -5404,15 +5521,22 @@ void main() {
         final listener = addListener(e, MockSimpleListener());
 
         i.value = 2;
-        i.value = 2;
-        i.value = 1;
-        i.value = 1;
-        i.value = 0;
+        verifyNever(listener());
 
-        verify(listener()).called(2);
+        i.value = 2;
+        verifyNever(listener());
+
+        i.value = 1;
+        verify(listener()).called(1);
+
+        i.value = 1;
+        verifyNever(listener());
+
+        i.value = 0;
+        verify(listener()).called(1);
       });
 
-      test('ValueCell.operator[] gets has correct value in batch update', () {
+      test('ValueCell.operator[] gets correct value in batch update', () {
         final l1 = MutableCell([2, 4, 8]);
         final ValueCell<List<int>> l2 = l1;
         final i = MutableCell(2);
@@ -5428,7 +5552,7 @@ void main() {
         expect(observer.values, equals([256]));
       });
 
-      test('MutableCell.operator[] gets has correct value in batch update', () {
+      test('MutableCell.operator[] gets correct value in batch update', () {
         final l = MutableCell([2, 4, 8]);
         final i = MutableCell(2);
         final e = l[i];
