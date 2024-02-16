@@ -1,8 +1,8 @@
 import 'observer_cell_state.dart';
 import 'stateful_cell.dart';
 
-/// Implements [didChange] by checking whether the new cell value is [==] to the previous value.
-mixin CheckChangesCellState<S extends StatefulCell> on ObserverCellState<S> {
+/// Changes [ObserverCellState] to only notify observers if the [cell]'s value has changed.
+mixin ChangesOnlyCellState<S extends StatefulCell> on ObserverCellState<S> {
   /// Has a previous value been recorded?
   var _hasValue = false;
 

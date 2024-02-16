@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import '../restoration/restoration.dart';
-import '../stateful_cell/check_changes_cell_state.dart';
+import '../stateful_cell/changes_only_cell_state.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 import 'compute_cell_state.dart';
@@ -23,12 +23,12 @@ import 'compute_cell_state.dart';
 class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   /// Create a cell which computes its value using [compute].
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   DynamicComputeCell(this._compute, {
     super.key,
-    bool checkChanges = false
-  }) : _checkChanges = checkChanges;
+    bool changesOnly = false
+  }) : _changesOnly = changesOnly;
 
   @override
   T get value {
@@ -57,7 +57,7 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
   final T Function() _compute;
 
   /// Should the cell check whether its value has actually changed before notifying observers?
-  final bool _checkChanges;
+  final bool _changesOnly;
 
   /// State restored by restoreState();
   CellState? _restoredState;
@@ -71,8 +71,8 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
       return state!;
     }
 
-    if (_checkChanges) {
-      return DynamicComputeCheckChangesCellState<T>(
+    if (_changesOnly) {
+      return DynamicComputeChangesOnlyCellState<T>(
           cell: this,
           key: key
       );
@@ -167,10 +167,10 @@ class DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<
   }
 }
 
-/// A [DynamicComputeCellState] that checks whether the cell value has changed on updates.
-class DynamicComputeCheckChangesCellState<T> extends DynamicComputeCellState<T>
-    with CheckChangesCellState {
-  DynamicComputeCheckChangesCellState({
+/// A [DynamicComputeCellState] that only notifies observers if [cell]'s value has changed.
+class DynamicComputeChangesOnlyCellState<T> extends DynamicComputeCellState<T>
+    with ChangesOnlyCellState {
+  DynamicComputeChangesOnlyCellState({
     required super.cell,
     required super.key
   });

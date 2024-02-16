@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import '../base/keys.dart';
-import '../stateful_cell/check_changes_cell_state.dart';
+import '../stateful_cell/changes_only_cell_state.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import 'compute_cell_state.dart';
@@ -17,10 +17,10 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
 
   /// Create a [StoreCell] which observes and saves the value of [argCell]
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   StoreCell(this.argCell, {
-    this.checkChanges = false
+    this.changesOnly = false
   }) : super(key: _StoreCellKey(argCell));
 
   @override
@@ -45,7 +45,7 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   final ValueCell<T> argCell;
 
   /// Should the observers only be notified if this cell's value has changed?
-  final bool checkChanges;
+  final bool changesOnly;
 
   /// State restored by restoreState();
   CellState? _restoredState;
@@ -63,8 +63,8 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
       return state!;
     }
 
-    if (checkChanges) {
-      return StoreCellCheckChangesState<T>(
+    if (changesOnly) {
+      return StoreCellChangesOnlyState<T>(
           cell: this,
           key: key
       );
@@ -100,12 +100,12 @@ extension StoreCellExtension<T> on ValueCell<T> {
   /// changes. Further references to the returned cell's value retrieve the
   /// stored value rather than running the computation function again.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   StoreCell<T> store({
-    bool checkChanges = false
+    bool changesOnly = false
   }) => StoreCell(this,
-      checkChanges: checkChanges
+      changesOnly: changesOnly
   );
 }
 
@@ -143,8 +143,8 @@ class StoreCellState<T> extends ComputeCellState<T, StoreCell<T>> {
 }
 
 /// A [StoreCellState] that only notifies observers if the [cell]'s value has changed.
-class StoreCellCheckChangesState<T> extends StoreCellState<T> with CheckChangesCellState<StoreCell<T>> {
-  StoreCellCheckChangesState({
+class StoreCellChangesOnlyState<T> extends StoreCellState<T> with ChangesOnlyCellState<StoreCell<T>> {
+  StoreCellChangesOnlyState({
     required super.cell,
     required super.key
   });

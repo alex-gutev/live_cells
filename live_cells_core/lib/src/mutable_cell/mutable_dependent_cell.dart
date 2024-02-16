@@ -28,17 +28,17 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
 
   /// Should the cell notify its observers only when its value has changed?
   @protected
-  final bool checkChanges;
+  final bool changesOnly;
 
   /// Construct a [MutableDependentCell] which depends on the cells in [arguments]
   ///
   /// Every cell of which the value is referenced in [compute] must be
   /// included in [arguments].
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   MutableDependentCell(this.arguments, {
-    this.checkChanges = false
+    this.changesOnly = false
   });
 
   /// Compute the value of the cell.
@@ -71,8 +71,8 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   MutableComputedCellState<T, MutableDependentCell<T>> createMutableState({
     covariant MutableComputedCellState<T, MutableDependentCell<T>>? oldState
   }) {
-    if (checkChanges) {
-      return MutableComptedCheckChangesCellState(
+    if (changesOnly) {
+      return MutableComptedChangesOnlyCellState(
           cell: this,
           key: key,
           arguments: arguments,

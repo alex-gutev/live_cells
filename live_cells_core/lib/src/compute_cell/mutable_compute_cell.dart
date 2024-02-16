@@ -21,7 +21,7 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
   /// [arguments] is a list of argument cells on which the value of the cell
   /// depends.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   /// Example:
@@ -42,7 +42,7 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
     required T Function() compute,
     required void Function(T) reverseCompute,
     required Set<ValueCell> arguments,
-    super.checkChanges
+    super.changesOnly
   }) : _compute = compute, _reverseCompute = reverseCompute, super(arguments);
 
   @override

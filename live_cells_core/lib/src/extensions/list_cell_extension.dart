@@ -18,7 +18,7 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
   /// Returns a cell with a value equal to the element at [index] in the [List] held in this cell.
   ValueCell<T> operator[](ValueCell<int> index) => (this, index).apply((l, i) => l[i],
     key: _ListIndexKey(this, index),
-  ).store(checkChanges: true);
+  ).store(changesOnly: true);
 
   /// Returns a cell which wraps the elements of the [List] held in this cell in [ValueCell]s.
   ///
@@ -48,7 +48,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   MutableCell<T> get first => mutableApply((value) => value.first,
       (v) => value = _updatedList(value, 0, v),
       key: _MutableListPropKey(this, #first),
-      checkChanges: true
+      changesOnly: true
   );
 
   /// Returns a cell which evaluates to [List.last] applied on the [value] in this cell.
@@ -59,7 +59,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// **NOTE**: The actual list is not modified but a new list is created.
   MutableCell<T> get last => mutableApply((value) => value.last,
       (v) => value = _updateListLast(value, v),
-      checkChanges: true,
+      changesOnly: true,
       key: _MutableListPropKey(this, #last)
   );
 
@@ -71,7 +71,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// **NOTE**: The actual list is not modified but a new list is created.
   MutableCell<int> get length => mutableApply((value) => value.length,
       (v) => value = _updateListLength(value, v),
-      checkChanges: true,
+      changesOnly: true,
       key: _MutableListPropKey(this, #length)
   );
 
@@ -84,7 +84,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   MutableCell<T> operator[](ValueCell<int> index) => (this, index).mutableApply((l, i) => l[i],
       (v) => value = _updatedList(value, index.value, v),
       key: _MutableListIndexKey(this, index),
-      checkChanges: true,
+      changesOnly: true,
   );
 
   /// Set the value of element [index] to [elem] in the [List] held in this cell.

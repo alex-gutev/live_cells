@@ -34,7 +34,7 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// [reverse] is called in a batch update, by [batch], so that the values of
   /// the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   /// Example:
@@ -46,11 +46,11 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// });
   /// ```
   factory MutableCell.computed(T Function() compute, void Function(T value) reverse, {
-    bool checkChanges = false
+    bool changesOnly = false
   }) => DynamicMutableComputeCell(
       compute: compute,
       reverseCompute: reverse,
-      checkChanges: checkChanges
+      changesOnly: changesOnly
   );
 
   /// Set the value of the cell.

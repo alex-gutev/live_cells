@@ -1,7 +1,7 @@
 import 'dynamic_compute_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import 'mutable_computed_cell_state.dart';
-import '../stateful_cell/check_changes_cell_state.dart';
+import '../stateful_cell/changes_only_cell_state.dart';
 
 /// A mutable computational cell which determines is dependencies at runtime
 ///
@@ -21,7 +21,7 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   DynamicMutableComputeCell({
     required T Function() compute,
     required void Function(T) reverseCompute,
-    super.checkChanges
+    super.changesOnly
   }) : _compute = compute, _reverseCompute = reverseCompute, super({});
 
   @override
@@ -41,8 +41,8 @@ class DynamicMutableComputeCell<T> extends MutableDependentCell<T> {
   MutableComputedCellState<T, DynamicMutableComputeCell<T>> createMutableState({
     covariant MutableComputedCellState<T, DynamicMutableComputeCell<T>>? oldState
   }) {
-    if (checkChanges) {
-      return _DynamicMutableComputeCheckChangesCellState(
+    if (changesOnly) {
+      return _DynamicMutableComputeChangesOnlyCellState(
           cell: this,
           key: key,
           oldState: oldState
@@ -74,10 +74,10 @@ class _DynamicMutableComputeCellState<T>
   });
 }
 
-/// A [_DynamicMutableComputeCellState] that checks whether the cell state has changed on update.
-class _DynamicMutableComputeCheckChangesCellState<T>
-    extends _DynamicMutableComputeCellState<T> with CheckChangesCellState {
-  _DynamicMutableComputeCheckChangesCellState({
+/// A [_DynamicMutableComputeCellState] that notifies observers only if [cell]'s value has changed.
+class _DynamicMutableComputeChangesOnlyCellState<T>
+    extends _DynamicMutableComputeCellState<T> with ChangesOnlyCellState {
+  _DynamicMutableComputeChangesOnlyCellState({
     required super.cell,
     required super.key,
     super.oldState

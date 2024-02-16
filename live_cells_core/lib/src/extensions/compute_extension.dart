@@ -29,7 +29,7 @@ extension ComputeExtension<T> on ValueCell<T> {
   /// such that calling [fn] again will produce the same value that was passed to
   /// [reverse].
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   /// The returned cell is identified by [key] if non-null. **NOTE**: A key
@@ -37,11 +37,11 @@ extension ComputeExtension<T> on ValueCell<T> {
   /// a full mutable computed cell.
   MutableCell<U> mutableApply<U>(U Function(T) fn, void Function(U) reverse, {
     key,
-    bool checkChanges = false
+    bool changesOnly = false
   }) {
-    if (checkChanges) {
+    if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -128,7 +128,7 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -136,19 +136,19 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2) fn, void Function(U) reverse, {
       key,
-      bool checkChanges = false
+      bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value),
         reverseCompute: reverse,
         arguments: {$1, $2},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -199,7 +199,7 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -207,19 +207,19 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3) fn, void Function(U) reverse, {
     key,
-    bool checkChanges = false
+    bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -271,7 +271,7 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -279,19 +279,19 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4) fn, void Function(U) reverse, {
     key,
-    bool checkChanges = false
+    bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value, $4.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3, $4},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -344,7 +344,7 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -352,19 +352,19 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5) fn, void Function(U) reverse, {
       key,
-      bool checkChanges = false
+      bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3, $4, $5},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -418,7 +418,7 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -426,19 +426,19 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6) fn, void Function(U) reverse, {
       key,
-      bool checkChanges = false
+      bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3, $4, $5, $6},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -493,7 +493,7 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -501,14 +501,14 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7) fn, void Function(U) reverse, {
       key,
-      bool checkChanges = false
+      bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3, $4, $5, $6, $7},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
 
@@ -564,7 +564,7 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -572,19 +572,19 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8) fn, void Function(U) reverse, {
       key,
-      bool checkChanges = false
+      bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3, $4, $5, $6, $7, $8},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -641,7 +641,7 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -649,19 +649,19 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9) fn, void Function(U) reverse, {
       key,
-      bool checkChanges = false
+      bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 
@@ -719,7 +719,7 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   /// [reverse] is called in a batch update, by [MutableCell.batch], so
   /// that the values of the argument cells are set simultaneously.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   ///
@@ -727,19 +727,19 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   /// If [key] is null a [MutableComputeCell] is returned.
   MutableCell<U> mutableApply<U>(U Function(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) fn, void Function(U) reverse, {
       key,
-      bool checkChanges = false
+      bool changesOnly = false
   }) {
     if (key == null) {
       return MutableComputeCell(
         compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
         reverseCompute: reverse,
         arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
-        checkChanges: checkChanges
+        changesOnly: changesOnly
       );
     }
-    else if (checkChanges) {
+    else if (changesOnly) {
       return apply(fn)
-          .store(checkChanges: true)
+          .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
 

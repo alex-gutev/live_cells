@@ -26,7 +26,7 @@ abstract class ValueCell<T> {
   /// argument cell. Any change in the value of an argument cell will result
   /// in the value of the returned cell being recomputed.
   ///
-  /// If [checkChanges] is true, the returned cell only notifies its observers
+  /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
   /// The created cell is identified by [key] if non-null.
@@ -42,11 +42,11 @@ abstract class ValueCell<T> {
   /// of either `a` or `b` changes, the value of `sum` is recomputed.
   factory ValueCell.computed(T Function() compute, {
     key,
-    bool checkChanges = false
+    bool changesOnly = false
   }) => DynamicComputeCell(
       compute,
       key: key,
-      checkChanges: checkChanges
+      changesOnly: changesOnly
   );
 
   /// Register a callback function to be called whenever the values of the referenced cells change.

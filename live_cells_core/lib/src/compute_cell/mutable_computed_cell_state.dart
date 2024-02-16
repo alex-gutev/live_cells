@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../base/exceptions.dart';
-import '../stateful_cell/check_changes_cell_state.dart';
+import '../stateful_cell/changes_only_cell_state.dart';
 import '../mutable_cell/mutable_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
 import '../restoration/restoration.dart';
@@ -159,10 +159,10 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
   }
 }
 
-/// A [MutableComputedCellState] which checks if the cell value changed on update.
-class MutableComptedCheckChangesCellState<T, S extends MutableDependentCell<T>>
-    extends MutableComputedCellState<T,S> with CheckChangesCellState<S> {
-  MutableComptedCheckChangesCellState({
+/// A [MutableComputedCellState] that notifies observers only if [cell]'s value has changed.
+class MutableComptedChangesOnlyCellState<T, S extends MutableDependentCell<T>>
+    extends MutableComputedCellState<T,S> with ChangesOnlyCellState<S> {
+  MutableComptedChangesOnlyCellState({
     required super.cell,
     required super.key,
     required super.arguments,
