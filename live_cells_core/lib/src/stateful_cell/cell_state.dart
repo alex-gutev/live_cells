@@ -114,14 +114,8 @@ class CellState<T extends StatefulCell> {
   ///
   /// If [isEqual] is true then only the observers, for which
   /// [CellObserver.shouldNotifyAlways] is true, are notified.
-  ///
-  /// If [hasNewValue] is true, only the observers for which
-  /// [CellObserver.shouldNotify] returns true, passing [newValue] as the
-  /// argument are notified.
   void notifyWillUpdate({
     bool isEqual = false,
-    newValue,
-    bool hasNewValue = false
   }) {
     assert(!_isDisposed);
 

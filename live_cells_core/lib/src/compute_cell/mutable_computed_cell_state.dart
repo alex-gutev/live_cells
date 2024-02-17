@@ -79,11 +79,7 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
     final isEqual = _hasValue && super.value == value;
 
     _reverse = true;
-    notifyWillUpdate(
-        isEqual: isEqual,
-        hasNewValue: true,
-        newValue: value
-    );
+    notifyWillUpdate(isEqual: isEqual);
 
     updating = false;
     stale = false;
