@@ -11,11 +11,11 @@ environment:
 
 dependencies:
   meta: ^1.12.0
-  collection: ^1.16.0
+  collection: ">=1.16.0"
   live_cell_annotations: ^0.4.0
 
 dev_dependencies:
   test: ^1.25.2
-  mockito: ^5.4.0
+  mockito: ^5.4.4
   lints: ^3.0.0
   build_runner: ^2.4.8
