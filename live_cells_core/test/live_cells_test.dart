@@ -5835,6 +5835,246 @@ void main() {
   });
 
   group('Map Cell Extensions', () {
+    group('.keys', () {
+      test('ValueCell.keys retrieves map keys', () {
+        const m = ValueCell.value({'k1': 1, 'k2': 2, 'k3': 3});
+        final keys = m.keys;
+
+        expect(keys.value.toSet(), equals({'k1', 'k2', 'k3'}));
+      });
+
+      test('ValueCell.keys reacts to changes in map', () {
+        final m = MutableCell({'k1': 1, 'k2': 2, 'k3': 3});
+        final keys = m.keys;
+        final keySet = keys.toSet();
+
+        final observer = addObserver(keySet, MockValueObserver());
+
+        m.value = {
+          'a': 0,
+          'b': 1,
+          'c': 2,
+          'd': 3
+        };
+
+        expect(observer.values, equals([{'a', 'b', 'c', 'd'}]));
+      });
+
+      test('ValueCell.keys compare == if same map cell', () {
+        const m = ValueCell.value({'a': 1});
+        final keys1 = m.keys;
+        final keys2 = m.keys;
+
+        expect(keys1 == keys2, isTrue);
+        expect(keys1.hashCode == keys2.hashCode, isTrue);
+      });
+
+      test('ValueCell.keys compare != if different map cells', () {
+        final m1 = MutableCell({'a': 1});
+        final m2 = MutableCell({'a': 1});
+
+        final keys1 = m1.keys;
+        final keys2 = m2.keys;
+
+        expect(keys1 != keys2, isTrue);
+        expect(keys1 == keys1, isTrue);
+      });
+    });
+
+    group('.values', () {
+      test('ValueCell.values retrieves map values', () {
+        const m = ValueCell.value({'k1': 1, 'k2': 2, 'k3': 3});
+        final values = m.values;
+
+        expect(values.value.toSet(), equals({1, 2, 3}));
+      });
+
+      test('ValueCell.values reacts to changes in map', () {
+        final m = MutableCell({'k1': 1, 'k2': 2, 'k3': 3});
+        final values = m.values;
+        final valueSet = values.toSet();
+
+        final observer = addObserver(valueSet, MockValueObserver());
+
+        m.value = {
+          'a': 10,
+          'b': 11,
+          'c': 12,
+          'd': 13
+        };
+
+        expect(observer.values, equals([{10, 11, 12, 13}]));
+      });
+
+      test('ValueCell.values compare == if same map cell', () {
+        const m = ValueCell.value({'a': 1});
+        final values1 = m.values;
+        final values2 = m.values;
+
+        expect(values1 == values2, isTrue);
+        expect(values1.hashCode == values2.hashCode, isTrue);
+      });
+
+      test('ValueCell.values compare != if different map cells', () {
+        final m1 = MutableCell({'a': 1});
+        final m2 = MutableCell({'a': 1});
+
+        final values1 = m1.values;
+        final values2 = m2.values;
+
+        expect(values1 != values2, isTrue);
+        expect(values1 == values1, isTrue);
+      });
+    });
+
+    group('.entries', () {
+      test('ValueCell.entries retrieves map values', () {
+        const m = ValueCell.value({'k1': 1, 'k2': 2, 'k3': 3});
+        final entries = m.entries;
+
+        expect(entries.value.map((e) => e.key).toSet(), equals({
+          'k1', 'k2', 'k3'
+        }));
+
+        expect(entries.value.map((e) => e.value).toSet(), equals({
+          1, 2, 3
+        }));
+      });
+
+      test('ValueCell.entries reacts to changes in map', () {
+        final m = MutableCell({'k1': 1, 'k2': 2, 'k3': 3});
+        final entries = m.entries;
+        final entrySet = entries.toSet();
+
+        final observer = addObserver(entrySet, MockValueObserver());
+
+        m.value = {
+          'a': 10,
+          'b': 11,
+          'c': 12,
+          'd': 13
+        };
+
+        expect(observer.values[0].map((e) => e.key).toSet(), equals({'a', 'b', 'c', 'd'}));
+        expect(observer.values[0].map((e) => e.value).toSet(), equals({10, 11, 12, 13}));
+      });
+
+      test('ValueCell.entries compare == if same map cell', () {
+        const m = ValueCell.value({'a': 1});
+        final entries1 = m.entries;
+        final entries2 = m.entries;
+
+        expect(entries1 == entries2, isTrue);
+        expect(entries1.hashCode == entries2.hashCode, isTrue);
+      });
+
+      test('ValueCell.entries compare != if different map cells', () {
+        final m1 = MutableCell({'a': 1});
+        final m2 = MutableCell({'a': 1});
+
+        final entries1 = m1.entries;
+        final entries2 = m2.entries;
+
+        expect(entries1 != entries2, isTrue);
+        expect(entries1 == entries1, isTrue);
+      });
+    });
+
+    group('.containsKey()', () {
+      test('Returns correct value', () {
+        final m = MutableCell({'a': 0, 'b': 1});
+        final k = m.containsKey('b'.cell);
+
+        final obs = addObserver(k, MockValueObserver());
+
+        m.value = {
+          'b': 100
+        };
+
+        m.value = {'d': 9};
+        m.value = {'d': 9, 'b': 5};
+
+        expect(obs.values, equals([true, false, true]));
+      });
+
+      test('compares == when same map and key cells', () {
+        const map = ValueCell.value({});
+        final e1 = map.containsKey('key1'.cell);
+        final e2 = map.containsKey('key1'.cell);
+
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
+
+      test('compares != when different map cells', () {
+        const m1 = ValueCell.value({});
+        const m2 = ValueCell.value({ 'a': 0 });
+
+        final e1 = m1.containsKey('key1'.cell);
+        final e2 = m2.containsKey('key1'.cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('compares != when different key cells', () {
+        const map = ValueCell.value({});
+        final e1 = map.containsKey('key1'.cell);
+        final e2 = map.containsKey('key2'.cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+    });
+
+    group('.containsValue()', () {
+      test('Returns correct value', () {
+        final m = MutableCell({'a': 0, 'b': 1});
+        final k = m.containsValue(5.cell);
+
+        final obs = addObserver(k, MockValueObserver());
+
+        m.value = {
+          'f': 5
+        };
+
+        m.value = {'d': 9};
+        m.value = {'d': 9, 'b': 5};
+        m.value = {};
+
+        expect(obs.values, equals([true, false, true, false]));
+      });
+
+      test('compares == when same map and key cells', () {
+        const map = ValueCell.value({});
+        final e1 = map.containsValue(100.cell);
+        final e2 = map.containsValue(100.cell);
+
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
+
+      test('compares != when different map cells', () {
+        const m1 = ValueCell.value({});
+        const m2 = ValueCell.value({ 'a': 0 });
+
+        final e1 = m1.containsValue(100.cell);
+        final e2 = m2.containsValue(100.cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('compares != when different value cells', () {
+        const map = ValueCell.value({});
+        final e1 = map.containsValue(1.cell);
+        final e2 = map.containsValue(2.cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+    });
+
     group('.operator[]', () {
       test('ValueCell.operator[] retrieves entry value', () {
         const m = ValueCell.value({
