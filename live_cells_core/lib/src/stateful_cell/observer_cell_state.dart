@@ -49,6 +49,24 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
   @protected
   void postUpdate() {}
 
+  /// Called when [willUpdate] is called for the first time during an update cycle.
+  ///
+  /// The [willUpdate] method should be called on the observers of the cell.
+  /// Overriding this method allows this behaviour to be changed.
+  @protected
+  void onWillUpdate() {
+    notifyWillUpdate();
+  }
+
+  /// Called when [update] is called
+  ///
+  /// The [update] method should be called on the observers of the cell.
+  /// Overriding this method allows this behaviour to be changed.
+  @protected
+  void onUpdate(bool didChange) {
+    notifyUpdate(didChange: didChange && this.didChange());
+  }
+
   @override
   void willUpdate(ValueCell cell) {
     if (!updating) {
@@ -57,7 +75,7 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
       updating = true;
       waitingForChange = false;
 
-      notifyWillUpdate();
+      onWillUpdate();
       stale = true;
     }
   }
@@ -65,7 +83,7 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
   @override
   void update(ValueCell cell, bool didChange) {
     if (updating || (didChange && waitingForChange)) {
-      notifyUpdate(didChange: didChange && this.didChange());
+      onUpdate(didChange && this.didChange());
 
       waitingForChange = !didChange;
       updating = false;

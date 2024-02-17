@@ -1,6 +1,6 @@
-import '../base/cell_observer.dart';
+import '../maybe_cell/maybe.dart';
 import '../stateful_cell/cell_state.dart';
-import '../stateful_cell/notifier_cell.dart';
+import '../stateful_cell/observer_cell_state.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 
@@ -9,13 +9,17 @@ import '../value_cell.dart';
 /// This cell class notifies its observers of changes in the value of
 /// another [ValueCell] after a time period has elapsed since the
 /// value change.
-class DelayCell<T> extends NotifierCell<T> {
+class DelayCell<T> extends StatefulCell<T> {
   /// Create a DelayCell.
   ///
   /// The cell notifies its observers of changes to the value
-  /// of [valueCell] after a time period of [delay].
-  DelayCell(this.delay, this.valueCell) :
-        super(valueCell.value);
+  /// of [arg] after a time period of [delay].
+  DelayCell(this.delay, this.arg) {
+    _initState();
+  }
+
+  @override
+  T get value => _state.value;
 
   /// Private
 
@@ -23,34 +27,39 @@ class DelayCell<T> extends NotifierCell<T> {
   final Duration delay;
 
   /// Observed value cell
-  final ValueCell<T> valueCell;
+  final ValueCell<T> arg;
+
+  /// Delay cell state
+  late _DelayCellState<T> _state;
 
   @override
-  CellState<StatefulCell> createState() => _DelayCellState(
-      cell: this,
-      key: key,
-      arg: valueCell
-  );
+  CellState<StatefulCell> createState() {
+    if (_state.isDisposed) {
+      _initState();
+    }
 
-  void _initValue(T value) {
-    setValue(value);
+    return _state;
   }
 
-  void _updateValue(T value) {
-    this.value = value;
+  void _initState() {
+    _state = _DelayCellState(
+      cell: this,
+      key: key,
+    );
   }
 }
 
-class _DelayCellState<T> extends CellState<DelayCell> implements CellObserver {
-  final ValueCell<T> arg;
-
-  var _updating = false;
+class _DelayCellState<T> extends CellState<DelayCell<T>>
+    with ObserverCellState<DelayCell<T>> {
+  /// The wrapped cell value
+  Maybe<T> _value;
 
   _DelayCellState({
     required super.cell,
     required super.key,
-    required this.arg
-  });
+  }) : _value = Maybe.wrap(() => cell.arg.value);
+
+  T get value => _value.unwrap;
 
   @override
   bool get shouldNotifyAlways => false;
@@ -58,33 +67,42 @@ class _DelayCellState<T> extends CellState<DelayCell> implements CellObserver {
   @override
   void init() {
     super.init();
-    cell._initValue(arg.value);
-    arg.addObserver(this);
+
+    cell.arg.addObserver(this);
+    _value = _getValue();
   }
 
   @override
   void dispose() {
-    arg.removeObserver(this);
+    cell.arg.removeObserver(this);
     super.dispose();
   }
 
   @override
-  void willUpdate(ValueCell cell) {
-    _updating = true;
+  void postUpdate() {
+    super.postUpdate();
+    _updateValue(_getValue());
   }
 
   @override
-  void update(ValueCell cell, bool didChange) {
-    if (_updating) {
-      _updateValue(cell.value);
-      _updating = false;
-    }
+  void onWillUpdate() {
+    // Prevent observers from being notified before delay
   }
 
-  Future<void> _updateValue(T value) async {
-    if (value != cell.value) {
-      await Future.delayed(cell.delay);
-      cell._updateValue(value);
-    }
+  @override
+  void onUpdate(bool didChange) {
+    // Prevent observers from being notified before delay
+  }
+
+  /// Get the argument cell value and wrap it in a [Maybe]
+  Maybe<T> _getValue() => Maybe.wrap(() => cell.arg.value);
+
+  /// Update the [DelayCell]'s value to [value] after the delay has elapsed.
+  Future<void> _updateValue(Maybe<T> value) async {
+    await Future.delayed(cell.delay);
+
+    notifyWillUpdate();
+    _value = value;
+    notifyUpdate();
   }
 }
