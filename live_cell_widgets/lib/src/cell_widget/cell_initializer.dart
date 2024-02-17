@@ -68,11 +68,40 @@ mixin CellInitializer on CellWidget {
   /// function. In subsequent builds, [cell] returns the existing
   /// [ValueCell] instance that was created during the first build using
   /// [create].
-  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
+  ///
+  /// If this CellWidget has a non-null [restorationId] the state of the cell is
+  /// also saved and restored when restoring the widget state.
+  ///
+  /// For state restoration to happen the following conditions need to be met:
+  ///
+  /// 1. The widget must be within a route which is restorable, see
+  ///    [Navigator.restorablePush].
+  /// 2. The cell returned by [create] must be a [RestorableCell].
+  ///
+  /// If [restorable] is false, the state of the returned cell is not restored.
+  /// If [restorable] is true, an assertion is violated if the cell returned
+  /// by [create] is not a [RestorableCell]. Otherwise if [restorable] is null
+  /// (the default) the state of the cell is only restored if the cell
+  /// is a [RestorableCell].
+  ///
+  /// **NOTE**: Only cells holding values encodable by [StandardMessageCodec],
+  /// can have their state restored. To restore the state of cells holding other
+  /// value types, a [CellValueCoder] subclass has to be implemented for the
+  /// value types. To use a [CellValueCoder] subclass, provide the constructor of
+  /// the subclass in [coder].
+  ///
+  /// **NOTE**: This method may only be called within the [build] method.
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create, {
+    bool? restorable,
+    CellValueCoder Function()? coder
+  }) {
     assert(_activeCellElement != null);
 
-    final cell = _activeCellElement!.getCell(create);
-    _activeCellElement!.nextCell();
+    final cell = _activeCellElement!.getCell(
+        create,
+        forceRestore: restorable ?? false,
+        makeCoder: coder
+    );
 
     return cell;
   }
@@ -87,17 +116,19 @@ mixin CellInitializer on CellWidget {
   ///
   /// **NOTE**: The callback is only registered once during the first build,
   /// and will not be registered again on subsequent builds.
+  ///
+  /// **NOTE**: This method may only be called within the [build] method.
   void watch(VoidCallback watch) {
     assert(_activeCellElement != null);
-
     _activeCellElement!.getWatcher(watch);
-    _activeCellElement!.nextWatcher();
   }
 
   @override
-  StatelessElement createElement() => _CellStorageElement(this);
+  StatelessElement createElement() => restorationId != null
+      ? _RestorableCellStorageElement(this, restorationId!)
+      : _CellStorageElement(this);
 
-  /// Private
+  // Private
 
   /// The element of the [CellWidget] currently being built.
   static _CellStorageElement? _activeCellElement;
@@ -111,12 +142,16 @@ extension CellWidgetContextExtension on BuildContext {
   ///
   /// **NOTE**: This method may only be called if [this] is the [BuildContext]
   /// of a [CellWidget] with the [CellInitializer] mixin.
-  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create, {
+    bool? restorable,
+    CellValueCoder Function()? coder
+  }) {
     final element = this as _CellStorageElement;
-    final cell = element.getCell(create);
 
-    element.nextCell();
-    return cell;
+    return element.getCell(create,
+      forceRestore: restorable ?? false,
+      makeCoder: coder
+    );
   }
 
   /// Register a callback function to be called whenever the values of cells change.
@@ -125,12 +160,9 @@ extension CellWidgetContextExtension on BuildContext {
   ///
   /// **NOTE**: This method may only be called if [this] is the [BuildContext]
   /// of a [CellWidget] with the [CellInitializer] mixin.
-  CellWatcher watch(VoidCallback watch) {
+  void watch(VoidCallback watch) {
     final element = this as _CellStorageElement;
-    final watcher = element.getWatcher(watch);
-
-    element.nextWatcher();
-    return watcher;
+    element.getWatcher(watch);
   }
 }
 
@@ -147,6 +179,9 @@ class _CellStorageElement extends _CellWidgetElement {
   /// List of registered cell watchers
   final List<CellWatcher> _watchers = [];
 
+  /// Is this the first build of the widget
+  var _isFirstBuild = true;
+
   /// Index of cell to retrieve/create when calling [getCell]
   var _curCell = 0;
 
@@ -154,62 +189,77 @@ class _CellStorageElement extends _CellWidgetElement {
   var _curWatcher = 0;
 
   /// Retrieve/create the current cell.
-  /// 
-  /// If there is no cell instance at the current cell index, [create] is called
-  /// to create a new instance. Calling [getCell] again at the current cell index
-  /// returns the existing cell instance.
-  /// 
-  /// The cell index can be advanced using [nextCell].
-  V getCell<T, V extends ValueCell<T>>(CreateCell<V> create) {
-    if (_curCell < _cells.length) {
-      return _cells[_curCell] as V;
+  ///
+  /// During the first build of the widget, [create] is called to create a new
+  /// instance at the current cell index.
+  ///
+  /// In subsequent builds, [getCell] returns the existing cell instance at the
+  /// current cell index.
+  ///
+  /// The cell index is advanced when calling this method.
+  V getCell<T, V extends ValueCell<T>>(CreateCell<V> create, {
+    required bool forceRestore,
+    required CellValueCoder Function()? makeCoder
+  }) {
+    assert(
+      !forceRestore,
+      'No active CellRestorationManager. This happens when CellWidget.cell(), '
+          'or BuildContext.cell() was called with `restorable: true` but the '
+          "CellWidget doesn't have a restorationId associated with it. Either "
+          'provide a non-null restorationId in the constructor or remove '
+          '`restorable: true`.'
+    );
+
+    if (_isFirstBuild) {
+      final cell = create();
+      _cells.add(cell);
+      _curCell++;
+
+      return cell;
     }
 
-    final cell = create();
-    _cells.add(cell);
+    assert(
+      _curCell < _cells.length,
+      'CellWidget.cell() was called more times in this build of the '
+        'widget than in the previous build. This usually happens when a call to '
+        'cell() is placed inside a conditional or loop.'
+    );
 
-    return cell;
+    return _cells[_curCell++] as V;
   }
 
-  /// Advance the cell index by 1.
+  /// Retrieve/create the current *cell watcher*.
   ///
-  /// Calling [getCell] after [nextCell] will retrieve the cell at the next
-  /// cell index.
-  void nextCell() {
-    _curCell++;
-  }
-
-  /// Retrieve/create the current *cell watcher*
+  /// During the first build of the widget, a new cell watcher is created with
+  /// watch function [watch], at the current watcher index.
   ///
-  /// If there is no [CellWatcher] instance at the current watcher index a new one
-  /// is created with watch function [watch]. Calling [getWatcher] again at the
-  /// current watcher index returns the existing [CellWatcher] instance.
+  /// In subsequent builds, [getWatcher] returns the existing [CellWatcher]
+  /// instance at the current watcher index.
   ///
-  /// The [CellWatcher] is automatically stopped when the element is unmounted.
-  ///
-  /// The watcher index can be advanced using [nextWatcher].
+  /// The watcher index is advanced when calling this method.
   CellWatcher getWatcher(VoidCallback watch) {
-    if (_curWatcher < _watchers.length) {
-      return _watchers[_curWatcher];
+    if (_isFirstBuild) {
+      final watcher = CellWatcher(watch);
+      _watchers.add(watcher);
+      _curWatcher++;
+
+      return watcher;
     }
 
-    final watcher = CellWatcher(watch);
-    _watchers.add(watcher);
+    assert(
+      _curWatcher < _watchers.length,
+      'CellWidget.watch() was called more times in this build of the '
+        'widget than in the previous build. This usually happens when a call to '
+        'watch() is placed inside a conditional or loop.'
+    );
 
-    return watcher;
-  }
-
-  /// Advance the watcher index by 1.
-  ///
-  /// Calling [getWatcher] after [nextWatcher] will retrieve the *cell watcher*
-  /// at the next watcher index.
-  void nextWatcher() {
-    _curWatcher++;
+    return _watchers[_curWatcher++];
   }
 
   @override
   Widget build() {
     final previousActiveElement = CellInitializer._activeCellElement;
+
     try {
       _curCell = 0;
       _curWatcher = 0;
@@ -218,6 +268,7 @@ class _CellStorageElement extends _CellWidgetElement {
       return super.build();
     }
     finally {
+      _isFirstBuild = false;
       CellInitializer._activeCellElement = previousActiveElement;
     }
   }
@@ -230,4 +281,62 @@ class _CellStorageElement extends _CellWidgetElement {
 
     super.unmount();
   }
+}
+
+/// A [_CellStorageElement] which restores the state of the cells created within it.
+class _RestorableCellStorageElement extends _CellStorageElement {
+  /// Restoration ID
+  final String _restorationId;
+
+  _RestorableCellStorageElement(super.widget, this._restorationId);
+
+  /// Retrieve/create the current cell and restore its state.
+  ///
+  /// If [forceRestore] is true an assertion is violated if the cell returned
+  /// by [create] is not a [RestorableCell]. If [forceRestore] is false and
+  /// the cell returned by [create] is not a [RestorableCell], its state is
+  /// not restored.
+  ///
+  /// [makeCoder] is a [CellValueCoder] constructor to use when encoding/decoding
+  /// the cell's value.
+  @override
+  V getCell<T, V extends ValueCell<T>>(CreateCell<V> create, {
+    required bool forceRestore,
+    required CellValueCoder Function()? makeCoder
+  }) {
+    final cell = super.getCell(create,
+        forceRestore: false,
+        makeCoder: null
+    );
+
+    if (_isFirstBuild) {
+      assert(
+        !forceRestore || cell is RestorableCell<T>,
+        'RestorableCellWidget.cell(): cell returned by creation function is not '
+          'a RestorableCell. You are seeing this error because you\'ve created a '
+          'cell with cell(..., restore: true) which is not a RestorableCell. To '
+          'fix this either return a RestorableCell from the creation function or '
+          'call cell() without the restore argument.'
+      );
+
+      if (cell is! RestorableCell<T>) {
+        return cell;
+      }
+
+      final coder = makeCoder?.call() ?? const CellValueCoder();
+
+      CellRestorationManagerState.activeState.registerCell(
+          cell: cell,
+          coder: coder
+      );
+    }
+
+    return cell;
+  }
+
+  @override
+  Widget build() => CellRestorationManager(
+      builder: super.build,
+      restorationId: _restorationId
+    );
 }

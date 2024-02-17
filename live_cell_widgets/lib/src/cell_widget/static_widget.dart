@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import '../restoration/cell_restoration_manager.dart';
+
 /// A widget that is only built once.
 ///
 /// This [build] method of this widget is only called during the first build.
@@ -24,11 +26,22 @@ import 'package:flutter/widgets.dart';
 /// }
 /// ```
 abstract class StaticWidget extends StatelessWidget {
-  const StaticWidget({super.key});
+  /// Restoration ID to use for restoring the cell state
+  ///
+  /// If null state restoration is not performed.
+  final String? restorationId;
+
+  const StaticWidget({
+    super.key,
+    this.restorationId
+  });
 
   /// Create a [StaticWidget] with the [build] method defined by [builder].
   ///
   /// This allows a [StaticWidget] to be created without subclassing.
+  ///
+  /// If [restorationId] is non-null [ValueCell.restore] may be called immediately
+  /// within [builder] to restore the state of cells.
   ///
   /// Example:
   ///
@@ -43,14 +56,19 @@ abstract class StaticWidget extends StatelessWidget {
   ///     );
   /// });
   /// ```
-  factory StaticWidget.builder(WidgetBuilder builder, {Key? key}) =>
-      _StaticWidgetBuilder(
-          key: key,
-          builder: builder
-      );
+  factory StaticWidget.builder(WidgetBuilder builder, {
+    Key? key,
+    String? restorationId
+  }) => _StaticWidgetBuilder(
+      key: key,
+      restorationId: restorationId,
+      builder: builder
+  );
 
   @override
-  StatelessElement createElement() => _StaticWidgetElement(this);
+  StatelessElement createElement() => restorationId != null
+      ? _RestorableStaticWidgetElement(this, restorationId!)
+      : _StaticWidgetElement(this);
 }
 
 /// A [StaticWidget] with the [build] method defined by [builder]
@@ -60,6 +78,7 @@ class _StaticWidgetBuilder extends StaticWidget {
 
   const _StaticWidgetBuilder({
     super.key,
+    super.restorationId,
     required this.builder
   });
 
@@ -77,4 +96,17 @@ class _StaticWidgetElement extends StatelessElement {
   Widget build() {
     return _builtWidget ??= super.build();
   }
+}
+
+/// [_StaticWidgetElement] that restores the state of cells within it.
+class _RestorableStaticWidgetElement extends _StaticWidgetElement {
+  final String _restorationId;
+
+  _RestorableStaticWidgetElement(super.widget, this._restorationId);
+
+  @override
+  Widget build() => CellRestorationManager(
+      builder: super.build,
+      restorationId: _restorationId
+  );
 }

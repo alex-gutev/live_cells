@@ -1,15 +1,16 @@
-import 'dart:collection';
-
 import 'package:flutter/widgets.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 
 import '../cell_widget/cell_widget.dart';
+import 'restorable_cell_state_list.dart';
+import 'cell_restoration_observer.dart';
 
 /// Provides functionality for creating cells which support state restoration.
 ///
 /// Cells created using the [cell] method are persisted between builds of the
 /// widget, see [CellInitializer.cell] for more information. Additionally, the
 /// state of these cells is restored during state restoration of the application.
+@Deprecated('Use CellWidget/StaticWidget with a non-null restorationId.')
 abstract class RestorableCellWidget extends StatelessWidget {
   const RestorableCellWidget({super.key});
 
@@ -140,7 +141,7 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
   static _RestorableCellWidgetState? _activeState;
 
   /// Restorable list holding the saved cell states
-  final _cellStates = _RestorableCellStateList();
+  final _cellStates = RestorableCellStateList();
 
   /// Is this the first build of the widget
   var _isFirstBuild = true;
@@ -155,7 +156,7 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
   var _curCellState = 0;
 
   /// Observes the restorable cells for changes in their values
-  late final _observer = _RestorableWidgetCellObserver(_cellStates);
+  late final _observer = CellRestorationObserver(_cellStates);
 
   /// List of registered cell watchers
   final List<CellWatcher> _watchers = [];
@@ -315,129 +316,5 @@ class _RestorableCellWidgetState extends State<_RestorableCellWidget> with
       _isFirstBuild = false;
       _activeState = previousActiveState;
     }
-  }
-}
-
-/// Observes restorable cells for changes in their values.
-///
-/// Whenever the value of an observed cell changes, its state is saved in a
-/// [_RestorableCellStateList].
-class _RestorableWidgetCellObserver implements CellObserver {
-  /// The restorable list into which to save the cell states.
-  final _RestorableCellStateList _values;
-
-  /// Maps cells to the indices, within [_values] at which to save their state.
-  final Map<RestorableCell, int> _indices = HashMap();
-
-  /// Maps cells to the [CellValueCoder] objects to use for encoding their values.
-  final Map<RestorableCell, CellValueCoder> _coders = HashMap();
-
-  /// Set of cells updated during the current update cycle
-  final Set<RestorableCell> _updatedCells = HashSet();
-
-  /// Is an update cycle ongoing?
-  var _isUpdating = false;
-
-  _RestorableWidgetCellObserver(this._values);
-
-  /// Stop observing the cells for changes.
-  /// 
-  /// **NOTE**: This method must be called otherwise resources will be leaked.
-  void dispose() {
-    for (final cell in _indices.keys) {
-      cell.removeObserver(this);
-    }
-  }
-  
-  /// Start observing [cell] for changes and save its state at [index] within [_values].
-  /// 
-  /// [coder] is the [CellValueCoder] used for encoding the cell's value.
-  void addCell({
-    required RestorableCell cell,
-    required int index,
-    required CellValueCoder coder
-  }) {
-    if (!_indices.containsKey(cell)) {
-      _indices[cell] = index;
-      _coders[cell] = coder;
-
-      cell.addObserver(this);
-    }
-  }
-
-  @override
-  bool get shouldNotifyAlways => true;
-
-  @override
-  void update(covariant RestorableCell<dynamic> cell, bool didChange) {
-    if (_isUpdating) {
-      for (final cell in _updatedCells) {
-        final index = _indices[cell]!;
-        final coder = _coders[cell]!;
-
-        _values[index] = cell.dumpState(coder);
-      }
-
-      _isUpdating = false;
-      _updatedCells.clear();
-
-      _values.notifyChanged();
-    }
-  }
-
-  @override
-  void willUpdate(ValueCell<dynamic> cell) {
-    _isUpdating = true;
-    _updatedCells.add(cell as RestorableCell);
-  }
-}
-
-/// A [RestorableProperty] holding a list of saved cell states.
-class _RestorableCellStateList extends RestorableProperty<List>{
-  /// List of saved cell states
-  List _states = [];
-
-  /// Number of saved cell states in list
-  int get length => _states.length;
-
-  /// Retrieve the saved cell state at [index].
-  operator [](int index) => _states[index];
-
-  /// Set the saved cell state at [index].
-  ///
-  /// [state] must be of a type supported by [StandardMessageCodec].
-  operator []=(int index, state) {
-    _states[index] = state;
-  }
-
-  /// Append a new saved state to the list.
-  void add(state) {
-    _states.add(state);
-  }
-
-  /// Notify the observers of this property that the list of saved cell states has changd.
-  void notifyChanged() {
-    notifyListeners();
-  }
-
-  @override
-  List createDefaultValue() {
-    return [];
-  }
-
-  @override
-  List fromPrimitives(Object? data) {
-    return data as List;
-  }
-
-  @override
-  void initWithValue(List value) {
-    _states = value;
-  }
-
-  @override
-  Object? toPrimitives() {
-    // The list has to be copied otherwise the updated list is not saved.
-    return List.from(_states);
   }
 }

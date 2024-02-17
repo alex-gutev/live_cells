@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
+import 'package:live_cell_widgets/src/restoration/cell_restoration_manager.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cells_core/live_cells_internals.dart';
 
@@ -34,7 +35,15 @@ part 'cell_observer_state.dart';
 /// In the above example, the widget is rebuilt automatically whenever the
 /// value of cell `a` is changed.
 abstract class CellWidget extends StatelessWidget {
-  const CellWidget({super.key});
+  /// Restoration ID to use for restoring the cell state
+  ///
+  /// If null state restoration is not performed.
+  final String? restorationId;
+
+  const CellWidget({
+    super.key,
+    this.restorationId
+  });
 
   /// Create a [CellWidget] with the [build] method defined by [builder].
   ///
@@ -45,13 +54,22 @@ abstract class CellWidget extends StatelessWidget {
   /// [CellWidgetContextExtension.cell] method to be called on the [BuildContext]
   /// passed to [builder].
   ///
+  /// If [restorationId] is non-null it is used as the restoration ID for
+  /// restoring the state of the cells created using
+  /// [CellWidgetContextExtension.cell].
+  ///
   /// Example:
   ///
   /// ```dart
   /// WidgetCell.builder((context) => Text('The value of cell a is ${a()}'))
   /// ```
-  factory CellWidget.builder(WidgetBuilder builder) =>
-      _WidgetCellBuilder(builder);
+  factory CellWidget.builder(WidgetBuilder builder, {
+    Key? key,
+    String? restorationId
+  }) => _WidgetCellBuilder(builder,
+    key: key,
+    restorationId: restorationId,
+  );
 
   @override
   StatelessElement createElement() => _CellWidgetElement(this);
@@ -63,7 +81,10 @@ class _WidgetCellBuilder extends CellWidget with CellInitializer {
   final WidgetBuilder builder;
 
   /// Create a [CellWidget] with [build] defined by [builder].
-  _WidgetCellBuilder(this.builder);
+  _WidgetCellBuilder(this.builder, {
+    super.key,
+    super.restorationId
+  });
 
   @override
   Widget build(BuildContext context) => builder(context);
