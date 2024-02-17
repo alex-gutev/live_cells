@@ -10,7 +10,7 @@ Cells would be pretty boring if you could not use them in widgets.
 The simplest way to use the value of a cell in a widget is with
 `CellWidget.builder`, which creates a widget that observes one or more
 cells. Whenever the values of the observed cells change, the widget is
-rebuilt and the new value of `count` is displayed.
+rebuilt.
 
 <CodeGroup title="CellWidget.builder">
 ```dart
@@ -60,13 +60,13 @@ Unlike `ValueNotifier` and `ChangeNotifier` you don't have to call
 
 In the previous section the `count` cell, which holds the value of the
 counter, is stored in the `State` class of a `StatefulWidget`. This is
-a good starting point, but it will quickly get annoying if you need to
+a good starting point, but it will quickly get tiring if you need to
 define cells that depend on other cells also defined in the same
 `State` class. Besides that having to use a `StatefulWidget` just to
 define a cell is verbose and annoying.
 
 Luckily `CellWidget` provides functionality for defining cells
-directly in the widget builder function. The `cell` method, of the
+directly in the widget build function. The `cell` method, of the
 `context` parameter passed to the widget builder function, creates a
 cell which is persisted between builds of the widget.
 
@@ -143,7 +143,7 @@ You can also define watch functions within `CellWidget.builder` using
 `context.watch`. Like `context.cell`, the watch function is only set up
 during the first build. Unlike a watch function defined using
 `ValueCell.watch`, the watch function is automatically stopped when
-the widget, in which it is defined, is removed from the tree.
+the `CellWidget`, in which it is defined, is removed from the tree.
 
 <CodeGroup>
 ```dart
