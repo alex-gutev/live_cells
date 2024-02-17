@@ -1,3 +1,7 @@
+## 0.12.1
+
+* Reduce minimum version of `meta` dependency
+
 ## 0.12.0
 
 New features:
