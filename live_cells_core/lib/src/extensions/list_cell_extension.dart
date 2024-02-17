@@ -31,7 +31,7 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
   ///
   /// A keyed cell is returned so that all accesses to this property, for a given
   /// [List] cell, will return an equivalent cell.
-  ValueCell<Iterable<ValueCell<T>>> get cells =>
+  ValueCell<Iterable<ValueCell<T>>> get cellList =>
       length.apply((length) => Iterable.generate(length, (i) => this[i.cell]),
         key: _ListPropKey(this, #cells)
       );

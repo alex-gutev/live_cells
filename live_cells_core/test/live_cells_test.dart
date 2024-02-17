@@ -5440,10 +5440,10 @@ void main() {
       });
     });
 
-    group('.cells', () {
+    group('.cellList', () {
       test('ValueCell.cells returns list of cells observing each element', () {
         const list = ValueCell.value(['a', 'b', 'c']);
-        final cells = list.cells.value.toList();
+        final cells = list.cellList.value.toList();
 
         expect(cells[0].value, 'a');
         expect(cells[1].value, 'b');
@@ -5452,7 +5452,7 @@ void main() {
 
       test('ValueCell.cells notifies observer when list length changed', () {
         final list = MutableCell([1, 2, 3, 4]);
-        final cells = list.cells;
+        final cells = list.cellList;
 
         final l = addListener(cells, MockSimpleListener());
 
@@ -5466,7 +5466,7 @@ void main() {
 
       test('ValueCell.cells returns list of cells which notify observer when element changed', () {
         final list = MutableCell([1, 2, 3, 4]);
-        final cells = list.cells.value.toList();
+        final cells = list.cellList.value.toList();
 
         final o1 = addObserver(cells[0], MockValueObserver());
         final o2 = addObserver(cells[2], MockValueObserver());
@@ -5481,7 +5481,7 @@ void main() {
 
       test('ValueCell.cells returns list of cells which do not notify observer when element not changed', () {
         final list = MutableCell([1, 2, 3, 4]);
-        final cells = list.cells.value.toList();
+        final cells = list.cellList.value.toList();
 
         final l1 = addListener(cells[0], MockSimpleListener());
         final l2 = addListener(cells[2], MockSimpleListener());
@@ -5497,8 +5497,8 @@ void main() {
 
       test('ValueCell.cells compares == when same list cell', () {
         const l = ValueCell.value([1, 2, 3]);
-        final f1 = l.cells;
-        final f2 = l.cells;
+        final f1 = l.cellList;
+        final f2 = l.cellList;
 
         expect(f1 == f2, isTrue);
         expect(f1.hashCode == f2.hashCode, isTrue);
@@ -5508,8 +5508,8 @@ void main() {
         final ValueCell<List<int>> l1 = MutableCell([1, 2, 3]);
         final ValueCell<List<int>> l2 = MutableCell([1, 2, 3]);
 
-        final f1 = l1.cells;
-        final f2 = l2.cells;
+        final f1 = l1.cellList;
+        final f2 = l2.cellList;
 
         expect(f1 != f2, isTrue);
         expect(f1 == f1, isTrue);
