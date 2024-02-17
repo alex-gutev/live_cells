@@ -7,6 +7,21 @@ import '../value_cell.dart';
 
 /// Provides [Map] methods directly on cells holding [Maps]s.
 extension MapCellExtension<K,V> on ValueCell<Map<K,V>> {
+  /// Returns a cell which evaluates to [Map.isEmpty] applied on the [value] in this cell
+  ValueCell<bool> get isEmpty => apply((map) => map.isEmpty,
+    key: _MapPropKey(this, #isEmpty)
+  );
+
+  /// Returns a cell which evaluates to [Map.isNotEmpty] applied on the [value] in this cell
+  ValueCell<bool> get isNotEmpty => apply((map) => map.isNotEmpty,
+      key: _MapPropKey(this, #isNotEmpty)
+  );
+
+  /// Returns a cell which evaluates to [Map.length] applied on the [value] in this cell
+  ValueCell<int> get length => apply((map) => map.length,
+      key: _MapPropKey(this, #length)
+  );
+
   /// Returns a cell which evaluates to [Map.entries] applied on the [value] in this cell.
   ValueCell<Iterable<MapEntry<K,V>>> get entries => apply((map) => map.entries,
     key: _MapPropKey(this, #entries)
