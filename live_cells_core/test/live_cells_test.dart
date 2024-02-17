@@ -6045,7 +6045,7 @@ void main() {
         expect(obs.values, equals([true, false, true, false]));
       });
 
-      test('compares == when same map and key cells', () {
+      test('compares == when same map and value cells', () {
         const map = ValueCell.value({});
         final e1 = map.containsValue(100.cell);
         final e2 = map.containsValue(100.cell);
@@ -6417,6 +6417,102 @@ void main() {
           {'a': 20, 'b': 16},
           {'a': 20, 'b': 50}
         ]));
+      });
+    });
+  });
+
+  group('Set Cell Extensions', () {
+    group('.contains()', () {
+      test('Returns correct value', () {
+        final s = MutableCell({2, 4, 8, 16});
+        final k = s.contains(8.cell);
+
+        final obs = addObserver(k, MockValueObserver());
+
+        s.value = {6, 7};
+
+        s.value = {9, 8};
+        s.value = {9, 5};
+
+        expect(obs.values, equals([false, true, false]));
+      });
+
+      test('compares == when same set and key cells', () {
+        const set = ValueCell.value({1, 2, 3});
+        final e1 = set.contains(5.cell);
+        final e2 = set.contains(5.cell);
+
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
+
+      test('compares != when different set cells', () {
+        final s1 = MutableCell({1, 2, 3});
+        final s2 = MutableCell({1, 2, 3});
+
+        final e1 = s1.contains(5.cell);
+        final e2 = s2.contains(5.cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('compares != when different key cells', () {
+        const set = ValueCell.value({4, 5, 6});
+        final e1 = set.contains(5.cell);
+        final e2 = set.contains(6.cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+    });
+
+    group('.containsAll()', () {
+      test('Returns correct value', () {
+        final s = MutableCell({2, 4, 8, 16});
+        final k = s.containsAll(const ValueCell.value([2, 4]));
+
+        final obs = addObserver(k, MockValueObserver());
+
+        s.value = {2, 6, 8};
+
+        s.value = {4, 8, 2};
+        s.value = {4, 8};
+
+        expect(obs.values, equals([false, true, false]));
+      });
+
+      test('compares == when same set and key cells', () {
+        const set = ValueCell.value({1, 2, 3});
+        const keys = ValueCell.value([1, 3]);
+
+        final e1 = set.containsAll(keys);
+        final e2 = set.containsAll(keys);
+
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
+
+      test('compares != when different set cells', () {
+        const keys = ValueCell.value([1, 3]);
+
+        final s1 = MutableCell({1, 2, 3});
+        final s2 = MutableCell({1, 2, 3});
+
+        final e1 = s1.containsAll(keys);
+        final e2 = s2.containsAll(keys);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('compares != when different key cells', () {
+        const set = ValueCell.value({4, 5, 6});
+        final e1 = set.containsAll(const ValueCell.value({5}));
+        final e2 = set.containsAll(const ValueCell.value({6}));
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
       });
     });
   });
