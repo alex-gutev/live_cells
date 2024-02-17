@@ -17,13 +17,13 @@ abstract class DependentCell<T> extends ValueCell<T> {
   /// key compare equal under [==].
   final dynamic key;
 
-  /// List of argument cells.
+  /// Set of argument cells.
   @protected
-  final List<ValueCell> arguments;
+  final Set<ValueCell> arguments;
 
   /// Create a cell, of which the value depends on a list of argument cells.
   ///
-  /// [arguments] is the list of all the argument cells on which the value
+  /// [arguments] is the set of all the argument cells on which the value
   /// of this cell depends.
   ///
   /// If [key] is non-null, the returned [DependentCell] object will compare

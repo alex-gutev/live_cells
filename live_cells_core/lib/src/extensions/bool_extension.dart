@@ -7,13 +7,13 @@ extension BoolCellExtension on ValueCell<bool> {
   /// Create a new cell which is the logical and of [this] and [other].
   ValueCell<bool> and(ValueCell<bool> other) => ComputeCell(
       compute: () => value && other.value,
-      arguments: [this, other]
+      arguments: {this, other}
   );
 
   /// Create a new cell which is the logical or of [this] and [other].
   ValueCell<bool> or(ValueCell<bool> other) => ComputeCell(
       compute: () => value || other.value,
-      arguments: [this, other]
+      arguments: {this, other}
   );
 
   /// Create a new cell which is the logical not of [this].

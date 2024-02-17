@@ -5,7 +5,7 @@ part of '../value_cell.dart';
 /// [T] is the value type of the first cell, and [U] is the value type of the second cell.
 class NeqCell<T,U> extends DependentCell<bool> {
   NeqCell(this._cellA, this._cellB) : super(
-      [_cellA, _cellB],
+      {_cellA, _cellB},
       key: _NeqCellKey(_cellA, _cellB)
   );
 

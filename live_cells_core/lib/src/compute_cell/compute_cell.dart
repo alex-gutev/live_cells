@@ -7,7 +7,7 @@ class ComputeCell<T> extends DependentCell<T> {
   /// The [compute] function is called with no arguments whenever
   /// the [value] of the cell is accessed. It should return the cell's value.
   ///
-  /// [arguments] is a list of argument cells on which the value of the cell
+  /// [arguments] is the set of argument cells on which the value of the cell
   /// depends. The observers of this cell are notified whenever the values of
   /// the argument cells change.
   ///
@@ -25,7 +25,7 @@ class ComputeCell<T> extends DependentCell<T> {
   /// ```
   ComputeCell({
     required this.compute,
-    required List<ValueCell> arguments,
+    required Set<ValueCell> arguments,
     super.key,
   }) : super(arguments);
 

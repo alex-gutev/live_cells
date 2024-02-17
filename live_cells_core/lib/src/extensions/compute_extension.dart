@@ -17,7 +17,7 @@ extension ComputeExtension<T> on ValueCell<T> {
     key,
   }) => ComputeCell(
       compute: () => fn(value),
-      arguments: [this],
+      arguments: {this},
       key: key
   );
 
@@ -46,7 +46,7 @@ extension ComputeExtension<T> on ValueCell<T> {
     }
 
     return MutableCellView(
-      arguments: [this],
+      arguments: {this},
       compute: () => fn(value),
       reverse: reverse,
       key: key,
@@ -66,7 +66,7 @@ extension ListComputeExtension on List {
   ValueCell<U> computeCell<U>(U Function() fn, {key}) =>
       ComputeCell(
           compute: fn,
-          arguments: cast<ValueCell>(),
+          arguments: toSet().cast<ValueCell>(),
           key: key
       );
 
@@ -111,7 +111,7 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value),
-      arguments: [$1, $2],
+      arguments: {$1, $2},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -156,7 +156,7 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
       key: key,
       compute: () => fn($1.value, $2.value),
       reverse: reverse,
-      arguments: [$1, $2],
+      arguments: {$1, $2},
     );
   }
 }
@@ -182,7 +182,7 @@ extension RecordComputeExtension3<T1, T2, T3> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value),
-      arguments: [$1, $2, $3],
+      arguments: {$1, $2, $3},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -227,7 +227,7 @@ extension RecordComputeExtension3<T1, T2, T3> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value),
       reverse: reverse,
-      arguments: [$1, $2, $3],
+      arguments: {$1, $2, $3},
     );
   }
 }
@@ -254,7 +254,7 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value),
-      arguments: [$1, $2, $3, $4],
+      arguments: {$1, $2, $3, $4},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -299,7 +299,7 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value),
       reverse: reverse,
-      arguments: [$1, $2, $3, $4],
+      arguments: {$1, $2, $3, $4},
     );
   }
 }
@@ -327,7 +327,7 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
-      arguments: [$1, $2, $3, $4, $5],
+      arguments: {$1, $2, $3, $4, $5},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -372,7 +372,7 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value),
       reverse: reverse,
-      arguments: [$1, $2, $3, $4, $5],
+      arguments: {$1, $2, $3, $4, $5},
     );
   }
 }
@@ -401,7 +401,7 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
-      arguments: [$1, $2, $3, $4, $5, $6],
+      arguments: {$1, $2, $3, $4, $5, $6},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -446,7 +446,7 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value),
       reverse: reverse,
-      arguments: [$1, $2, $3, $4, $5, $6],
+      arguments: {$1, $2, $3, $4, $5, $6},
     );
   }
 }
@@ -476,7 +476,7 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
-      arguments: [$1, $2, $3, $4, $5, $6, $7],
+      arguments: {$1, $2, $3, $4, $5, $6, $7},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -516,7 +516,7 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value),
       reverse: reverse,
-      arguments: [$1, $2, $3, $4, $5, $6, $7],
+      arguments: {$1, $2, $3, $4, $5, $6, $7},
     );
   }
 }
@@ -547,7 +547,7 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
-      arguments: [$1, $2, $3, $4, $5, $6, $7, $8],
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -592,7 +592,7 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value),
       reverse: reverse,
-      arguments: [$1, $2, $3, $4, $5, $6, $7, $8],
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8},
     );
   }
 }
@@ -624,7 +624,7 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
-      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9],
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -669,7 +669,7 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value),
       reverse: reverse,
-      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9],
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9},
     );
   }
 }
@@ -702,7 +702,7 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
   }) => ComputeCell(
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
-      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10],
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
   );
 
   /// Create a [MutableComputeCell] with given compute and reverse compute functions, and the cells in this as the argument list.
@@ -747,7 +747,7 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
       key: key,
       compute: () => fn($1.value, $2.value, $3.value, $4.value, $5.value, $6.value, $7.value, $8.value, $9.value, $10.value),
       reverse: reverse,
-      arguments: [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10],
+      arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
     );
   }
 }

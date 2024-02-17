@@ -162,7 +162,7 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
 
   /// Create a unique cell which references the property [prop] using [get] and sets it using [set].
   MutableCell<T> _getProp<T>(String prop, T Function() get, void Function(T) set) =>
-      MutableCellView(arguments: [this], reverse: set, compute: get, key: _key(prop));
+      MutableCellView(arguments: {this}, reverse: set, compute: get, key: _key(prop));
 }
 
 /// Extends [Duration] with a [cell] property to create a [ValueCell] holding a [Duration].
