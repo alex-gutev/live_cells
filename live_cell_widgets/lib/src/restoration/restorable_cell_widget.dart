@@ -369,7 +369,7 @@ class _RestorableWidgetCellObserver implements CellObserver {
   bool get shouldNotifyAlways => true;
 
   @override
-  void update(covariant RestorableCell<dynamic> cell) {
+  void update(covariant RestorableCell<dynamic> cell, bool didChange) {
     if (_isUpdating) {
       for (final cell in _updatedCells) {
         final index = _indices[cell]!;

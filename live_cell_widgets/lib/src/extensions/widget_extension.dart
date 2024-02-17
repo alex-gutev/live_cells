@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:live_cells_core/live_cells_core.dart';
+import 'cell_listenable_extension.dart';
 
 /// Provides functionality for creating [Widget]'s from [ValueCell]'s
 extension WidgetExtension<T> on ValueCell<T> {
@@ -54,5 +55,6 @@ extension ComputeWidgetExtension on List {
   /// final widget =
   ///    [a, b, sum].computeWidget(() => Text('${a.value} + ${b.value} = ${sum.value}'))
   /// ````
+  @Deprecated('Use .widget() on a computed cell instead.')
   Widget computeWidget(Widget Function() builder) => computeCell(builder).widget();
 }

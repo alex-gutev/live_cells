@@ -113,18 +113,28 @@ class _WidgetCellObserver extends CellObserver {
   /// Are the argument cells in the process of updating their values?
   var _isUpdating = false;
 
+  /// Is the observer waiting for [update] to be called with didChange equal to true.
+  var _waitingForChange = false;
+
   _WidgetCellObserver(this.listener);
 
   @override
-  void update(ValueCell cell) {
-    if (_isUpdating) {
-      listener();
+  void update(ValueCell cell, bool didChange) {
+    if (_isUpdating || (didChange && _waitingForChange)) {
       _isUpdating = false;
+      _waitingForChange = !didChange;
+
+      if (didChange) {
+        listener();
+      }
     }
   }
 
   @override
   void willUpdate(ValueCell cell) {
-    _isUpdating = true;
+    if (!_isUpdating) {
+      _isUpdating = true;
+      _waitingForChange = false;
+    }
   }
 }
