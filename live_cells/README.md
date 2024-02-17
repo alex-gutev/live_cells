@@ -27,7 +27,7 @@ This library also has the following advantages over other similar libraries:
 ## Getting Started
 
 If you haven't used Live Cells before, please head to the full
-[documentation](https://docs.page/alex-gutev/live_cells).
+[documentation](https://alex-gutev.github.io/live_cells/docs/intro).
 
 The remainder of this README shows brief examples that demonstrate the main features of this library.
 
@@ -251,6 +251,6 @@ person.firstName.value = 'John';
 If you discover any issues or have any feature requests, please open an issue on the package's Github
 repository.
 
-Please visit the full [documentation](https://docs.page/alex-gutev/live_cells) for a full
+Please visit the full [documentation](https://alex-gutev.github.io/live_cells/docs/intro) for a full
 introduction to the library's features. Also take a look at the `example` directory for more
 complete examples of how to use this library.
