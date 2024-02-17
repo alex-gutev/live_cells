@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:meta/meta.dart';
 
 import '../base/keys.dart';
 import '../stateful_cell/changes_only_cell_state.dart';

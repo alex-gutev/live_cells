@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
 import '../compute_cell/mutable_computed_cell_state.dart';
 import '../restoration/restoration.dart';

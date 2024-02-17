@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:meta/meta.dart';
 
 import '../cell_watch/cell_watcher.dart';
 import '../value_cell.dart';

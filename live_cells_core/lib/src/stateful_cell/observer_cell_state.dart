@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:meta/meta.dart';
 
 import 'stateful_cell.dart';
 import 'cell_state.dart';

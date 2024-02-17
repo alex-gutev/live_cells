@@ -1,7 +1,8 @@
 import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
+import '../base/types.dart';
 import '../base/cell_observer.dart';
 import 'stateful_cell.dart';
 
@@ -126,9 +127,7 @@ class CellState<T extends StatefulCell> {
         }
       }
       catch (e, st) {
-        if (kDebugMode) {
-          print('Error in CellObserver.willUpdate: $e - $st');
-        }
+        debugPrint('Error in CellObserver.willUpdate: $e - $st');
       }
     }
   }
@@ -156,9 +155,7 @@ class CellState<T extends StatefulCell> {
         }
       }
       catch (e, st) {
-        if (kDebugMode) {
-          print('Error in CellObserver.update: $e - $st');
-        }
+        debugPrint('Error in CellObserver.update: $e - $st');
       }
     }
   }

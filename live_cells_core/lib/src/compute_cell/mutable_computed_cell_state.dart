@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
 import '../base/exceptions.dart';
+import '../base/types.dart';
 import '../stateful_cell/changes_only_cell_state.dart';
 import '../mutable_cell/mutable_cell.dart';
 import '../mutable_cell/mutable_dependent_cell.dart';
@@ -92,9 +93,7 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
         cell.reverseCompute(value);
       }
       catch (e, st) {
-        if (kDebugMode) {
-          print('Exception in MutableDependentCell reverse computation function: $e - $st');
-        }
+        debugPrint('Exception in MutableDependentCell reverse computation function: $e - $st');
       }
     });
 

@@ -1,4 +1,5 @@
-/// Classes to use as cell keys
+/// Base classes for creating cell keys
+library;
 
 /// A key which is distinguished from other keys by a single [value].
 class ValueKey1<T> {

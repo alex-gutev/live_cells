@@ -1,6 +1,6 @@
 import 'dart:collection';
-import 'dart:ui';
 
+import '../base/types.dart';
 import '../base/cell_observer.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
 import '../value_cell.dart';
@@ -11,7 +11,7 @@ import '../value_cell.dart';
 /// cells referenced within it change.
 class CellWatcher {
   /// The watcher function
-  final VoidCallback watch;
+  final WatchCallback watch;
 
   /// Create a *cell watcher*
   ///
@@ -36,7 +36,7 @@ class CellWatcher {
 /// Cell observer which calls a *cell watcher* function
 class _CellWatchObserver implements CellObserver {
   /// The cell watcher function
-  final VoidCallback watch;
+  final WatchCallback watch;
 
   /// Set of cells referenced within [watch]
   final Set<ValueCell> _arguments = HashSet();

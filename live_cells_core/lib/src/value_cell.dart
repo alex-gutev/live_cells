@@ -1,4 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
+
+import 'base/types.dart';
 import 'base/cell_equality_factory.dart';
 import 'base/exceptions.dart';
 import 'cell_watch/cell_watcher.dart';
@@ -57,7 +59,7 @@ abstract class ValueCell<T> {
   ///
   /// **NOTE**: [CellWatcher.stop] must be called on the returned object when the
   /// watch function should no longer be called.
-  static CellWatcher watch(VoidCallback watch) => CellWatcher(watch);
+  static CellWatcher watch(WatchCallback watch) => CellWatcher(watch);
 
   /// Stop computation of the current cell's value.
   ///

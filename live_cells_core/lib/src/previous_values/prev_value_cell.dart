@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
 import '../stateful_cell/cell_state.dart';
 import '../stateful_cell/observer_cell_state.dart';

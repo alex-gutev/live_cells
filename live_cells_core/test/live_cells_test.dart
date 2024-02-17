@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 
 import 'package:mockito/annotations.dart';
@@ -1910,83 +1910,6 @@ void main() {
     });
   });
 
-  group('ValueCell.listenable', () {
-    test('Listeners called when value of cell changes', () {
-      final cell = MutableCell(10);
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
-
-      cell.listenable.addListener(listener1);
-      cell.listenable.addListener(listener2);
-
-      cell.value = 30;
-
-      verify(listener1()).called(1);
-      verify(listener2()).called(1);
-    });
-
-    test('Listeners not called after they are removed', () {
-      final cell = MutableCell(10);
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
-
-      cell.listenable.addListener(listener1);
-      cell.listenable.addListener(listener2);
-
-      cell.value = 30;
-      cell.listenable.removeListener(listener1);
-
-      cell.value = 40;
-
-      verify(listener1()).called(1);
-      verify(listener2()).called(2);
-    });
-
-    test('init() called when first listener is added', () {
-      final resource = MockResource();
-      final cell = TestManagedCell(resource, 1);
-
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
-
-      cell.listenable.addListener(listener1);
-      cell.listenable.addListener(listener2);
-
-      verify(resource.init()).called(1);
-    });
-
-    test('dispose() called when all listeners are removed', () {
-      final resource = MockResource();
-      final cell = TestManagedCell(resource, 1);
-
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
-
-      cell.listenable.addListener(listener1);
-      cell.listenable.addListener(listener2);
-
-      cell.listenable.removeListener(listener2);
-      cell.listenable.removeListener(listener1);
-
-      verify(resource.dispose()).called(1);
-    });
-
-    test('dispose() not called when not all listeners are removed', () {
-      final resource = MockResource();
-      final cell = TestManagedCell(resource, 1);
-
-      final listener1 = MockSimpleListener();
-      final listener2 = MockSimpleListener();
-
-      cell.listenable.addListener(listener1);
-      cell.listenable.addListener(listener2);
-
-      cell.listenable.removeListener(listener1);
-
-      verifyNever(resource.dispose());
-    });
-  });
-
   group('MutableComputeCell', () {
     test('MutableComputeCell.value computed on construction', () {
       final a = MutableCell(1);
@@ -3888,57 +3811,35 @@ void main() {
       final a = MutableCell([1, 2, 3]);
       final b = ValueCell.computed(() => a()[1], changesOnly: true);
 
-      final listener = MockSimpleListener();
-
-      final watcher = ValueCell.watch(() {
-        b();
-        listener();
-      });
-
-      addTearDown(watcher.stop);
-
+      final listener = addListener(b, MockSimpleListener());
       a.value = [4, 2, 6];
 
-      verify(listener()).called(1);
+      verifyNever(listener());
     });
 
     test('Watch function not called when didChange is false in MutableCell.batch', () {
       final a = MutableCell([1, 2, 3]);
       final b = ValueCell.computed(() => a()[1], changesOnly: true);
 
-      final listener = MockSimpleListener();
-
-      final watcher = ValueCell.watch(() {
-        b();
-        listener();
-      });
-
-      addTearDown(watcher.stop);
+      final listener = addListener(b, MockSimpleListener());
 
       MutableCell.batch(() {
         a.value = [4, 2, 6];
       });
 
-      verify(listener()).called(1);
+      verifyNever(listener());
     });
 
     test('Watch function called when didChange is true after returning false', () {
       final a = MutableCell([1, 2, 3]);
       final b = ValueCell.computed(() => a()[1], changesOnly: true);
 
-      final listener = MockSimpleListener();
-
-      final watcher = ValueCell.watch(() {
-        b();
-        listener();
-      });
-
-      addTearDown(watcher.stop);
+      final listener = addListener(b, MockSimpleListener());
 
       a.value = [4, 2, 6];
       a.value = [7, 8, 9];
 
-      verify(listener()).called(2);
+      verify(listener()).called(1);
     });
 
     test('Watch function called when didChange is true for at least one argument', () {
@@ -3963,71 +3864,6 @@ void main() {
       });
 
       verify(listener()).called(2);
-    });
-
-    test('Value listener function not called when didChange is false', () {
-      final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], changesOnly: true);
-
-      final listener = MockSimpleListener();
-      b.listenable.addListener(listener);
-
-      addTearDown(() => b.listenable.removeListener(listener));
-
-      a.value = [4, 2, 6];
-
-      verifyNever(listener());
-    });
-
-    test('Value listener function not called when didChange is false in MutableCell.batch', () {
-      final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], changesOnly: true);
-
-      final listener = MockSimpleListener();
-      b.listenable.addListener(listener);
-
-      addTearDown(() => b.listenable.removeListener(listener));
-
-      MutableCell.batch(() {
-        a.value = [4, 2, 6];
-      });
-
-      verifyNever(listener());
-    });
-
-    test('Value listener function called when didChange is true after returning false', () {
-      final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], changesOnly: true);
-
-      final listener = MockSimpleListener();
-      b.listenable.addListener(listener);
-
-      addTearDown(() => b.listenable.removeListener(listener));
-
-      a.value = [4, 2, 6];
-      a.value = [7, 8, 9];
-
-      verify(listener()).called(1);
-    });
-
-    test('Value listener function called when didChange is true for at least one argument', () {
-      final a = MutableCell([1, 2, 3]);
-      final b = ValueCell.computed(() => a()[1], changesOnly: true);
-
-      final c = MutableCell(3);
-      final d = b + c;
-
-      final listener = MockSimpleListener();
-      d.listenable.addListener(listener);
-
-      addTearDown(() => d.listenable.removeListener(listener));
-
-      MutableCell.batch(() {
-        a.value = [4, 2, 6];
-        c.value = 5;
-      });
-
-      verify(listener()).called(1);
     });
 
     test('Computed cell not recomputed when didChange is false', () {
@@ -4680,10 +4516,7 @@ void main() {
         final ValueCell<List<int>> l2 = l;
         final f = l2.first;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [1, 4, 5];
         verifyNever(listener());
@@ -4708,10 +4541,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final f = l.first;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [1, 4, 5];
         verifyNever(listener());
@@ -4827,10 +4657,7 @@ void main() {
         final ValueCell<List<int>> l2 = l;
         final f = l2.last;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [4, 5, 3];
         verifyNever(listener());
@@ -4855,10 +4682,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final f = l.last;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [4, 5, 3];
         verifyNever(listener());
@@ -4962,10 +4786,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final f = l.isEmpty;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [4, 5, 3];
         verifyNever(listener());
@@ -5047,10 +4868,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final f = l.isNotEmpty;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [4, 5, 3];
         verifyNever(listener());
@@ -5144,10 +4962,7 @@ void main() {
         final ValueCell<List<int>> l2 = l;
         final f = l2.length;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [1, 1, 1];
         verifyNever(listener());
@@ -5169,10 +4984,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final f = l.length;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [1, 1, 1];
         verifyNever(listener());
@@ -5265,10 +5077,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final f = l.reversed;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [4, 5, 3];
         l.value = [6, 7, 3];
@@ -5322,10 +5131,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final f = l.single;
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [4];
         l.value = [6, 7, 3];
@@ -5399,10 +5205,7 @@ void main() {
         final ValueCell<List<int>> l2 = l;
         final f = l2[3.cell];
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [10, 20, 30, 4, 50];
         verifyNever(listener());
@@ -5427,10 +5230,7 @@ void main() {
         final l = MutableCell([1, 2, 3, 4, 5, 6, 7]);
         final f = l[3.cell];
 
-        final listener = MockSimpleListener();
-
-        f.listenable.addListener(listener);
-        addTearDown(() => f.listenable.removeListener(listener));
+        final listener = addListener(f, MockSimpleListener());
 
         l.value = [10, 20, 30, 4, 50];
         verifyNever(listener());
@@ -5741,10 +5541,7 @@ void main() {
         final it = MutableCell(Iterable.generate(5, (i) => i));
         final l = it.toList();
 
-        final listener = MockSimpleListener();
-
-        l.listenable.addListener(listener);
-        addTearDown(() => l.listenable.removeListener(listener));
+        final listener = addListener(l, MockSimpleListener());
 
         it.value = Iterable.generate(3, (i) => 2 + i);
         it.value = Iterable.generate(10, (i) => 2 * i);
@@ -5800,10 +5597,7 @@ void main() {
         final it = MutableCell(Iterable.generate(5, (i) => i));
         final l = it.toSet();
 
-        final listener = MockSimpleListener();
-
-        l.listenable.addListener(listener);
-        addTearDown(() => l.listenable.removeListener(listener));
+        final listener = addListener(l, MockSimpleListener());
 
         it.value = Iterable.generate(3, (i) => 2 + i);
         it.value = Iterable.generate(10, (i) => 2 * i);
@@ -6647,15 +6441,36 @@ T addObserver<T extends CellObserver>(ValueCell cell, T observer) {
   return observer;
 }
 
-/// Add a listener to a cell via (ValueCell.listenable).
+/// Add a listener to a cell, which is called whenever the cell changes.
+///
+/// This function adds a watch function that references [cell]. Unlike
+/// [ValueCell.watch] the watch function is not called on the initial setup.
 ///
 /// This function also adds a teardown to the current test which removes
 /// the [listener] from [cell], after the current test runs.
 T addListener<T extends SimpleListener>(ValueCell cell, T? listener) {
   listener ??= MockSimpleListener() as T?;
 
-  cell.listenable.addListener(listener!.call);
-  addTearDown(() => cell.listenable.removeListener(listener!.call));
+  var first = true;
 
-  return listener;
+  final watcher = ValueCell.watch(() {
+    try {
+      cell();
+    }
+    catch (e) {
+      // Print exceptions from failing tests
+      // The value is only referenced to set up the dependency. An exception
+      // doesn't actually mean a test failed
+    }
+
+    if (!first) {
+      listener!.call();
+    }
+
+    first = false;
+  });
+
+  addTearDown(() => watcher.stop());
+
+  return listener!;
 }
