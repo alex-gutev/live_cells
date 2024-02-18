@@ -1400,4 +1400,51 @@ void main() {
       expect(find.text('Child 3'), findsOneWidget);
     });
   });
+
+  group('CellTextField', () {
+    testWidgets('Content of field reflects value of content cell', (tester) async {
+      final content = MutableCell('init');
+
+      await tester.pumpWidget(TestApp(
+        child: CellTextField(content: content),
+      ));
+
+      finder(String text) => find.byWidgetPredicate((widget) => widget is TextField &&
+          widget.controller?.text == text
+      );
+
+      expect(finder('init'), findsOneWidget);
+      expect(finder('new'), findsNothing);
+
+      // Change value of content cell
+      content.value = 'new';
+      await tester.pump();
+
+      expect(finder('new'), findsOneWidget);
+      expect(finder('init'), findsNothing);
+    });
+
+    testWidgets('Value of cell reflects text field content', (tester) async {
+      final content = MutableCell('init');
+
+      await tester.pumpWidget(TestApp(
+        child: CellTextField(content: content),
+      ));
+
+      finder(String text) => find.byWidgetPredicate((widget) => widget is TextField &&
+          widget.controller?.text == text
+      );
+
+      final fieldFinder = finder('init');
+
+      expect(fieldFinder, findsOneWidget);
+      expect(finder('new'), findsNothing);
+
+      // Enter new text in the field
+      await tester.enterText(fieldFinder, 'new text');
+
+      expect(finder('new text'), findsOneWidget);
+      expect(finder('init'), findsNothing);
+    });
+  });
 }
