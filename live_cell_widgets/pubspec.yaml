@@ -23,4 +23,4 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^3.0.1
   build_runner: ^2.4.8
-  live_cell_extension: ^0.3.0
+  live_cell_extension: ^0.4.0
