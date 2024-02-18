@@ -108,6 +108,60 @@ class CellWidgetTest4 extends CellWidget with CellInitializer {
   }
 }
 
+/// Tests StaticWidget subclass with cells defined in build method
+class StaticWidgetTest1 extends StaticWidget {
+  const StaticWidgetTest1({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final c1 = MutableCell(0);
+    final c2 = MutableCell(10);
+
+    return Column(
+      children: [
+        ElevatedButton(
+            onPressed: () => c1.value++,
+            child: CellWidget.builder((_) => Text('${c1()}'))
+        ),
+        ElevatedButton(
+            onPressed: () => c2.value++,
+            child: CellWidget.builder((_) => Text('${c2()}'))
+        )
+      ],
+    );
+  }
+}
+
+/// Tests that cells defined in build method are persisted across builds.
+///
+/// Additionally also tests that the widgets defined in the build method are
+/// not rebuilt.
+class StaticWidgetTest2 extends StaticWidget {
+  final String title;
+
+  const StaticWidgetTest2(this.title, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final c1 = MutableCell(0);
+    final c2 = MutableCell(10);
+
+    return Column(
+      children: [
+        Text(title),
+        ElevatedButton(
+            onPressed: () => c1.value++,
+            child: CellWidget.builder((_) => Text('${c1()}'))
+        ),
+        ElevatedButton(
+            onPressed: () => c2.value++,
+            child: CellWidget.builder((_) => Text('${c2()}'))
+        )
+      ],
+    );
+  }
+}
+
 void main() {
   group('CellWidget.builder', () {
     testWidgets('Rebuilt when referenced cell changes', (tester) async {
@@ -547,6 +601,103 @@ void main() {
       // Check that the hierarchy has been rebuilt
       expect(find.text('Second Build'), findsOneWidget);
       expect(find.text('First Build'), findsNothing);
+
+      // Press first button
+      await tester.tap(find.text('1'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
+  });
+
+  group('StaticWidget subclass', () {
+    testWidgets('Cells defined in build method', (tester) async {
+      await tester.pumpWidget(const TestApp(
+        child: StaticWidgetTest1(),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      await tester.tap(find.text('1'));
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
+
+    testWidgets('Cells defined in build method persisted between builds', (tester) async {
+      await tester.pumpWidget(const TestApp(
+        child: Column(
+          children: [
+            Text('First Build'),
+            StaticWidgetTest2('Build 1'),
+          ],
+        ),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      expect(find.text('First Build'), findsOneWidget);
+      expect(find.text('Build 1'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Rebuild widget hierarchy
+      await tester.pumpWidget(const TestApp(
+        child: Column(
+          children: [
+            Text('Second Build'),
+            StaticWidgetTest2('Build 2'),
+          ],
+        ),
+      ));
+
+      // Check that counters still have the same values
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Check that the hierarchy has been rebuilt
+      expect(find.text('Second Build'), findsOneWidget);
+      expect(find.text('First Build'), findsNothing);
+
+      // Check that the widgets inside the [StaticWidget] have not been rebuilt
+      expect(find.text('Build 1'), findsOneWidget);
+      expect(find.text('Build 2'), findsNothing);
 
       // Press first button
       await tester.tap(find.text('1'));
