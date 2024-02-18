@@ -18,6 +18,7 @@ class TestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      restorationScopeId: 'root',
       home: Scaffold(body: child),
     );
   }
@@ -59,7 +60,7 @@ class CellWidgetTest2 extends CellWidget {
 
 /// Tests CellWidget subclass with cells defined in build method
 class CellWidgetTest3 extends CellWidget with CellInitializer {
-  const CellWidgetTest3({super.key});
+  const CellWidgetTest3({super.key, super.restorationId});
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +150,33 @@ class StaticWidgetTest2 extends StaticWidget {
     return Column(
       children: [
         Text(title),
+        ElevatedButton(
+            onPressed: () => c1.value++,
+            child: CellWidget.builder((_) => Text('${c1()}'))
+        ),
+        ElevatedButton(
+            onPressed: () => c2.value++,
+            child: CellWidget.builder((_) => Text('${c2()}'))
+        )
+      ],
+    );
+  }
+}
+
+/// Tests state restoration
+class StaticWidgetTest3 extends StaticWidget {
+  const StaticWidgetTest3({
+    super.key,
+    required super.restorationId
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c1 = MutableCell(0).restore();
+    final c2 = MutableCell(10).restore();
+
+    return Column(
+      children: [
         ElevatedButton(
             onPressed: () => c1.value++,
             child: CellWidget.builder((_) => Text('${c1()}'))
@@ -352,6 +380,70 @@ void main() {
       expect(find.text('2'), findsOneWidget);
       expect(find.text('12'), findsOneWidget);
     });
+
+    testWidgets('Cells defined in build method restored', (tester) async {
+      await tester.pumpWidget(TestApp(
+        child: Column(
+          children: [
+            CellWidget.builder((context) {
+              final c1 = context.cell(() => MutableCell(0));
+              final c2 = context.cell(() => MutableCell(10));
+
+              return Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: () => c1.value++,
+                      child: Text('${c1()}')
+                  ),
+                  ElevatedButton(
+                      onPressed: () => c2.value++,
+                      child: Text('${c2()}')
+                  )
+                ],
+              );
+            }, restorationId: 'test_restoration_id'),
+          ],
+        ),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Restart and restore
+      await tester.restartAndRestore();
+
+      // Check that counters still have the same values
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('1'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
   });
 
   group('CellWidget subclass', () {
@@ -468,6 +560,52 @@ void main() {
       // Check that the hierarchy has been rebuilt
       expect(find.text('Second Build'), findsOneWidget);
       expect(find.text('First Build'), findsNothing);
+
+      // Press first button
+      await tester.tap(find.text('1'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
+
+    testWidgets('Cells defined in build method restored', (tester) async {
+      await tester.pumpWidget(const TestApp(
+        child: CellWidgetTest3(
+          restorationId: 'test_restoration_id',
+        ),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Restart and restore
+      await tester.restartAndRestore();
+
+      // Check that counters still have the same values
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
 
       // Press first button
       await tester.tap(find.text('1'));
@@ -622,6 +760,70 @@ void main() {
       expect(find.text('2'), findsOneWidget);
       expect(find.text('12'), findsOneWidget);
     });
+
+    testWidgets('Cells defined in build method restored', (tester) async {
+      await tester.pumpWidget(TestApp(
+        child: Column(
+          children: [
+            StaticWidget.builder((context) {
+              final c1 = MutableCell(0).restore();
+              final c2 = MutableCell(10).restore();
+
+              return Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: () => c1.value++,
+                      child: CellWidget.builder((_) => Text('${c1()}'))
+                  ),
+                  ElevatedButton(
+                      onPressed: () => c2.value++,
+                      child: CellWidget.builder((_) => Text('${c2()}'))
+                  )
+                ],
+              );
+            }, restorationId: 'test_restoration_id'),
+          ],
+        ),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Restart and restore
+      await tester.restartAndRestore();
+
+      // Check that counters still have the same values
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('1'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
   });
 
   group('StaticWidget subclass', () {
@@ -704,6 +906,56 @@ void main() {
       // Check that the widgets inside the [StaticWidget] have not been rebuilt
       expect(find.text('Build 1'), findsOneWidget);
       expect(find.text('Build 2'), findsNothing);
+
+      // Press first button
+      await tester.tap(find.text('1'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
+
+    testWidgets('Cells defined in build method restored', (tester) async {
+      await tester.pumpWidget(const TestApp(
+        child: Column(
+          children: [
+            StaticWidgetTest3(
+                restorationId: 'test_restoration_id'
+            ),
+          ],
+        ),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Rebuild widget hierarchy
+      await tester.restartAndRestore();
+
+      // Check that counters still have the same values
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
 
       // Press first button
       await tester.tap(find.text('1'));
