@@ -64,7 +64,7 @@ class _StaticWidgetBuilder extends StaticWidget {
   });
 
   @override
-  Widget build(BuildContext context) => build(context);
+  Widget build(BuildContext context) => builder(context);
 }
 
 /// Element for [StaticWidget].
