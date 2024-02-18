@@ -129,6 +129,11 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
   }
 
   @override
+  void update(ValueCell cell, bool didChange) {
+    super.update(cell, !_computed || didChange);
+  }
+
+  @override
   void init() {
     super.init();
 
