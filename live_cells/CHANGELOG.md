@@ -1,3 +1,9 @@
+## 0.11.2
+
+Bump `live_cell_widgets` dependency version to 0.1.1:
+
+* Fix bug in StaticWidget.builder.
+
 ## 0.11.1
 
 Move documentation to: <https://alex-gutev.github.io/live_cells/docs/intro>
