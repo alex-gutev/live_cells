@@ -1,3 +1,39 @@
+## 0.12.0
+
+New features in core:
+
+New features:
+
+* Record extension methods for creating lightweight computed (and mutable computed) cells:
+
+  ```dart
+  (a, b).apply((a,b) => a + b);
+  (a, b).mutableApply((a,b) => a + b, (v) {...});
+  ```
+
+* `changesOnly` option in cell constructors. When this option is set to true, the cell only
+  notifies its observers when its value has actually changed.
+
+* Relaxed restriction that `MutableCellView` only accept a single argument
+
+* Extensions which allow Iterable, List, Map and Set methods and properties to be used directly on
+  cells:
+
+New features in widgets library:
+
+* Simplified state restoration:
+
+  * No need to use `RestorableCellWidget`
+  * Add `restorationId` directly on `CellWidget` / `StaticWidget`.
+  * Added `.restore()` method for cell state restoration in `StaticWidget`
+
+* New Widgets:
+  * `CellRow`
+  * `CellColumn`
+
+
+
+
 ## 0.11.2
 
 Bump `live_cell_widgets` dependency version to 0.1.1:
