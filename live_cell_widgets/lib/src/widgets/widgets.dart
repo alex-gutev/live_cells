@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:live_cell_widgets/src/extensions/widget_extension.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cell_annotations/live_cell_annotations.dart';
 
@@ -274,6 +275,30 @@ the cell.'''
       documentation: '''A [ClipRect] widget with its properties controlled by [ValueCell]'s.
 
 The constructor takes the same arguments as the unnamed constructor of [ClipRect],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<Column>(
+      includeSuperProperties: [
+        #mainAxisAlignment,
+        #mainAxisSize,
+        #crossAxisAlignment,
+        #textDirection,
+        #verticalDirection,
+        #textBaseline,
+        #children
+      ],
+
+      propertyValues: {
+        #children: 'children.cellList().map((e) => e.widget()).toList()'
+      },
+
+      documentation: '''A [Column] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Column],
 but as [ValueCell]'s. This binds each property value to the [ValueCell] given
 in the constructor. If the cell value is changed, the value of the corresponding
 property to which it is bound is automatically updated to reflect the value of
@@ -720,6 +745,31 @@ the selected button.
 
 See [CellRadio] for a more detailed explanation.
 '''
+  ),
+
+
+  WidgetSpec<Row>(
+      includeSuperProperties: [
+        #mainAxisAlignment,
+        #mainAxisSize,
+        #crossAxisAlignment,
+        #textDirection,
+        #verticalDirection,
+        #textBaseline,
+        #children
+      ],
+
+      propertyValues: {
+        #children: 'children.cellList().map((e) => e.widget()).toList()'
+      },
+
+      documentation: '''A [Row] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [Row],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
   ),
 ])
 part 'widgets.g.dart';
