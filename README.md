@@ -6,4 +6,4 @@ This repository contains the packages comprising the **Live Cells** library:
 * [live_cells_core](live_cells_core/)
 * [live_cell_widgets](live_cell_widgets/)
 
-The full documentation is available at <https://docs.page/alex-gutev/live_cells>.
+The full documentation is available at <https://alex-gutev.github.io/live_cells/>.
