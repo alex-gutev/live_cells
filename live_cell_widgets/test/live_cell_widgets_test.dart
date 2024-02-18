@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:live_cell_widgets/live_cell_widgets.dart';
 import 'package:live_cell_widgets/live_cell_widgets_base.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 
+/// Wraps a widget in a [MaterialApp] for testing
 class TestApp extends StatelessWidget {
+  /// Child widget to test
   final Widget child;
 
   const TestApp({
@@ -20,10 +23,11 @@ class TestApp extends StatelessWidget {
   }
 }
 
-class CellWidgetCounter extends CellWidget {
+/// Tests CellWidget subclass observing one cell
+class CellWidgetTest1 extends CellWidget {
   final ValueCell<int> count;
 
-  const CellWidgetCounter({
+  const CellWidgetTest1({
     super.key,
     required this.count
   });
@@ -34,12 +38,13 @@ class CellWidgetCounter extends CellWidget {
   }
 }
 
-class CellWidgetSum extends CellWidget {
+/// Tests CellWidget subclass observing two cells
+class CellWidgetTest2 extends CellWidget {
   final ValueCell<num> a;
   final ValueCell<num> b;
   final ValueCell<num> sum;
 
-  const CellWidgetSum({
+  const CellWidgetTest2({
     super.key,
     required this.a,
     required this.b,
@@ -49,6 +54,30 @@ class CellWidgetSum extends CellWidget {
   @override
   Widget build(BuildContext context) {
     return Text('${a()} + ${b()} = ${sum()}');
+  }
+}
+
+/// Tests CellWidget subclass with cells defined in build method
+class CellWidgetTest3 extends CellWidget with CellInitializer {
+  const CellWidgetTest3({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final c1 = cell(() => MutableCell(0));
+    final c2 = cell(() => MutableCell(10));
+
+    return Column(
+      children: [
+        ElevatedButton(
+            onPressed: () => c1.value++,
+            child: Text('${c1()}')
+        ),
+        ElevatedButton(
+            onPressed: () => c2.value++,
+            child: Text('${c2()}')
+        )
+      ],
+    );
   }
 }
 
@@ -99,13 +128,57 @@ void main() {
       await tester.pump();
       expect(find.text('5 + 8 = 13'), findsOneWidget);
     });
+
+    testWidgets('Cells defined in build method', (tester) async {
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          final c1 = context.cell(() => MutableCell(0));
+          final c2 = context.cell(() => MutableCell(10));
+
+          return Column(
+            children: [
+              ElevatedButton(
+                  onPressed: () => c1.value++,
+                  child: Text('${c1()}')
+              ),
+              ElevatedButton(
+                  onPressed: () => c2.value++,
+                  child: Text('${c2()}')
+              )
+            ],
+          );
+        }),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      await tester.tap(find.text('1'));
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
   });
 
   group('CellWidget subclass', () {
     testWidgets('Rebuilt when referenced cell changes', (tester) async {
       final count = MutableCell(0);
       await tester.pumpWidget(TestApp(
-          child: CellWidgetCounter(count: count)
+          child: CellWidgetTest1(count: count)
       ));
 
       expect(find.text('0'), findsOneWidget);
@@ -131,7 +204,7 @@ void main() {
       final sum = (a + b).store();
 
       await tester.pumpWidget(TestApp(
-          child: CellWidgetSum(
+          child: CellWidgetTest2(
             a: a,
             b: b,
             sum: sum,
@@ -150,6 +223,34 @@ void main() {
       });
       await tester.pump();
       expect(find.text('5 + 8 = 13'), findsOneWidget);
+    });
+
+    testWidgets('Cells defined in build method', (tester) async {
+      await tester.pumpWidget(const TestApp(
+        child: CellWidgetTest3(),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      await tester.tap(find.text('1'));
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
     });
   });
 }
