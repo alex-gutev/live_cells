@@ -1,9 +1,9 @@
 name: live_cells
 description: A replacement for ChangeNotifier and ValueNotifier that is easier to use and more flexible
-version: 0.11.0
+version: 0.11.2
 repository: https://github.com/alex-gutev/live_cells/tree/master/live_cells
 issue_tracker: https://github.com/alex-gutev/live_cells/issues
-homepage: https://docs.page/alex-gutev/live_cells
+homepage: https://alex-gutev.github.io/live_cells/
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -12,7 +12,7 @@ environment:
 dependencies:
   live_cell_annotations: ^0.4.0
   live_cells_core: ^0.11.0
-  live_cell_widgets: ^0.1.0
+  live_cell_widgets: ^0.1.1
 
   flutter:
     sdk: flutter
