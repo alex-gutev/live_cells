@@ -988,4 +988,164 @@ void main() {
       expect(groupValue.value, equals(RadioTestValue.value2));
     });
   });
+
+  group('CellColumn', () {
+    testWidgets('All children rendered correctly', (tester) async {
+      final children = MutableCell(const [
+        Text('Child 1'),
+        Expanded(child: Text('Child 2'))
+      ]);
+
+      await tester.pumpWidget(TestApp(
+        child: CellColumn(children: children),
+      ));
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+
+      // Change the first child
+      children[0] = const Text('New Child');
+      await tester.pump();
+
+      expect(find.text('New Child'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 1'), findsNothing);
+    });
+
+    testWidgets('Children added to list are rendered correctly', (tester) async {
+      final children = MutableCell(const [
+        Text('Child 1'),
+        Expanded(child: Text('Child 2'))
+      ]);
+
+      await tester.pumpWidget(TestApp(
+        child: CellColumn(children: children),
+      ));
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsNothing);
+
+      // Add a widget to the list
+      children.value = const [
+        Text('Child 1'),
+        Text('Child 2'),
+        Text('Child 3')
+      ];
+
+      await tester.pump();
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsOneWidget);
+    });
+
+    testWidgets('Children rendered correctly when widgets removed from list', (tester) async {
+      final children = MutableCell(const [
+        Text('Child 1'),
+        Expanded(child: Text('Child 2')),
+        Text('Child 3')
+      ]);
+
+      await tester.pumpWidget(TestApp(
+        child: CellColumn(children: children),
+      ));
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsOneWidget);
+
+      // Add a widget to the list
+      children.value = const [
+        Expanded(child: Text('Child 2')),
+        Text('Child 3')
+      ];
+
+      await tester.pump();
+
+      expect(find.text('Child 1'), findsNothing);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsOneWidget);
+    });
+  });
+
+  group('CellRow', () {
+    testWidgets('All children rendered correctly', (tester) async {
+      final children = MutableCell(const [
+        Text('Child 1'),
+        Expanded(child: Text('Child 2'))
+      ]);
+
+      await tester.pumpWidget(TestApp(
+        child: CellRow(children: children),
+      ));
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+
+      // Change the first child
+      children[0] = const Text('New Child');
+      await tester.pump();
+
+      expect(find.text('New Child'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 1'), findsNothing);
+    });
+
+    testWidgets('Children added to list are rendered correctly', (tester) async {
+      final children = MutableCell(const [
+        Text('Child 1'),
+        Expanded(child: Text('Child 2'))
+      ]);
+
+      await tester.pumpWidget(TestApp(
+        child: CellRow(children: children),
+      ));
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsNothing);
+
+      // Add a widget to the list
+      children.value = const [
+        Text('Child 1'),
+        Text('Child 2'),
+        Text('Child 3')
+      ];
+
+      await tester.pump();
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsOneWidget);
+    });
+
+    testWidgets('Children rendered correctly when widgets removed from list', (tester) async {
+      final children = MutableCell(const [
+        Text('Child 1'),
+        Expanded(child: Text('Child 2')),
+        Text('Child 3')
+      ]);
+
+      await tester.pumpWidget(TestApp(
+        child: CellRow(children: children),
+      ));
+
+      expect(find.text('Child 1'), findsOneWidget);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsOneWidget);
+
+      // Add a widget to the list
+      children.value = const [
+        Expanded(child: Text('Child 2')),
+        Text('Child 3')
+      ];
+
+      await tester.pump();
+
+      expect(find.text('Child 1'), findsNothing);
+      expect(find.text('Child 2'), findsOneWidget);
+      expect(find.text('Child 3'), findsOneWidget);
+    });
+  });
 }
