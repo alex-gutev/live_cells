@@ -18,7 +18,7 @@ class TestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: child,
+      home: Scaffold(body: child),
     );
   }
 }
@@ -715,6 +715,13 @@ void main() {
     });
   });
 
+  // The following tests will test some of the generated widget wrappers
+
+  // Testing every single wrapper is an insurmountable task, so the tests will
+  // focus on those Widgets with customizations to the generated code, such
+  // as CellSwitch, CellRadio, CellTextField (which is written by hand),
+  // and those which are likely to be problematic such as Row and Column
+
   group('CellText', () {
     testWidgets('Data updated when cell value changed', (tester) async {
       final data = MutableCell('hello');
@@ -728,6 +735,78 @@ void main() {
       data.value = 'bye';
       await tester.pump();
       expect(find.text('bye'), findsOneWidget);
+    });
+  });
+
+  group('CellSwitch', () {
+    testWidgets('Switch initialized to on', (tester) async {
+      final state = MutableCell(true);
+
+      await tester.pumpWidget(TestApp(
+        child: CellSwitch(value: state),
+      ));
+
+      final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
+      final offFinder = find.byWidgetPredicate((widget) => widget is Switch && !widget.value);
+
+      expect(onFinder, findsOneWidget);
+      expect(offFinder, findsNothing);
+    });
+
+    testWidgets('Switch initialized to off', (tester) async {
+      final state = MutableCell(false);
+
+      await tester.pumpWidget(TestApp(
+        child: CellSwitch(value: state),
+      ));
+
+      final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
+      final offFinder = find.byWidgetPredicate((widget) => widget is Switch && !widget.value);
+
+      expect(onFinder, findsNothing);
+      expect(offFinder, findsOneWidget);
+    });
+
+    testWidgets('Switch state reflects value of cell', (tester) async {
+      final state = MutableCell(true);
+
+      await tester.pumpWidget(TestApp(
+        child: CellSwitch(value: state),
+      ));
+
+      final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
+      final offFinder = find.byWidgetPredicate((widget) => widget is Switch && !widget.value);
+
+      // Check that the switch is initially on
+      expect(onFinder, findsOneWidget);
+      expect(offFinder, findsNothing);
+
+      state.value = false;
+      await tester.pump();
+
+      // Check that the switch is now off
+      expect(onFinder, findsNothing);
+      expect(offFinder, findsOneWidget);
+    });
+
+    testWidgets('Value of cell reflects the switch state', (tester) async {
+      final state = MutableCell(true);
+
+      await tester.pumpWidget(TestApp(
+        child: CellSwitch(value: state),
+      ));
+
+      final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
+      final offFinder = find.byWidgetPredicate((widget) => widget is Switch && !widget.value);
+
+      // Check that the switch is initially on
+      expect(onFinder, findsOneWidget);
+      expect(offFinder, findsNothing);
+
+      // Toggle the switch
+      await tester.tap(onFinder);
+
+      expect(state.value, isFalse);
     });
   });
 }
