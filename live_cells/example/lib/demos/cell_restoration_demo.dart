@@ -35,16 +35,16 @@ class RadioValueCoder implements CellValueCoder {
   }
 }
 
-class CellRestorationDemo extends RestorableCellWidget {
+class CellRestorationDemo extends StaticWidget {
   @override
   String get restorationId => 'cell_restoration_demo';
 
   @override
   Widget build(BuildContext context) {
     // The state of the following cells is restored without additional steps
-    final sliderValue = cell(() => MutableCell(0.0));
-    final switchValue = cell(() => MutableCell(false));
-    final checkboxValue = cell(() => MutableCell(true));
+    final sliderValue = MutableCell(0.0).restore();
+    final switchValue = MutableCell(false).restore();
+    final checkboxValue = MutableCell(true).restore();
 
     // This cell requires a [CellValueCoder] to have its state restored.
     // In this case the [RadioValueCoder] constructor is provided since the

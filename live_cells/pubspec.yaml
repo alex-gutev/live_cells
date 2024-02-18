@@ -11,8 +11,8 @@ environment:
 
 dependencies:
   live_cell_annotations: ^0.4.0
-  live_cells_core: ^0.11.0
-  live_cell_widgets: ^0.1.1
+  live_cells_core: ^0.12.1
+  live_cell_widgets: ^0.2.0
 
   flutter:
     sdk: flutter
