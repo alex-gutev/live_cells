@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Relax live_cells_core dependency version constraint.
+
 ## 0.2.0
 
 * Simplified state restoration:
