@@ -162,6 +162,12 @@ class StaticWidgetTest2 extends StaticWidget {
   }
 }
 
+// Group Value enum for unit tests
+enum RadioTestValue {
+  value1,
+  value2
+}
+
 void main() {
   group('CellWidget.builder', () {
     testWidgets('Rebuilt when referenced cell changes', (tester) async {
@@ -717,10 +723,11 @@ void main() {
 
   // The following tests will test some of the generated widget wrappers
 
-  // Testing every single wrapper is an insurmountable task, so the tests will
-  // focus on those Widgets with customizations to the generated code, such
-  // as CellSwitch, CellRadio, CellTextField (which is written by hand),
-  // and those which are likely to be problematic such as Row and Column
+  // Writing unit tests for every single wrapper is an insurmountable task,
+  // so the tests will focus on those Widgets with customizations to the
+  // generated code, such as CellSwitch, CellRadio, CellTextField
+  // (which is written by hand), and those which are likely to be problematic
+  // such as Row and Column.
 
   group('CellText', () {
     testWidgets('Data updated when cell value changed', (tester) async {
@@ -807,6 +814,151 @@ void main() {
       await tester.tap(onFinder);
 
       expect(state.value, isFalse);
+    });
+  });
+
+  group('CellRadioListTile', () {
+    testWidgets('group value initialized correctly', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(RadioTestValue.value1);
+
+      await tester.pumpWidget(TestApp(
+        child: Column(
+          children: [
+            CellRadioListTile(
+              value: RadioTestValue.value1.cell,
+              groupValue: groupValue,
+              title: const Text('value1').cell,
+            ),
+            CellRadioListTile(
+              value: RadioTestValue.value2.cell,
+              groupValue: groupValue,
+              title: const Text('value2').cell,
+            )
+          ],
+        )
+      ));
+
+      final value1Finder = find.byWidgetPredicate((widget) => widget is RadioListTile &&
+          widget.value == RadioTestValue.value1 &&
+          widget.groupValue == RadioTestValue.value1
+      );
+
+      final value2Finder = find.byWidgetPredicate((widget) => widget is RadioListTile &&
+          widget.value == RadioTestValue.value2 &&
+          widget.groupValue == RadioTestValue.value1
+      );
+
+      expect(value1Finder, findsOneWidget);
+      expect(value2Finder, findsOneWidget);
+    });
+
+    testWidgets('group value initialized correctly when null', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(null);
+
+      await tester.pumpWidget(TestApp(
+          child: Column(
+            children: [
+              CellRadioListTile(
+                value: RadioTestValue.value1.cell,
+                groupValue: groupValue,
+                title: const Text('value1').cell,
+              ),
+              CellRadioListTile(
+                value: RadioTestValue.value2.cell,
+                groupValue: groupValue,
+                title: const Text('value2').cell,
+              )
+            ],
+          )
+      ));
+
+      final value1Finder = find.byWidgetPredicate((widget) => widget is RadioListTile &&
+          widget.value == RadioTestValue.value1 &&
+          widget.groupValue == null
+      );
+
+      final value2Finder = find.byWidgetPredicate((widget) => widget is RadioListTile &&
+          widget.value == RadioTestValue.value2 &&
+          widget.groupValue == null
+      );
+
+      expect(value1Finder, findsOneWidget);
+      expect(value2Finder, findsOneWidget);
+    });
+
+    testWidgets('group value reflects value of cell', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(null);
+
+      await tester.pumpWidget(TestApp(
+          child: Column(
+            children: [
+              CellRadioListTile(
+                value: RadioTestValue.value1.cell,
+                groupValue: groupValue,
+                title: const Text('value1').cell,
+              ),
+              CellRadioListTile(
+                value: RadioTestValue.value2.cell,
+                groupValue: groupValue,
+                title: const Text('value2').cell,
+              )
+            ],
+          )
+      ));
+
+      finder(RadioTestValue? groupValue, RadioTestValue value) =>
+          find.byWidgetPredicate((widget) => widget is RadioListTile &&
+              widget.value == value &&
+              widget.groupValue == groupValue
+          );
+
+      expect(finder(null, RadioTestValue.value1), findsOneWidget);
+      expect(finder(null, RadioTestValue.value2), findsOneWidget);
+
+      groupValue.value = RadioTestValue.value1;
+      await tester.pump();
+
+      // Check that the group value is updated in both radio buttons
+      expect(finder(RadioTestValue.value1, RadioTestValue.value1), findsOneWidget);
+      expect(finder(RadioTestValue.value1, RadioTestValue.value2), findsOneWidget);
+    });
+
+    testWidgets('value of cell reflects group value', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(null);
+
+      await tester.pumpWidget(TestApp(
+          child: Column(
+            children: [
+              CellRadioListTile(
+                value: RadioTestValue.value1.cell,
+                groupValue: groupValue,
+                title: const Text('value1').cell,
+              ),
+              CellRadioListTile(
+                value: RadioTestValue.value2.cell,
+                groupValue: groupValue,
+                title: const Text('value2').cell,
+              )
+            ],
+          )
+      ));
+
+      finder(RadioTestValue? groupValue, RadioTestValue value) =>
+          find.byWidgetPredicate((widget) => widget is RadioListTile &&
+              widget.value == value &&
+              widget.groupValue == groupValue
+          );
+
+      expect(finder(null, RadioTestValue.value1), findsOneWidget);
+      expect(finder(null, RadioTestValue.value2), findsOneWidget);
+
+      // Tap first radio button
+      await tester.tap(find.text('value1'));
+      expect(groupValue.value, equals(RadioTestValue.value1));
+
+      // Tap second radio button
+      await tester.tap(find.text('value2'));
+      expect(groupValue.value, equals(RadioTestValue.value2));
     });
   });
 }
