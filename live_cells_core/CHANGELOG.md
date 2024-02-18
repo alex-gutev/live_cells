@@ -1,3 +1,7 @@
+## 0.12.2
+
+* Fix issue with recomputing the value of mutable computed cells.
+
 ## 0.12.1
 
 * Reduce minimum version of `meta` dependency
