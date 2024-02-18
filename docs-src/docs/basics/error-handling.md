@@ -1,0 +1,162 @@
+---
+title: Error Handling
+description: How to handle errors using two-way data flow
+sidebar_position: 6
+---
+
+# Error Handling
+
+In the previous section we introduced how to handle numeric input
+using mutable computed cells. However, we glossed over what happens if
+the user enters invalid input.
+
+When a cells created by `mutableString()` is assigned a string which
+does not represent a valid number, a default value of `0` is
+assigned. This default value can be changed using the `errorValue`
+argument:
+
+```dart title="Example of mutableString(errorValue: ...)"
+final a = MutableCell<num>(0);
+
+final strA = a.mutableString(
+  errorValue: -1.cell
+);
+
+strA.value = 'not a valid number';
+
+print(a.value); // Prints -1
+```
+
+In this example, cell `a` is assigned a value of `-1` if `strA` is
+assigned a string which does not represent a valid number.
+
+:::tip
+The `errorValue` is a cell, which allows the default value to be
+changed dynamically.
+:::
+
+## Maybe Cells
+
+This error handling strategy might be sufficient for some cases but
+usually, we want to detect and handle the error rather than assigning
+a default value. This can be done with `Maybe` cells. A `Maybe` object
+either holds a value or an exception that was thrown while computing a
+value.
+
+A `Maybe` cell can easily be created from a`MutableCell` with the
+`maybe()` method. The resulting `Maybe` cell is a mutable computed
+cell with the following behaviour:
+
+* Its computed value is the value of the argument cell wrapped in a
+  `Maybe`.
+* When the cell's value is set, it sets the value of the argument cell
+  to the value wrapped in the `Maybe` if it is holding a value.
+
+The `Maybe` cell provides an `error` property which retrieves a
+`ValueCell` that evaluates to the exception held in the `Maybe` or
+`null` if the `Maybe` is holding a value. This can be used to
+determine whether an error occurred while computing a value.
+
+To handle errors while parsing a number, `mutableString` should be
+called on a cell containing a `Maybe<num>` rather than a `num`. We can
+then check whether the `error` cell is non-null to check if an error
+occurred.
+
+Putting it all together a text field for numeric input, which displays
+an error message when an invalid value is entered, can be implemented
+with the following:
+
+```dart title="Numeric text field with error handling"
+Widget numberField(MutableCell<num> n) => StaticWidget.builder((_) {
+    final maybe = n.maybe();
+    final error = maybe.error;
+    
+    return CellTextField(
+        content: maybe.mutableString(),
+        decoration: ValueCell.computed(() => InputDecoration(
+            errorText: error() != null 
+              ? 'Please enter a valid number' 
+              : null
+       ))
+    );
+});
+```
+
+:::note
+We've packaged the input field in a function which takes the cell to
+which to bind the content of the field as an argument. This allows us
+to reuse this error handling logic wherever a numeric input text field
+is required.
+:::
+
+Here we're testing whether `error` is non-null, that is whether an
+error occurred while parsing a number from the text field, and if so
+providing an error message in the `errorText` of the
+`InputDecoration`.
+
+The error message can be made more descriptive by also checking
+whether the field is empty, or not:
+
+```dart title="Numeric text field with error handling"
+Widget numberField(MutableCell<num> n) => StaticWidget.builder((_) {
+    final maybe = n.maybe();
+    final error = maybe.error;
+    final content = n.mutableString();
+    
+    return CellTextField(
+        content: content,
+        decoration: ValueCell.computed(() => InputDecoration(
+            errorText: content().isEmpty ? 
+              ? 'Cannot be empty'
+              : error() != null 
+              ? 'Please enter a valid number' 
+              : null
+       ))
+    );
+});
+```
+
+Now that we have a reusable numeric input text field with error
+handling, defined in `numberField()`, let's use it to reimplement the
+sum example from earlier.
+
+```dart title="Sum example using numberField()"
+Widget example() => StaticWidget.builder((_) {
+    final a = MutableCell<num>(0);
+    final b = MutableCell<num>(0);
+    
+    final sum = a + b;
+    
+    return Column(
+        children: [
+            Row(
+                children: [
+                    numberField(a),
+                    SizedBox(width: 5),
+                    Text('+'),
+                    SizedBox(width: 5),
+                    numberField(b),
+                ],
+            ),
+            CellText(
+                data: ValueCell.computed(
+                    () => '${a()} + ${b()} = ${sum()}'
+                )
+            ),
+            ElevatedButton(
+                child: Text('Reset'),
+                onPressed: () => MutableCell.batch(() {
+                    a.value = 0;
+                    b.value = 0;
+                })
+            )
+        ]
+    );
+});
+```
+
+Notice how we were able to package our text field with error handling
+in a separate function, that can be reused, all without writing a
+single `onChanged` callback and at the same time being able to reset
+the content of the fields simply by changing the values of the cells
+holding our data.
