@@ -81,6 +81,33 @@ class CellWidgetTest3 extends CellWidget with CellInitializer {
   }
 }
 
+/// Tests that cells defined in build method are persisted across builds.
+class CellWidgetTest4 extends CellWidget with CellInitializer {
+  final String title;
+
+  const CellWidgetTest4(this.title, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final c1 = cell(() => MutableCell(0));
+    final c2 = cell(() => MutableCell(10));
+
+    return Column(
+      children: [
+        Text(title),
+        ElevatedButton(
+            onPressed: () => c1.value++,
+            child: Text('${c1()}')
+        ),
+        ElevatedButton(
+            onPressed: () => c2.value++,
+            child: Text('${c2()}')
+        )
+      ],
+    );
+  }
+}
+
 void main() {
   group('CellWidget.builder', () {
     testWidgets('Rebuilt when referenced cell changes', (tester) async {
