@@ -20,7 +20,11 @@ extension WidgetExtension<T> on ValueCell<T> {
     Widget? child
   }) {
     return ValueListenableBuilder(
-        valueListenable: listenable,
+        // Prevent exceptions from reaching ValueListenableBuilder
+        valueListenable: onError(ComputeCell(
+            compute: () => ValueCell.none(),
+            arguments: {}
+        )).listenable,
         builder: builder,
         child: child
     );
