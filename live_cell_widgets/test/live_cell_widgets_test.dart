@@ -424,4 +424,159 @@ void main() {
       expect(find.text('12'), findsOneWidget);
     });
   });
+
+  group('StaticWidget.builder', () {
+    testWidgets('Cells defined in build method', (tester) async {
+      await tester.pumpWidget(TestApp(
+        child: StaticWidget.builder((context) {
+          final c1 = MutableCell(0);
+          final c2 = MutableCell(10);
+
+          return Column(
+            children: [
+              ElevatedButton(
+                  onPressed: () => c1.value++,
+                  child: CellWidget.builder((_) => Text('${c1()}'))
+              ),
+              ElevatedButton(
+                  onPressed: () => c2.value++,
+                  child: CellWidget.builder((_) => Text('${c2()}'))
+              )
+            ],
+          );
+        }),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      await tester.tap(find.text('1'));
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
+
+    testWidgets('Cells defined in build method persisted between builds', (tester) async {
+      await tester.pumpWidget(TestApp(
+        child: Column(
+          children: [
+            const Text('First Build'),
+            StaticWidget.builder((context) {
+              final c1 = MutableCell(0);
+              final c2 = MutableCell(10);
+
+              return Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: () => c1.value++,
+                      child: CellWidget.builder((_) => Text('${c1()}'))
+                  ),
+                  ElevatedButton(
+                      onPressed: () => c2.value++,
+                      child: CellWidget.builder((_) => Text('${c2()}'))
+                  )
+                ],
+              );
+            }),
+          ],
+        ),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('First Build'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Rebuild widget hierarchy
+      await tester.pumpWidget(TestApp(
+        child: Column(
+          children: [
+            const Text('Second Build'),
+            StaticWidget.builder((context) {
+              final c1 = MutableCell(0);
+              final c2 = MutableCell(10);
+
+              return Column(
+                children: [
+                  ElevatedButton(
+                      onPressed: () => c1.value++,
+                      child: CellWidget.builder((_) => Text('${c1()}'))
+                  ),
+                  ElevatedButton(
+                      onPressed: () => c2.value++,
+                      child: CellWidget.builder((_) => Text('${c2()}'))
+                  )
+                ],
+              );
+            }),
+          ],
+        ),
+      ));
+
+      // Check that counters still have the same values
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Check that the hierarchy has been rebuilt
+      expect(find.text('Second Build'), findsOneWidget);
+      expect(find.text('First Build'), findsNothing);
+
+      // Press first button
+      await tester.tap(find.text('1'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
+  });
+
+  group('CellText', () {
+    testWidgets('Data updated when cell value changed', (tester) async {
+      final data = MutableCell('hello');
+
+      await tester.pumpWidget(TestApp(
+        child: CellText(data: data),
+      ));
+
+      expect(find.text('hello'), findsOneWidget);
+
+      data.value = 'bye';
+      await tester.pump();
+      expect(find.text('bye'), findsOneWidget);
+    });
+  });
 }
