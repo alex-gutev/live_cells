@@ -743,6 +743,33 @@ void main() {
       await tester.pump();
       expect(find.text('bye'), findsOneWidget);
     });
+
+    testWidgets('All properties updated when cell values change', (tester) async {
+      final data = MutableCell('hello');
+      final align = MutableCell(TextAlign.left);
+
+      await tester.pumpWidget(TestApp(
+        child: CellText(
+          data: data,
+          textAlign: align,
+        ),
+      ));
+
+      findText(String data, TextAlign align) => find.byWidgetPredicate((widget) => widget is Text &&
+          widget.data == data &&
+          widget.textAlign == align
+      );
+
+      expect(findText('hello', TextAlign.left), findsOneWidget);
+
+      MutableCell.batch(() {
+        data.value = 'bye';
+        align.value = TextAlign.center;
+      });
+
+      await tester.pump();
+      expect(findText('bye', TextAlign.center), findsOneWidget);
+    });
   });
 
   group('CellSwitch', () {
