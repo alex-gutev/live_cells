@@ -252,5 +252,56 @@ void main() {
       expect(find.text('2'), findsOneWidget);
       expect(find.text('12'), findsOneWidget);
     });
+
+    testWidgets('Cells defined in build method persisted between builds', (tester) async {
+      await tester.pumpWidget(const TestApp(
+        child: CellWidgetTest4('First Build'),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('First Build'), findsOneWidget);
+
+      // Press first button
+      await tester.tap(find.text('0'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('10'));
+      await tester.pump();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Rebuild widget hierarchy
+      await tester.pumpWidget(const TestApp(
+        child: CellWidgetTest4('Second Build'),
+      ));
+
+      // Check that counters still have the same values
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Check that the hierarchy has been rebuilt
+      expect(find.text('Second Build'), findsOneWidget);
+      expect(find.text('First Build'), findsNothing);
+
+      // Press first button
+      await tester.tap(find.text('1'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('11'), findsOneWidget);
+
+      // Press second button
+      await tester.tap(find.text('11'));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('12'), findsOneWidget);
+    });
   });
 }
