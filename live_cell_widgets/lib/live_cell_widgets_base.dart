@@ -17,4 +17,7 @@ export 'src/cell_widget/cell_widget.dart'
 
 export 'src/cell_widget/static_widget.dart' show StaticWidget;
 
+export 'src/restoration/cell_restoration_extension.dart'
+    show CellRestorationExtension;
+
 export 'src/restoration/restorable_cell_widget.dart' show RestorableCellWidget;
