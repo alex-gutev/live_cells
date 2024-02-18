@@ -10,7 +10,7 @@ class ClampCell<T extends num> extends DependentCell<T> {
   final ValueCell<T> argMax;
 
   ClampCell(this.argValue, this.argMin, this.argMax) :
-        super([argValue, argMin, argMax]);
+        super({argValue, argMin, argMax});
 
   @override
   T get value => min(argMax.value, max(argMin.value, argValue.value));

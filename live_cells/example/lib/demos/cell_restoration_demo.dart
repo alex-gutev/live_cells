@@ -49,24 +49,22 @@ class CellRestorationDemo extends StaticWidget {
     // This cell requires a [CellValueCoder] to have its state restored.
     // In this case the [RadioValueCoder] constructor is provided since the
     // cell holds a [RadioValue].
-    final radioValue = cell(
-      () => MutableCell<RadioValue?>(RadioValue.value1),
-      coder: RadioValueCoder.new
-    );
+    final radioValue = MutableCell<RadioValue?>(RadioValue.value1)
+        .restore(coder: RadioValueCoder());
 
     // This cell is restored automatically
-    final textValue = cell(() => MutableCell(''));
+    final textValue = MutableCell('').restore();
 
     // This cell is restored automatically
-    final numValue = cell(() => MutableCell<num>(1));
+    final numValue = MutableCell<num>(1).restore();
 
     // The state of this cannot be saved since it holds a [Maybe] which is
     // not a value that can be saved, hence the `restorable: false`.
     //
     // Although its state cannot be saved, its state is recomputed on state
     // restoration and effectively restored
-    final numMaybe = cell(() => numValue.maybe(), restorable: false);
-    final numError = cell(() => numMaybe.error);
+    final numMaybe = numValue.maybe();
+    final numError = numMaybe.error;
 
     return Scaffold(
       appBar: AppBar(
@@ -153,12 +151,12 @@ class CellRestorationDemo extends StaticWidget {
               const SizedBox(height: 10),
               const Text('Text field for numeric input:'),
               CellTextField(
-                content: cell(() => numMaybe.mutableString()),
-                decoration: cell(() => ValueCell.computed(() => InputDecoration(
+                content: numMaybe.mutableString().restore(),
+                decoration: ValueCell.computed(() => InputDecoration(
                   errorText: numError() != null
                       ? 'Not a valid number'
                       : null
-                )), restorable: false),
+                )),
               ),
               const SizedBox(height: 10),
 
