@@ -118,19 +118,30 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
   /// Has the value of the cell been initialized
   var _hasValue = false;
 
+  /// Was the value (before the current update cycle) a computed value?
+  var _wasComputed = true;
+
   @override
   bool get shouldNotifyAlways => true;
 
   @override
   void willUpdate(ValueCell cell) {
     if (!_reverse) {
+      if (!updating) {
+        _wasComputed = _computed;
+      }
+
       super.willUpdate(cell);
+    }
+    else {
+      _wasComputed = false;
+      waitingForChange = false;
     }
   }
 
   @override
   void update(ValueCell cell, bool didChange) {
-    super.update(cell, !_computed || didChange);
+    super.update(cell, !_wasComputed || didChange);
   }
 
   @override
