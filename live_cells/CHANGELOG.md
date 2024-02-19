@@ -1,3 +1,8 @@
+## 0.12.1
+
+* Increase live_cells_core dependency version to 0.12.3
+* Increase live_cell_widgets dependency version to 0.2.2
+
 ## 0.12.0
 
 New features in core:
@@ -30,9 +35,6 @@ New features in widgets library:
 * New Widgets:
   * `CellRow`
   * `CellColumn`
-
-
-
 
 ## 0.11.2
 
