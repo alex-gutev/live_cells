@@ -1,3 +1,8 @@
+## 0.12.3
+
+* Fix potential issues when the computed value of a mutable computed cell is the same as its
+  assigned value.
+
 ## 0.12.2
 
 * Fix issue with recomputing the value of mutable computed cells.
