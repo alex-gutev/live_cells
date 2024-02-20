@@ -44,6 +44,18 @@ extension IterableCellExtension<T> on ValueCell<Iterable<T>> {
   ValueCell<Set<T>> toSet() => apply((value) => value.toSet(),
       key: _IterablePropKey(this, #toSet)
   ).store();
+
+  /// Returns a cell which evaluates to [Iterable.cast<R>()] applied on the value in this cell.
+  ValueCell<Iterable<R>> cast<R>() => apply((value) => value.cast<R>(),
+      key: _IterableTypedPropKey<R>(this, #cast)
+  ).store();
+
+  /// Returns a cell which evaluates to [Iterable.map()] applied on the value in this cell.
+  ///
+  /// Unlike the other extension properties and method, the returned cell does
+  /// not have a key.
+  ValueCell<Iterable<E>> map<E>(E Function(T e) toElement) =>
+      apply((value) => value.map(toElement)).store();
 }
 
 /// Key identifying a [ValueCell], which accesses an [Iterable] property.
@@ -53,4 +65,9 @@ class _IterablePropKey extends ValueKey2<ValueCell, Symbol> {
   /// [value1] is a [ValueCell] holding an [Iterable] and [value2] is the property
   /// being accessed.
   _IterablePropKey(super.value1, super.value2);
+}
+
+/// Key identifying a [ValueCell], which access an [Iterable] property with a type parameter.
+class _IterableTypedPropKey<T> extends ValueKey2<ValueCell, Symbol> {
+  _IterableTypedPropKey(super.value1, super.value2);
 }

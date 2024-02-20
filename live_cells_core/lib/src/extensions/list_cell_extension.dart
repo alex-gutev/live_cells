@@ -35,6 +35,20 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
       length.apply((length) => Iterable.generate(length, (i) => this[i.cell]),
         key: _ListPropKey(this, #cells)
       );
+
+  /// Returns a cell which evaluates to [List.cast<R>()] applied on the value in this cell.
+  ValueCell<List<R>> cast<R>() => apply((value) => value.cast<R>(),
+      key: _ListTypedPropKey<R>(this, #cast)
+  ).store();
+
+  /// Apply a function on the value of every cell in [cellList].
+  ///
+  /// Returns an [Iterable], where every element is a computed cell with [fn]
+  /// applied on the cell, at the corresponding index, in [cellList].
+  ValueCell<Iterable<ValueCell<E>>> mapCells<E>(E Function(T e) fn) =>
+      cellList.apply((value) => value.map((e) => e.apply(fn, key: _ElementMapKey(e, fn))),
+        key: _ListMapKey(this, fn)
+      ).store();
 }
 
 /// Provides variants which return [MutableCell] of the methods provided by [ListCellExtension].
@@ -103,6 +117,10 @@ class _ListPropKey extends ValueKey2<ValueCell, Symbol> {
   /// being accessed.
   _ListPropKey(super.value1, super.value2);
 }
+/// Key identifying a [ValueCell], which access a [List] property with a type parameter.
+class _ListTypedPropKey<T> extends ValueKey2<ValueCell, Symbol> {
+  _ListTypedPropKey(super.value1, super.value2);
+}
 
 /// Key identifying a [MutableCell], which accesses a [List] property.
 class _MutableListPropKey extends ValueKey2<MutableCell, Symbol> {
@@ -120,6 +138,16 @@ class _ListIndexKey extends ValueKey2<ValueCell, ValueCell> {
   /// [value1] is a [ValueCell] holding a list and [value2] is a [ValueCell]
   /// holding the index of the element being accessed.
   _ListIndexKey(super.value1, super.value2);
+}
+
+/// Key identifying a [ValueCell] which maps a function over the elements of a [List]
+class _ListMapKey extends ValueKey2<ValueCell, Function> {
+  _ListMapKey(super.value1, super.value2);
+}
+
+/// Key identifying a [ValueCell] which applies a function on a cell held in a [List].
+class _ElementMapKey extends ValueKey2<ValueCell, Function> {
+  _ElementMapKey(super.value1, super.value2);
 }
 
 /// Key identifying a [MutableCell] which access an element with a [List]

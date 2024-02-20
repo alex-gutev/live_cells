@@ -5515,6 +5515,86 @@ void main() {
         expect(f1 == f1, isTrue);
       });
     });
+
+    group('.cast()', () {
+      test('Returns correct value', () {
+        final ValueCell<List<dynamic>> cell = [1, 2, 3, 4, 5].cell;
+        final ValueCell<List<num>> cast = cell.cast<num>();
+
+        expect(cast.value.toList(), equals([1, 2, 3, 4, 5]));
+      });
+
+      test('Compares == when same cell and same type', () {
+        final ValueCell<List<dynamic>> cell = [0, 1, 2, 3, 4].cell;
+        final ValueCell<List<num>> cast1 = cell.cast<num>();
+        final ValueCell<List<num>> cast2 = cell.cast<num>();
+
+        expect(cast1 == cast2, isTrue);
+        expect(cast1.hashCode == cast2.hashCode, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        final cell1 = MutableCell<Iterable<dynamic>>([0, 1, 2, 3, 4]);
+        final cell2 = MutableCell<Iterable<dynamic>>([0, 1, 2, 3, 4]);
+
+        final cast1 = cell1.cast<num>();
+        final cast2 = cell2.cast<num>();
+
+        expect(cast1 != cast2, isTrue);
+        expect(cast1 == cast1, isTrue);
+      });
+
+      test('Compares != when different types', () {
+        final ValueCell<List<dynamic>> cell = [0, 1, 2, 3, 4].cell;
+        final cast1 = cell.cast<num>();
+        final cast2 = cell.cast<int>();
+
+        expect(cast1 != cast2, isTrue);
+        expect(cast1 == cast1, isTrue);
+      });
+    });
+
+    group('.mapCell()', () {
+      test('Returns correct value', () {
+        final it = [1, 2, 3].cell;
+        final map = it.mapCells((e) => e * 2);
+
+        expect(map.value.map((e) => e.value).toList(), equals([2, 4, 6]));
+      });
+
+      test('Reacts to changes in list length only', () {
+        final it = MutableCell([1, 2, 3]);
+        final map = it.mapCells((e) => e * 2);
+
+        final listener = addListener(map, MockSimpleListener());
+
+        expect(map.value.map((e) => e.value).toList(), equals([2, 4, 6]));
+
+        it.value = [4, 5, 6];
+        expect(map.value.map((e) => e.value).toList(), equals([8, 10, 12]));
+
+        verifyNever(listener());
+
+        it.value = [7, 8];
+        expect(map.value.map((e) => e.value).toList(), equals([14, 16]));
+
+        verify(listener()).called(1);
+      });
+
+      test('Element cells react to element changes only', () {
+        final it = MutableCell([1, 2, 3, 4]);
+        final map = it.mapCells((e) => e * 2);
+
+        final listener1 = addListener(map.value.first, MockSimpleListener());
+        final listener2 = addListener(map.value.elementAt(1), MockSimpleListener());
+        final listener3 = addListener(map.value.elementAt(2), MockSimpleListener());
+
+        it.value = [1, 10, 3, 20];
+        verifyNever(listener1());
+        verifyNever(listener3());
+        verify(listener2()).called(1);
+      });
+    });
   });
 
   group('Iterable Cell Extensions', () {
@@ -5624,6 +5704,70 @@ void main() {
 
         expect(f1 != f2, isTrue);
         expect(f1 == f1, isTrue);
+      });
+    });
+
+    group('.cast()', () {
+      test('Returns correct value', () {
+        final ValueCell<Iterable<dynamic>> cell = Iterable.generate(5, (e) => e).cell;
+        final ValueCell<Iterable<num>> cast = cell.cast<num>();
+
+        expect(cast.value.toList(), equals([0, 1, 2, 3, 4]));
+      });
+
+      test('Compares == when same cell and same type', () {
+        final ValueCell<Iterable<dynamic>> cell = Iterable.generate(5, (e) => e).cell;
+        final ValueCell<Iterable<num>> cast1 = cell.cast<num>();
+        final ValueCell<Iterable<num>> cast2 = cell.cast<num>();
+
+        expect(cast1 == cast2, isTrue);
+        expect(cast1.hashCode == cast2.hashCode, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        final cell1 = MutableCell<Iterable<dynamic>>(
+            Iterable.generate(5, (e) => e)
+        );
+
+        final cell2 = MutableCell<Iterable<dynamic>>(
+            Iterable.generate(5, (e) => e)
+        );
+
+        final cast1 = cell1.cast<num>();
+        final cast2 = cell2.cast<num>();
+
+        expect(cast1 != cast2, isTrue);
+        expect(cast1 == cast1, isTrue);
+      });
+
+      test('Compares != when different types', () {
+        final ValueCell<Iterable<dynamic>> cell = Iterable.generate(5, (e) => e).cell;
+        final cast1 = cell.cast<num>();
+        final cast2 = cell.cast<int>();
+
+        expect(cast1 != cast2, isTrue);
+        expect(cast1 == cast1, isTrue);
+      });
+    });
+
+    group('.map()', () {
+      test('Returns correct value', () {
+        final it = Iterable.generate(5, (e) => e).cell;
+        final map = it.map((e) => e + 1);
+
+        expect(map.value.toList(), equals([1, 2, 3, 4, 5]));
+      });
+
+      test('Reacts to changes in iterable', () {
+        final it = MutableCell(
+            Iterable.generate(5, (e) => e)
+        );
+
+        final map = it.map((e) => e * 2);
+        expect(map.value.toList(), equals([0, 2, 4, 6, 8]));
+
+        it.value = Iterable.generate(3, (e) => 10 + e);
+        expect(map.value.toList(), equals([20, 22, 24]));
       });
     });
   });
