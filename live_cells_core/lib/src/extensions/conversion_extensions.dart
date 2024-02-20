@@ -3,6 +3,12 @@ import '../value_cell.dart';
 import '../maybe_cell/maybe.dart';
 import '../mutable_cell/mutable_cell.dart';
 
+/// Adds the [cell] property for creating a constant cell.
+extension ValueCellExtension<T> on T {
+  /// Create a constant cell with value equal to [this].
+  ValueCell<T> get cell => ValueCell.value(this);
+}
+
 /// Provides methods for converting an integer to a string and vice versa.
 extension ParseIntExtension on MutableCell<int> {
   /// Return a cell which evaluates to a string representation of this cell's value.

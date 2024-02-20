@@ -1,12 +1,12 @@
 import 'dart:collection';
 
+import 'conversion_extensions.dart';
 import '../compute_cell/store_cell.dart';
 import 'iterable_cell_extension.dart';
 import '../base/keys.dart';
 import '../mutable_cell/mutable_cell.dart';
 import 'compute_extension.dart';
 import '../value_cell.dart';
-import 'values_extension.dart';
 
 /// Provides [List] methods directly on cells holding [List]s.
 extension ListCellExtension<T> on ValueCell<List<T>> {

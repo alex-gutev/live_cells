@@ -165,12 +165,6 @@ extension MutableDurationCellExtension on MutableCell<Duration> {
       MutableCellView(arguments: {this}, reverse: set, compute: get, key: _key(prop));
 }
 
-/// Extends [Duration] with a [cell] property to create a [ValueCell] holding a [Duration].
-extension DurationCellConstructorExtension on Duration {
-  /// Create a constant [ValueCell] with value equal to [this].
-  ValueCell<Duration> get cell => ValueCell.value(this);
-}
-
 class _DurationPropKey {
   final ValueCell cell;
   final String prop;

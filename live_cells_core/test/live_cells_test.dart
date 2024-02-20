@@ -719,12 +719,12 @@ void main() {
       verify(observer1.update(c, any)).called(3);
       verify(observer2.update(c, any)).called(2);
     });
-    
+
     test('DynamicComputeCell arguments tracked correctly when using conditionals', () {
       final a = MutableCell(true);
       final b = MutableCell(2);
       final c = MutableCell(3);
-      
+
       final d = ValueCell.computed(() => a() ? b() : c());
 
       final observer = MockValueObserver();
@@ -1230,7 +1230,7 @@ void main() {
     });
 
     test('a.abs() creates ValueCell which is equal to absolute value of a', () {
-      const a = ValueCell.value(-3);
+      final a = -3.cell;
 
       expect(a.abs().value, equals(3));
     });
@@ -1242,7 +1242,7 @@ void main() {
     });
 
     test('a.sign creates ValueCell which is equal to -1 if a < 0', () {
-      const a = ValueCell.value(-3);
+      final a = -3.cell;
 
       expect(a.sign.value, equals(-1));
     });
@@ -1843,7 +1843,7 @@ void main() {
     test('init() not called if no observers added', () {
       final resource = MockResource();
       final cell = TestManagedCell(resource, 1);
-      
+
       verifyNever(resource.init());
     });
 
@@ -4475,7 +4475,7 @@ void main() {
   group('List Cell Extensions', () {
     group('.first', () {
       test('ValueCell.first retrieves first element', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f = l.first;
 
         expect(f.value, 1);
@@ -4492,7 +4492,7 @@ void main() {
         final l = MutableCell([1, 2, 3]);
         final ValueCell<List<int>> l2 = l;
         final observer = addObserver(l2.first, MockValueObserver());
-        
+
         l.value = [4, 5, 6];
         l.value = [7, 8, 9];
         l.value = [10, 11, 12];
@@ -4574,7 +4574,7 @@ void main() {
       });
 
       test('ValueCell.first compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.first;
         final f2 = l.first;
 
@@ -4616,7 +4616,7 @@ void main() {
 
     group('.last', () {
       test('ValueCell.last retrieves last element', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f = l.last;
 
         expect(f.value, 3);
@@ -4715,7 +4715,7 @@ void main() {
       });
 
       test('ValueCell.last compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.last;
         final f2 = l.last;
 
@@ -4757,14 +4757,14 @@ void main() {
 
     group('.isEmpty', () {
       test('ValueCell.isEmpty is true when list is empty', () {
-        const l = ValueCell.value([]);
+        final l = [].cell;
         final f = l.isEmpty;
 
         expect(f.value, isTrue);
       });
 
       test('ValueCell.isEmpty is false when list is not empty', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f = l.isEmpty;
 
         expect(f.value, isFalse);
@@ -4817,7 +4817,7 @@ void main() {
       });
 
       test('ValueCell.isEmpty compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.isEmpty;
         final f2 = l.isEmpty;
 
@@ -4839,14 +4839,14 @@ void main() {
 
     group('.isNotEmpty', () {
       test('ValueCell.isNotEmpty is false when list is empty', () {
-        const l = ValueCell.value([]);
+        final l = [].cell;
         final f = l.isNotEmpty;
 
         expect(f.value, isFalse);
       });
 
       test('ValueCell.isNotEmpty is true when list is not empty', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f = l.isNotEmpty;
 
         expect(f.value, isTrue);
@@ -4899,7 +4899,7 @@ void main() {
       });
 
       test('ValueCell.isNotEmpty compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.isNotEmpty;
         final f2 = l.isNotEmpty;
 
@@ -4921,7 +4921,7 @@ void main() {
 
     group('.length', () {
       test('ValueCell.length retrieves list length', () {
-        const l = ValueCell.value([1, 1, 1, 1]);
+        final l = [1, 1, 1, 1].cell;
         final f = l.length;
 
         expect(f.value, 4);
@@ -5025,7 +5025,7 @@ void main() {
       });
 
       test('ValueCell.length compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.length;
         final f2 = l.length;
 
@@ -5089,7 +5089,7 @@ void main() {
       });
 
       test('ValueCell.reversed compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.reversed;
         final f2 = l.reversed;
 
@@ -5142,7 +5142,7 @@ void main() {
       });
 
       test('ValueCell.single compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.reversed;
         final f2 = l.reversed;
 
@@ -5164,7 +5164,7 @@ void main() {
 
     group('.operator[]', () {
       test('ValueCell.operator[] retrieves indexed element', () {
-        const l = ValueCell.value([10, 20, 30, 40]);
+        final l = [10, 20, 30, 40].cell;
         final f = l[2.cell];
 
         expect(f.value, 30);
@@ -5263,10 +5263,10 @@ void main() {
       });
 
       test('ValueCell.operator[] notifies observers when index changed', () {
-        const l = ValueCell.value([2, 4, 8, 16, 32]);
+        final l = [2, 4, 8, 16, 32].cell;
         final i = MutableCell(2);
         final e = l[i];
-        
+
         final observer = addObserver(e, MockValueObserver());
 
         i.value = 0;
@@ -5291,7 +5291,7 @@ void main() {
       });
 
       test('ValueCell.operator[] does not notify observers when index not changed', () {
-        const l = ValueCell.value([2, 4, 8, 16, 32]);
+        final l = [2, 4, 8, 16, 32].cell;
         final i = MutableCell(2);
         final e = l[i];
 
@@ -5368,7 +5368,7 @@ void main() {
       });
 
       test('ValueCell.operator[] compares == when same list cell and same index', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l[2.cell];
         final f2 = l[2.cell];
 
@@ -5442,7 +5442,7 @@ void main() {
 
     group('.cellList', () {
       test('ValueCell.cells returns list of cells observing each element', () {
-        const list = ValueCell.value(['a', 'b', 'c']);
+        final list = ['a', 'b', 'c'].cell;
         final cells = list.cellList.value.toList();
 
         expect(cells[0].value, 'a');
@@ -5496,7 +5496,7 @@ void main() {
       });
 
       test('ValueCell.cells compares == when same list cell', () {
-        const l = ValueCell.value([1, 2, 3]);
+        final l = [1, 2, 3].cell;
         final f1 = l.cellList;
         final f2 = l.cellList;
 
@@ -5520,7 +5520,7 @@ void main() {
   group('Iterable Cell Extensions', () {
     group('.toList()', () {
       test('ValueCell.toList() returns iterable elements in list', () {
-        final it = ValueCell.value(Iterable.generate(5, (i) => i));
+        final it = Iterable.generate(5, (i) => i).cell;
         final l = it.toList();
 
         expect(l.value, equals([0, 1, 2, 3, 4]));
@@ -5573,7 +5573,7 @@ void main() {
 
     group('.toSet()', () {
       test('ValueCell.toSet() returns iterable elements in list', () {
-        final it = ValueCell.value(Iterable.generate(5, (i) => i));
+        final it = Iterable.generate(5, (i) => i).cell;
         final l = it.toSet();
 
         expect(l.value, equals({0, 1, 2, 3, 4}));
@@ -5646,7 +5646,7 @@ void main() {
       });
 
       test('compares == when same map cell', () {
-        const map = ValueCell.value({'a': 1});
+        final map = {'a': 1}.cell;
         final e1 = map.isEmpty;
         final e2 = map.isEmpty;
 
@@ -5682,7 +5682,7 @@ void main() {
       });
 
       test('compares == when same map cell', () {
-        const map = ValueCell.value({'a': 1});
+        final map = {'a': 1}.cell;
         final e1 = map.isNotEmpty;
         final e2 = map.isNotEmpty;
 
@@ -5718,7 +5718,7 @@ void main() {
       });
 
       test('compares == when same map cell', () {
-        const map = ValueCell.value({'a': 1});
+        final map = {'a': 1}.cell;
         final e1 = map.length;
         final e2 = map.length;
 
@@ -5740,7 +5740,7 @@ void main() {
 
     group('.keys', () {
       test('ValueCell.keys retrieves map keys', () {
-        const m = ValueCell.value({'k1': 1, 'k2': 2, 'k3': 3});
+        final m = {'k1': 1, 'k2': 2, 'k3': 3}.cell;
         final keys = m.keys;
 
         expect(keys.value.toSet(), equals({'k1', 'k2', 'k3'}));
@@ -5764,7 +5764,7 @@ void main() {
       });
 
       test('ValueCell.keys compare == if same map cell', () {
-        const m = ValueCell.value({'a': 1});
+        final m = {'a': 1}.cell;
         final keys1 = m.keys;
         final keys2 = m.keys;
 
@@ -5786,7 +5786,7 @@ void main() {
 
     group('.values', () {
       test('ValueCell.values retrieves map values', () {
-        const m = ValueCell.value({'k1': 1, 'k2': 2, 'k3': 3});
+        final m = {'k1': 1, 'k2': 2, 'k3': 3}.cell;
         final values = m.values;
 
         expect(values.value.toSet(), equals({1, 2, 3}));
@@ -5810,7 +5810,7 @@ void main() {
       });
 
       test('ValueCell.values compare == if same map cell', () {
-        const m = ValueCell.value({'a': 1});
+        final m = {'a': 1}.cell;
         final values1 = m.values;
         final values2 = m.values;
 
@@ -5832,7 +5832,7 @@ void main() {
 
     group('.entries', () {
       test('ValueCell.entries retrieves map values', () {
-        const m = ValueCell.value({'k1': 1, 'k2': 2, 'k3': 3});
+        final m = {'k1': 1, 'k2': 2, 'k3': 3}.cell;
         final entries = m.entries;
 
         expect(entries.value.map((e) => e.key).toSet(), equals({
@@ -5863,7 +5863,7 @@ void main() {
       });
 
       test('ValueCell.entries compare == if same map cell', () {
-        const m = ValueCell.value({'a': 1});
+        final m = {'a': 1}.cell;
         final entries1 = m.entries;
         final entries2 = m.entries;
 
@@ -5901,7 +5901,7 @@ void main() {
       });
 
       test('compares == when same map and key cells', () {
-        const map = ValueCell.value({});
+        final map = {}.cell;
         final e1 = map.containsKey('key1'.cell);
         final e2 = map.containsKey('key1'.cell);
 
@@ -5910,8 +5910,8 @@ void main() {
       });
 
       test('compares != when different map cells', () {
-        const m1 = ValueCell.value({});
-        const m2 = ValueCell.value({ 'a': 0 });
+        final m1 = {}.cell;
+        final m2 = { 'a': 0 }.cell;
 
         final e1 = m1.containsKey('key1'.cell);
         final e2 = m2.containsKey('key1'.cell);
@@ -5921,7 +5921,7 @@ void main() {
       });
 
       test('compares != when different key cells', () {
-        const map = ValueCell.value({});
+        final map = {}.cell;
         final e1 = map.containsKey('key1'.cell);
         final e2 = map.containsKey('key2'.cell);
 
@@ -5949,7 +5949,7 @@ void main() {
       });
 
       test('compares == when same map and value cells', () {
-        const map = ValueCell.value({});
+        final map = {}.cell;
         final e1 = map.containsValue(100.cell);
         final e2 = map.containsValue(100.cell);
 
@@ -5958,8 +5958,8 @@ void main() {
       });
 
       test('compares != when different map cells', () {
-        const m1 = ValueCell.value({});
-        const m2 = ValueCell.value({ 'a': 0 });
+        final m1 = {}.cell;
+        final m2 = { 'a': 0 }.cell;
 
         final e1 = m1.containsValue(100.cell);
         final e2 = m2.containsValue(100.cell);
@@ -5969,7 +5969,7 @@ void main() {
       });
 
       test('compares != when different value cells', () {
-        const map = ValueCell.value({});
+        final map = {}.cell;
         final e1 = map.containsValue(1.cell);
         final e2 = map.containsValue(2.cell);
 
@@ -6246,7 +6246,7 @@ void main() {
       });
 
       test('ValueCell.operator[] compares == when same map and key cells', () {
-        const map = ValueCell.value({});
+        final map = {}.cell;
         final e1 = map['key1'.cell];
         final e2 = map['key1'.cell];
 
@@ -6255,8 +6255,8 @@ void main() {
       });
 
       test('ValueCell.operator[] compares != when different map cells', () {
-        const m1 = ValueCell.value({});
-        const m2 = ValueCell.value({ 'a': 0 });
+        final m1 = {}.cell;
+        final m2 = { 'a': 0 }.cell;
 
         final e1 = m1['key1'.cell];
         final e2 = m2['key1'.cell];
@@ -6266,7 +6266,7 @@ void main() {
       });
 
       test('ValueCell.operator[] compares != when different key cells', () {
-        const map = ValueCell.value({});
+        final map = {}.cell;
         final e1 = map['key1'.cell];
         final e2 = map['key2'.cell];
 
@@ -6341,7 +6341,7 @@ void main() {
       });
 
       test('compares == when same set and key cells', () {
-        const set = ValueCell.value({1, 2, 3});
+        final set = {1, 2, 3}.cell;
         final e1 = set.contains(5.cell);
         final e2 = set.contains(5.cell);
 
@@ -6361,7 +6361,7 @@ void main() {
       });
 
       test('compares != when different key cells', () {
-        const set = ValueCell.value({4, 5, 6});
+        final set = {4, 5, 6}.cell;
         final e1 = set.contains(5.cell);
         final e2 = set.contains(6.cell);
 
@@ -6373,7 +6373,7 @@ void main() {
     group('.containsAll()', () {
       test('Returns correct value', () {
         final s = MutableCell({2, 4, 8, 16});
-        final k = s.containsAll(const ValueCell.value([2, 4]));
+        final k = s.containsAll(const [2, 4].cell);
 
         final obs = addObserver(k, MockValueObserver());
 
@@ -6386,8 +6386,8 @@ void main() {
       });
 
       test('compares == when same set and key cells', () {
-        const set = ValueCell.value({1, 2, 3});
-        const keys = ValueCell.value([1, 3]);
+        final set = {1, 2, 3}.cell;
+        final keys = [1, 3].cell;
 
         final e1 = set.containsAll(keys);
         final e2 = set.containsAll(keys);
@@ -6397,7 +6397,7 @@ void main() {
       });
 
       test('compares != when different set cells', () {
-        const keys = ValueCell.value([1, 3]);
+        final keys = [1, 3].cell;
 
         final s1 = MutableCell({1, 2, 3});
         final s2 = MutableCell({1, 2, 3});
@@ -6410,9 +6410,9 @@ void main() {
       });
 
       test('compares != when different key cells', () {
-        const set = ValueCell.value({4, 5, 6});
-        final e1 = set.containsAll(const ValueCell.value({5}));
-        final e2 = set.containsAll(const ValueCell.value({6}));
+        final set = {4, 5, 6}.cell;
+        final e1 = set.containsAll(const {5}.cell);
+        final e2 = set.containsAll(const {6}.cell);
 
         expect(e1 != e2, isTrue);
         expect(e1 == e1, isTrue);

@@ -43,25 +43,18 @@ export 'src/previous_values/prev_value_cell.dart'
     show PrevValueCell, PrevValueCellExtension, UninitializedCellError;
 
 export 'src/extensions/numeric_extension.dart' show NumericExtension;
-export 'src/extensions/values_extension.dart'
-    show
-        NumValueCellExtension,
-        StringValueCellExtension,
-        BoolValueCellExtension,
-        NullValueCellExtension,
-        EnumValueCellExtension;
 
 export 'src/extensions/duration_extension.dart'
     show
         DurationCellExtension,
-        MutableDurationCellExtension,
-        DurationCellConstructorExtension;
+        MutableDurationCellExtension;
 
 export 'src/extensions/bool_extension.dart' show BoolCellExtension;
 export 'src/extensions/error_handling_extension.dart' show ErrorCellExtension;
 
 export 'src/extensions/conversion_extensions.dart'
     show
+        ValueCellExtension,
         ParseIntExtension,
         ParseDoubleExtension,
         ParseNumExtension,
