@@ -63,30 +63,6 @@ abstract class StatefulCell<T> extends ValueCell<T> {
     _getState()?.removeObserver(observer);
   }
 
-
-  /// Notify the observers of the cell that the cell's value will change.
-  ///
-  /// This should be called before the value of the cell has actually changed.
-  ///
-  /// If [isEqual] is true then only the observers, for which
-  /// [CellObserver.shouldNotifyAlways] is true, are notified.
-  @protected
-  void notifyWillUpdate([bool isEqual = false]) {
-    _getState()?.notifyWillUpdate(isEqual: isEqual);
-  }
-
-  /// Notify the observers of the cell that the cell's value has changed.
-  ///
-  /// This should be called after the value of the cell has changed to a new
-  /// value following a [notifyWillChange] call.
-  ///
-  /// If [isEqual] is true then only the observers, for which
-  /// [CellObserver.shouldNotifyAlways] is true, are notified.
-  @protected
-  void notifyUpdate([bool isEqual = false]) {
-    _getState()?.notifyUpdate(isEqual: isEqual);
-  }
-
   /// Private
 
   /// Current cell state or [null] if the cell is inactive.
