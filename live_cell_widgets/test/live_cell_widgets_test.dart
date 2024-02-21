@@ -4,6 +4,66 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_cell_widgets/live_cell_widgets.dart';
 import 'package:live_cell_widgets/live_cell_widgets_base.dart';
 import 'package:live_cells_core/live_cells_core.dart';
+import 'package:mockito/mockito.dart';
+
+/// Track calls to [init] and [dispose] of a [ManagedCellState]
+abstract class CellStateTracker {
+  void init();
+  void dispose();
+}
+
+class MockCellStateTracker extends Mock implements CellStateTracker {
+  @override
+  void init();
+  @override
+  void dispose();
+}
+
+/// A state which calls [init] and [dispose] on [tracker].
+///
+/// This is used to check that the lifecycle methods of the cell state are
+/// being called.
+class ManagedCellState extends CellState {
+  final CellStateTracker tracker;
+
+  ManagedCellState({
+    required super.cell,
+    required super.key,
+    required this.tracker
+  });
+
+  @override
+  void init() {
+    super.init();
+    tracker.init();
+  }
+
+  @override
+  void dispose() {
+    tracker.dispose();
+    super.dispose();
+  }
+}
+
+/// A [StatefulCell] with a constant value for testing cell lifecycle.
+///
+/// This cell's state calls [CellStateTracker.init] and [CellStateTracker.dispose] on a
+/// [CellStateTracker] when the corresponding [CellState] methods are called.
+class TestManagedCell<T> extends StatefulCell<T> {
+  final CellStateTracker _tracker;
+
+  @override
+  final T value;
+
+  TestManagedCell(this._tracker, this.value);
+
+  @override
+  CellState<StatefulCell> createState() => ManagedCellState(
+      cell: this,
+      key: key,
+      tracker: _tracker
+  );
+}
 
 /// Wraps a widget in a [MaterialApp] for testing
 class TestApp extends StatelessWidget {
@@ -443,6 +503,81 @@ void main() {
 
       expect(find.text('2'), findsOneWidget);
       expect(find.text('12'), findsOneWidget);
+    });
+
+    testWidgets('Conditional dependencies tracked correctly', (tester) async {
+      final a = MutableCell(0);
+      final b = MutableCell(1);
+      final cond = MutableCell(true);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          final value = cond() ? a() : b();
+          return Text(value.toString());
+        }),
+      ));
+
+      expect(find.text('0'), findsOneWidget);
+
+      a.value = 10;
+      await tester.pump();
+      expect(find.text('10'), findsOneWidget);
+
+      cond.value = false;
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+
+      b.value = 100;
+      await tester.pump();
+      expect(find.text('100'), findsOneWidget);
+    });
+
+    testWidgets('New dependencies tracked correctly', (tester) async {
+      final a = MutableCell(0);
+      final b = MutableCell('hello');
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) => Text('A = ${a()}')),
+      ));
+
+      expect(find.text('A = 0'), findsOneWidget);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) => Text('B = ${b()}')),
+      ));
+
+      expect(find.text('B = hello'), findsOneWidget);
+
+      b.value = 'bye';
+      await tester.pump();
+
+      expect(find.text('B = bye'), findsOneWidget);
+    });
+
+    testWidgets('Unused dependencies untracked', (tester) async {
+      final tracker = MockCellStateTracker();
+      final a = TestManagedCell(tracker, 0);
+      final b = MutableCell('hello');
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) => Text('A = ${a()}')),
+      ));
+
+      expect(find.text('A = 0'), findsOneWidget);
+
+      // Test that the dependency cell state was initialized
+      verify(tracker.init()).called(1);
+      verifyNever(tracker.dispose());
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) => Text('B = ${b()}')),
+      ));
+
+      expect(find.text('B = hello'), findsOneWidget);
+
+      // Test that the dependency cell state was disposed
+      verifyNever(tracker.init());
+      verify(tracker.dispose()).called(1);
     });
   });
 
