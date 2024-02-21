@@ -42,7 +42,7 @@ documentation and examples.
       ),
       ElevatedButton(
         child: Text('Say Hi!'),
-        onPressed: () => content.value = 'hello'
+        onPressed: () => content.value = 'Hi!'
      )
    ]);
   }
@@ -81,7 +81,7 @@ documentation and examples.
         valueListenable: switchState,
         builder: (context, value, _) => Switch(
             value: value,
-            onChanged: (value) => switchState.content = value
+            onChanged: (value) => switchState.value = value
         )
       )
     ]);
