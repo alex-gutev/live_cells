@@ -5593,6 +5593,129 @@ void main() {
         verifyNever(listener1());
         verifyNever(listener3());
         verify(listener2()).called(1);
+
+        it.value = [5, 6, 7];
+        verify(listener1()).called(1);
+        verify(listener2()).called(1);
+        verify(listener3()).called(1);
+      });
+
+      test('Compares == when same cell and same function', () {
+        f(a) => a * 2;
+
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapCells(f);
+        final map2 = l.mapCells(f);
+
+        expect(map1 == map2, isTrue);
+        expect(map1.hashCode == map2.hashCode, isTrue);
+      });
+
+      test('Compares != when same cell and different function', () {
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapCells((e) => e * 2);
+        final map2 = l.mapCells((e) => e + 1);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        f(a) => a * 2;
+
+        final l1 = MutableCell([1, 2, 3, 4]);
+        final l2 = MutableCell([1, 2, 3, 4]);
+        final map1 = l1.mapCells(f);
+        final map2 = l2.mapCells(f);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Element cells compare == when same cell and function', () {
+        f(a) => a * 2;
+
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapCells(f);
+        final map2 = l.mapCells(f);
+
+        final c1 = map1.value.elementAt(1);
+        final c2 = map2.value.elementAt(1);
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Element cells compare != when same cell and different function', () {
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapCells((a) => a * 2);
+        final map2 = l.mapCells((a) => a + 1);
+
+        final c1 = map1.value.elementAt(1);
+        final c2 = map2.value.elementAt(1);
+
+        expect(c1 != c2, isTrue);
+        expect(c1 == c1, isTrue);
+      });
+
+      test('Element cells compare != when different cells', () {
+        f(a) => a * 2;
+
+        final l1 = MutableCell([1, 2, 3, 4]);
+        final l2 = MutableCell([1, 2, 3, 4]);
+        final map1 = l1.mapCells(f);
+        final map2 = l2.mapCells(f);
+
+        final c1 = map1.value.elementAt(1);
+        final c2 = map2.value.elementAt(1);
+
+        expect(c1 != c2, isTrue);
+        expect(c1 == c1, isTrue);
+      });
+
+      test('Element cells compare != when different elements', () {
+        f(a) => a * 2;
+
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapCells(f);
+
+        final c1 = map1.value.elementAt(1);
+        final c2 = map1.value.elementAt(2);
+
+        expect(c1 != c2, isTrue);
+        expect(c1 == c1, isTrue);
+      });
+
+      test('Element cells compare == after changes to elements', () {
+        f(a) => a * 2;
+
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapCells(f);
+
+        final c1 = map1.value.elementAt(1);
+
+        l.value = [5, 6, 7, 8];
+
+        final c2 = map1.value.elementAt(1);
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Element cells compare == after changes to elements and list length', () {
+        f(a) => a * 2;
+
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapCells(f);
+
+        final c1 = map1.value.elementAt(1);
+
+        l.value = [5, 6];
+
+        final c2 = map1.value.elementAt(1);
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
       });
     });
   });
