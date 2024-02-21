@@ -530,6 +530,14 @@ void main() {
       b.value = 100;
       await tester.pump();
       expect(find.text('100'), findsOneWidget);
+
+      cond.value = true;
+      await tester.pump();
+      expect(find.text('10'), findsOneWidget);
+
+      a.value = 20;
+      await tester.pump();
+      expect(find.text('20'), findsOneWidget);
     });
 
     testWidgets('New dependencies tracked correctly', (tester) async {
