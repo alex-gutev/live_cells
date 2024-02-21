@@ -1,3 +1,13 @@
+## 0.13.0
+
+* `.cell` extension property is now available on all types
+* Additions to `Iterable` cell extension:
+  * `cast<E>()` method
+  * `map()` method
+* Additions to `List` cell extension:
+  * `cast<E>()` method
+  * `mapCells()` method
+
 ## 0.12.3
 
 * Fix potential issues when the computed value of a mutable computed cell is the same as its
