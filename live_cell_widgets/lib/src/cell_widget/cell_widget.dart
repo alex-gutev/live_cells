@@ -100,17 +100,33 @@ class _CellWidgetElement extends StatelessElement {
     _observer = _WidgetCellObserver(markNeedsBuild);
   }
 
-  final Set<ValueCell> _arguments = HashSet();
+  Set<ValueCell> _arguments = HashSet();
   late _WidgetCellObserver _observer;
 
   @override
   Widget build() {
-    return ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
+    final Set<ValueCell> newArguments = HashSet();
+
+    final widget = ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
+      newArguments.add(cell);
+
       if (!_arguments.contains(cell)) {
         _arguments.add(cell);
         cell.addObserver(_observer);
       }
     });
+
+    // Stop observing cells which are no longer referenced
+
+    for (final arg in _arguments) {
+      if (!newArguments.contains(arg)) {
+        arg.removeObserver(_observer);
+      }
+    }
+
+    _arguments = newArguments;
+
+    return widget;
   }
 
   @override
