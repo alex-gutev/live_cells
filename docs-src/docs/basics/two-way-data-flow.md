@@ -66,23 +66,23 @@ the `mutableString` cell to the *content* property of a
 `CellTextField`:
 
 ```dart title="Text field for numeric input"
-Widget example() => StaticWidget.builder((_) {
-    final a = MutableCell<num>(0);
-    final square = a * a;
+StaticWidget.builder((_) {
+  final a = MutableCell<num>(0);
+  final square = a * a;
     
-    return Column(
-        children: [
-            CellTextField(
-                content: a.mutableString()  
-                keyboardType: TextInputType.number.cell
-            ),
-            CellText(
-                data: ValueCell.computed(
-                    () => '${a()}^2 = ${square()}'
-                )
-            )
-        ]
-    );
+  return Column(
+    children: [
+      CellTextField(
+        content: a.mutableString()  
+        keyboardType: TextInputType.number.cell
+      ),
+      CellText(
+        data: ValueCell.computed(
+          () => '${a()}^2 = ${square()}'
+        )
+      )
+    ]
+  );
 });
 ```
 
@@ -100,43 +100,43 @@ a widget which displays the sum of the two numbers entered and a
 "Reset" button:
 
 ```dart title="Text field for numeric input"
-Widget example() => StaticWidget.builder((_) {
-    final a = MutableCell<num>(0);
-    final b = MutableCell<num>(0);
+StaticWidget.builder((_) {
+  final a = MutableCell<num>(0);
+  final b = MutableCell<num>(0);
     
-    final sum = a + b;
+  final sum = a + b;
     
-    return Column(
+  return Column(
+    children: [
+      Row(
         children: [
-            Row(
-                children: [
-                    CellTextField(
-                        content: a.mutableString(),
-                        keyboardType: TextInputType.number.cell
-                    ),
-                    SizedBox(width: 5),
-                    Text('+'),
-                    SizedBox(width: 5),
-                    CellTextField(
-                        content: b.mutableString(),
-                        keyboardType: TextInputType.number.cell
-                    ),
-                ],
-            ),
-            CellText(
-                data: ValueCell.computed(
-                    () => '${a()} + ${b()} = ${sum()}'
-                )
-            ),
-            ElevatedButton(
-                child: Text('Reset'),
-                onPressed: () => MutableCell.batch(() {
-                    a.value = 0;
-                    b.value = 0;
-                })
-            )
-        ]
-    );
+          CellTextField(
+            content: a.mutableString(),
+            keyboardType: TextInputType.number.cell
+          ),
+          SizedBox(width: 5),
+          Text('+'),
+          SizedBox(width: 5),
+          CellTextField(
+            content: b.mutableString(),
+            keyboardType: TextInputType.number.cell
+          ),
+        ],
+      ),
+      CellText(
+        data: ValueCell.computed(
+          () => '${a()} + ${b()} = ${sum()}'
+        )
+      ),
+      ElevatedButton(
+        child: Text('Reset'),
+        onPressed: () => MutableCell.batch(() {
+          a.value = 0;
+          b.value = 0;
+        })
+      )
+    ]
+  );
 });
 ```
 
@@ -197,42 +197,42 @@ is to add a `CellTextField` and bind its content to the `sum` cell.
 Here's the full example with a `CellTextField` for the result of the addition:
 
 ```dart title="Multi-argument mutable computed cell"
-Widget example() => StaticWidget.builder((_) {
-    final a = cell(() => MutableCell<num>(0));
-    final b = cell(() => MutableCell<num>(0));
+StaticWidget.builder((_) {
+  final a = MutableCell<num>(0);
+  final b = MutableCell<num>(0);
     
-    final sum = cell(() => MutableCell.computed(() => a() + b(), (sum) {
-        final half = sum / 2;
-        a.value = half;
-        b.value = half;
-    }));
+  final sum = MutableCell.computed(() => a() + b(), (sum) {
+    final half = sum / 2;
+    a.value = half;
+    b.value = half;
+  });
     
-    return Column(
+  return Column(
+    children: [
+      Row(
         children: [
-            Row(
-                children: [
-                    CellTextField(
-                        content: a.mutableString(),
-                        keyboardType: TextInputType.number.cell
-                    ),
-                    SizedBox(width: 5),
-                    Text('+'),
-                    SizedBox(width: 5),
-                    CellTextField(
-                        content: b.mutableString(),
-                        keyboardType: TextInputType.number.cell
-                    ),
-                    SizedBox(width: 5),
-                    Text('='),
-                    SizedBox(width: 5),
-                    CellTextField(
-                        content: sum.mutableString(),
-                        keyboardType: TextInputType.number.cell
-                    )
-                ],
-            )
-        ]
-    );
+          CellTextField(
+            content: a.mutableString(),
+            keyboardType: TextInputType.number.cell
+          ),
+          SizedBox(width: 5),
+          Text('+'),
+          SizedBox(width: 5),
+          CellTextField(
+            content: b.mutableString(),
+            keyboardType: TextInputType.number.cell
+          ),
+          SizedBox(width: 5),
+          Text('='),
+          SizedBox(width: 5),
+          CellTextField(
+            content: sum.mutableString(),
+            keyboardType: TextInputType.number.cell
+          )
+        ],
+      )
+    ]
+  );
 });
 ```
 * Entering a value in the fields for `a` and `b` will result in the

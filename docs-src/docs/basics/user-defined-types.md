@@ -94,7 +94,7 @@ to the `dev_dependencies` of your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-    live_cell_extension: 0.3.0
+    live_cell_extension: 0.4.0
     ...
 ```
 
@@ -157,54 +157,56 @@ Widget personForm(MutableCell<Person> person) => Column(
             content: person.lastName
         ),
         Text('Age:'),
-        numberField(person.age)
+        Numberfield(person.age)
     ]
-);
+)
 ```
 
-We used the `numberField` widget defined earlier, for the `age`
+We used the `Numberfield` widget, defined [earlier](error-handling), for the `age`
 property.
 
 :::info
-The form is not wrapped in a `StaticWidget` since it will only be used
-within a static widget.
+
+We defined the form as a function, rather than a widget class since it
+will only be used within a `StaticWidget`.
+
 :::
 
 We can then use this form as follows:
 
 ```dart
-Widget example() => StaticWidget.builder((_) {
-    final person = MutableCell(
-        Person(
-            firstName: 'John',
-            lastName: 'Smith',
-            age: 25
-        )
-    );
+StaticWidget.builder((_) {
+  final person = MutableCell(
+      Person(
+          firstName: 'John',
+          lastName: 'Smith',
+          age: 25
+      )
+  );
     
-    return Column(
-        children: [
-            personForm(person),
-            CellText(
-                data: ValueCell.computed(
-                    () => '${person.firstName()} ${person.lastName()}: ${person.age()} years'
-                )
-            ),
-            ElevatedButton(
-                child: Text('Save'),
-                // A hypothetical savePerson function
-                onPressed: () => savePerson(person.value)
-            ),
-            ElevatedButton(
-                child: Text('Reset'),
-                onPressed: () => person.value = Person(
-                    firstName: 'John',
-                    lastName: 'Smith',
-                    age: 25
-                )
-            )   
-        ]
-    );
+  return Column(
+    children: [
+      personForm(person),
+      CellText(
+        data: ValueCell.computed(
+          () => '${person.firstName()} ${person.lastName()}: ${person.age()} years'
+        )
+      ),
+      ElevatedButton(
+        child: Text('Save'),
+        // A hypothetical savePerson function
+        onPressed: () => savePerson(person.value)
+      ),
+      ElevatedButton(
+        child: Text('Reset'),
+        onPressed: () => person.value = Person(
+          firstName: 'John',
+          lastName: 'Smith',
+          age: 25
+        )
+      )
+    ]
+  );
 });
 ```
 

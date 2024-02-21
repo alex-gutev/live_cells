@@ -168,13 +168,13 @@ This is particularly useful for constructing a `Column` or `Row`
 widget using a list of child widgets held in a cell:
 
 ```dart
-Widget example(ValueCell<List<Widget>> children) => CellWidget.builder((_) => {
-    return Column(
-        children: children.cellList()
-            .map((c) => c.widget())
-            .toList()
-    );
-});
+ValueCell<List<Widget>> children;
+
+CellWidget.builder((_) => Column(
+  children: children.cellList()
+      .map((c) => c.widget())
+      .toList()
+);
 ```
 
 :::info
@@ -285,8 +285,9 @@ using the following:
 children[1] = 'Updated Child 2';
 ```
 
-What we've gained with this definition is that we've effectively
-separated our data from its presentation.
+What we've gained with this definition is that the presentation logic
+is not only effectively separated from the data but is only specified
+in one place.
 
 ## Map and Set Properties
 

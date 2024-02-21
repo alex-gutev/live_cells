@@ -27,7 +27,7 @@ value of the cell changes, the value of the property is automatically
 updated to reflect the value of the cell.
 
 ```dart title="CellText example"
-Widget example() => CellWidget.builder((c) {
+CellWidget.builder((c) {
     final content = c.cell(() => MutableCell(''));
     
     return Column(
@@ -46,18 +46,6 @@ In the example above a `CellText` is created with its data property bound to the
 cell `content`, which initially holds the empty string. The button
 below sets the value of `content` to the string "Hi!". This value is
 then displayed in the `CellText` widget.
-
-:::danger
-**Do not** change the cell to which a widget property is bound, i.e. don't
-do this:
-
-```dart
-CellText(data: condition ? cell1 : cell2)
-```
-
-Instead change the value of the cell and put the condition inside a
-computed cell.
-:::
 
 Every widget provided by live cells also provides a `bind`
 method. This method creates a copy of the widget with the properties
@@ -84,7 +72,7 @@ of the switch, similarly when the user changes the state of
 the switch, the value of the cell is changed to reflect the state.
 
 ```dart title="CellSwitch example"
-Widget example() => CellWidget.builder((c) {
+CellWidget.builder((c) {
     final state = c.cell(() => MutableCell(false));
     final text = c.cell(() => state.select(
         'The switch is on'.cell,
@@ -126,7 +114,7 @@ the field. Here's a simple example that echoes whatever is written in
 the field to a `CellText` widget.
 
 ```dart title="CellTextField example"
-Widget example() => CellWidget.builder((c) {
+CellWidget.builder((c) {
     final content = c.cell(() => MutableCell(''));
     
     return Column(
@@ -179,7 +167,7 @@ function without having to use the `cell` method.
 With `StaticWidget` the `CellSwitch` example becomes:
 
 ```dart title="StaticWidget example"
-Widget example() => StaticWidget.builder((c) {
+StaticWidget.builder((c) {
     final state = MutableCell(false);
     
     return Column(
@@ -199,7 +187,7 @@ Widget example() => StaticWidget.builder((c) {
 And the `CellTextField` example becomes:
 
 ```dart title="CellText example with StaticWidget"
-Widget example() => StaticWidget.builder((c) {
+StaticWidget.builder((c) {
     final content = MutableCell('');
     
     return Column(
@@ -216,13 +204,12 @@ Widget example() => StaticWidget.builder((c) {
 ```
 
 :::tip
-Like `CellWidget`, subclassing `StaticWidget` and overriding the `build`
+Subclassing `StaticWidget` and overriding the `build`
 method is equivalent to using `StaticWidget.builder`.
 :::
 
 If you know that your widget is only going to be used inside a
-`StaticWidget`, you can even eliminate `StaticWidget.builder` entirely
-and define your widget as a function:
+`StaticWidget`, you can define your widget entirely as a function:
 
 ```dart title="CellText example as a function"
 Widget example() {
@@ -240,3 +227,24 @@ Widget example() {
     );
 }
 ```
+
+:::danger
+
+Do not conditionally select a `build` function that is passed to
+`StaticWidget.builder`. If the condition changes the widget will not
+be rebuilt with the new build function (in-fact it is not rebuilt at
+all).
+
+**Don't do this:**
+
+```dart
+StaticWidget.builder(cond ? (c) { ... } : (c) { ... })
+```
+
+**Don't do this either:**
+
+```dart
+cond ? StaticWidget.builder(...) : StaticWidget.builder(...)
+```
+
+:::

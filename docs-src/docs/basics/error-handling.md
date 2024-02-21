@@ -67,26 +67,35 @@ an error message when an invalid value is entered, can be implemented
 with the following:
 
 ```dart title="Numeric text field with error handling"
-Widget numberField(MutableCell<num> n) => StaticWidget.builder((_) {
+class NumberField extends StaticWidget {
+  final MutableCell<num> n;
+  
+  NumberField(this.n);
+  
+  @override
+  Widget build(BuildContext context) {
     final maybe = n.maybe();
     final error = maybe.error;
     
     return CellTextField(
-        content: maybe.mutableString(),
-        decoration: ValueCell.computed(() => InputDecoration(
-            errorText: error() != null 
+      content: maybe.mutableString(),
+      decoration: ValueCell.computed(() => InputDecoration(
+          errorText: error() != null 
               ? 'Please enter a valid number' 
               : null
-       ))
+      ))
     );
-});
+  }
+}
 ```
 
 :::note
-We've packaged the input field in a function which takes the cell to
-which to bind the content of the field as an argument. This allows us
-to reuse this error handling logic wherever a numeric input text field
-is required.
+
+We've packaged the input field in a `StaticWidget` subclass which
+takes the cell to which to bind the content of the field as an
+argument. This allows us to reuse this error handling logic wherever a
+numeric input text field is required.
+
 :::
 
 Here we're testing whether `error` is non-null, that is whether an
@@ -98,65 +107,70 @@ The error message can be made more descriptive by also checking
 whether the field is empty, or not:
 
 ```dart title="Numeric text field with error handling"
-Widget numberField(MutableCell<num> n) => StaticWidget.builder((_) {
+class NumberField extends StaticWidget {
+  final MutableCell<num> n;
+  
+  NumberField(this.n);
+  
+  @override
+  Widget build(BuildContext context) {
     final maybe = n.maybe();
     final error = maybe.error;
-    final content = n.mutableString();
     
     return CellTextField(
-        content: content,
-        decoration: ValueCell.computed(() => InputDecoration(
-            errorText: content().isEmpty ? 
-              ? 'Cannot be empty'
+      content: maybe.mutableString(),
+      decoration: ValueCell.computed(() => InputDecoration(
+          errorText: error() != null 
+              ? 'Please enter a valid number' 
               : error() != null 
               ? 'Please enter a valid number' 
               : null
-       ))
+      ))
     );
-});
+  }
+}
 ```
 
 Now that we have a reusable numeric input text field with error
-handling, defined in `numberField()`, let's use it to reimplement the
-sum example from earlier.
+handling, let's use it to reimplement the sum example from earlier.
 
 ```dart title="Sum example using numberField()"
-Widget example() => StaticWidget.builder((_) {
-    final a = MutableCell<num>(0);
-    final b = MutableCell<num>(0);
+StaticWidget.builder((_) {
+  final a = MutableCell<num>(0);
+  final b = MutableCell<num>(0);
     
-    final sum = a + b;
+  final sum = a + b;
     
-    return Column(
+  return Column(
+    children: [
+      Row(
         children: [
-            Row(
-                children: [
-                    numberField(a),
-                    SizedBox(width: 5),
-                    Text('+'),
-                    SizedBox(width: 5),
-                    numberField(b),
-                ],
-            ),
-            CellText(
-                data: ValueCell.computed(
-                    () => '${a()} + ${b()} = ${sum()}'
-                )
-            ),
-            ElevatedButton(
-                child: Text('Reset'),
-                onPressed: () => MutableCell.batch(() {
-                    a.value = 0;
-                    b.value = 0;
-                })
-            )
-        ]
-    );
+          NumberField(a),
+          SizedBox(width: 5),
+          Text('+'),
+          SizedBox(width: 5),
+          NumberField(b),
+        ],
+      ),
+      CellText(
+        data: ValueCell.computed(
+          () => '${a()} + ${b()} = ${sum()}'
+        )
+      ),
+      ElevatedButton(
+        child: Text('Reset'),
+        onPressed: () => MutableCell.batch(() {
+          a.value = 0;
+          b.value = 0;
+        })
+      )
+    ]
+  );
 });
 ```
 
 Notice how we were able to package our text field with error handling
-in a separate function, that can be reused, all without writing a
-single `onChanged` callback and at the same time being able to reset
-the content of the fields simply by changing the values of the cells
-holding our data.
+entirely in a separate class, that can be reused, all without writing
+or passing a single `onChanged` callback and at the same time being
+able to reset the content of the fields simply by changing the values
+of the cells holding our data.

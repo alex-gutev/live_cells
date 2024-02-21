@@ -64,13 +64,13 @@ define a cell is verbose and annoying.
 
 Luckily `CellWidget` provides functionality for defining cells
 directly in the widget build function. The `cell` method, of the
-`context` parameter passed to the widget builder function, creates a
+`context` parameter passed to the widget build function, creates a
 cell which is persisted between builds of the widget.
 
 Using `CellWidget.builder`, the counter can be implemented as follows:
 
 ```dart title="Defining cells using context.cell"
-Widget counter() => CellWidget.builder((context) {
+CellWidget.builder((context) {
     final count = context.cell(() => MutableCell(0));
 
     return ElevatedButton(
@@ -139,7 +139,7 @@ during the first build. Unlike a watch function defined using
 the `CellWidget`, in which it is defined, is removed from the tree.
 
 ```dart title="Watch function in widget"
-Widget counter() => CellWidget.builder((context) {
+CellWidget.builder((context) {
     final count = context.cell(() => MutableCell(0));
 
     context.watch(() => print('Count ${count()}'));
@@ -153,13 +153,18 @@ Widget counter() => CellWidget.builder((context) {
 
 ## Subclassing CellWidget
 
-If you prefer subclassing you can subclass `CellWidget` and override
-its build method, instead of passing a build function to
-`CellWidget.builder`.
+We'll be using `CellWidget.builder` throughout the documentation,
+since its succinct and convenient. However, if you want to make a
+widget which will be used in more than one place, you should subclass
+`CellWidget` instead.
 
-**NOTE**: To use the `cell` and `watch` methods, the mixin
-`CellInitializer` has to be included by the subclass. This mixin
-also provides `cell` and `watch` methods directly to the subclass.
+:::important
+
+To use the `cell` and `watch` methods, the mixin `CellInitializer` has
+to be included by the subclass. This mixin also provides `cell` and
+`watch` methods directly to the subclass.
+
+:::
 
 The counter example using a `CellWidget` subclass:
 

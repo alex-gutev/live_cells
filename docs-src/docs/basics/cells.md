@@ -17,10 +17,9 @@ final c = ValueCell.value(someValue);
 ```
 
 The above is an example of *constant cells*, which can be created
-either using the `.cell` property, which is added to the value types
-built into Dart, or the `ValueCell.value` constructor which takes a
-value and wraps it in a `ValueCell`. A constant cell has a value that
-does not change throughout its lifetime. 
+either using the `.cell` property or the `ValueCell.value` constructor
+which takes a value and wraps it in a `ValueCell`. A constant cell has
+a value that does not change throughout its lifetime.
 
 The value of a cell is accessed using the `value` property.
 
@@ -68,11 +67,15 @@ b.value = 10; // Prints: 5 + 10 = 15
 In the example above, a watch function that prints the values of cells
 `a` and `b` to the console, along with their sum, is defined. This
 function is called automatically when the value of either `a` or `b`
-change. 
+changes. 
 
-**Note**, the value of a cell is referenced using the function call
+:::important
+
+the value of a cell is referenced using the function call
 syntax, within a watch function, rather than accessing the value
 property directly.
+
+:::
 
 Every call to `ValueCell.watch` adds a new watch function, for
 example:
