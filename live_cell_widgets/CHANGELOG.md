@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Improvements to `CellWidget`:
+  * Unused dependencies are untracked.
+  * Widget properties can now be bound to different cells between builds.
+
 ## 0.2.2
 
 * Increase core dependency version to 0.12.3
