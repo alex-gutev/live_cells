@@ -80,7 +80,7 @@ final firstName = person.firstName;
 And to update the value of the `firstName` property:
 
 ```dart title="Generated MutableCell property accessors"
-person.firstName = 'Jane';
+person.firstName.value = 'Jane';
 ```
 
 That's it, no need to write a `copyWith` method either. This ties in
@@ -94,7 +94,7 @@ to the `dev_dependencies` of your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-    live_cell_extension: 0.4.0
+    live_cell_extension: 0.4.3
     ...
 ```
 
@@ -128,7 +128,7 @@ Next you'll need to run the following command in the root directory of
 your project:
 
 ```sh
-flutter pub run build_runner build
+dart run build_runner build
 ```
 
 This will generate the `.g.dart` files, which contain the generated

@@ -40,7 +40,7 @@ rebuilt and a new `a` is created, BUT with the same key as the
 previous `a`, the `CellWidget` sees it as the same cell and continues
 observing the previous `a`. More importantly, the new `a` shares the
 same state (and hence the same value) as the previous `a`. In-effect
-is the same cell, just referenced by a different object.
+it is the same cell, just referenced by a different object.
 
 Previously, we said cells should be created in a `CellWidget` with
 `context.cell`. So why the need for keys? Keys, are especially useful
@@ -74,11 +74,48 @@ that the property getter is called on the same cell. The first code
 snippet is much simpler, more intuitive and more readable than the
 second snippet.
 
-Keys are not only useful in cell widgets, but are useful wherever a
-cell property, which itself returns a cell, is accessed. This is
-allows you to freely reference cell extension properties such as
-`.first`, as many times as you need to without having to store the
-returned cell in a local variable first.
+Keys are not only useful in cell widgets, but also in computed cells:
+
+```dart
+final a = MutableCell(0);
+final sum = ValueCell.computed(() => a() + a.previous());
+```
+
+Notice, we directly referenced the `previous` property (which
+references the previous value of cell `a`). in the computed cell. We
+are able to do this because `previous` returns a keyed cell. If it
+weren't for keyed cells we would have to write to store `a.previous`
+in a local variable first and referenced that in the computed cell,
+i.e. something similar to the following:
+
+```dart
+final a = MutableCell(0);
+final prev = a.previous;
+
+final sum = ValueCell.computed(() => a() + prev());
+```
+
+The second snippet is more verbose and would be inefficient, if
+`previous` wasn't a keyed cell, because every `a.previous` would
+create a new cell that tracks the previous value of `a`. With keyed
+cells there is only a single `a.previous` cell that is tracking the
+previous value of `a`.
+
+### Why?
+
+You may be asking why keyed cells instead of just caching the created
+cells in private properties? There's three reasons for this:
+
+* It keeps the core cell classes small. 
+* All additional functionality `.previous`, `.wait`, `.delayed`,
+  `.first`, `.last`, ..., can be kept in extensions on the relevant
+  `ValueCell` classes rather than bloating the classes themselves.
+* `live_cell_extension` (see [User Defined
+  Types](/docs/basics/user-defined-types)) would not have been
+  possible without cell keys.
+* This allows users of the library to extend the cell classes with
+  their own properties, e.g. `.foo`, which can be used just like a
+  built in property.
 
 ## Which cells have keys?
 
@@ -129,8 +166,8 @@ key. For your own keys, you're generally encouraged to do the following:
   function.
 * If your cell depends on other cells, include those cells in the key
   class and in its implementation of `==`.
-  
-An example implementation of `MyKey` from the example above:
+
+An example implementation of `MyKey`:
 
 ```dart title="Example key implementation"
 class MyKey {
@@ -148,6 +185,25 @@ class MyKey {
     int get hashCode => Object.hash(runtimeType, a, b);     
 }
 ```
+
+
+:::danger
+
+Don't give unrelated cells the same key. **Don't do this**
+
+```dart
+final a = ValueCell.computed(() => a() + b(),
+    key: MyKey(a, b)
+);
+
+final b = ValueCell.computed(() => a() * b(),
+    key: MyKey(a, b)
+);
+```
+
+Not unless you want bad things to happen.
+
+:::
 
 :::info
 
