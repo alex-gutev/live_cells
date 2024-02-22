@@ -36,8 +36,8 @@ class RadioValueCoder implements CellValueCoder {
 }
 
 class CellRestorationDemo extends StaticWidget {
-  @override
-  String get restorationId => 'cell_restoration_demo';
+  const CellRestorationDemo({super.key}) :
+    super(restorationId: 'cell_restoration_demo');
 
   @override
   Widget build(BuildContext context) {

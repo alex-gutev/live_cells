@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'demos/async_demo.dart';
 import 'demos/cell_text_field_demo1.dart';
 import 'demos/cell_text_field_demo2.dart';
 import 'demos/counter_demo.dart';
@@ -220,6 +221,14 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('State Restoration'),
                         onPressed: () {
                             Navigator.restorablePush(context, _makeStateRestorationDemo);
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Asynchronous Cells'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => AsyncDemo()
+                          ));
                         },
                       ),
                       ElevatedButton(

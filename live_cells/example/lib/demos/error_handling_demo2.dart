@@ -32,13 +32,13 @@ class ErrorHandlingDemo2 extends StaticWidget {
               Row(
                 children: [
                   Expanded(
-                    child: inputField(a),
+                    child: NumberField(a),
                   ),
                   const SizedBox(width: 5),
                   const Text('+'),
                   const SizedBox(width: 5),
                   Expanded(
-                    child: inputField(b),
+                    child: NumberField(b),
                   ),
                 ],
               ),
@@ -65,17 +65,34 @@ class ErrorHandlingDemo2 extends StaticWidget {
       ),
     );
   }
+}
 
-  /// Creates a text field for numeric input with error checking.
+/// Creates a text field for numeric input with error checking.
+///
+/// NOTE: [cell] is a `num` cell to which the parsed numeric input is assigned,
+/// whenever text is entered in the field. Similarly changing the value of
+/// [cell] results in that value being displayed in the field.
+///
+/// The field also displays an error message if it is empty or the entered
+/// text is not a valid number
+class NumberField extends StaticWidget {
+  /// The `num` cell to which the content of the field is bound
+  final MutableCell<num> n;
+
+  /// Create text field with its content bound to the `num` cell `n`
   ///
-  /// NOTE: [cell] is a `num` cell to which the parsed numeric input is assigned,
-  /// whenever text is entered in the field. Similarly changing the value of
-  /// [cell] results in that value being displayed in the field.
+  /// NOTE: Given that the field is defined using a [StaticWidget], which is only
+  /// built once when it is added to the tree, this cannot be changed while the
+  /// widget is in the tree, i.e. you cannot do the following:
   ///
-  /// The field also displays an error message if it is empty or the entered
-  /// text is not a valid number
-  static Widget inputField(MutableCell<num> cell) {
-    final maybe = cell.maybe();
+  /// ```dart
+  /// NumberField(cond ? n : m);
+  /// ```
+  const NumberField(this.n, { super.key });
+
+  @override
+  Widget build(BuildContext context) {
+    final maybe = n.maybe();
     final content = maybe.mutableString();
     final error = maybe.error;
 
