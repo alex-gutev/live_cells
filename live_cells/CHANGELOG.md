@@ -1,3 +1,15 @@
+## 0.14.0
+
+New features for asynchronous cells:
+
+* `.wait` property for creating a cell that `await`s a `Future` held in another cell.
+* `.delayed` for creating a cell that takes the value of another cell but only notifies its
+  observers after a given delay.
+
+Breaking changes:
+
+* Removed `DelayCell`.
+
 ## 0.13.0
 
 * `.cell` extension property is now available on all types
