@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:test/test.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 
@@ -6683,6 +6684,432 @@ void main() {
 
         expect(e1 != e2, isTrue);
         expect(e1 == e1, isTrue);
+      });
+    });
+  });
+
+  group('WaitCell', () {
+    test('.wait on one FutureCell with constant value', () {
+      fakeAsync((self) {
+        final cell = Future(() => 12).cell.wait;
+        observeCell(cell);
+
+        // .flushMicrotasks doesn't work
+        self.elapse(Duration(seconds: 1));
+
+        expect(cell.value, 12);
+      });
+    });
+
+    test('.wait on one FutureCell with Mutable value', () {
+      fakeAsync((self) {
+        final future = MutableCell(Future(() => 12));
+        final cell = future.wait;
+
+        observeCell(cell);
+
+        self.elapse(Duration(seconds: 1));
+        expect(cell.value, 12);
+
+        future.value = Future.value(100);
+        expect(cell.value, 12);
+
+        self.elapse(Duration(seconds: 1));
+        expect(cell.value, 100);
+      });
+    });
+
+    test('.wait notifies observers when value is ready', () {
+      fakeAsync((self) {
+        final future = MutableCell(Future(() => 12));
+        final cell = future.wait;
+
+        final observer = addObserver(cell, MockValueObserver());
+
+        future.value = Future.value(100);
+        future.value = Future.value(20);
+        future.value = Future.value(30);
+
+        self.elapse(Duration(seconds: 1));
+        expect(observer.values, equals([100, 20, 30]));
+      });
+    });
+
+    test('.wait on computed FutureCell', () {
+      fakeAsync((self) {
+        final cellA = MutableCell(Future.value(1));
+        final cellB = MutableCell(Future.value(2));
+
+        final sum = ValueCell.computed(() async {
+          final (a, b) = await (cellA(), cellB()).wait;
+          return a + b;
+        });
+
+        final cell = sum.wait;
+        observeCell(cell);
+
+        self.elapse(Duration(seconds: 1));
+        expect(cell.value, 3);
+
+        cellA.value = Future.value(5);
+        expect(cell.value, 3);
+
+        self.elapse(Duration(seconds: 1));
+        expect(cell.value, 7);
+
+        cellB.value = Future.value(10);
+        expect(cell.value, 7);
+
+        self.elapse(Duration(seconds: 1));
+        expect(cell.value, 15);
+
+        MutableCell.batch(() {
+          cellA.value = Future.value(20);
+          cellB.value = Future.value(30);
+        });
+
+        expect(cell.value, 15);
+
+        self.elapse(Duration(seconds: 1));
+        expect(cell.value, 50);
+      });
+    });
+
+    test('.wait on computed FutureCell with delay', () {
+      fakeAsync((self) {
+        final cellA = MutableCell(Future.value(1));
+        final cellB = MutableCell(Future.value(2));
+
+        final sum = ValueCell.computed(() async {
+          final (a, b) = await (cellA(), cellB()).wait;
+          return a + b;
+        });
+
+        final cell = sum.wait;
+        observeCell(cell);
+
+        self.elapse(Duration(seconds: 1));
+        expect(cell.value, 3);
+
+        MutableCell.batch(() {
+          cellA.value = Future.value(20);
+          cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
+        });
+
+        expect(cell.value, 3);
+
+        self.elapse(Duration(seconds: 5));
+        expect(cell.value, 3);
+
+        self.elapse(Duration(seconds: 6));
+        expect(cell.value, 50);
+      });
+    });
+
+    test('.wait on two constant cells', () {
+      fakeAsync((self) {
+        final cellA = Future.value(1).cell;
+        final cellB = Future.value(2).cell;
+
+        final sum = ValueCell.computed(() {
+          final (a, b) = (cellA, cellB).wait();
+          return a + b;
+        });
+
+        observeCell(sum);
+
+        self.elapse(Duration(seconds: 1));
+        expect(sum.value, 3);
+      });
+    });
+
+    test('.wait on two mutable cells', () {
+      fakeAsync((self) {
+        final cellA = MutableCell(Future.value(1));
+        final cellB = MutableCell(Future.value(2));
+
+        final sum = ValueCell.computed(() {
+          final (a, b) = (cellA, cellB).wait();
+          return a + b;
+        });
+
+        observeCell(sum);
+
+        self.elapse(Duration(seconds: 1));
+        expect(sum.value, 3);
+
+        cellA.value = Future.value(5);
+        expect(sum.value, 3);
+
+        self.elapse(Duration(seconds: 1));
+        expect(sum.value, 7);
+
+        cellB.value = Future.value(10);
+        expect(sum.value, 7);
+
+        self.elapse(Duration(seconds: 1));
+        expect(sum.value, 15);
+
+        MutableCell.batch(() {
+          cellA.value = Future.value(20);
+          cellB.value = Future.value(30);
+        });
+
+        expect(sum.value, 15);
+
+        self.elapse(Duration(seconds: 1));
+        expect(sum.value, 50);
+      });
+    });
+
+    test('.wait on two mutable cells notifies observers', () {
+      fakeAsync((self) {
+        final cellA = MutableCell(Future.value(1));
+        final cellB = MutableCell(Future.value(2));
+
+        final sum = ValueCell.computed(() {
+          final (a, b) = (cellA, cellB).wait();
+          return a + b;
+        });
+
+        final observer = addObserver(sum, MockValueObserver());
+
+        cellA.value = Future.value(15);
+        cellB.value = Future.value(20);
+
+        MutableCell.batch(() {
+          cellA.value = Future.value(100);
+          cellB.value = Future.value(320);
+        });
+
+        self.elapse(Duration(seconds: 1));
+        expect(observer.values, equals([17, 35, 420]));
+      });
+    });
+
+    test('.wait on two mutable cells with delay', () {
+      fakeAsync((self) {
+        final cellA = MutableCell(Future.value(1));
+        final cellB = MutableCell(Future.value(2));
+
+        final sum = ValueCell.computed(() {
+          final (a, b) = (cellA, cellB).wait();
+          return a + b;
+        });
+
+        observeCell(sum);
+
+        self.elapse(Duration(seconds: 1));
+        expect(sum.value, 3);
+
+        MutableCell.batch(() {
+          cellA.value = Future.value(20);
+          cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
+        });
+
+        expect(sum.value, 3);
+
+        self.elapse(Duration(seconds: 5));
+        expect(sum.value, 3);
+
+        self.elapse(Duration(seconds: 6));
+        expect(sum.value, 50);
+      });
+    });
+
+    test('.wait compare equal if same future cells', () {
+      final f = MutableCell(Future.value(1));
+
+      final w1 = f.wait;
+      final w2 = f.wait;
+
+      expect(w1 == w2, isTrue);
+      expect(w1.hashCode == w2.hashCode, isTrue);
+    });
+
+    test('.wait compare not equal if different future cells', () {
+      final f1 = MutableCell(Future.value(1));
+      final f2 = MutableCell(Future.value(3));
+
+      final w1 = f1.wait;
+      final w2 = f2.wait;
+
+      expect(w1 != w2, isTrue);
+      expect(w1 == w1, isTrue);
+    });
+
+    test('.wait compare equal if same 2 future cells', () {
+      final f1 = MutableCell(Future.value(1));
+      final f2 = MutableCell(Future.value(3));
+
+      final w1 = (f1, f2).wait;
+      final w2 = (f1, f2).wait;
+
+      expect(w1 == w2, isTrue);
+      expect(w1.hashCode == w2.hashCode, isTrue);
+    });
+
+    test('.wait compare not equal if different 2 future cells', () {
+      final f1 = MutableCell(Future.value(1));
+      final f2 = MutableCell(Future.value(3));
+      final f3 = MutableCell(Future.value(5));
+
+      final w1 = (f1, f2).wait;
+      final w2 = (f1, f3).wait;
+      final w3 = (f3, f2).wait;
+
+      expect(w1 == w1, isTrue);
+      expect(w1 != w2, isTrue);
+      expect(w1 != w3, isTrue);
+      expect(w2 != w3, isTrue);
+    });
+
+    /// Test WaitCellExtension 3-9
+
+    test('.wait on three constant cells', () {
+      fakeAsync((self) {
+        final c1 = Future.value(1).cell;
+        final c2 = Future.value(2).cell;
+        final c3 = Future.value(3).cell;
+
+        final conc = ValueCell.computed(() {
+          final (v1, v2, v3) = (c1, c2, c3).wait();
+          return '$v1,$v2,$v3';
+        });
+
+        observeCell(conc);
+
+        self.elapse(Duration(seconds: 1));
+        expect(conc.value, '1,2,3');
+      });
+    });
+
+    test('.wait on four constant cells', () {
+      fakeAsync((self) {
+        final c1 = Future.value(1).cell;
+        final c2 = Future.value(2).cell;
+        final c3 = Future.value(3).cell;
+        final c4 = Future.value(4).cell;
+
+        final conc = ValueCell.computed(() {
+          final (v1,v2,v3,v4) = (c1,c2,c3,c4).wait();
+          return '$v1,$v2,$v3,$v4';
+        });
+
+        observeCell(conc);
+
+        self.elapse(Duration(seconds: 1));
+        expect(conc.value, '1,2,3,4');
+      });
+    });
+
+    test('.wait on five constant cells', () {
+      fakeAsync((self) {
+        final c1 = Future.value(1).cell;
+        final c2 = Future.value(2).cell;
+        final c3 = Future.value(3).cell;
+        final c4 = Future.value(4).cell;
+        final c5 = Future.value(5).cell;
+
+        final conc = ValueCell.computed(() {
+          final (v1,v2,v3,v4,v5) = (c1,c2,c3,c4,c5).wait();
+          return '$v1,$v2,$v3,$v4,$v5';
+        });
+
+        observeCell(conc);
+
+        self.elapse(Duration(seconds: 1));
+        expect(conc.value, '1,2,3,4,5');
+      });
+    });
+
+    test('.wait on six constant cells', () {
+      fakeAsync((self) {
+        final c1 = Future.value(1).cell;
+        final c2 = Future.value(2).cell;
+        final c3 = Future.value(3).cell;
+        final c4 = Future.value(4).cell;
+        final c5 = Future.value(5).cell;
+        final c6 = Future.value(6).cell;
+
+        final conc = ValueCell.computed(() {
+          final (v1,v2,v3,v4,v5,v6) = (c1,c2,c3,c4,c5,c6).wait();
+          return '$v1,$v2,$v3,$v4,$v5,$v6';
+        });
+
+        observeCell(conc);
+
+        self.elapse(Duration(seconds: 1));
+        expect(conc.value, '1,2,3,4,5,6');
+      });
+    });
+
+    test('.wait on seven constant cells', () {
+      fakeAsync((self) {
+        final c1 = Future.value(1).cell;
+        final c2 = Future.value(2).cell;
+        final c3 = Future.value(3).cell;
+        final c4 = Future.value(4).cell;
+        final c5 = Future.value(5).cell;
+        final c6 = Future.value(6).cell;
+        final c7 = Future.value(7).cell;
+
+        final conc = ValueCell.computed(() {
+          final (v1,v2,v3,v4,v5,v6,v7) = (c1,c2,c3,c4,c5,c6,c7).wait();
+          return '$v1,$v2,$v3,$v4,$v5,$v6,$v7';
+        });
+
+        observeCell(conc);
+
+        self.elapse(Duration(seconds: 1));
+        expect(conc.value, '1,2,3,4,5,6,7');
+      });
+    });
+
+    test('.wait on eight constant cells', () {
+      fakeAsync((self) {
+        final c1 = Future.value(1).cell;
+        final c2 = Future.value(2).cell;
+        final c3 = Future.value(3).cell;
+        final c4 = Future.value(4).cell;
+        final c5 = Future.value(5).cell;
+        final c6 = Future.value(6).cell;
+        final c7 = Future.value(7).cell;
+        final c8 = Future.value(8).cell;
+
+        final conc = ValueCell.computed(() {
+          final (v1,v2,v3,v4,v5,v6,v7,v8) = (c1,c2,c3,c4,c5,c6,c7,c8).wait();
+          return '$v1,$v2,$v3,$v4,$v5,$v6,$v7,$v8';
+        });
+
+        observeCell(conc);
+
+        self.elapse(Duration(seconds: 1));
+        expect(conc.value, '1,2,3,4,5,6,7,8');
+      });
+    });
+
+    test('.wait on eight constant cells', () {
+      fakeAsync((self) {
+        final c1 = Future.value(1).cell;
+        final c2 = Future.value(2).cell;
+        final c3 = Future.value(3).cell;
+        final c4 = Future.value(4).cell;
+        final c5 = Future.value(5).cell;
+        final c6 = Future.value(6).cell;
+        final c7 = Future.value(7).cell;
+        final c8 = Future.value(8).cell;
+        final c9 = Future.value(9).cell;
+
+        final conc = ValueCell.computed(() {
+          final (v1,v2,v3,v4,v5,v6,v7,v8,v9) = (c1,c2,c3,c4,c5,c6,c7,c8,c9).wait();
+          return '$v1,$v2,$v3,$v4,$v5,$v6,$v7,$v8,$v9';
+        });
+
+        observeCell(conc);
+
+        self.elapse(Duration(seconds: 1));
+        expect(conc.value, '1,2,3,4,5,6,7,8,9');
       });
     });
   });

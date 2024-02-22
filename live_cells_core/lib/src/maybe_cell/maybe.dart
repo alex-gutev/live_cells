@@ -37,6 +37,20 @@ class Maybe<T> {
     }
   }
 
+  /// Compute a [Future] value using [compute] and wrap the result in a [Maybe].
+  ///
+  /// 1. [compute] is called to compute a [Future] value.
+  /// 2. The [Future] is awaited.
+  /// 3. The result is wrapped in a [Maybe] as if by [Maybe.wrap]
+  static Future<Maybe<T>> wrapAsync<T>(Future<T> Function() compute) async {
+    try {
+      return Maybe(await compute());
+    }
+    catch (e) {
+      return Maybe.error(e);
+    }
+  }
+
   /// Get the wrapped value or throw [error] if this [Maybe] represents an error.
   T get unwrap {
     if (error != null) {
