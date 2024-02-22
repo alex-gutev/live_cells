@@ -1,3 +1,7 @@
+## 0.3.1
+
+* Update `live_cells_core` dependency version to `0.14.0`
+
 ## 0.3.0
 
 * Improvements to `CellWidget`:
