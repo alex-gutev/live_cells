@@ -6731,7 +6731,7 @@ void main() {
         future.value = Future.value(30);
 
         self.elapse(Duration(seconds: 1));
-        expect(observer.values, equals([100, 20, 30]));
+        expect(observer.values, equals([12, 100, 20, 30]));
       });
     });
 
@@ -6803,6 +6803,38 @@ void main() {
 
         self.elapse(Duration(seconds: 6));
         expect(cell.value, 50);
+      });
+    });
+
+    test('Futures with varying delays queued correctly', () {
+      fakeAsync((self) {
+        final f = MutableCell(Future.delayed(Duration(seconds: 10), () => 1));
+        final w = f.wait;
+
+        final observer = addObserver(w, MockValueObserver());
+
+        f.value = Future.value(2);
+        f.value = Future.delayed(Duration(seconds: 30), () => 3);
+        f.value = Future.value(4);
+
+        expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+        expect(observer.values, equals([]));
+
+        self.elapse(Duration(seconds: 5));
+        expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+        expect(observer.values, equals([]));
+
+        self.elapse(Duration(seconds: 6));
+        expect(w.value, 2);
+        expect(observer.values, equals([1, 2]));
+
+        self.elapse(Duration(seconds: 10));
+        expect(w.value, 2);
+        expect(observer.values, equals([1, 2]));
+
+        self.elapse(Duration(seconds: 10));
+        expect(w.value, 4);
+        expect(observer.values, equals([1, 2, 3, 4]));
       });
     });
 
@@ -6883,7 +6915,7 @@ void main() {
         });
 
         self.elapse(Duration(seconds: 1));
-        expect(observer.values, equals([17, 35, 420]));
+        expect(observer.values, equals([3, 17, 35, 420]));
       });
     });
 
@@ -6914,6 +6946,48 @@ void main() {
 
         self.elapse(Duration(seconds: 6));
         expect(sum.value, 50);
+      });
+    });
+
+    test('.wait on two cells: Futures with varying delays queued correctly', () {
+      fakeAsync((self) {
+        final c1 = MutableCell(Future.delayed(Duration(seconds: 10), () => 1));
+        final c2 = MutableCell(Future.value(2));
+        final w = ValueCell.computed(() {
+          final (v1, v2) = (c1, c2).wait();
+
+          return v1 + v2;
+        });
+
+        final observer = addObserver(w, MockValueObserver());
+
+        c1.value = Future.value(10);
+
+        MutableCell.batch(() {
+          c1.value = Future.delayed(Duration(seconds: 30), () => 20);
+          c2.value = Future.value(7);
+        });
+
+        c1.value = Future.value(100);
+
+        expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+        expect(observer.values, equals([]));
+
+        self.elapse(Duration(seconds: 5));
+        expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+        expect(observer.values, equals([]));
+
+        self.elapse(Duration(seconds: 6));
+        expect(w.value, 12);
+        expect(observer.values, equals([3, 12]));
+
+        self.elapse(Duration(seconds: 10));
+        expect(w.value, 12);
+        expect(observer.values, equals([3, 12]));
+
+        self.elapse(Duration(seconds: 10));
+        expect(w.value, 107);
+        expect(observer.values, equals([3, 12, 27, 107]));
       });
     });
 

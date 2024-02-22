@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../base/keys.dart';
 import '../maybe_cell/maybe.dart';
 import '../stateful_cell/cell_state.dart';
@@ -45,6 +47,10 @@ class _WaitCellState<T> extends CellState<WaitCell<T>>
   /// Awaited [Future] value
   Maybe<T> _value = Maybe.error(UninitializedCellError());
 
+  Completer<void>? _wait;
+  //StreamController<Future<Maybe<T>>>? _queue;
+  //StreamSubscription<Future<Maybe<T>>>? _subQueue;
+
   _WaitCellState({
     required super.cell,
     required super.key
@@ -60,7 +66,9 @@ class _WaitCellState<T> extends CellState<WaitCell<T>>
     super.init();
 
     cell.arg.addObserver(this);
-    _initValue();
+    //_queue = StreamController();
+
+    _updateValue(_getValue());
   }
 
   @override
@@ -85,11 +93,6 @@ class _WaitCellState<T> extends CellState<WaitCell<T>>
     _updateValue(_getValue());
   }
 
-  /// Initialize the state with the cell's current value
-  Future<void> _initValue() async {
-    _value = await _getValue();
-  }
-
   /// Get the a [Future] which resolves to the current value of [arg], wrapped in a [Maybe].
   Future<Maybe<T>> _getValue() {
     return Maybe.wrapAsync(() => cell.arg.value);
@@ -97,7 +100,13 @@ class _WaitCellState<T> extends CellState<WaitCell<T>>
 
   /// Await [future] and update this cell's value while notifying observers.
   Future<void> _updateValue(Future<Maybe<T>> future) async {
+    final wait = _wait;
+    final newWait = _wait = Completer();
+
+    await wait?.future;
     final value = await future;
+
+    newWait.complete();
 
     notifyWillUpdate();
     _value = value;
