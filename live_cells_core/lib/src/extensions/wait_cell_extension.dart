@@ -6,6 +6,22 @@ import '../value_cell.dart';
 /// A cell, which holds a [Future] value.
 typedef FutureCell<T> = ValueCell<Future<T>>;
 
+/// Provides methods for creating cells that notify their observers after a delay.
+extension DelayCellExtension<T> on ValueCell<T> {
+  /// Create a cell which notifies its observers, for value changes in [this], after a delay.
+  ///
+  /// The returned cell takes on the same value as [this], but instead of
+  /// updating its value immediately when the value of [this] changes, it updates
+  /// its value, and hence notifies its observers, after a [delay].
+  ///
+  /// The cell returned is a keyed cell, which is unique for a given [this] and
+  /// [delay].
+  FutureCell<T> delayed(Duration delay) =>
+      apply((value) => Future.delayed(delay, () => value),
+        key: _DelayCellKey(this, delay)
+      );
+}
+
 /// Provides the [wait] method on a cell holding a [Future].
 extension WaitCellExtension1<T> on FutureCell<T> {
   /// Return a cell which awaits the [Future] held in [this].
@@ -236,4 +252,9 @@ extension WaitCellExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
 /// A key which identifies a record of cells
 class _CombinedCellKey<T> extends ValueKey1<T> {
   _CombinedCellKey(super.value);
+}
+
+/// Key identifying a delayed cell.
+class _DelayCellKey<T> extends ValueKey2<ValueCell<T>, Duration> {
+  _DelayCellKey(super.value1, super.value2);
 }

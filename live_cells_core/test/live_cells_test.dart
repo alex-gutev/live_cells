@@ -3491,89 +3491,6 @@ void main() {
     });
   });
 
-  group('DelayCell', () {
-    test('DelayCell.value equals initial value of cell when not changed', () {
-      final cell = MutableCell(2);
-      final delay = DelayCell(const Duration(milliseconds: 1), cell);
-
-      expect(delay.value, equals(2));
-    });
-
-    test('DelayCell takes latest value of argument cell', () {
-      final cell = MutableCell(10);
-      final delay = DelayCell(const Duration(milliseconds: 1), cell);
-
-      final observer = MockSimpleObserver();
-      cell.value = 20;
-
-      delay.addObserver(observer);
-
-      expect(delay.value, equals(20));
-    });
-
-    test('DelayCell.value is updated after setting argument cell value', () async {
-      final cell = MutableCell(1);
-      final delay = DelayCell(const Duration(milliseconds: 1), cell);
-
-      final observer = MockValueObserver();
-      delay.addObserver(observer);
-
-      cell.value = 2;
-
-      await untilCalled(observer.gotValue(2)).timeout(const Duration(seconds: 1), onTimeout: () {
-        fail('DelayCell.value not updated');
-      });
-    });
-
-    test('DelayCell.value observers called for every argument cell value change', () async {
-      final cell = MutableCell(1);
-      final delay = DelayCell(const Duration(milliseconds: 1), cell);
-
-      final observer = MockValueObserver();
-      delay.addObserver(observer);
-
-      cell.value = 2;
-      cell.value = 5;
-
-      await untilCalled(observer.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
-        fail('DelayCell.value not updated');
-      });
-
-      verify(observer.gotValue(any)).called(2);
-    });
-
-    test('DelayCell.value observer not called after it is removed', () async {
-      final cell = MutableCell(1);
-      final delay = DelayCell(const Duration(milliseconds: 1), cell);
-
-      final observer1 = MockValueObserver();
-      final observer2 = MockValueObserver();
-
-      delay.addObserver(observer1);
-      delay.addObserver(observer2);
-
-      cell.value = 2;
-
-      await untilCalled(observer1.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
-        fail('DelayCell.value not updated');
-      });
-
-      await untilCalled(observer2.gotValue(2)).timeout(const Duration(seconds: 2), onTimeout: () {
-        fail('DelayCell.value not updated');
-      });
-
-      delay.removeObserver(observer1);
-      cell.value = 5;
-
-      await untilCalled(observer2.gotValue(5)).timeout(const Duration(seconds: 2), onTimeout: () {
-        fail('DelayCell.value not updated');
-      });
-
-      verify(observer1.gotValue(any)).called(1);
-      verify(observer2.gotValue(any)).called(2);
-    });
-  });
-
   group('Cell watcher', () {
     test('Watch function called once on registration', () {
       final a = MutableCell(1);
@@ -7184,6 +7101,78 @@ void main() {
 
         self.elapse(Duration(seconds: 1));
         expect(conc.value, '1,2,3,4,5,6,7,8,9');
+      });
+    });
+  });
+
+  group('Delayed Cell', () {
+    test('Uninitialized before delay has elapsed', () {
+      fakeAsync((async) {
+        final cell = 1.cell.delayed(Duration(seconds: 5)).wait;
+        observeCell(cell);
+
+        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+      });
+    });
+
+    test('Initialized after delay has elapsed', () {
+      fakeAsync((async) {
+        final cell = 1.cell.delayed(Duration(seconds: 5)).wait;
+        observeCell(cell);
+
+        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+
+        async.elapse(Duration(seconds: 3));
+        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+
+        async.elapse(Duration(seconds: 3));
+        expect(cell.value, 1);
+      });
+    });
+
+    test('Updated after setting argument cell value', () {
+      fakeAsync((async) {
+        final src = MutableCell(1);
+        final cell = src.delayed(Duration(seconds: 10)).wait;
+        observeCell(cell);
+
+        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+
+        async.elapse(Duration(seconds: 6));
+        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+
+        async.elapse(Duration(seconds: 5));
+        expect(cell.value, 1);
+
+        src.value = 2;
+        async.elapse(Duration(seconds: 6));
+        expect(cell.value, 1);
+
+        async.elapse(Duration(seconds: 5));
+        expect(cell.value, 2);
+      });
+    });
+
+    test('Notifies observers after delay elapses', () {
+      fakeAsync((async) {
+        final src = MutableCell(1);
+        final cell = src.delayed(Duration(seconds: 20)).wait;
+        final observer = addObserver(cell, MockValueObserver());
+
+        expect(observer.values, equals([]));
+
+        async.elapse(Duration(seconds: 11));
+        expect(observer.values, equals([]));
+
+        async.elapse(Duration(seconds: 10));
+        expect(observer.values, equals([1]));
+
+        src.value = 2;
+        async.elapse(Duration(seconds: 11));
+        expect(observer.values, equals([1]));
+
+        async.elapse(Duration(seconds: 10));
+        expect(observer.values, equals([1, 2]));
       });
     });
   });

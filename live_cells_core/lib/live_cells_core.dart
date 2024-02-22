@@ -74,8 +74,6 @@ export 'src/extensions/map_cell_extension.dart'
 
 export 'src/extensions/wait_cell_extension.dart';
 
-export 'src/async_cell/delay_cell.dart' show DelayCell;
-
 export 'src/cell_watch/cell_watcher.dart' show CellWatcher;
 
 export 'src/restoration/restoration.dart' show RestorableCell, CellValueCoder;
