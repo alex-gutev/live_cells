@@ -246,6 +246,34 @@ ValueCell.watch(() {
 person.firstName.value = 'John';
 ```
 
+### Asynchronous Cells
+
+Cells can hold and manipulate a `Future` like any other value:
+
+```dart
+ValueCell<Future<int>> cell1;
+ValueCell<Future<int>> cell2;
+...
+final sum = ValueCell.computed(() async {
+  (a, b) = await (cell1(), cell2()).wait;
+  return a + b;
+});
+```
+
+Cells can `await` a `Future` held in another cell:
+
+```dart
+ValueCell<Future<int>> cell1;
+ValueCell<Future<int>> cell2;
+...
+// The value of `sum` is only computed once the futures
+// in both `cell1` and `cell2` have completed
+final sum = ValueCell.computed(() {
+  (a, b) = (cell1, cell2).wait();
+  return a + b;
+});
+```
+
 ## Additional information
 
 If you discover any issues or have any feature requests, please open an issue on the package's Github
