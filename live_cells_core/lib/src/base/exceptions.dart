@@ -17,3 +17,7 @@ class StopComputeException implements Exception {
       'If you are seeing this you most likely used ValueCell.none() outside a '
       'cell value computation function.';
 }
+
+/// Used to cancel an asynchronous computation
+class CancelComputeException implements Exception {
+}
