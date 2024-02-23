@@ -1,3 +1,7 @@
+## 0.14.2
+
+* Fix async examples in README.
+
 ## 0.14.1
 
 Minor additions from core:

@@ -255,7 +255,7 @@ ValueCell<Future<int>> cell1;
 ValueCell<Future<int>> cell2;
 ...
 final sum = ValueCell.computed(() async {
-  (a, b) = await (cell1(), cell2()).wait;
+  final (a, b) = await (cell1(), cell2()).wait;
   return a + b;
 });
 ```
@@ -269,7 +269,7 @@ ValueCell<Future<int>> cell2;
 // The value of `sum` is only computed once the futures
 // in both `cell1` and `cell2` have completed
 final sum = ValueCell.computed(() {
-  (a, b) = (cell1, cell2).wait();
+  final (a, b) = (cell1, cell2).wait();
   return a + b;
 });
 ```
