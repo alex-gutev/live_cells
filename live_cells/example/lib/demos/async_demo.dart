@@ -23,6 +23,21 @@ class AsyncDemo extends CellWidget with CellInitializer {
         .onError<UninitializedCellError>(''.cell)
     );
 
+    /// This cell holds the content of the text field but only updates after
+    /// a delay of 3 seconds.
+    ///
+    /// `.waitLast` is like `.wait` but if the value of `delayed(...) changes
+    /// before the previous Future has been awaited, the previous future is
+    /// discarded. In-effect, this implements a form of debouncing.
+    ///
+    /// The `.onError<UninitializedCellError>` catches the exception that is
+    /// thrown when the cell's value is accessed before the Future has been
+    /// resolved.
+    final debounced = cell(() => content.delayed(const Duration(seconds: 3))
+        .waitLast
+        .onError<UninitializedCellError>(''.cell)
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Asynchronous Cells'),
@@ -52,6 +67,18 @@ class AsyncDemo extends CellWidget with CellInitializer {
               // The content of the text field is retrieved using the `input` cell
               CellText(
                 data: delayed,
+              ),
+              const Text(
+                  'Debounced:',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20
+                  )
+              ),
+              const SizedBox(height: 10),
+              // The content of the text field is retrieved using the `input` cell
+              CellText(
+                data: debounced,
               ),
             ],
           ),
