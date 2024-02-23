@@ -1,3 +1,10 @@
+## 0.14.1
+
+Minor additions from core:
+
+* `.waitLast` property which is the same as `.wait` but if a new Future is received before the
+  previous one has completed, the previous future is dropped.
+
 ## 0.14.0
 
 New features for asynchronous cells:
