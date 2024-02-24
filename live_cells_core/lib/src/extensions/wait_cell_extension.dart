@@ -1,4 +1,5 @@
 import 'compute_extension.dart';
+import '../async_cell/await_cell.dart';
 import '../async_cell/wait_cell.dart';
 import '../base/keys.dart';
 import '../value_cell.dart';
@@ -24,10 +25,10 @@ extension DelayCellExtension<T> on ValueCell<T> {
 
 /// Provides the [wait] method on a cell holding a [Future].
 extension WaitCellExtension1<T> on FutureCell<T> {
-  /// Return a cell which awaits the [Future] held in [this].
+  /// Return a cell that awaits the [Future] held in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
-  /// Whenever the value of [this] changes, the returned cell resolves the
+  /// The value of the returned cell is the completed value of the [Future].
+  /// Whenever the value of [this] changes, the returned cell awaits the
   /// new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
@@ -37,11 +38,11 @@ extension WaitCellExtension1<T> on FutureCell<T> {
   /// to function.
   ValueCell<T> get wait => WaitCell(arg: this);
 
-  /// Return a cell which awaits the [Future] held in [this].
+  /// Return a cell that awaits the [Future] held in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the value of
-  /// [this] changes to a new [Future], before its previous value has been
-  /// resolved, the previous value is dropped.
+  /// [this] changes to a new [Future], before its previous value has
+  /// completed, the previous value is dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -52,15 +53,26 @@ extension WaitCellExtension1<T> on FutureCell<T> {
       arg: this,
       lastOnly: true
   );
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the value of [this] is changed to a new [Future], accessing the value of
+  /// the returned cell before the new [Future] has completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<T> get awaited => AwaitCell(arg: this);
 }
 
 /// Provides the [wait] method on a record of cells each holding a [Future]
 extension WaitCellExtension2<T1, T2> on (FutureCell<T1>, FutureCell<T2>) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -72,11 +84,11 @@ extension WaitCellExtension2<T1, T2> on (FutureCell<T1>, FutureCell<T2>) {
           key: _CombinedCellKey(this, false)
       ));
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -89,6 +101,21 @@ extension WaitCellExtension2<T1, T2> on (FutureCell<T1>, FutureCell<T2>) {
       ),
       lastOnly: true
   );
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2)> get awaited => AwaitCell(
+      arg: ($1, $2).apply((p0, p1) => (p0, p1).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
+  );
 }
 
 /// Provides the [wait] method on a record of cells each holding a [Future]
@@ -97,11 +124,11 @@ extension WaitCellExtension3<T1, T2, T3> on (
   FutureCell<T2>,
   FutureCell<T3>
 ) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -113,11 +140,11 @@ extension WaitCellExtension3<T1, T2, T3> on (
           key: _CombinedCellKey(this, false)
       ));
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -130,6 +157,21 @@ extension WaitCellExtension3<T1, T2, T3> on (
       ),
       lastOnly: true
   );
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2, T3)> get awaited => AwaitCell(
+      arg: ($1, $2, $3).apply((p0, p1, p2) => (p0, p1, p2).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
+  );
 }
 
 /// Provides the [wait] method on a record of cells each holding a [Future]
@@ -139,11 +181,11 @@ extension WaitCellExtension4<T1, T2, T3, T4> on (
   FutureCell<T3>,
   FutureCell<T4>
 ) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -155,11 +197,11 @@ extension WaitCellExtension4<T1, T2, T3, T4> on (
           key: _CombinedCellKey(this, false)
       ));
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -172,6 +214,21 @@ extension WaitCellExtension4<T1, T2, T3, T4> on (
       ),
       lastOnly: true
   );
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2, T3, T4)> get awaited => AwaitCell(
+      arg: ($1, $2, $3, $4).apply((p0, p1, p2, p3) => (p0, p1, p2, p3).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
+  );
 }
 
 /// Provides the [wait] method on a record of cells each holding a [Future]
@@ -182,11 +239,11 @@ extension WaitCellExtension5<T1, T2, T3, T4, T5> on (
   FutureCell<T4>,
   FutureCell<T5>
 ) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -200,11 +257,11 @@ extension WaitCellExtension5<T1, T2, T3, T4, T5> on (
       )
   );
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -218,6 +275,22 @@ extension WaitCellExtension5<T1, T2, T3, T4, T5> on (
       ),
       lastOnly: true
   );
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2, T3, T4, T5)> get awaited => AwaitCell(
+      arg: ($1, $2, $3, $4, $5)
+          .apply((p0, p1, p2, p3, p4) => (p0, p1, p2, p3, p4).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
+  );
 }
 
 /// Provides the [wait] method on a record of cells each holding a [Future]
@@ -229,11 +302,11 @@ extension WaitCellExtension6<T1, T2, T3, T4, T5, T6> on (
   FutureCell<T5>,
   FutureCell<T6>
 ) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -247,11 +320,11 @@ extension WaitCellExtension6<T1, T2, T3, T4, T5, T6> on (
       )
   );
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -265,6 +338,22 @@ extension WaitCellExtension6<T1, T2, T3, T4, T5, T6> on (
       ),
       lastOnly: true
   );
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2, T3, T4, T5, T6)> get awaited => AwaitCell(
+      arg: ($1, $2, $3, $4, $5, $6)
+          .apply((p0, p1, p2, p3, p4, p5) => (p0, p1, p2, p3, p4, p5).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
+  );
 }
 
 /// Provides the [wait] method on a record of cells each holding a [Future]
@@ -277,11 +366,11 @@ extension WaitCellExtension7<T1, T2, T3, T4, T5, T6, T7> on (
   FutureCell<T6>,
   FutureCell<T7>
 ) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -295,11 +384,11 @@ extension WaitCellExtension7<T1, T2, T3, T4, T5, T6, T7> on (
       )
   );
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -312,6 +401,23 @@ extension WaitCellExtension7<T1, T2, T3, T4, T5, T6, T7> on (
           key: _CombinedCellKey(this, true)
       ),
       lastOnly: true
+  );
+
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2, T3, T4, T5, T6, T7)> get awaited => AwaitCell(
+      arg: ($1, $2, $3, $4, $5, $6, $7)
+          .apply((p0, p1, p2, p3, p4, p5, p6) => (p0, p1, p2, p3, p4, p5, p6).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
   );
 }
 
@@ -326,11 +432,11 @@ extension WaitCellExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
   FutureCell<T7>,
   FutureCell<T8>
 ) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -344,11 +450,11 @@ extension WaitCellExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
       )
   );
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -361,6 +467,23 @@ extension WaitCellExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
           key: _CombinedCellKey(this, true)
       ),
       lastOnly: true
+  );
+
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2, T3, T4, T5, T6, T7, T8)> get awaited => AwaitCell(
+      arg: ($1, $2, $3, $4, $5, $6, $7, $8)
+          .apply((p0, p1, p2, p3, p4, p5, p6, p7) => (p0, p1, p2, p3, p4, p5, p6, p7).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
   );
 }
 
@@ -376,11 +499,11 @@ extension WaitCellExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
   FutureCell<T8>,
   FutureCell<T9>
 ) {
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
-  /// The value of the returned cell is the resolved value of the [Future].
+  /// The value of the returned cell is the completed value of the [Future].
   /// Whenever the values of the cells in [this] change, the returned cell
-  /// resolves the new [Future] and updates its value accordingly.
+  /// awaits the new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -394,11 +517,11 @@ extension WaitCellExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
       )
   );
 
-  /// Return a cell which awaits the [Future] held in the cells in [this].
+  /// Return a cell that awaits the [Future] held in the cells in [this].
   ///
   /// The returned cell is like [wait] with the difference that if the values of
-  /// the cells in [this] change, before the previous values have been
-  /// resolved, the previous values are dropped.
+  /// the cells in [this] change, before the previous values have
+  /// completed, the previous values are dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
   /// will throw an [UninitializedCellError].
@@ -412,11 +535,32 @@ extension WaitCellExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
       ),
       lastOnly: true
   );
+
+  /// Return a cell that awaits the [Future] held in [this].
+  ///
+  /// The returned cell is like [waitLast] with the difference that whenever
+  /// the values of the cells in [this] change, accessing the value of
+  /// the returned cell before the new [Future]s have completed, will throw
+  /// an [UninitializedCellError].
+  ///
+  /// **NOTE**: The returned cell must have at least one observer in order
+  /// to function.
+  ValueCell<(T1, T2, T3, T4, T5, T6, T7, T8, T9)> get awaited => AwaitCell(
+      arg: ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          .apply((p0, p1, p2, p3, p4, p5, p6, p7, p8) => (p0, p1, p2, p3, p4, p5, p6, p7, p8).wait,
+          key: _CombinedAwaitCellKey(this)
+      ),
+  );
 }
 
 /// A key which identifies a record of cells
 class _CombinedCellKey<T> extends ValueKey2<T, bool> {
   _CombinedCellKey(super.value1, super.value2);
+}
+
+/// A key which identifies a record of cells used with `.awaited`
+class _CombinedAwaitCellKey<T> extends ValueKey1<T> {
+  _CombinedAwaitCellKey(super.value);
 }
 
 /// Key identifying a delayed cell.
