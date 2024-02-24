@@ -14,8 +14,8 @@ fetched / computed asynchronously.
 A cell can hold and perform computations on a `Future`, which
 represents an asynchronously computed value in Dart, just like any
 other value. Thus, to perform a computation on asynchronous data,
-simply define a computed cell with an `async` computation function,
-while using `await` to wait for the values in the argument cells to be
+simply define a computed cell with an `async` computation function and
+use `await` to wait for the values in the argument cells to be
 computed.
 
 ```dart title="Example of an asynchronous cell"
@@ -31,7 +31,7 @@ final next = ValueCell.computed(() async => await n() + 1);
 When a `Future` is assigned to the value of `n`, the value of `next`
 is updated with the new `Future` held in `n`.
 
-It's important to now that the values of asynchronous cells, which
+It's important to note that the values of asynchronous cells, which
 remember are `Future`s, are updated synchronously as soon as a value
 is assigned to a mutable cell. It's only the computations represented
 by the `Future`s that are asynchronous. This is best explained by the
@@ -48,8 +48,8 @@ print(await next.value); // Prints 3
 
 An asynchronous cell can reference multiple argument cells, however
 the argument cells should all be referenced before the first `await`
-statement. Argument cells that are only referenced after the first
-`await` expression not observed by the computed cells.
+expression. Argument cells that are only referenced after the first
+`await` expression will not be observed by the computed cell.
 
 Multiple asynchronous argument cells should either be referenced first
 and then awaited, such as in the following example:
@@ -125,7 +125,7 @@ final next = ValueCell.computed(() => n() + 1);
 
 Notice in this definition of `next`, the computation function is not
 an `async` function and the value of `n` is not `awaited`. Since
-`wait` is a property, it returns a keyed cell, like all properties
+`wait` is a property it returns a keyed cell, like all properties
 that return cells. This means the `n` variable above can be omitted
 and the above example can be simplified to the following:
 
@@ -152,8 +152,9 @@ being thrown. Once the `Future` completes, it will retain its value
 until the next `Future` completes.
 
 For example accessing the value of `next` above before the first value
-update of `n.wait`, will result in an `UninitializedCellError`. This
-can be handled with `onError` to give an initial value to a wait cell:
+update of `n.wait`, will result in an `UninitializedCellError`
+exception being thrown. This can be handled with `onError` to give an
+initial value to a wait cell:
 
 ```dart
 final waitN = n.wait.onError<UninitializedCellError>(0.cell);
@@ -164,8 +165,8 @@ final next = ValueCell.computed(() => waitN() + 1);
 
 :::important
 
-The `.wait` cell only is only *awaits* `Future`s when it has at least
-one observer.
+The `.wait` cell only *awaits* `Future`s when it has at least one
+observer.
 
 :::
 
@@ -325,10 +326,10 @@ final sum = ValueCell.computed(() async => await a() + b).wait;
 ## Latest Futures Only
 
 The `.waitLast` property is like `.wait` however with one important
-difference. If the value of the cell is updated before the `Future`,
+difference. If the value of the cell is updated before the `Future`
 that was previously held in the cell completes, the previous `Future`
-is ignored and the value of `.waitLast` is not updated when the
-`Future` completes.
+is ignored and the value of `.waitLast` is not updated when it
+completes.
 
 ```dart title="Example of .waitLast"
 
@@ -362,10 +363,10 @@ This is useful in two scenarios:
 
 ## Delays and Debouncing
 
-Live Cells provides a `delayed(...)` method on cells which returns a
-cell that holds a `Future` which completes with the same value as the
-value of the cell, on which `delayed` was called, but after a given
-delay.
+Live Cells provides a `delayed(...)` method on cells. This method
+returns a cell that holds a `Future` that completes with the same
+value as the value of the cell, on which `delayed` was called, but
+after a given delay.
 
 ```dart title="Example of .delayed(...)"
 final n = MutableCell(0);
@@ -407,10 +408,9 @@ to a local variable first.
 
 When `delayed(...)` is used with `.waitLast`, the result is
 effectively a *debouncing* of the cell's value. Debouncing is a
-technique for preventing a task from running too frequently, in this
-case we're preventing the value of the cell from being updated too
-frequently. This is especially useful for implementing a "search as
-you type" functionality.
+technique for preventing a task, in this case updating the value of a
+cell, from running too frequently. This is especially useful for
+implementing a "search as you type" functionality.
 
 We can demonstrate the effect of `delayed(...)` followed by `waitLast`
 with the following widget:
