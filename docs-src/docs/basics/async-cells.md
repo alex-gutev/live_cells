@@ -361,6 +361,130 @@ This is useful in two scenarios:
   assigning a new `Future` to the cell.
 * Debouncing (we'll see how to do this in the next section).
 
+The `.awaited` cell is similar to `.waitLast`, however it does not
+retain the completed value of the previous `Future`. If the current
+`Future` has completed, the value of the `.awaited` cell is the
+completed value of the `Future`. If the `Future` has not completed, an
+`UninitializedCellError` exception is thrown when accessing the value
+of `.awaited`.
+
+:::tip
+
+The `.initialValue(...)` method, on all cells can be used to handle
+`UninitializedCellError`, by returning the value of another cell:
+
+```dart
+final f = Future.delayed(Duration(seconds: 10), 1)
+    .cell
+    .awaited
+    .initialValue(0.cell);
+    
+// The value of f is `0` until its value is initialized,
+// which happens when the Future completes.
+print(f.value) // Prints: 0
+```
+
+:::
+
+Here's an example demonstrating the difference between `.waitLast` and
+`.awaited`:
+
+```dart example="Difference between .waitLast and .awaited"
+final f = MutableCell(Future.value(1));
+
+final waitLast = f.waitLast.initialValue(0.cell);
+final awaited = f.awaited.initialValue(0.cell);
+
+ValueCell.watch(() {
+    print('.waitLast: ${waitLast()}');
+});
+
+ValueCell.watch(() {
+    print('.awaited: ${awaited()}');
+});
+
+await Future.delayed(Duration(seconds: 1));
+
+```
+
+This will result in the following values being printed to the console,
+which is the initial value provided with `initialValue(0.cell)`:
+
+```
+.waitLast: 0
+.awaited: 0
+```
+
+:::note
+
+The exact order in which the lines are printed may vary, since they
+are printed from different watch functions.
+
+:::
+
+When the initial future completes, the following is printed:
+
+```
+.waitLast: 1
+.awaited: 1
+```
+
+So far the two are identical, however when a new `Future` is assigned
+to `f`:
+
+```dart
+f.value = Future.value(2);
+```
+
+The following is printed immediately when setting `f.value`:
+
+```dart
+.awaited: 0
+```
+
+The value of `.awaited` is reset to the initial value, given with
+`initialValue(0.cell)`, whereas the current value of `.waitLast` is
+retained.
+
+When the `Future` completes, the following is printed:
+
+```dart
+.awaited: 2
+.waitLast: 2
+```
+
+## Checking if Complete
+
+All cells holding a `Future` provide an `isCompleted` property which
+returns a cell that is `true` when the `Future` is complete, and
+`false` while it is still pending.
+
+This allows other cells to check if, and be notified of, an
+asynchronous operation has completed or whether its still in
+progress.
+
+```dart
+final complete = Future.delayed(Duration(seconds: 10))
+    .cell
+    .isCompleted
+    
+ValueCell.watch(() {
+    if (complete()) {
+        print('Complete');
+    }
+    else {
+        print('Loading...');
+    }
+});
+```
+
+Initially "Loading..." is printed to the console. When the `Future`
+completes, after ten seconds, "Complete" is printed.
+
+When the cell holding the `Future` is updated, the value of
+`isCompleted` is also updated to reflect the state of the new
+`Future`.
+
 ## Delays and Debouncing
 
 Live Cells provides a `delayed(...)` method on cells. This method
