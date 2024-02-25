@@ -93,6 +93,10 @@ const config = {
                 label: 'Basics',
                 to: '/docs/intro',
               },
+              {
+                label: 'Advanced',
+                to: '/docs/category/advanced',
+              },
             ],
           },
           {
