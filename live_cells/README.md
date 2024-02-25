@@ -274,6 +274,17 @@ final sum = ValueCell.computed(() {
 });
 ```
 
+Cells can also check if, and be notified when, a `Future` in another cell has completed:
+
+```dart
+ValueCell<Future<int>> cell1;
+ValueCell<Future<int>> cell2;
+...
+// isLoading is true until both the Futures in cell1
+// and cell2 have completed
+final isLoading = (cell1, cell2).isCompleted.not();
+```
+
 ## Additional information
 
 If you discover any issues or have any feature requests, please open an issue on the package's Github
