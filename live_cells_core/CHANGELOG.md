@@ -1,3 +1,7 @@
+## 0.15.1
+
+* Fix issue with `.isCompleted` having incorrect value when `Future` completes with an error.
+
 ## 0.15.0
 
 New features:
