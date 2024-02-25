@@ -1,3 +1,4 @@
+import '../base/keys.dart';
 import '../value_cell.dart';
 
 /// Extends [ValueCell] with facilities for handling exceptions thrown while computing values
@@ -9,6 +10,9 @@ extension ErrorCellExtension<T> on ValueCell<T> {
   ///
   /// [E] is the type of exception to handle. By default, if this is not
   /// explicitly given, all exceptions are handled.
+  ///
+  /// A keyed cell is returned, which is unique for a given [this], [other] and
+  /// exception type [E].
   ValueCell<T> onError<E extends Object>(ValueCell<T> other) => ValueCell.computed(() {
     try {
       return this();
@@ -16,7 +20,7 @@ extension ErrorCellExtension<T> on ValueCell<T> {
     on E {
       return other();
     }
-  });
+  }, key: _OnErrorKey<E>(this, other));
 
   /// Create a cell which captures exceptions thrown during the computation of this cell.
   ///
@@ -29,8 +33,10 @@ extension ErrorCellExtension<T> on ValueCell<T> {
   ///
   /// If [E] is given, only exceptions of type [E] are captured, otherwise all
   /// exceptions are captured.
+  ///
+  /// A keyed cell is returned, which is unique for a given [this], [all] and
+  /// exception type [E].
   ValueCell<E?> error<E extends Object>({bool all = false}) => ValueCell.computed(() {
-
     try {
       this();
     }
@@ -46,5 +52,15 @@ extension ErrorCellExtension<T> on ValueCell<T> {
     }
 
     return null;
-  });
+  }, key: _ErrorCellKey<E>(this, all));
+}
+
+/// Key identifying a cell created with `onError`
+class _OnErrorKey<T> extends ValueKey2<ValueCell, ValueCell> {
+  _OnErrorKey(super.value1, super.value2);
+}
+
+/// Key identifying a cell created with `error()`
+class _ErrorCellKey<T> extends ValueKey2<ValueCell, bool> {
+  _ErrorCellKey(super.value1, super.value2);
 }

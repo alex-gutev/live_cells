@@ -1352,166 +1352,265 @@ void main() {
   });
 
   group('ErrorCellExtension', () {
-    test('ErrorCellExtension.on handles all exceptions without type argument', () {
-      final a = MutableCell(1);
-      final b = ValueCell.computed(() {
-        if (a() <= 0) {
-          throw 'A generic exception';
-        }
+    group('.onError()', () {
+      test('Handles all exceptions without type argument', () {
+        final a = MutableCell(1);
+        final b = ValueCell.computed(() {
+          if (a() <= 0) {
+            throw 'A generic exception';
+          }
 
-        return a();
+          return a();
+        });
+
+        final c = MutableCell(2);
+        final result = b.onError(c);
+
+        final observer = addObserver(result, MockValueObserver());
+        expect(result.value, equals(1));
+
+        a.value = 0;
+        c.value = 4;
+        a.value = 10;
+        c.value = 100;
+
+        expect(observer.values, equals([2, 4, 10]));
       });
 
-      final c = MutableCell(2);
-      final result = b.onError(c);
+      test('Handles only given exception with type argument', () {
+        final a = MutableCell(1);
+        final b = ValueCell.computed(() {
+          if (a() < 0) {
+            throw Exception('A generic exception');
+          }
+          else if (a() == 0) {
+            throw ArgumentError('A cannot be 0');
+          }
 
-      final observer = addObserver(result, MockValueObserver());
-      expect(result.value, equals(1));
+          return a();
+        });
 
-      a.value = 0;
-      c.value = 4;
-      a.value = 10;
-      c.value = 100;
+        final c = MutableCell(2);
+        final result = b.onError<ArgumentError>(c);
 
-      expect(observer.values, equals([2, 4, 10]));
+        final observer = addObserver(result, MockValueObserver());
+        expect(result.value, equals(1));
+
+        a.value = 0;
+        c.value = 4;
+        a.value = 10;
+        c.value = 100;
+
+        expect(observer.values, equals([2, 4, 10]));
+
+        result.removeObserver(observer);
+
+        a.value = -1;
+        expect(() => result.value, throwsException);
+      });
+
+      test('Compares == when same cells and type', () {
+        final a = MutableCell(0);
+        final e1 = a.onError((-1).cell);
+        final e2 = a.onError((-1).cell);
+
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
+
+      test('Compares != when different `this` cell', () {
+        final a = MutableCell(0);
+        final b = MutableCell(0);
+
+        final e1 = a.onError((-1).cell);
+        final e2 = b.onError((-1).cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('Compares != when different error value cell', () {
+        final a = MutableCell(0);
+
+        final e1 = a.onError((-1).cell);
+        final e2 = a.onError(2.cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('Compares != when different exception type', () {
+        final a = MutableCell(0);
+
+        final e1 = a.onError((-1).cell);
+        final e2 = a.onError<Exception>((-1).cell);
+        final e3 = a.onError<Exception>((-1).cell);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+        expect(e2 == e3, isTrue);
+      });
     });
 
-    test('ErrorCellExtension.on handles only given exception with type argument', () {
-      final a = MutableCell(1);
-      final b = ValueCell.computed(() {
-        if (a() < 0) {
-          throw Exception('A generic exception');
-        }
-        else if (a() == 0) {
-          throw ArgumentError('A cannot be 0');
-        }
+    group('.error()', () {
+      test('Captures exceptions thrown during computation', () {
+        final a = MutableCell(1);
+        final b = ValueCell.computed(() {
+          if (a() < 0) {
+            throw 'A generic exception';
+          }
 
-        return a();
+          return a();
+        });
+
+        final error = b.error();
+        final observer = addObserver(error, MockValueObserver());
+
+        expect(error.value, isNull);
+
+        a.value = 2;
+        a.value = -1;
+        a.value = 3;
+
+        expect(observer.values, equals(['A generic exception']));
       });
 
-      final c = MutableCell(2);
-      final result = b.onError<ArgumentError>(c);
+      test('Always updates when all = true', () {
+        final a = MutableCell(1);
+        final b = ValueCell.computed(() {
+          if (a() < 0) {
+            throw 'A generic exception';
+          }
 
-      final observer = addObserver(result, MockValueObserver());
-      expect(result.value, equals(1));
+          return a();
+        });
 
-      a.value = 0;
-      c.value = 4;
-      a.value = 10;
-      c.value = 100;
+        final error = b.error(all: true);
 
-      expect(observer.values, equals([2, 4, 10]));
+        observeCell(error);
+        expect(error.value, isNull);
 
-      result.removeObserver(observer);
+        a.value = 2;
+        expect(error.value, isNull);
 
-      a.value = -1;
-      expect(() => result.value, throwsException);
-    });
+        a.value = -1;
+        expect(error.value, equals('A generic exception'));
 
-    test('ErrorCellExtension.error captures exceptions thrown during computation', () {
-      final a = MutableCell(1);
-      final b = ValueCell.computed(() {
-        if (a() < 0) {
-          throw 'A generic exception';
-        }
-
-        return a();
+        a.value = 3;
+        expect(error.value, isNull);
       });
 
-      final error = b.error();
-      final observer = addObserver(error, MockValueObserver());
+      test('Captures exception of given type thrown during computation', () {
+        final a = MutableCell(1);
+        final b = ValueCell.computed(() {
+          if (a() < 0) {
+            throw 'A generic exception';
+          }
+          else if (a() == 0) {
+            throw ArgumentError('Cannot be zero');
+          }
 
-      expect(error.value, isNull);
+          return a();
+        });
 
-      a.value = 2;
-      a.value = -1;
-      a.value = 3;
+        final error = b.error<ArgumentError>();
 
-      expect(observer.values, equals(['A generic exception']));
-    });
+        observeCell(error);
+        expect(error.value, isNull);
 
-    test('ErrorCellExtension.error always updates when all = true', () {
-      final a = MutableCell(1);
-      final b = ValueCell.computed(() {
-        if (a() < 0) {
-          throw 'A generic exception';
-        }
+        a.value = 2;
+        expect(error.value, isNull);
 
-        return a();
+        a.value = 0;
+        expect(error.value, isA<ArgumentError>());
+
+        a.value = 3;
+        expect(error.value, isA<ArgumentError>());
+
+        a.value = -1;
+        expect(error.value, isA<ArgumentError>());
       });
 
-      final error = b.error(all: true);
+      test('Always updates when all = true and type argument given', () {
+        final a = MutableCell(1);
+        final b = ValueCell.computed(() {
+          if (a() < 0) {
+            throw 'A generic exception';
+          }
+          else if (a() == 0) {
+            throw ArgumentError('Cannot be zero');
+          }
 
-      observeCell(error);
-      expect(error.value, isNull);
+          return a();
+        });
 
-      a.value = 2;
-      expect(error.value, isNull);
+        final error = b.error<ArgumentError>(all: true);
 
-      a.value = -1;
-      expect(error.value, equals('A generic exception'));
+        observeCell(error);
+        expect(error.value, isNull);
 
-      a.value = 3;
-      expect(error.value, isNull);
-    });
+        a.value = 2;
+        expect(error.value, isNull);
 
-    test('ErrorCellExtension.error captures exception of given type thrown during computation', () {
-      final a = MutableCell(1);
-      final b = ValueCell.computed(() {
-        if (a() < 0) {
-          throw 'A generic exception';
-        }
-        else if (a() == 0) {
-          throw ArgumentError('Cannot be zero');
-        }
+        a.value = 0;
+        expect(error.value, isA<ArgumentError>());
 
-        return a();
+        a.value = -1;
+        expect(error.value, isNull);
       });
 
-      final error = b.error<ArgumentError>();
+      test('Compares == when same cell', () {
+        final a = MutableCell(0);
 
-      observeCell(error);
-      expect(error.value, isNull);
+        final e1 = a.error();
+        final e2 = a.error();
 
-      a.value = 2;
-      expect(error.value, isNull);
-
-      a.value = 0;
-      expect(error.value, isA<ArgumentError>());
-
-      a.value = 3;
-      expect(error.value, isA<ArgumentError>());
-
-      a.value = -1;
-      expect(error.value, isA<ArgumentError>());
-    });
-
-    test('ErrorCellExtension.error always updates when all = true and type argument given', () {
-      final a = MutableCell(1);
-      final b = ValueCell.computed(() {
-        if (a() < 0) {
-          throw 'A generic exception';
-        }
-        else if (a() == 0) {
-          throw ArgumentError('Cannot be zero');
-        }
-
-        return a();
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
       });
 
-      final error = b.error<ArgumentError>(all: true);
+      test('Compares == when same cell and type', () {
+        final a = MutableCell(0);
 
-      observeCell(error);
-      expect(error.value, isNull);
+        final e1 = a.error<UninitializedCellError>();
+        final e2 = a.error<UninitializedCellError>();
 
-      a.value = 2;
-      expect(error.value, isNull);
+        expect(e1 == e2, isTrue);
+        expect(e1.hashCode == e2.hashCode, isTrue);
+      });
 
-      a.value = 0;
-      expect(error.value, isA<ArgumentError>());
+      test('Compares != when different cells', () {
+        final a = MutableCell(0);
+        final b = MutableCell(0);
 
-      a.value = -1;
-      expect(error.value, isNull);
+        final e1 = a.error();
+        final e2 = b.error();
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('Compares != when different exception types', () {
+        final a = MutableCell(0);
+
+        final e1 = a.error();
+        final e2 = a.error<Exception>();
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+      });
+
+      test('Compares != when all options is not equal', () {
+        final a = MutableCell(0);
+
+        final e1 = a.error(all: true);
+        final e2 = a.error(all: false);
+        final e3 = a.error(all: true);
+
+        expect(e1 != e2, isTrue);
+        expect(e1 == e1, isTrue);
+        expect(e1 == e3, isTrue);
+      });
     });
   });
 
