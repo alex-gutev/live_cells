@@ -1612,6 +1612,72 @@ void main() {
         expect(e1 == e3, isTrue);
       });
     });
+
+    group('.initialValue()', () {
+      test('Passes through cell value when initialized', () {
+        final a = MutableCell(0);
+        final b = a.initialValue((-1).cell);
+
+        final obs = addObserver(b, MockValueObserver());
+
+        a.value = 1;
+        a.value = 2;
+
+        expect(obs.values, equals([1, 2]));
+      });
+
+      test('Passes through init value when uninitialized', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() == 0 ? throw UninitializedCellError() : a());
+
+        final init = MutableCell(-1);
+        final c = b.initialValue(init);
+
+        expect(c.value, -1);
+        final obs = addObserver(c, MockValueObserver());
+
+        a.value = 1;
+        a.value = 2;
+        a.value = 0;
+        init.value = -5;
+
+        expect(obs.values, equals([1, 2, -1, -5]));
+      });
+
+      test('Compares == if same cells', () {
+        final a = MutableCell(0);
+        final b = MutableCell(1);
+
+        final c1 = a.initialValue(b);
+        final c2 = a.initialValue(b);
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Compares != if different this cell', () {
+        final a = MutableCell(0);
+        final b = MutableCell(1);
+
+        final c1 = a.initialValue(1.cell);
+        final c2 = b.initialValue(1.cell);
+
+        expect(c1 != c2, isTrue);
+        expect(c1 == c1, isTrue);
+      });
+
+      test('Compares != if different initial value cell', () {
+        final a = MutableCell(0);
+        final b = MutableCell(1);
+        final c = MutableCell(1);
+
+        final c1 = a.initialValue(b);
+        final c2 = a.initialValue(c);
+
+        expect(c1 != c2, isTrue);
+        expect(c1 == c1, isTrue);
+      });
+    });
   });
 
   group('Cell update consistency', () {

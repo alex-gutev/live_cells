@@ -1,3 +1,4 @@
+import '../base/exceptions.dart';
 import '../base/keys.dart';
 import '../value_cell.dart';
 
@@ -53,6 +54,12 @@ extension ErrorCellExtension<T> on ValueCell<T> {
 
     return null;
   }, key: _ErrorCellKey<E>(this, all));
+
+  /// Returns a cell that evaluates to the value of [value] when the value of this is uninitialized.
+  ///
+  /// A keyed cell is returned, which is unique for a given [this] and [value].
+  ValueCell<T> initialValue(ValueCell<T> value) =>
+      onError<UninitializedCellError>(value);
 }
 
 /// Key identifying a cell created with `onError`
