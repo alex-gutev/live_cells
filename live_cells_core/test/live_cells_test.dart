@@ -2277,8 +2277,8 @@ void main() {
 
     test('Previous MutableComputeCell.value preserved if ValueCell.none is used', () {
       final a = MutableCell(0);
-      final evens = MutableComputeCell(arguments: {a}, compute: () => a().isEven ? a() : ValueCell.none(), reverseCompute: (a) {
-        a.value = a;
+      final evens = MutableComputeCell(arguments: {a}, compute: () => a().isEven ? a() : ValueCell.none(), reverseCompute: (v) {
+        a.value = v;
       });
 
       final observer = addObserver(evens, MockValueObserver());
@@ -2295,8 +2295,8 @@ void main() {
 
     test('MutableComputeCell.value initialized to defaultValue if ValueCell.none is used', () {
       final a = MutableCell(1);
-      final evens = MutableComputeCell(arguments: {a}, compute: () => a().isEven ? a() : ValueCell.none(10), reverseCompute: (a) {
-        a.value = a;
+      final evens = MutableComputeCell(arguments: {a}, compute: () => a().isEven ? a() : ValueCell.none(10), reverseCompute: (v) {
+        a.value = v;
       });
 
       final observer = addObserver(evens, MockValueObserver());
