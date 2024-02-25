@@ -135,7 +135,8 @@ to function.'''
   @RecordExtensionElement(
     type: 'ValueCell<bool>',
     implementation: '''return awaited.apply((_) => true, key: _IsCompleteCellKey(this))
-      .initialValue(false.cell);''',
+      .initialValue(false.cell)
+      .onError(true.cell);''',
 
   documentation: '''A cell that is true when the [Future]s in the cells in this have completed, false otherwise.
 
@@ -144,7 +145,8 @@ to function.'''
 )
   ValueCell<bool> get isCompleted => awaited
       .apply((_) => true, key: _IsCompleteCellKey(this))
-      .initialValue(false.cell);
+      .initialValue(false.cell)
+      .onError(true.cell);
 }
 
 /// A key which identifies a record of cells

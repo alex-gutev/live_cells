@@ -8507,6 +8507,20 @@ void main() {
         });
       });
 
+      test('Does not propagate exceptions in Future', () {
+        fakeAsync((async) {
+          final f = Future.error(Exception('An exception')).cell;
+          final complete = f.isCompleted;
+
+          observeCell(complete);
+
+          expect(complete.value, false);
+
+          async.elapse(Duration(seconds: 1));
+          expect(complete.value, true);
+        });
+      });
+
       test('Two constant cells', () {
         fakeAsync((self) {
           final cellA = Future.value(1).cell;
@@ -8644,6 +8658,28 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(w.value, true);
           expect(observer.values, equals([false, true, false, true]));
+        });
+      });
+
+      test('Does not propagate exceptions in two Future cells', () {
+        fakeAsync((async) {
+          final f1 = Future.error(Exception('An exception')).cell;
+          final f2 = Future.error('An error').cell;
+          final f3 = Future.value(1).cell;
+
+          final c1 = (f1, f2).isCompleted;
+          final c2 = (f2, f3).isCompleted;
+
+          observeCell(c1);
+          observeCell(c2);
+
+          expect(c1.value, false);
+          expect(c2.value, false);
+
+          async.elapse(Duration(seconds: 1));
+
+          expect(c1.value, true);
+          expect(c2.value, true);
         });
       });
 
