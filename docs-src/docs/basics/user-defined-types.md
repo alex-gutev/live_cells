@@ -94,7 +94,7 @@ to the `dev_dependencies` of your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-    live_cell_extension: 0.4.3
+    live_cell_extension: 0.4.7
     ...
 ```
 
