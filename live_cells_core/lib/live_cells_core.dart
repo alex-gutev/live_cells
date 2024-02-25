@@ -9,6 +9,9 @@ export 'src/base/cell_equality_factory.dart'
 
 export 'src/base/cell_observer.dart' show CellObserver;
 
+export 'src/base/types.dart' show WatchCallback;
+export 'src/base/exceptions.dart' show UninitializedCellError;
+
 export 'src/stateful_cell/cell_state.dart' show CellState;
 export 'src/stateful_cell/observer_cell_state.dart' show ObserverCellState;
 export 'src/stateful_cell/stateful_cell.dart' show StatefulCell;
@@ -40,7 +43,7 @@ export 'src/maybe_cell/maybe.dart'
     show Maybe, MaybeCell, CellMaybeExtension, MaybeCellExtension;
 
 export 'src/previous_values/prev_value_cell.dart'
-    show PrevValueCell, PrevValueCellExtension, UninitializedCellError;
+    show PrevValueCell, PrevValueCellExtension;
 
 export 'src/extensions/numeric_extension.dart' show NumericExtension;
 

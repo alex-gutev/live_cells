@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../base/exceptions.dart';
 import 'async_cell_state_mixin.dart';
 
 import '../base/keys.dart';
@@ -7,7 +8,6 @@ import '../stateful_cell/cell_state.dart';
 import '../stateful_cell/observer_cell_state.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
-import '../previous_values/prev_value_cell.dart';
 
 /// A cell which waits for a [Future] held in another cell to complete.
 ///

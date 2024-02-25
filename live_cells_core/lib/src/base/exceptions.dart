@@ -21,3 +21,10 @@ class StopComputeException implements Exception {
 /// Used to cancel an asynchronous computation
 class CancelComputeException implements Exception {
 }
+
+/// Represents an attempt to access the value of a cell which does not yet have a value
+class UninitializedCellError implements Exception {
+  @override
+  String toString() =>
+      'The value of a cell was referenced before it was initialized.';
+}

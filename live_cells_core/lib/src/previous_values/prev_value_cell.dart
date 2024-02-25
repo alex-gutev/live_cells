@@ -1,18 +1,12 @@
 import 'package:meta/meta.dart';
 
+import '../base/exceptions.dart';
 import '../stateful_cell/cell_state.dart';
 import '../stateful_cell/observer_cell_state.dart';
 import '../maybe_cell/maybe.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
-
-/// Represents an attempt to access the value of a cell which does not yet have a value
-class UninitializedCellError implements Exception {
-  @override
-  String toString() =>
-      'The value of a cell was referenced before it was initialized.';
-}
 
 /// A cell which records the stores previous value of another cell at a given time.
 class PrevValueCell<T> extends StatefulCell<T> implements RestorableCell<T> {
