@@ -1,3 +1,20 @@
+## 0.15.0
+
+New features:
+
+* `.awaited` property on cells holding a `Future`. 
+
+  Returns a cell which evaluates to the value of the `Future` when completed, throws 
+  an `UninitializedCellError` when it is pending.
+  
+* `.isCompleted` property on cells holding a `Future`. 
+  
+  Returns a cell which evaluates to `true` when the `Future` is complete, `false` while it is
+  pending.
+  
+* `.initialValue(...)` which returns a cell with takes on the value of the given cell until it 
+  is initialized.
+
 ## 0.14.1
 
 Minor additions:
