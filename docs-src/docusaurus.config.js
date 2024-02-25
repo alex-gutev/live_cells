@@ -41,17 +41,9 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/alex-gutev/live_cells',
         },
         blog: {
           showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/alex-gutev/live_cells',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -77,6 +69,11 @@ const config = {
             sidebarId: 'tutorialSidebar',
             position: 'left',
             label: 'Basics',
+          },
+          {
+              to: '/docs/category/advanced',
+              label: 'Advanced',
+              position: 'left'
           },
           // {to: '/blog', label: 'Blog', position: 'left'},
           // {
