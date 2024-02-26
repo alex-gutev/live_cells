@@ -81,8 +81,9 @@ cell objects. _See [Cell Keys](cell-keys) for more information._
 
 If you want to control when the value properties of each argument are
 referenced, you can define a lightweight computed cell using the
-`ComputeCell` constructor. The constructor takes the `compute`
-function, set of argument cells (`arguments`) and an optional `key`:
+[`ComputeCell`](https://pub.dev/documentation/live_cells/latest/live_cells/ComputeCell/ComputeCell.html)
+constructor. The constructor takes the `compute` function, set of
+argument cells (`arguments`) and an optional `key`:
 
 ```dart title="ComputeCell constructor"
 final logand = ComputeCell(
@@ -112,6 +113,280 @@ accessed directly.
 
 :::
 
+## Stateless to Stateful
+
+Occasionally you may want to convert a stateless (lightweight)
+computed cell to a stateful cell that caches its value on only
+recomputes it when the values of the arguments have changed. You can
+do that with the `.store()` method.
+
+The `.store()` method creates a cell that evaluates to the same value
+as the cell, on which the method is called, but caches its value so
+that it is only recomputed when the arguments have changed.
+
+:::tip
+
+`.store()` returns a keyed cell that is unique for the cell on which
+the method is called.
+
+:::
+
+Consider the following definition of `sum` using a stateless computed
+cell:
+
+```dart
+final a = MutableCell(0);
+final b = MutableCell(1);
+
+final sum = (a, b).apply((a, b) {
+    print('Computing sum');
+    return a + b;
+});
+
+final sumStore = sum.store();
+```
+
+`sumStore` is the `sum` cell converted to a stateful cell, using
+`.store()`.
+
+When the following is evaluated:
+
+```dart
+ValuCell(() {
+    print('sum1: ${sum()}');
+    print('sum2: ${sum()}');
+});
+
+a.value = 1;
+```
+
+The value computation function for `sum` is called twice, when its
+value is referenced twice in the watch function. As a result
+"Computing sum" is printed to the console twice.
+
+However when the following is evaluated:
+
+```dart
+ValuCell(() {
+    print('sum1: ${sumStore()}');
+    print('sum2: ${sumStore()}');
+});
+
+a.value = 1;
+```
+
+The value computation function for `sum` is only called once, and
+hence "Computing sum" is only printed to the console once.
+
+:::warning[Important]
+
+`.store()` only has an affect when the value of the cell is referenced
+through the cell returned by `.store()`. Referencing the value of the
+original cell will still result in its value being recomputed.
+
+:::
+
+`.store()` also takes an optional `changesOnly` argument. When
+`changsOnly` is true, the returned cell only notifies its observers
+when the new value of the cell is not equal (by `==`) to its previous
+value. This is useful to prevent potentially expensive recomputations
+(and side effects such as rebuilding a widget hierarchy) when the
+actual value of the cell hasn't changed.
+
+This can be demonstrated with the following example:
+
+```dart
+final a = MutableCell(2);
+
+final c1 = a.apply((a) => a % 2).store();
+final c2 = a.apply((a) => a % 2)
+    .store(changesOnly: true);
+    
+ValueCell.watch(() => print('C1: ${c1()}');
+ValueCell.watch(() => print('C2: ${c2()}');
+```
+
+When the following is evaluated:
+
+```dart
+a.value = 4;
+a.value = 6;
+```
+
+The following is printed to the console:
+
+```
+C1: 0
+C1: 0
+```
+
+Notice the second watch function, which observers `c2` which is
+defined using `.store(changesOnly: true)` is not called. This is
+because the computed value of the cell has not changed, even though
+the value of its argument cell has.
+
+When evaluating the following:
+
+```dart
+a.value = 7;
+```
+
+The following is printed:
+
+```
+C1: 1
+C2: 1
+```
+
+Now both watch functions are called, because the computed value has
+changed from `0` to `1`.
+
+:::caution
+
+Only one value can be provided for `changesOnly` for a given cell. For
+example:
+
+```dart
+final store1 = a.store(changesOnly: true);
+final store2 = a.store();
+```
+
+will only result in one of the values for changesOnly (`true` or
+`false` which is the default) taking effect for both `store1` and
+`store2`. Treat `changesOnly` as a performance optimization but don't
+depend on the difference between `changesOnly: true` and `changesOnly:
+false` for correctness.
+
+:::
+
+:::info
+
+`changesOnly: true` changes the evaluation semantics of the cell on
+which it is applied from lazy to eager. This will be explained in more
+detail in the next section of the documentation.
+
+:::
+
+## Stateless Mutable Computed Cells
+
+A stateless variant of a mutable computed cell can be defined using
+`.mutableApply()`. Like `apply` this function can either be applied on
+the cell, or a record of cells, and takes the value computation
+function as an argument. `.mutableApply()` also takes a second
+argument which is the reverse computation function, as in
+`MutableCell.computed()`.
+
+It is important to note that by default `mutableApply` does not create
+a stateless cell, but a stateful mutable computed cell with a static
+argument cell set. In order for a stateless cell to be created, a
+non-null value for the `key` argument has to be given.
+
+Example:
+
+```dart
+final a = MutableCell<num>(0);
+final b = MutableCell<num>(1);
+
+final sum = (a, b).mutableApply((a, b) => a + b, (sum) {
+    final half = sum / 2;
+    
+    a.value = b.value = half;
+}, key: MyKey(a, b));
+```
+
+In this example the `sum` cell from [Fun with Mutable Computed
+Cells](/docs/basics/two-way-data-flow#fun-with-mutable-computed-cells)
+has been implemented using a stateless mutable computed cell. The
+behaviour of the cell is equivalent to the previous definition. It's
+computed value is the sum of cells `a` and `b`, while setting its
+value results in its value divided by 2 being assigned to both `a` and
+`b` However, with this definition the `sum` cell is entirely
+stateless. It doesn't keep track of its value, neither its computed
+value nor that assigned to it. It's value is recomputed whenever
+`sum.value` is accessed. The cell also does not keep track of which
+cells are observing it. Adding an observer to `sum` results in the
+observer being added directly to cells `a` and `b`.
+
+A stateless mutable computed cell can also be defined with the
+[`MutableCellView`](https://pub.dev/documentation/live_cells/latest/live_cells/MutableCellView/MutableCellView.html)
+constructor. The constructor takes the set of argument cells, the
+compute value function and the reverse computed functions as
+arguments, with an optional `key` argument. Like `ComputeCell` the
+compute value function is not called with any arguments, which allows
+you to control when the values of the argument cells are referenced,
+using `.value`.
+
+The above definition using the `MutableCellView` constructor.
+
+```dart
+final sum = MutableCellView(
+    arguments: {a, b}
+    compute: () => a.value + b.value,
+    reverse: (sum) {
+        final half = sum / 2;
+    
+        a.value = b.value = half;
+    },
+    
+    key: MyKey(a, b)
+);
+```
+
+Stateless mutable computed cells differ in their semantics from their
+stateful counterparts. Stateful mutable computed cells keep track of
+the value assigned to them whereas the stateless variants do not. This
+becomes apparent if the values assigned to the argument cells do not
+result in the same value being computed as the value that was assigned
+to the mutable computed cell.
+
+For example consider the following cell:
+
+```dart
+final sum = MutableCell.computed(() => a() + b(), (sum) {
+    a.value = sum;
+    b.value = sum
+});
+```
+
+The values assigned to the argument cells, in the reverse computation
+function, will not result in the same value being computed as the
+value that was assigned to sum. However the `sum` cell will remember
+what value it was assigned:
+
+
+```dart
+sum.value = 10;
+
+print(sum.value);         // 10
+print(a.value + b.value); // 20
+```
+
+A stateless mutable computed cell on the other hand will not remember
+what value it was assigned. Instead it will recompute its value which
+is now different from the value it was assigned:
+
+
+```dart
+final sum = (a, b).mutableApply((a, b) => a + b, (sum) {
+    a.value = sum;
+    b.value = sum
+});
+```
+
+```dart
+sum.value = 10;
+
+print(sum.value);         // 20
+print(a.value + b.value); // 20
+```
+
+Therefore it's important to ensure that the values assigned to the
+argument cells are such that when the value computation function is
+run, an equivalent value will be produced as the value that was
+assigned. If this condition cannot be met, then you should use a
+normal stateful mutable computed cell.
+
+
 ## When to use Stateless Cells?
 
 Stateless computed cells are useful for lightweight computations, such
@@ -119,5 +394,5 @@ as basic arithmetic and numeric comparisons, where recomputing the
 cell's value every time it is accessed is likely to be faster than
 caching it, due to the overhead of maintaining a state. For expensive
 computations, it's preferable to cache the value and only recompute it
-when necessary. If in doubt, you're
-better off sticking to `ValueCell.computed`.
+when necessary. If in doubt, you're better off sticking to
+`ValueCell.computed` and `MutableCell.computed`.
