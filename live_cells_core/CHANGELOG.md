@@ -1,3 +1,19 @@
+## 0.16.0
+
+New features:
+
+* `and()`, `or()` and `not()` now return keyed cells.
+
+* The following methods for waiting for changes in cell values:
+  * `.nextChange()`
+  * `.untilValue()`
+  * `.untilTrue()`
+  * `.untilFalse()`
+  
+* `ActionCell`
+  
+  A cell without a value, used solely to represent actions and events.
+
 ## 0.15.1
 
 * Fix issue with `.isCompleted` having incorrect value when `Future` completes with an error.
