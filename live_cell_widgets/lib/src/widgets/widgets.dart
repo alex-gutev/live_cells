@@ -10,6 +10,16 @@ import 'package:live_cell_annotations/live_cell_annotations.dart';
 import '../cell_widget/cell_widget.dart';
 
 @GenerateCellWidgets([
+  WidgetSpec<AbsorbPointer>(
+    documentation: '''An [AbsorbPointer] widget with its properties controlled by [ValueCell]'s
+
+The constructor takes the same arguments as the unnamed constructor of [AbsorbPointer],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
   WidgetSpec<Align>(
     includeSuperProperties: [#child],
 
@@ -46,12 +56,38 @@ property to which it is bound is automatically updated to reflect the value of
 the cell.'''
   ),
 
+  WidgetSpec<AnimatedCrossFade>(
+      propertyDefaultValues: {
+        #layoutBuilder: 'AnimatedCrossFade.defaultLayoutBuilder'
+      },
+
+      documentation: '''An [AnimatedCrossFade] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedCrossFade],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
   WidgetSpec<AnimatedDefaultTextStyle>(
       includeSuperProperties: [#curve, #duration, #onEnd],
 
       documentation: '''An [AnimatedDefaultTextStyle] widget with its properties controlled by [ValueCell]'s.
 
 The constructor takes the same arguments as the unnamed constructor of [AnimatedDefaultTextStyle],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedFractionallySizedBox>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedFractionallySizedBox] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedFractionallySizedBox],
 but as [ValueCell]'s. This binds each property value to the [ValueCell] given
 in the constructor. If the cell value is changed, the value of the corresponding
 property to which it is bound is automatically updated to reflect the value of
@@ -94,12 +130,91 @@ property to which it is bound is automatically updated to reflect the value of
 the cell.'''
   ),
 
+  WidgetSpec<AnimatedPositionedDirectional>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedPositionedDirectional] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedPositionedDirectional],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedRotation>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedRotation] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedRotation],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedScale>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedScale] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedScale],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
   WidgetSpec<AnimatedSize>(
       includeSuperProperties: [#curve, #duration, #onEnd],
 
       documentation: '''An [AnimatedSize] widget with its properties controlled by [ValueCell]'s.
 
 The constructor takes the same arguments as the unnamed constructor of [AnimatedSize],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedSlide>(
+      includeSuperProperties: [#curve, #duration, #onEnd],
+
+      documentation: '''An [AnimatedSlide] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedSlide],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnimatedSwitcher>(
+      propertyTypes: {
+        #layoutBuilder: 'AnimatedSwitcherLayoutBuilder'
+      },
+
+      documentation: '''An [AnimatedSwitcher] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnimatedSwitcher],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.'''
+  ),
+
+  WidgetSpec<AnnotatedRegion>(
+      typeArguments: ['T extends Object'],
+      includeSuperProperties: [#child],
+
+      propertyTypes: {
+        #value: 'T'
+      },
+
+      documentation: '''An [AnnotatedRegion] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes the same arguments as the unnamed constructor of [AnnotatedRegion],
 but as [ValueCell]'s. This binds each property value to the [ValueCell] given
 in the constructor. If the cell value is changed, the value of the corresponding
 property to which it is bound is automatically updated to reflect the value of
