@@ -76,6 +76,7 @@ export 'src/extensions/map_cell_extension.dart'
     show MapCellExtension, MutableMapCellExtension;
 
 export 'src/extensions/wait_cell_extension.dart';
+export 'src/extensions/value_change_extension.dart';
 
 export 'src/cell_watch/cell_watcher.dart' show CellWatcher;
 

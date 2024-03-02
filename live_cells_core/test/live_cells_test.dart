@@ -8967,6 +8967,348 @@ void main() {
       });
     });
   });
+
+  group('ValueChangeExtension', () {
+    group ('.nextValue()', () {
+      test('Completes when MutableCell value changed', () {
+        final a = MutableCell(0);
+        final future = a.nextValue();
+
+        a.value = 1;
+        expect(future, completion(1));
+      });
+
+      test('Completes when computed cell value changed', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() + 1);
+
+        final future = b.nextValue();
+
+        a.value = 1;
+        expect(future, completion(2));
+      });
+
+      test('Completes on first change only', () {
+        final a = MutableCell(0);
+        final future = a.nextValue();
+
+        a.value = 1;
+        a.value = 10;
+
+        expect(future, completion(1));
+      });
+
+      test('Completes with error if exception is thrown', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() >= 0 ? a() : throw ArgumentError());
+
+        final future = b.nextValue();
+        a.value = -1;
+
+        expect(future, throwsArgumentError);
+      });
+
+      test('Completes only on actual value change of MutableCell', () {
+        final a = MutableCell(0);
+        final future = a.nextValue();
+
+        a.value = 0;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes only on actual value change when changesOnly: true', () {
+        final a = MutableCell(0);
+        final b = (a % 2.cell).store(changesOnly: true);
+        final future = b.nextValue();
+
+        a.value = 10;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes if cell is updated to same value with changesOnly: false', () {
+        final a = MutableCell(0);
+        final b = (a % 2.cell).store(changesOnly: false);
+        final future = b.nextValue();
+
+        a.value = 10;
+        expect(future, completion(0));
+      });
+
+      test('Does not leak resources', () {
+        fakeAsync((async) {
+          final resource = MockResource();
+          final a = TestManagedCell(resource, 1);
+          final b = MutableCell(2);
+          final sum = (a + b).store();
+
+          sum.nextValue();
+          b.value = 3;
+
+          async.elapse(Duration(seconds: 1));
+
+          verify(resource.dispose()).called(1);
+        });
+      });
+    });
+
+    group ('.untilValue()', () {
+      test('Completes when MutableCell value set to expected value', () {
+        final a = MutableCell(0);
+        final future = a.untilValue(10);
+
+        a.value = 10;
+        expect(future, completes);
+      });
+
+      test('Completes when MutableCell value is already expected value', () {
+        final a = MutableCell(3);
+        expect(a.untilValue(3), completes);
+      });
+
+      test('Does not complete when MutableCell value not set to expected value', () {
+        final a = MutableCell(0);
+        final future = a.untilValue(5);
+
+        a.value = 10;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes when computed cell value equals expected value', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() + 1);
+
+        final future = b.untilValue(2);
+
+        a.value = 1;
+        expect(future, completes);
+      });
+
+      test('Completes when computed cell is already expected value', () {
+        final a = MutableCell(3);
+        final b = ValueCell.computed(() => a() + 1);
+
+        expect(b.untilValue(4), completes);
+      });
+
+      test('Does not complete when computed cell value does not equal expected value', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() + 1);
+
+        final future = b.untilValue(2);
+
+        a.value = 5;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes if condition satisfied on second change', () {
+        final a = MutableCell(0);
+        final future = a.untilValue(10);
+
+        a.value = 1;
+        a.value = 10;
+
+        expect(future, completes);
+      });
+
+      test('Exceptions handled', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() >= 0 ? a() : throw ArgumentError());
+
+        final future = b.untilValue(-1);
+        a.value = -1;
+
+        expect(future, doesNotComplete);
+      });
+
+      test('Does not leak resources', () {
+        fakeAsync((async) {
+          final resource = MockResource();
+          final a = TestManagedCell(resource, 1);
+          final b = MutableCell(2);
+          final sum = (a + b).store();
+
+          sum.untilValue(4);
+          b.value = 3;
+
+          async.elapse(Duration(seconds: 1));
+
+          verify(resource.dispose()).called(1);
+        });
+      });
+    });
+
+    group ('.untilTrue()', () {
+      test('Completes when MutableCell value set to true', () {
+        final a = MutableCell(false);
+        final future = a.untilTrue();
+
+        a.value = true;
+        expect(future, completes);
+      });
+
+      test('Completes when MutableCell value is already true', () {
+        final a = MutableCell(true);
+        expect(a.untilTrue(), completes);
+      });
+
+      test('Does not complete when MutableCell value changes to false', () {
+        final a = MutableCell(false);
+        final future = a.untilTrue();
+
+        a.value = false;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes when computed cell value is true', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() % 2 != 0);
+
+        final future = b.untilTrue();
+
+        a.value = 1;
+        expect(future, completes);
+      });
+
+      test('Completes when computed cell is already true', () {
+        final a = MutableCell(3);
+        final b = ValueCell.computed(() => a() % 2 != 0);
+
+        expect(b.untilTrue(), completes);
+      });
+
+      test('Does not complete when computed cell value is not true', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() % 2 != 0);
+
+        final future = b.untilTrue();
+
+        a.value = 6;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes if value is true on second change', () {
+        final a = MutableCell(false);
+        final future = a.untilTrue();
+
+        a.value = false;
+        a.value = true;
+
+        expect(future, completes);
+      });
+
+      test('Exceptions handled', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() > 0 ? true : throw ArgumentError());
+
+        final future = b.untilTrue();
+        a.value = -1;
+
+        expect(future, doesNotComplete);
+      });
+
+      test('Does not leak resources', () {
+        fakeAsync((async) {
+          final resource = MockResource();
+          final a = TestManagedCell(resource, true);
+          final b = MutableCell(false);
+          final c = a.and(b).store();
+
+          c.untilTrue();
+          b.value = true;
+
+          async.elapse(Duration(seconds: 1));
+
+          verify(resource.dispose()).called(1);
+        });
+      });
+    });
+
+    group ('.untilFalse()', () {
+      test('Completes when MutableCell value set to false', () {
+        final a = MutableCell(true);
+        final future = a.untilFalse();
+
+        a.value = false;
+        expect(future, completes);
+      });
+
+      test('Completes when MutableCell value is already false', () {
+        final a = MutableCell(false);
+        expect(a.untilFalse(), completes);
+      });
+
+      test('Does not complete when MutableCell value changes to true', () {
+        final a = MutableCell(true);
+        final future = a.untilFalse();
+
+        a.value = true;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes when computed cell value is false', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() % 2 == 0);
+
+        final future = b.untilFalse();
+
+        a.value = 1;
+        expect(future, completes);
+      });
+
+      test('Completes when computed cell is already false', () {
+        final a = MutableCell(3);
+        final b = ValueCell.computed(() => a() % 2 == 0);
+
+        expect(b.untilFalse(), completes);
+      });
+
+      test('Does not complete when computed cell value is not false', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() % 2 == 0);
+
+        final future = b.untilFalse();
+
+        a.value = 6;
+        expect(future, doesNotComplete);
+      });
+
+      test('Completes if value is false on second change', () {
+        final a = MutableCell(true);
+        final future = a.untilFalse();
+
+        a.value = true;
+        a.value = false;
+
+        expect(future, completes);
+      });
+
+      test('Exceptions handled', () {
+        final a = MutableCell(0);
+        final b = ValueCell.computed(() => a() > 0 ? true : throw ArgumentError());
+
+        final future = b.untilFalse();
+        a.value = -1;
+
+        expect(future, doesNotComplete);
+      });
+
+      test('Does not leak resources', () {
+        fakeAsync((async) {
+          final resource = MockResource();
+          final a = TestManagedCell(resource, true);
+          final b = MutableCell(true);
+          final c = a.and(b).store();
+
+          c.untilFalse();
+          b.value = false;
+
+          async.elapse(Duration(seconds: 1));
+
+          verify(resource.dispose()).called(1);
+        });
+      });
+    });
+  });
 }
 
 // Test utility functions
