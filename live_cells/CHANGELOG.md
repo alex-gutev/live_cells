@@ -1,3 +1,36 @@
+## 0.16.0
+
+New features from core:
+
+* `and()`, `or()` and `not()` now return keyed cells.
+
+* The following methods for waiting for changes in cell values:
+  * `.nextChange()`
+  * `.untilValue()`
+  * `.untilTrue()`
+  * `.untilFalse()`
+
+* `ActionCell`
+
+  A cell without a value, used solely to represent actions and events.
+
+New widgets:
+
+* AbsorbPointer
+* AnimatedCrossFade
+* AnimatedFractionallySizedBox
+* AnimatedPositionedDirectional
+* AnimatedRotation
+* AnimatedScale
+* AnimatedSlide
+* AnimatedSwitcher
+* AnnotatedRegion
+
+Other changes:
+
+* Removed deprecated `computeCell` and `computeWidget` extension methods on `List`
+* Removed deprecated `RestorableCellWidget`
+
 ## 0.15.1
 
 * Fix issue with `.isCompleted` having incorrect value when `Future` completes with an error.

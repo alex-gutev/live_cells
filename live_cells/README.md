@@ -12,6 +12,7 @@ Cells offers the following benefits over `ChangeNotifier` / `ValueNotifier`:
 + Integrated with a library of widgets which allow their properties to
   be controlled and observed by cells. This allows for a style of
   programming which fits in with the reactive paradigm of Flutter.
++ Effortless state restoration with minimal boilerplate.
 
 This library also has the following advantages over other similar libraries:
 
