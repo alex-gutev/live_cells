@@ -2,7 +2,7 @@
 library live_cell_widgets_base;
 
 export 'src/extensions/widget_extension.dart'
-    show WidgetExtension, WidgetCellExtension, ComputeWidgetExtension;
+    show WidgetExtension, WidgetCellExtension;
 
 export 'src/extensions/cell_listenable_extension.dart'
     show CellListenableExtension;
@@ -19,5 +19,3 @@ export 'src/cell_widget/static_widget.dart' show StaticWidget;
 
 export 'src/restoration/cell_restoration_extension.dart'
     show CellRestorationExtension;
-
-export 'src/restoration/restorable_cell_widget.dart' show RestorableCellWidget;

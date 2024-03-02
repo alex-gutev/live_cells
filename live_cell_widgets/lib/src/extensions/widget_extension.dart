@@ -39,26 +39,3 @@ extension WidgetCellExtension on ValueCell<Widget> {
   /// changes.
   Widget widget() => toWidget((_, value, __) => value);
 }
-
-/// Extends [List] with a method for creating a [Widget] which is dependent on one or more [ValueCell]'s.
-extension ComputeWidgetExtension on List {
-  /// Create a [Widget] which is dependent on the [ValueCell]'s in [this].
-  ///
-  /// The widget is defined by the function [builder], which is called to build
-  /// the widget whenever the value of one of the cells in [this] is changed.
-  ///
-  /// Example:
-  ///
-  /// ````dart
-  /// final a = MutableCell(0);
-  /// final b = MutableCell(1);
-  /// final sum = a + b;
-  ///
-  /// ...
-  ///
-  /// final widget =
-  ///    [a, b, sum].computeWidget(() => Text('${a.value} + ${b.value} = ${sum.value}'))
-  /// ````
-  @Deprecated('Use .widget() on a computed cell instead.')
-  Widget computeWidget(Widget Function() builder) => computeCell(builder).widget();
-}
