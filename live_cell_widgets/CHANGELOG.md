@@ -1,3 +1,22 @@
+## 0.4.0
+
+New widgets:
+
+* AbsorbPointer
+* AnimatedCrossFade
+* AnimatedFractionallySizedBox
+* AnimatedPositionedDirectional
+* AnimatedRotation
+* AnimatedScale
+* AnimatedSlide
+* AnimatedSwitcher
+* AnnotatedRegion
+
+Other changes:
+
+* Minimum core dependency version updated to `0.16.0`
+* Removed deprecated methods and `RestorableCellWidget`
+
 ## 0.3.2
 
 * Update `live_cells_core` dependency version to `0.15.0`
