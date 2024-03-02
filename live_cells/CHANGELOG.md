@@ -1,3 +1,7 @@
+## 0.16.1
+
+* Fix typos in Changelog.
+
 ## 0.16.0
 
 New features from core:
@@ -16,15 +20,15 @@ New features from core:
 
 New widgets:
 
-* AbsorbPointer
-* AnimatedCrossFade
-* AnimatedFractionallySizedBox
-* AnimatedPositionedDirectional
-* AnimatedRotation
-* AnimatedScale
-* AnimatedSlide
-* AnimatedSwitcher
-* AnnotatedRegion
+* `CellAbsorbPointer`
+* `CellAnimatedCrossFade`
+* `CellAnimatedFractionallySizedBox`
+* `CellAnimatedPositionedDirectional`
+* `CellAnimatedRotation`
+* `CellAnimatedScale`
+* `CellAnimatedSlide`
+* `CellAnimatedSwitcher`
+* `CellAnnotatedRegion`
 
 Other changes:
 
