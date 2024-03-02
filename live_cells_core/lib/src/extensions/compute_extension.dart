@@ -54,46 +54,6 @@ extension ComputeExtension<T> on ValueCell<T> {
   }
 }
 
-/// Extends [List] with a method for creating a [ComputeCell] with the argument
-/// cells given in the list.
-extension ListComputeExtension on List {
-  /// Create a [ComputeCell] with compute function [fn] and argument cell list [this].
-  ///
-  /// A [ValueCell] is returned of which the value is the result returned by [fn].
-  /// Whenever the value of one of the elements of [this] changes, [fn] is called
-  /// again to compute the new value of the cell.
-  @Deprecated('Use RecordComputeExtension{2-10}.apply instead')
-  ValueCell<U> computeCell<U>(U Function() fn, {key}) =>
-      ComputeCell(
-          compute: fn,
-          arguments: toSet().cast<ValueCell>(),
-          key: key
-      );
-
-  /// Create a [MutableComputeCell] with given compute and reverse compute functions, and argument cell list [this].
-  ///
-  /// The [compute] function is called with no arguments whenever
-  /// the value of at least one cell in [this] changes. It should return
-  /// the cell's value.
-  ///
-  /// The [reverse] function is called when the [value] of the cell is
-  /// set, with the new value passed as an argument to the function. It should
-  /// set the values of the argument cells accordingly such that calling [compute]
-  /// again will produce the same value that was passed to [reverse].
-  ///
-  /// [reverse] is called in a batch update, by [MutableCell.batch], so
-  /// that the values of the argument cells are set simultaneously.
-  ///
-  /// **NOTE:** Every element of [this] should be a [MutableCell].
-  @Deprecated('Use RecordComputeExtension{2-10}.mutableApply instead')
-  MutableCell<U> mutableComputeCell<U>(U Function() compute, void Function(U) reverse) =>
-      MutableComputeCell(
-          compute: compute,
-          reverseCompute: reverse,
-          arguments: cast<ValueCell>().toSet(),
-      );
-}
-
 /// Extends a record with a method for creating a [ComputeCell] by applying a
 /// function on the argument cells given in the record.
 extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
