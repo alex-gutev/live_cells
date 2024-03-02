@@ -1261,93 +1261,174 @@ void main() {
   });
 
   group('BoolCellExtension', () {
-    test('BoolCellExtension.and produces cell which is the logical and of its arguments', () {
-      final a = MutableCell(true);
-      final b = MutableCell(true);
-      final and = a.and(b);
+    group('.and()', () {
+      test('Evaluates to the logical and of its arguments', () {
+        final a = MutableCell(true);
+        final b = MutableCell(true);
+        final and = a.and(b);
 
-      expect(and.value, isTrue);
+        expect(and.value, isTrue);
 
-      a.value = false;
-      expect(and.value, isFalse);
+        a.value = false;
+        expect(and.value, isFalse);
 
-      b.value = false;
-      expect(and.value, isFalse);
+        b.value = false;
+        expect(and.value, isFalse);
 
-      a.value = true;
-      expect(and.value, isFalse);
+        a.value = true;
+        expect(and.value, isFalse);
 
-      b.value = true;
-      expect(and.value, isTrue);
+        b.value = true;
+        expect(and.value, isTrue);
+      });
+
+      test('Compares == if same cells', () {
+        final a = MutableCell(true);
+        final b = MutableCell(true);
+
+        final c1 = a.and(b);
+        final c2 = a.and(b);
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Compares != if different cells', () {
+        final a = MutableCell(true);
+        final b = MutableCell(true);
+        final c = MutableCell(true);
+
+        final c1 = a.and(b);
+        final c2 = b.and(c);
+        final c3 = b.and(a);
+
+        expect(c1 == c1, isTrue);
+        expect(c1 != c2, isTrue);
+        expect(c1 != c3, isTrue);
+        expect(c2 != c3, isTrue);
+      });
     });
 
-    test('BoolCellExtension.or produces cell which is the logical or of its arguments', () {
-      final a = MutableCell(true);
-      final b = MutableCell(true);
-      final or = a.or(b);
+    group('.or()', () {
+      test('Evaluates to the logical or of its arguments', () {
+        final a = MutableCell(true);
+        final b = MutableCell(true);
+        final or = a.or(b);
 
-      expect(or.value, isTrue);
+        expect(or.value, isTrue);
 
-      a.value = false;
-      expect(or.value, isTrue);
+        a.value = false;
+        expect(or.value, isTrue);
 
-      b.value = false;
-      expect(or.value, isFalse);
+        b.value = false;
+        expect(or.value, isFalse);
 
-      a.value = true;
-      expect(or.value, isTrue);
+        a.value = true;
+        expect(or.value, isTrue);
 
-      b.value = true;
-      expect(or.value, isTrue);
+        b.value = true;
+        expect(or.value, isTrue);
+      });
+
+      test('Compares == if same cells', () {
+        final a = MutableCell(true);
+        final b = MutableCell(true);
+
+        final c1 = a.or(b);
+        final c2 = a.or(b);
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Compares != if different cells', () {
+        final a = MutableCell(true);
+        final b = MutableCell(true);
+        final c = MutableCell(true);
+
+        final c1 = a.or(b);
+        final c2 = b.or(c);
+        final c3 = b.or(a);
+
+        expect(c1 == c1, isTrue);
+        expect(c1 != c2, isTrue);
+        expect(c1 != c3, isTrue);
+        expect(c2 != c3, isTrue);
+      });
     });
 
-    test('BoolCellExtension.not produces cell which is the logical not of itself', () {
-      final a = MutableCell(true);
-      final not = a.not();
+    group('.not()', () {
+      test('Evaluates to the logical not of itself', () {
+        final a = MutableCell(true);
+        final not = a.not();
 
-      expect(not.value, isFalse);
+        expect(not.value, isFalse);
 
-      a.value = false;
-      expect(not.value, isTrue);
+        a.value = false;
+        expect(not.value, isTrue);
+      });
+
+      test('Compares == if same cells', () {
+        final a = MutableCell(true);
+
+        final c1 = a.not();
+        final c2 = a.not();
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Compares != if different cells', () {
+        final a = MutableCell(true);
+        final b = MutableCell(true);
+
+        final c1 = a.not();
+        final c2 = b.not();
+
+        expect(c1 == c1, isTrue);
+        expect(c1 != c2, isTrue);
+      });
     });
 
-    test('BoolCellExtension.select with ifFalse selects correct value', () {
-      final a = 'true'.cell;
-      final b = MutableCell('false');
-      final cond = MutableCell(true);
+    group('.select()', () {
+      test('Selects correct value with ifFalse', () {
+        final a = 'true'.cell;
+        final b = MutableCell('false');
+        final cond = MutableCell(true);
 
-      final select = cond.select(a, b);
-      final observer = addObserver(select, MockValueObserver());
+        final select = cond.select(a, b);
+        final observer = addObserver(select, MockValueObserver());
 
-      expect(select.value, equals('true'));
+        expect(select.value, equals('true'));
 
-      cond.value = false;
-      b.value = 'else';
-      cond.value = true;
+        cond.value = false;
+        b.value = 'else';
+        cond.value = true;
 
-      expect(observer.values, equals(['false', 'else', 'true']));
-    });
+        expect(observer.values, equals(['false', 'else', 'true']));
+      });
 
-    test('BoolCellExtension.select with ifFalse does not update value when false', () {
-      final a = MutableCell('true');
-      final cond = MutableCell(true);
+      test('Does not update value when condition is false and ifFalse is not given', () {
+        final a = MutableCell('true');
+        final cond = MutableCell(true);
 
-      final select = cond.select(a);
+        final select = cond.select(a);
 
-      observeCell(select);
-      expect(select.value, equals('true'));
+        observeCell(select);
+        expect(select.value, equals('true'));
 
-      cond.value = false;
-      expect(select.value, equals('true'));
+        cond.value = false;
+        expect(select.value, equals('true'));
 
-      a.value = 'then';
-      expect(select.value, equals('true'));
+        a.value = 'then';
+        expect(select.value, equals('true'));
 
-      cond.value = true;
-      expect(select.value, equals('then'));
+        cond.value = true;
+        expect(select.value, equals('then'));
 
-      a.value = 'when';
-      expect(select.value, equals('when'));
+        a.value = 'when';
+        expect(select.value, equals('when'));
+      });
     });
   });
 
