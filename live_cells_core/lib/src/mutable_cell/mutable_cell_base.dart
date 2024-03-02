@@ -54,7 +54,7 @@ abstract class MutableCellBase<T> extends StatefulCell<T> implements MutableCell
   late MutableCellState<T, MutableCellBase<T>> _mutableState;
 }
 
-class MutableCellState<T, S extends MutableCellBase<T>> extends CellState<S> {
+class MutableCellState<T, S extends StatefulCell<T>> extends CellState<S> {
   MutableCellState({
     required super.cell,
     required super.key,

@@ -17,6 +17,7 @@ export 'src/stateful_cell/observer_cell_state.dart' show ObserverCellState;
 export 'src/stateful_cell/stateful_cell.dart' show StatefulCell;
 
 export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
+export 'src/mutable_cell/action_cell.dart' show ActionCell;
 export 'src/mutable_cell/mutable_dependent_cell.dart' show MutableDependentCell;
 export 'src/mutable_cell/mutable_cell_view.dart' show MutableCellView;
 

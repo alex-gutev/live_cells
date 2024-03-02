@@ -9309,6 +9309,69 @@ void main() {
       });
     });
   });
+
+  group('ActionCell', () {
+    test('Notifies observers when triggered', () {
+      final action = ActionCell();
+      final listener = addListener(action, MockSimpleListener());
+
+      action.trigger();
+      verify(listener()).called(1);
+    });
+
+    test('Notifies observers on every trigger', () {
+      final action = ActionCell();
+      final listener = addListener(action, MockSimpleListener());
+
+      action.trigger();
+      action.trigger();
+      action.trigger();
+
+      verify(listener()).called(3);
+    });
+
+    test('Can be added as a cell dependency', () {
+      final action = ActionCell();
+      final a = MutableCell(0);
+
+      var i = 0;
+      final b = ValueCell.computed(() {
+        action();
+        return a() + (i++);
+      });
+
+      final observer = addObserver(b, MockValueObserver());
+
+      action.trigger();
+      action.trigger();
+
+      a.value = 10;
+
+      expect(observer.values, equals([1, 2, 13]));
+    });
+
+    test('Works correctly with ValueCell.batch', () {
+      final action = ActionCell();
+      final a = MutableCell(0);
+
+      var i = 0;
+      final b = ValueCell.computed(() {
+        action();
+        return a() + (i++);
+      });
+
+      final observer = addObserver(b, MockValueObserver());
+
+      action.trigger();
+
+      MutableCell.batch(() {
+        action.trigger();
+        a.value = 10;
+      });
+
+      expect(observer.values, equals([1, 12]));
+    });
+  });
 }
 
 // Test utility functions
