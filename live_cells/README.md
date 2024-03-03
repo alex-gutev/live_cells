@@ -286,6 +286,26 @@ ValueCell<Future<int>> cell2;
 final isLoading = (cell1, cell2).isCompleted.not();
 ```
 
+## ValueListenable
+
+The `.listenable` property returns a `ValueListenable` that notifies its observers whenever the
+value of the cell changes:
+
+```dart
+final count = MutableCell<int>(0);
+final countListenable = count.listenable;
+```
+
+This allows cells to be used as a drop-in replacement for `ValueNotifier`, whenever a 
+`ValueListenable` is expected:
+
+```dart
+ValueListenableBuilder(
+  valueListenable: count.listenable,
+  ...
+)
+```
+
 ## Additional information
 
 If you discover any issues or have any feature requests, please open an issue on the package's Github
