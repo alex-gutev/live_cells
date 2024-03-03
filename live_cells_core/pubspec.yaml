@@ -25,4 +25,5 @@ dev_dependencies:
 
 topics:
   - reactive
-  - state management
+  - state-management
+  - extension
