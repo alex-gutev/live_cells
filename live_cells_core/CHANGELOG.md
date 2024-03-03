@@ -1,3 +1,8 @@
+## 0.16.1
+
+* Add exception handling in initial call to cell watch functions.
+* Improve unhandled exception notices.
+
 ## 0.16.0
 
 New features:
