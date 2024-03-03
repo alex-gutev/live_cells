@@ -93,7 +93,7 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
         cell.reverseCompute(value);
       }
       catch (e, st) {
-        debugPrint('Exception in MutableDependentCell reverse computation function: $e - $st');
+        debugPrint('Unhandled exception in MutableDependentCell reverse computation function: $e\n$st');
       }
     });
 

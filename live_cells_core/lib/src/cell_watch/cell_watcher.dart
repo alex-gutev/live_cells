@@ -49,7 +49,12 @@ class _CellWatchObserver implements CellObserver {
 
   /// Create a cell observer which calls *cell watcher* [watch]
   _CellWatchObserver(this.watch) {
-    _callWatchFn();
+    try {
+      _callWatchFn();
+    }
+    catch (e, st) {
+      debugPrint('Unhandled exception in ValueCell.watch(): $e\n$st');
+    }
   }
 
   /// Remove the observer from the referenced cells

@@ -127,7 +127,7 @@ class CellState<T extends StatefulCell> {
         }
       }
       catch (e, st) {
-        debugPrint('Error in CellObserver.willUpdate: $e - $st');
+        debugPrint('Unhandled exception in CellObserver.willUpdate: $e\n$st');
       }
     }
   }
@@ -155,7 +155,7 @@ class CellState<T extends StatefulCell> {
         }
       }
       catch (e, st) {
-        debugPrint('Error in CellObserver.update: $e - $st');
+        debugPrint('Unhandled exception in CellObserver.update: $e\n$st');
       }
     }
   }
