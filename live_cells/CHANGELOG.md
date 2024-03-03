@@ -1,3 +1,10 @@
+## 0.16.2
+
+Changes from core:
+
+* Add exception handling to initial cell watch function calls.
+* Improve unhandled exception notices.
+
 ## 0.16.1
 
 * Fix typos in Changelog.
