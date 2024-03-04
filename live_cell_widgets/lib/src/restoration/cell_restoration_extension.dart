@@ -6,8 +6,8 @@ import 'cell_restoration_manager.dart';
 extension CellRestorationExtension<T extends ValueCell> on T {
   /// Register the cell for restoration and restore its state.
   ///
-  /// This method may only be called within a [StaticWidget] build function,
-  /// with a non-null [StaticWidget.restorationId].
+  /// This method may only be called within a [CellWidget] or [StaticWidget]
+  /// build method, with a non-null "restorationId".
   ///
   /// This cell must be a [RestorableCell].
   ///
@@ -15,9 +15,15 @@ extension CellRestorationExtension<T extends ValueCell> on T {
   /// can have their state restored. To restore the state of cells holding other
   /// value types, a suitable [CellValueCoder] has to be provided in [coder].
   ///
+  /// If [optional] is true, state restoration is only attempted if the cell is
+  /// in a context where cell state restoration is supported. If false,
+  /// attempting to restore a cell outside of a context providing cell restoration,
+  /// violates an assertion.
+  ///
   /// Returns [this].
   T restore({
-    CellValueCoder coder = const CellValueCoder()
+    CellValueCoder coder = const CellValueCoder(),
+    optional = false
   }) {
     assert(
       this is RestorableCell,
@@ -26,10 +32,12 @@ extension CellRestorationExtension<T extends ValueCell> on T {
           'call.'
     );
 
-    CellRestorationManagerState.activeState.registerCell(
-      cell: this as RestorableCell,
-      coder: coder
-    );
+    if (!optional || CellRestorationManagerState.isActive) {
+      CellRestorationManagerState.activeState.registerCell(
+          cell: this as RestorableCell,
+          coder: coder
+      );
+    }
 
     return this;
   }

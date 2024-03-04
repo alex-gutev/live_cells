@@ -33,8 +33,14 @@ class CellRestorationManagerState extends State<CellRestorationManager> with
   /// Index of the saved state to use when restoring the cell in [getRestorableCell].
   var _curCellState = 0;
 
+  /// If true the widget hasn't been built for the first time yet.
+  var _firstBuild = true;
+
   /// Observes the restorable cells for changes in their values
   late final _observer = CellRestorationObserver(_cellStates);
+
+  /// Is there a [CellRestorationManagerState] in effect?
+  static bool get isActive => _activeState != null;
 
   /// Get the current [CellRestorationManagerState].
   ///
@@ -59,6 +65,10 @@ class CellRestorationManagerState extends State<CellRestorationManager> with
     required RestorableCell cell,
     required CellValueCoder coder
   }) {
+    if (!_firstBuild) {
+      return;
+    }
+
     if (_curCellState < _cellStates.length) {
       cell.restoreState(_cellStates[_curCellState], coder);
     }
@@ -105,6 +115,7 @@ class CellRestorationManagerState extends State<CellRestorationManager> with
       return widget.builder();
     }
     finally {
+      _firstBuild = false;
       _activeState = previousActiveState;
     }
   }

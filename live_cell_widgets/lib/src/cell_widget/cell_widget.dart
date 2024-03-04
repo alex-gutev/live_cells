@@ -72,7 +72,9 @@ abstract class CellWidget extends StatelessWidget {
   );
 
   @override
-  StatelessElement createElement() => _CellWidgetElement(this);
+  StatelessElement createElement() => restorationId != null
+      ? _RestorableCellWidgetElement(this, restorationId!)
+      : _CellWidgetElement(this);
 }
 
 /// [CellWidget] with the [build] method defined by [builder].
@@ -103,18 +105,57 @@ class _CellWidgetElement extends StatelessElement {
   Set<ValueCell> _arguments = HashSet();
   late _WidgetCellObserver _observer;
 
+  /// If true the widget hasn't been built for the first time yet.
+  var _firstBuild = true;
+
+  /// The number of non-keyed cells defined in the [build] method.
+  var _numCells = 0;
+
+  /// Generate a key for the cell at index [index].
+  _WidgetCellKey _generateCellKey(int index) {
+    if (_firstBuild) {
+      assert(index == _numCells, 'This indicates a bug in live_cell_widgets. '
+          'Please report it.');
+      _numCells++;
+
+      return _WidgetCellKey(this, index);
+    }
+
+    assert(index < _numCells,
+      'More cells defined during this build of the '
+        'widget than in the previous build. This usually happens when a cell definition '
+        'is placed within a conditional or loop inside the CellWidget.build method.'
+    );
+    return _cellKeyForIndex(index);
+  }
+
+  _WidgetCellKey _cellKeyForIndex(int index) {
+    return _WidgetCellKey(this, index);
+  }
+
   @override
   Widget build() {
     final Set<ValueCell> newArguments = HashSet();
 
-    final widget = ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
-      newArguments.add(cell);
+    var keyIndex = 0;
 
-      if (!_arguments.contains(cell)) {
-        _arguments.add(cell);
-        cell.addObserver(_observer);
-      }
-    });
+    late final Widget widget;
+
+    try {
+      AutoKey.withAutoKeys(() => _generateCellKey(keyIndex++), () {
+        widget = ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
+          newArguments.add(cell);
+
+          if (!_arguments.contains(cell)) {
+            _arguments.add(cell);
+            cell.addObserver(_observer);
+          }
+        });
+      });
+    }
+    finally {
+      _firstBuild = false;
+    }
 
     // Stop observing cells which are no longer referenced
 
@@ -137,8 +178,33 @@ class _CellWidgetElement extends StatelessElement {
 
     _arguments.clear();
 
+    _disposeCells();
+
     super.unmount();
   }
+
+  /// Dispose the state of all cells defined during the build method.
+  ///
+  /// This is necessary to remove mutable cell state from the global state
+  /// table.
+  void _disposeCells() {
+    for (var i = 0; i < _numCells; i++) {
+      final key = _cellKeyForIndex(i);
+      CellState.maybeGetState(key)?.removeAllObservers();
+    }
+  }
+}
+
+class _RestorableCellWidgetElement extends _CellWidgetElement {
+  final String _restorationId;
+
+  _RestorableCellWidgetElement(super.widget, this._restorationId);
+
+  @override
+  Widget build() => CellRestorationManager(
+      builder: super.build,
+      restorationId: _restorationId
+  );
 }
 
 /// [CellObserver] that calls a callback when all argument cells have updated
@@ -174,4 +240,9 @@ class _WidgetCellObserver extends CellObserver {
       _waitingForChange = false;
     }
   }
+}
+
+/// Key identifying a cell defined within CellWidget.build.
+class _WidgetCellKey extends CellKey2<BuildContext, int> {
+  _WidgetCellKey(super.value1, super.value2);
 }

@@ -23,7 +23,8 @@ extension WidgetExtension<T> on ValueCell<T> {
         // Prevent exceptions from reaching ValueListenableBuilder
         valueListenable: onError(ComputeCell(
             compute: () => ValueCell.none(),
-            arguments: {}
+            arguments: {},
+            key: ValueCell.none
         )).listenable,
         builder: builder,
         child: child

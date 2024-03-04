@@ -69,41 +69,10 @@ mixin CellInitializer on CellWidget {
   /// [ValueCell] instance that was created during the first build using
   /// [create].
   ///
-  /// If this CellWidget has a non-null [restorationId] the state of the cell is
-  /// also saved and restored when restoring the widget state.
-  ///
-  /// For state restoration to happen the following conditions need to be met:
-  ///
-  /// 1. The widget must be within a route which is restorable, see
-  ///    [Navigator.restorablePush].
-  /// 2. The cell returned by [create] must be a [RestorableCell].
-  ///
-  /// If [restorable] is false, the state of the returned cell is not restored.
-  /// If [restorable] is true, an assertion is violated if the cell returned
-  /// by [create] is not a [RestorableCell]. Otherwise if [restorable] is null
-  /// (the default) the state of the cell is only restored if the cell
-  /// is a [RestorableCell].
-  ///
-  /// **NOTE**: Only cells holding values encodable by [StandardMessageCodec],
-  /// can have their state restored. To restore the state of cells holding other
-  /// value types, a [CellValueCoder] subclass has to be implemented for the
-  /// value types. To use a [CellValueCoder] subclass, provide the constructor of
-  /// the subclass in [coder].
-  ///
   /// **NOTE**: This method may only be called within the [build] method.
-  V cell<T, V extends ValueCell<T>>(CreateCell<V> create, {
-    bool? restorable,
-    CellValueCoder Function()? coder
-  }) {
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     assert(_activeCellElement != null);
-
-    final cell = _activeCellElement!.getCell(
-        create,
-        forceRestore: restorable ?? false,
-        makeCoder: coder
-    );
-
-    return cell;
+    return _activeCellElement!.getCell(create);
   }
 
   /// Register a callback to be called whenever the values of cells change.
@@ -142,16 +111,10 @@ extension CellWidgetContextExtension on BuildContext {
   ///
   /// **NOTE**: This method may only be called if [this] is the [BuildContext]
   /// of a [CellWidget] with the [CellInitializer] mixin.
-  V cell<T, V extends ValueCell<T>>(CreateCell<V> create, {
-    bool? restorable,
-    CellValueCoder Function()? coder
-  }) {
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     final element = this as _CellStorageElement;
 
-    return element.getCell(create,
-      forceRestore: restorable ?? false,
-      makeCoder: coder
-    );
+    return element.getCell(create);
   }
 
   /// Register a callback function to be called whenever the values of cells change.
@@ -197,21 +160,14 @@ class _CellStorageElement extends _CellWidgetElement {
   /// current cell index.
   ///
   /// The cell index is advanced when calling this method.
-  V getCell<T, V extends ValueCell<T>>(CreateCell<V> create, {
-    required bool forceRestore,
-    required CellValueCoder Function()? makeCoder
-  }) {
-    assert(
-      !forceRestore,
-      'No active CellRestorationManager. This happens when CellWidget.cell(), '
-          'or BuildContext.cell() was called with `restorable: true` but the '
-          "CellWidget doesn't have a restorationId associated with it. Either "
-          'provide a non-null restorationId in the constructor or remove '
-          '`restorable: true`.'
-    );
-
+  V getCell<T, V extends ValueCell<T>>(CreateCell<V> create) {
     if (_isFirstBuild) {
-      final cell = create();
+      late final V cell;
+
+      AutoKey.withAutoKeys(() => null, () {
+        cell = create();
+      });
+
       _cells.add(cell);
       _curCell++;
 
@@ -285,54 +241,9 @@ class _CellStorageElement extends _CellWidgetElement {
 
 /// A [_CellStorageElement] which restores the state of the cells created within it.
 class _RestorableCellStorageElement extends _CellStorageElement {
-  /// Restoration ID
   final String _restorationId;
 
   _RestorableCellStorageElement(super.widget, this._restorationId);
-
-  /// Retrieve/create the current cell and restore its state.
-  ///
-  /// If [forceRestore] is true an assertion is violated if the cell returned
-  /// by [create] is not a [RestorableCell]. If [forceRestore] is false and
-  /// the cell returned by [create] is not a [RestorableCell], its state is
-  /// not restored.
-  ///
-  /// [makeCoder] is a [CellValueCoder] constructor to use when encoding/decoding
-  /// the cell's value.
-  @override
-  V getCell<T, V extends ValueCell<T>>(CreateCell<V> create, {
-    required bool forceRestore,
-    required CellValueCoder Function()? makeCoder
-  }) {
-    final cell = super.getCell(create,
-        forceRestore: false,
-        makeCoder: null
-    );
-
-    if (_isFirstBuild) {
-      assert(
-        !forceRestore || cell is RestorableCell<T>,
-        'RestorableCellWidget.cell(): cell returned by creation function is not '
-          'a RestorableCell. You are seeing this error because you\'ve created a '
-          'cell with cell(..., restore: true) which is not a RestorableCell. To '
-          'fix this either return a RestorableCell from the creation function or '
-          'call cell() without the restore argument.'
-      );
-
-      if (cell is! RestorableCell<T>) {
-        return cell;
-      }
-
-      final coder = makeCoder?.call() ?? const CellValueCoder();
-
-      CellRestorationManagerState.activeState.registerCell(
-          cell: cell,
-          coder: coder
-      );
-    }
-
-    return cell;
-  }
 
   @override
   Widget build() => CellRestorationManager(
