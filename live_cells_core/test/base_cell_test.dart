@@ -309,7 +309,7 @@ void main() {
       a.value = 16;
       expect(a.value, 16);
 
-      final observer2 = addObserver(a, MockSimpleObserver());
+      addObserver(a, MockSimpleObserver());
       expect(a.value, 16);
 
       a.value = 17;
