@@ -114,7 +114,7 @@ class CellState<T extends StatefulCell> {
   /// This state is disposed after this method is called and should no
   /// longer be used.
   void removeAllObservers() {
-    if (_observers.isNotEmpty) {
+    if (!isDisposed) {
       _observers.clear();
       dispose();
     }
