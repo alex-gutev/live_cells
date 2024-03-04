@@ -169,6 +169,189 @@ void main() {
 
       expect(msg.value, '1 + 2 = 3');
     });
+
+    test('Compares == when same key', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      final b = MutableCell(0, key: 'mutable-cell-key1');
+
+      addTearDown(() {
+        a.dispose();
+        b.dispose();
+      });
+
+      expect(a == b, isTrue);
+      expect(a.hashCode == b.hashCode, isTrue);
+    });
+
+    test('Compares != with different keys', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      final b = MutableCell(0, key: 'mutable-cell-key2');
+
+      addTearDown(() {
+        a.dispose();
+        b.dispose();
+      });
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
+
+    test('Compares != with null keys', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
+
+    test('Cells with the same keys share the same state', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      final b = MutableCell(0, key: 'mutable-cell-key1');
+
+      addTearDown(() {
+        a.dispose();
+        b.dispose();
+      });
+
+      a.value = 10;
+
+      expect(a.value, 10);
+      expect(b.value, 10);
+    });
+
+    test('Cells with the same keys manage the same set of observers', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      final b = MutableCell(0, key: 'mutable-cell-key1');
+
+      addTearDown(() {
+        a.dispose();
+        b.dispose();
+      });
+
+      final observer1 = addObserver(a, MockValueObserver());
+      final observer2 = addObserver(b, MockValueObserver());
+
+      a.value = 10;
+      b.value = 20;
+      a.value = 30;
+      b.value = 40;
+
+      b.removeObserver(observer1);
+      a.value = 50;
+
+      a.removeObserver(observer2);
+      a.value = 60;
+      b.value = 70;
+
+      expect(observer1.values, equals([10, 20, 30, 40]));
+      expect(observer2.values, equals([10, 20, 30, 40, 50]));
+    });
+
+    test('Cells with different keys do not sgare the same state', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      final b = MutableCell(0, key: 'mutable-cell-key2');
+
+      addTearDown(() {
+        a.dispose();
+        b.dispose();
+      });
+
+      a.value = 10;
+
+      expect(a.value, 10);
+      expect(b.value, 0);
+    });
+
+    test('Cells with different keys manage different sets of observers', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      final b = MutableCell(0, key: 'mutable-cell-key2');
+
+      addTearDown(() {
+        a.dispose();
+        b.dispose();
+      });
+
+      final observer1 = addObserver(a, MockValueObserver());
+      final observer2 = addObserver(b, MockValueObserver());
+
+      a.value = 10;
+      b.value = 20;
+      a.value = 30;
+      b.value = 40;
+
+      b.removeObserver(observer1);
+      a.value = 50;
+
+      a.removeObserver(observer2);
+      a.value = 60;
+      b.value = 70;
+
+      expect(observer1.values, equals([10, 30, 50, 60]));
+      expect(observer2.values, equals([20, 40, 70]));
+    });
+
+    test('State recreated after disposal when using keys', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+
+      addTearDown(() => a.dispose());
+
+      a.value = 5;
+
+      final observer1 = addObserver(a, MockSimpleObserver());
+      expect(a.value, 5);
+
+      a.value = 10;
+      a.value = 15;
+
+      a.removeObserver(observer1);
+      expect(a.value, 15);
+
+      a.value = 16;
+      expect(a.value, 16);
+
+      final observer2 = addObserver(a, MockSimpleObserver());
+      expect(a.value, 16);
+
+      a.value = 17;
+      expect(a.value, 17);
+    });
+
+    test('Cells with keys do not leak resources', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      addTearDown(() => a.dispose());
+
+      a.value = 5;
+
+      observeCell(a);
+      observeCell(a);
+
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNotNull);
+
+      a.dispose();
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNull);
+    });
+
+    test('All observers removed after calling dispose', () {
+      final a = MutableCell(0, key: 'mutable-cell-key1');
+      addTearDown(() => a.dispose());
+
+      a.value = 5;
+
+      final listener1 = addListener(a, MockSimpleListener());
+      final listener2 = addListener(a, MockSimpleListener());
+
+      a.value = 6;
+      a.value = 7;
+      
+      verify(listener1()).called(2);
+      verify(listener2()).called(2);
+
+      a.dispose();
+      a.value = 8;
+      
+      verifyNoMoreInteractions(listener1);
+      verifyNoMoreInteractions(listener2);
+    });
   });
 
   group('Equality Comparisons', () {
