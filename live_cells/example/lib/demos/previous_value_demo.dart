@@ -4,20 +4,21 @@ import 'package:live_cells/live_cells.dart';
 /// Example showing how the pevious values of cells can be accessed
 ///
 /// This example also demonstrates exception handling using `onError`.
-class PreviousValueDemo extends CellWidget with CellInitializer {
+class PreviousValueDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the counter value
-    final count = cell(() => MutableCell(0));
+    final count = MutableCell(0);
 
     // Convert count to a string
-    final countStr = cell(() => ValueCell.computed(() => count().toString()));
+    final countStr = ValueCell.computed(() => count().toString());
 
     // onError is used so that the cell has an initial value of '<none>'
     // Without the onError, `UninitializedCellError` is thrown until
     // the first time `count` changes its value.
-    final prevCount = cell(() =>
-        countStr.previous.onError<UninitializedCellError>('<none>'.cell));
+    final prevCount = countStr
+        .previous
+        .initialValue('<none>'.cell);
 
     return Scaffold(
       appBar: AppBar(

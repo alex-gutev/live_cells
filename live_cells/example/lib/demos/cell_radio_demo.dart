@@ -24,11 +24,11 @@ extension RadioOptionExtension on RadioOption {
 }
 
 /// Example showing usage of [CellRadio]
-class CellRadioDemo extends CellWidget with CellInitializer {
+class CellRadioDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the group value - the value of the selected radio button
-    final option = cell(() => MutableCell<RadioOption?>(RadioOption.optionB));
+    final option = MutableCell<RadioOption?>(RadioOption.optionB);
 
     return Scaffold(
       appBar: AppBar(

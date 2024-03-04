@@ -3,11 +3,11 @@ import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
 /// Example usage of [CellSwitch]
-class CellSwitchDemo extends CellWidget with CellInitializer {
+class CellSwitchDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the switch state
-    final state = cell(() => MutableCell(true));
+    final state = MutableCell(true);
 
     return Scaffold(
       appBar: AppBar(

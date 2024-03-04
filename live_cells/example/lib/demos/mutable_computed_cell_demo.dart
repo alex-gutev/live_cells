@@ -6,13 +6,13 @@ import 'package:live_cells/live_cells.dart';
 ///
 /// The example demonstrates using `mutableString` to convert a `num` value to
 /// a `string` and vice versa.
-class MutableComputedCellDemo extends CellWidget with CellInitializer {
+class MutableComputedCellDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cells holding the parsed `num` values from fields `a` and `b`
     // These can also be used to reset the content of the fields
-    final a = cell(() => MutableCell<num>(0));
-    final b = cell(() => MutableCell<num>(0));
+    final a = MutableCell<num>(0);
+    final b = MutableCell<num>(0);
 
     // Cells holding string representations of `a` and `b`.
     //
@@ -23,12 +23,12 @@ class MutableComputedCellDemo extends CellWidget with CellInitializer {
     // and assigned to `a`/`b`.
     //
     // These are given as the content cell in the CellTextField constructor
-    final strA = cell(() => a.mutableString());
-    final strB = cell(() => b.mutableString());
+    final strA = a.mutableString();
+    final strB = b.mutableString();
 
     // A computed cell demonstrating that `a` and `b` can be used as any other
     // cell
-    final sum = cell(() => a + b);
+    final sum = a + b;
 
     return Scaffold(
       appBar: AppBar(

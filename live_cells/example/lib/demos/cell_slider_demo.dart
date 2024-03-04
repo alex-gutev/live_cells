@@ -3,11 +3,11 @@ import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
 /// Example showing usage of [CellSlider]
-class CellSliderDemo extends CellWidget with CellInitializer {
+class CellSliderDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the slider value
-    final n = cell(() => MutableCell(2.0));
+    final n = MutableCell(2.0);
 
     return Scaffold(
       appBar: AppBar(

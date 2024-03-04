@@ -3,11 +3,11 @@ import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
 /// Example showing using of [CellTextField]
-class CellTextFieldDemo1 extends CellWidget with CellInitializer {
+class CellTextFieldDemo1 extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the content of the field
-    final input = cell(() => MutableCell(''));
+    final input = MutableCell('');
 
     return Scaffold(
       appBar: AppBar(

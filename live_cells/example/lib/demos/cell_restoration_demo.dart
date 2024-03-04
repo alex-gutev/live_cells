@@ -35,7 +35,7 @@ class RadioValueCoder implements CellValueCoder {
   }
 }
 
-class CellRestorationDemo extends StaticWidget {
+class CellRestorationDemo extends CellWidget {
   const CellRestorationDemo({super.key}) :
     super(restorationId: 'cell_restoration_demo');
 

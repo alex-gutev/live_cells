@@ -3,11 +3,11 @@ import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
 /// Example showing usage of [CellCheckbox]
-class CellCheckboxDemo extends CellWidget with CellInitializer {
+class CellCheckboxDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the state of the checkbox.
-    final state = cell(() => MutableCell<bool?>(true));
+    final state = MutableCell<bool?>(true);
 
     return Scaffold(
       appBar: AppBar(

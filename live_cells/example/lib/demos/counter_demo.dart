@@ -3,11 +3,11 @@ import 'package:live_cells/live_cells.dart';
 
 // Basic example demonstrating how `CellWidget` rebuilds when the values of
 // cells referenced within it change.
-class CounterDemo extends CellWidget with CellInitializer {
+class CounterDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the counter value
-    final counter = cell(() => MutableCell(0));
+    final counter = MutableCell(0);
 
     return Scaffold(
       appBar: AppBar(

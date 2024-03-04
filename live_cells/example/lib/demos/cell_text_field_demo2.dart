@@ -3,16 +3,16 @@ import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
 /// Example showing usage of a [CellTextField] with both a content and selection cell provided.
-class CellTextFieldDemo2 extends CellWidget with CellInitializer {
+class CellTextFieldDemo2 extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cell holding the content of the text field
-    final input = cell(() => MutableCell(''));
+    final input = MutableCell('');
 
     // Cell holding the field's selection
-    final selection = cell(() => MutableCell(
+    final selection = MutableCell(
         const TextSelection.collapsed(offset: 0)
-    ));
+    );
 
     return Scaffold(
       appBar: AppBar(

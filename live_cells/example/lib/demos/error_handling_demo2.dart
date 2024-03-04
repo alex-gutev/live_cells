@@ -10,7 +10,7 @@ import 'package:live_cells/live_cells.dart';
 ///
 /// The purpose of this example is to demonstrate how the text field validation
 /// functionality can be packaged in a reusable function.
-class ErrorHandlingDemo2 extends StaticWidget {
+class ErrorHandlingDemo2 extends CellWidget {
   @override
   Widget build(BuildContext context) {
     final a = MutableCell<num>(0);

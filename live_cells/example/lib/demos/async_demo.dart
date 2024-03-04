@@ -3,11 +3,11 @@ import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
 /// Demonstrates asynchronous cells
-class AsyncDemo extends CellWidget with CellInitializer {
+class AsyncDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
     /// Text field content cell
-    final content = cell(() => MutableCell(''));
+    final content = MutableCell('');
 
     /// This cell holds the content of the text field but only updates after
     /// a delay of 3 seconds.
@@ -18,10 +18,9 @@ class AsyncDemo extends CellWidget with CellInitializer {
     /// The `.onError<UninitializedCellError>` catches the exception that is
     /// thrown when the cell's value is accessed before the Future has been
     /// resolved.
-    final delayed = cell(() => content.delayed(const Duration(seconds: 3))
+    final delayed = content.delayed(const Duration(seconds: 3))
         .wait
-        .onError<UninitializedCellError>(''.cell)
-    );
+        .initialValue(''.cell);
 
     /// This cell holds the content of the text field but only updates after
     /// a delay of 3 seconds.
@@ -33,10 +32,9 @@ class AsyncDemo extends CellWidget with CellInitializer {
     /// The `.onError<UninitializedCellError>` catches the exception that is
     /// thrown when the cell's value is accessed before the Future has been
     /// resolved.
-    final debounced = cell(() => content.delayed(const Duration(seconds: 3))
+    final debounced = content.delayed(const Duration(seconds: 3))
         .waitLast
-        .onError<UninitializedCellError>(''.cell)
-    );
+        .initialValue(''.cell);
 
     return Scaffold(
       appBar: AppBar(

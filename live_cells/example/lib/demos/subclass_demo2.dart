@@ -74,10 +74,10 @@ class CountCellState extends CellState<CountCell> {
   }
 }
 
-class SubclassDemo2 extends CellWidget with CellInitializer {
+class SubclassDemo2 extends CellWidget {
   @override
   Widget build(BuildContext context) {
-    final counter = cell(() => CountCell(10, interval: const Duration(seconds: 1)));
+    final counter = CountCell(10, interval: const Duration(seconds: 1));
 
     return Scaffold(
       appBar: AppBar(

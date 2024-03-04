@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
 /// Example showing computed cells
-class SumDemo extends CellWidget with CellInitializer {
+class SumDemo extends CellWidget {
   @override
   Widget build(BuildContext context) {
-    final a = cell(() => MutableCell(0));
-    final b = cell(() => MutableCell(0));
+    final a = MutableCell(0);
+    final b = MutableCell(0);
 
     // Computed cell holding the sum of `a` and `b`
     //
     // The value of this cell is updated whenever the values of `a` or `b` change.
-    final sum = cell(() => a + b);
+    final sum = a + b;
 
     return Scaffold(
       appBar: AppBar(

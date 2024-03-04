@@ -16,14 +16,14 @@ class ClampCell<T extends num> extends DependentCell<T> {
   T get value => min(argMax.value, max(argMin.value, argValue.value));
 }
 
-class SubclassDemo1 extends CellWidget with CellInitializer {
+class SubclassDemo1 extends CellWidget {
   @override
   Widget build(BuildContext context) {
-    final a = cell(() => MutableCell(5));
+    final a = MutableCell(5);
     final aMax = 10.cell;
     final aMin = 2.cell;
 
-    final clamped = cell(() => ClampCell(a, aMin, aMax));
+    final clamped = ClampCell(a, aMin, aMax);
 
     return Scaffold(
       appBar: AppBar(

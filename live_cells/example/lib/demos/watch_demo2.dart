@@ -16,8 +16,8 @@ class WatchDemo2 extends StatelessWidget {
         padding: const EdgeInsets.all(10.0),
         child: Center(
           child: CellWidget.builder((context) {
-            final counter1 = context.cell(() => MutableCell(0));
-            final counter2 = context.cell(() => MutableCell(0));
+            final counter1 = MutableCell(0);
+            final counter2 = MutableCell(0);
 
             // Register a watch function to be called when the values of counter1 and
             // counter2 change.

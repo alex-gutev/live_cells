@@ -8,7 +8,7 @@ import 'package:live_cells/live_cells.dart';
 /// Specifically the example uses `mutableString` and `CellTextField` to
 /// retrieve numeric input from a text field whilst handling invalid input by
 /// displaying and error message under the field.
-class ErrorHandlingDemo1 extends StaticWidget {
+class ErrorHandlingDemo1 extends CellWidget {
   @override
   Widget build(BuildContext context) {
     // Cells holding the parsed `num` values from fields `a` and `b`
