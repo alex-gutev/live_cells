@@ -109,6 +109,17 @@ class CellState<T extends StatefulCell> {
     }
   }
 
+  /// Remove all the observers and call [dispose].
+  ///
+  /// This state is disposed after this method is called and should no
+  /// longer be used.
+  void removeAllObservers() {
+    if (_observers.isNotEmpty) {
+      _observers.clear();
+      dispose();
+    }
+  }
+
   /// Notify the observers of the cell that the cell's value will change.
   ///
   /// This should be called before the value of the cell has actually changed.

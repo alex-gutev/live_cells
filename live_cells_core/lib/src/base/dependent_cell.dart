@@ -29,8 +29,8 @@ abstract class DependentCell<T> extends ValueCell<T> {
   /// If [key] is non-null, the returned [DependentCell] object will compare
   /// [==] to all [DependentCell] objects with the same [key] under [==].
   DependentCell(this.arguments, {
-    this.key,
-  });
+    key,
+  }) : key = key ?? AutoKey.autoKey();
 
   @override
   bool operator ==(other) => other is DependentCell && key != null

@@ -7,32 +7,38 @@ part of 'mutable_cell.dart';
 ///
 /// **NOTE**: Subclasses should override [createMutableState] instead of
 /// [createState].
-abstract class MutableCellBase<T> extends StatefulCell<T> implements MutableCell<T> {
-  MutableCellBase() {
-    _mutableState = createMutableState(oldState: null);
-  }
+abstract class MutableCellBase<T> extends PersistentStatefulCell<T> implements MutableCell<T> {
+  /// Mutable cell base constructor.
+  ///
+  /// If [key] is non-null it is used to identify the cell. **NOTE**, if [key]
+  /// is non null [dispose] has to be called, when the cell is no longer used.
+  MutableCellBase({super.key});
 
   @override
-  T get value => _mutableState.value;
+  T get value => state.value;
 
   @override
   set value(T value) {
-    _mutableState.value = value;
+    state.value = value;
+  }
+
+  @override
+  void dispose() {
+    _mutableState?.removeAllObservers();
   }
 
   @override
   @protected
   MutableCellState<T, MutableCellBase<T>> get state =>
-      (super.state as MutableCellState<T,MutableCellBase<T>>?) ??
-          createState();
+      super.state as MutableCellState<T,MutableCellBase<T>>;
 
   @override
   MutableCellState<T, MutableCellBase<T>> createState() {
-    if (_mutableState.isDisposed) {
+    if (_mutableState?.isDisposed ?? true) {
       _mutableState = createMutableState(oldState: _mutableState);
     }
 
-    return _mutableState;
+    return _mutableState!;
   }
 
   /// Create the state for the MutableCell.
@@ -51,7 +57,7 @@ abstract class MutableCellBase<T> extends StatefulCell<T> implements MutableCell
 
   // Private
 
-  late MutableCellState<T, MutableCellBase<T>> _mutableState;
+  MutableCellState<T, MutableCellBase<T>>? _mutableState;
 }
 
 class MutableCellState<T, S extends StatefulCell<T>> extends CellState<S> {

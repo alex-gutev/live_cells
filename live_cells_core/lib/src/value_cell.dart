@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 
+import 'base/auto_key.dart';
 import 'base/types.dart';
 import 'base/cell_equality_factory.dart';
 import 'base/exceptions.dart';

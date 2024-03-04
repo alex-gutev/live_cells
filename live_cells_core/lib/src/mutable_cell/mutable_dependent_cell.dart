@@ -37,8 +37,12 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   ///
   /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
+  ///
+  /// If [key] is non-null it is used to identify the cell. **NOTE**, if [key]
+  /// is non null [dispose] has to be called, when the cell is no longer used.
   MutableDependentCell(this.arguments, {
-    this.changesOnly = false
+    this.changesOnly = false,
+    super.key
   });
 
   /// Compute the value of the cell.

@@ -1,8 +1,11 @@
 import 'package:meta/meta.dart';
 
+import '../base/auto_key.dart';
 import '../base/cell_observer.dart';
 import 'cell_state.dart';
 import '../value_cell.dart';
+
+part 'persistent_stateful_cell.dart';
 
 /// A cell with the state managed by a [CellState] object.
 ///
@@ -30,10 +33,10 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   ///
   /// If this is [null] then this [ValueCell] is unique from all other [ValueCell]
   /// objects including those with a [key] equal to [null].
-  late final dynamic key;
+  final dynamic key;
 
   /// Create a cell identified by [key].
-  StatefulCell({this.key});
+  StatefulCell({key}) : key = key ?? AutoKey.autoKey();
 
   @override
   bool operator ==(Object other) => other is StatefulCell && key != null

@@ -13,7 +13,7 @@ part 'mutable_cell_base.dart';
 /// Interface for a [ValueCell] of which the [value] property can be set explicitly
 abstract class MutableCell<T> extends ValueCell<T> {
   /// Create a mutable cell with its value initialized to [value]
-  factory MutableCell(T value) => _MutableCellImpl(value);
+  factory MutableCell(T value, {key}) => _MutableCellImpl(value, key: key);
 
   /// Create a computational cell which can also have its value set directly.
   ///
@@ -46,11 +46,13 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// });
   /// ```
   factory MutableCell.computed(T Function() compute, void Function(T value) reverse, {
-    bool changesOnly = false
+    bool changesOnly = false,
+    key
   }) => DynamicMutableComputeCell(
       compute: compute,
       reverseCompute: reverse,
-      changesOnly: changesOnly
+      changesOnly: changesOnly,
+      key: key
   );
 
   /// Set the value of the cell.
@@ -62,6 +64,14 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// 2. Set value of cell
   /// 3. [CellObserver.update()]
   set value(T value);
+
+  /// Dispose the cell and its state.
+  ///
+  /// It is only necessary to call this method if this cell has a non-null [key].
+  ///
+  /// When this method is called, its observers and all references to its state
+  /// are removed. The value of the cell is lost.
+  void dispose();
 
   /// Set the value of multiple [MutableCell]'s simultaneously.
   ///
@@ -126,7 +136,7 @@ abstract class MutableCell<T> extends ValueCell<T> {
 }
 
 class _MutableCellImpl<T> extends MutableCellBase<T> implements RestorableCell<T> {
-  _MutableCellImpl(this._initialValue);
+  _MutableCellImpl(this._initialValue, {super.key});
 
   /// The initial value
   final T _initialValue;

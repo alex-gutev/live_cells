@@ -24,6 +24,9 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
   /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
   ///
+  /// If [key] is non-null it is used to identify the cell. **NOTE**, if [key]
+  /// is non null [dispose] has to be called, when the cell is no longer used.
+  ///
   /// Example:
   ///
   /// ```dart
@@ -42,7 +45,8 @@ class MutableComputeCell<T> extends MutableDependentCell<T> {
     required T Function() compute,
     required void Function(T) reverseCompute,
     required Set<ValueCell> arguments,
-    super.changesOnly
+    super.changesOnly,
+    super.key
   }) : _compute = compute, _reverseCompute = reverseCompute, super(arguments);
 
   @override

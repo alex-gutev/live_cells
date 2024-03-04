@@ -33,6 +33,11 @@ class MutableCellView<T> extends ComputeCell<T> implements MutableCell<T> {
     });
   }
 
+  @override
+  void dispose() {
+    // Does nothing since this is a stateless which has no state to dispose.
+  }
+
   // Private
 
   /// Reverse computation function
