@@ -118,7 +118,7 @@ class CellWidgetTest2 extends CellWidget {
 }
 
 /// Tests CellWidget subclass with cells defined in build method using hook interface
-class CellWidgetTest3 extends CellWidget with CellInitializer {
+class CellWidgetTest3 extends CellWidget with CellHooks {
   const CellWidgetTest3({super.key, super.restorationId});
 
   @override
@@ -142,7 +142,7 @@ class CellWidgetTest3 extends CellWidget with CellInitializer {
 }
 
 /// Tests that cells defined in build method using hook interface are persisted across builds.
-class CellWidgetTest4 extends CellWidget with CellInitializer {
+class CellWidgetTest4 extends CellWidget with CellHooks {
   final String title;
 
   const CellWidgetTest4(this.title, {super.key});
@@ -193,7 +193,7 @@ class CellWidgetTest5 extends CellWidget {
 }
 
 /// Tests that cells defined in build method are persisted across builds.
-class CellWidgetTest6 extends CellWidget with CellInitializer {
+class CellWidgetTest6 extends CellWidget {
   final String title;
 
   const CellWidgetTest6(this.title, {super.key});

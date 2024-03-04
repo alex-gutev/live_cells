@@ -11,7 +11,7 @@ export 'src/cell_widget/cell_widget.dart'
     show
         CellWidget,
         CreateCell,
-        CellInitializer,
+        CellHooks,
         CellHookContext,
         CellObserverState;
 

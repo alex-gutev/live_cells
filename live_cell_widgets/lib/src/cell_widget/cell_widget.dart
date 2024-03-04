@@ -5,7 +5,7 @@ import 'package:live_cell_widgets/src/restoration/cell_restoration_manager.dart'
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cells_core/live_cells_internals.dart';
 
-part 'cell_initializer.dart';
+part 'cell_hooks.dart';
 part 'cell_observer_state.dart';
 
 /// A widget which is rebuilt in response to changes in the values of [ValueCell]'s.
@@ -120,7 +120,7 @@ abstract class CellWidget extends StatelessWidget {
 }
 
 /// [CellWidget] with the [build] method defined by [builder].
-class _WidgetCellBuilder extends CellWidget with CellInitializer {
+class _WidgetCellBuilder extends CellWidget with CellHooks {
   /// Widget builder function
   final Widget Function(CellHookContext context) builder;
 

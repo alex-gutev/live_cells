@@ -56,7 +56,7 @@ typedef CreateCell<T extends ValueCell> = T Function();
 /// 1. Calls to [cell] must not appear within conditionals or loops.
 /// 2. Calls to [cell] must not appear within widget builder functions, such as
 ///    those used with [Builder] or [ValueListenableBuilder].
-mixin CellInitializer on CellWidget {
+mixin CellHooks on CellWidget {
   /// Return an instance of a [ValueCell] that is kept between builds of the widget.
   ///
   /// This function is intended to be used within [build] to create and
@@ -107,12 +107,12 @@ mixin CellInitializer on CellWidget {
 abstract class CellHookContext extends BuildContext {
   /// Return an instance of a [ValueCell] that is kept between builds of the widget.
   ///
-  /// The functionality of this method is the same as [CellInitializer.cell].
+  /// The functionality of this method is the same as [CellHooks.cell].
   V cell<T, V extends ValueCell<T>>(CreateCell<V> create);
 
   /// Register a callback function to be called whenever the values of cells change.
   ///
-  /// The functionality of this method is the same as [CellInitializer.watch].
+  /// The functionality of this method is the same as [CellHooks.watch].
   void watch(VoidCallback watch);
 
   /// Prevent construction
@@ -204,18 +204,18 @@ class _CellStorageElement extends _CellWidgetElement implements CellHookContext 
 
   @override
   Widget build() {
-    final previousActiveElement = CellInitializer._activeCellElement;
+    final previousActiveElement = CellHooks._activeCellElement;
 
     try {
       _curCell = 0;
       _curWatcher = 0;
 
-      CellInitializer._activeCellElement = this;
+      CellHooks._activeCellElement = this;
       return super.build();
     }
     finally {
       _isFirstBuild = false;
-      CellInitializer._activeCellElement = previousActiveElement;
+      CellHooks._activeCellElement = previousActiveElement;
     }
   }
 
