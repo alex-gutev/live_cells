@@ -247,7 +247,7 @@ void main() {
       expect(observer2.values, equals([10, 20, 30, 40, 50]));
     });
 
-    test('Cells with different keys do not sgare the same state', () {
+    test('Cells with different keys do not share the same state', () {
       final a = MutableCell(0, key: 'mutable-cell-key1');
       final b = MutableCell(0, key: 'mutable-cell-key2');
 

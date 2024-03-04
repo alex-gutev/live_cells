@@ -69,7 +69,10 @@ class _DynamicMutableComputeCellState<T>
   @override
   T compute() => ComputeArgumentsTracker.computeWithTracker(cell._compute, (arg) {
     if (!arguments.contains(arg)) {
-      arg.addObserver(this);
+      if (isActive) {
+        arg.addObserver(this);
+      }
+
       arguments.add(arg);
     }
   });

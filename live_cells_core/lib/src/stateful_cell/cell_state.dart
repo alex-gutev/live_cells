@@ -22,6 +22,9 @@ class CellState<T extends StatefulCell> {
   /// After a state has been disposed it should no longer be used
   bool get isDisposed => _isDisposed;
 
+  /// Does this cell have at least one observer?
+  bool get isActive => !_isDisposed && _observers.isNotEmpty;
+
   /// Create a state for [cell] identified by [key].
   CellState({
     required this.cell,

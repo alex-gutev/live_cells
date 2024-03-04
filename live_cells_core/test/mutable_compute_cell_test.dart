@@ -417,6 +417,336 @@ void main() {
       observeCell(cell);
       expect(() => cell.value, throwsException);
     });
+
+    test('Compares == when same key', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      expect(b1 == b2, isTrue);
+      expect(b1.hashCode == b2.hashCode, isTrue);
+    });
+
+    test('Compares != when different keys', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key2'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      expect(b1 != b2, isTrue);
+      expect(b1 == b1, isTrue);
+    });
+
+    test('Compares != when null keys', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1
+      );
+
+      expect(b1 != b2, isTrue);
+      expect(b1 == b1, isTrue);
+    });
+
+    test('Cells with the same keys share the same state', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      observeCell(b1);
+      observeCell(b2);
+
+      b1.value = 10;
+      expect(a.value, 15);
+      expect(b1.value, 10);
+      expect(b2.value, 10);
+
+      b2.value = 20;
+      expect(a.value, 25);
+      expect(b1.value, 20);
+      expect(b2.value, 20);
+    });
+
+    test('Cells with the same keys manage the same set of observers', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      final observer1 = addObserver(b1, MockValueObserver());
+      final observer2 = addObserver(b2, MockValueObserver());
+
+      b1.value = 10;
+      b2.value = 20;
+      b1.value = 30;
+      b2.value = 40;
+
+      b2.removeObserver(observer1);
+      b1.value = 50;
+
+      b2.removeObserver(observer2);
+      b1.value = 60;
+      b2.value = 70;
+
+      expect(observer1.values, equals([10, 20, 30, 40]));
+      expect(observer2.values, equals([10, 20, 30, 40, 50]));
+    });
+
+    test('Cells with different keys do not share the same state', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key2'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      observeCell(b1);
+      observeCell(b2);
+
+      b1.value = 10;
+      expect(a.value, 15);
+      expect(b1.value, 10);
+      expect(b2.value, 16);
+
+      b2.value = 20;
+      expect(a.value, 25);
+      expect(b1.value, 26);
+      expect(b2.value, 20);
+    });
+
+    test('Cells with different keys manage different sets of observers', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key2'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      observeCell(b1);
+      observeCell(b2);
+
+      final observer1 = addObserver(b1, MockValueObserver());
+      final observer2 = addObserver(b2, MockValueObserver());
+
+      b1.value = 10;
+      b2.value = 20;
+      b1.value = 30;
+      b2.value = 40;
+
+      b2.removeObserver(observer1);
+      b1.value = 50;
+
+      b1.removeObserver(observer2);
+      b1.value = 60;
+      b2.value = 70;
+
+      expect(observer1.values, equals([10, 26, 30, 46, 50, 60, 76]));
+      expect(observer2.values, equals([16, 20, 36, 40, 56, 66, 70]));
+    });
+
+    test('State recreated after disposal when using keys', () {
+      final a = MutableCell(0);
+
+      final b = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b.dispose();
+      });
+
+      addTearDown(() => b.dispose());
+
+      b.value = 5;
+
+      // The cell's value is recomputed when its state is initialized
+      final observer1 = addObserver(b, MockSimpleObserver());
+      expect(b.value, 11);
+
+      b.value = 10;
+      b.value = 15;
+
+      // The cell's value is recomputed when its state is recreated
+      b.removeObserver(observer1);
+      expect(b.value, 21);
+
+      b.value = 16;
+      expect(b.value, 16);
+
+      // The cell's value is recomputed when its state is initialized
+      addObserver(b, MockSimpleObserver());
+      expect(b.value, 22);
+
+      b.value = 17;
+      expect(b.value, 17);
+    });
+
+    test('Cells with keys do not leak resources', () {
+      final resource = MockResource();
+      final testCell = TestManagedCell(resource, 1);
+
+      final a = MutableCell(0);
+
+      final b = MutableComputeCell(
+          arguments: {a, testCell},
+          compute: () => a.value + testCell.value,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b.dispose();
+      });
+
+      b.value = 5;
+
+      observeCell(b);
+      observeCell(b);
+
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNotNull);
+
+      verifyNever(resource.dispose());
+
+      b.dispose();
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNull);
+
+      verify(resource.dispose()).called(1);
+    });
+
+    test('All observers removed after calling dispose', () {
+      final a = MutableCell(0);
+
+      final b = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() => b.dispose());
+
+      b.value = 5;
+
+      final listener1 = addListener(b, MockSimpleListener());
+      final listener2 = addListener(b, MockSimpleListener());
+
+      b.value = 6;
+      b.value = 7;
+
+      verify(listener1()).called(2);
+      verify(listener2()).called(2);
+
+      b.dispose();
+      b.value = 8;
+
+      verifyNoMoreInteractions(listener1);
+      verifyNoMoreInteractions(listener2);
+    });
   });
 
   group('DynamicMutableComputeCell', () {
@@ -901,6 +1231,303 @@ void main() {
 
       observeCell(cell);
       expect(() => cell.value, throwsException);
+    });
+
+    test('Compares == when same key', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      expect(b1 == b2, isTrue);
+      expect(b1.hashCode == b2.hashCode, isTrue);
+    });
+
+    test('Compares != when different keys', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1,
+          key: 'mutable-cell-key2'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      expect(b1 != b2, isTrue);
+      expect(b1 == b1, isTrue);
+    });
+
+    test('Compares != when null keys', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1
+      );
+
+      final b2 = MutableComputeCell(
+          arguments: {a},
+          compute: () => a.value + 1,
+          reverseCompute: (v) => a.value = v - 1
+      );
+
+      expect(b1 != b2, isTrue);
+      expect(b1 == b1, isTrue);
+    });
+
+    test('Cells with the same keys share the same state', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      observeCell(b1);
+      observeCell(b2);
+
+      b1.value = 10;
+      expect(a.value, 15);
+      expect(b1.value, 10);
+      expect(b2.value, 10);
+
+      b2.value = 20;
+      expect(a.value, 25);
+      expect(b1.value, 20);
+      expect(b2.value, 20);
+    });
+
+    test('Cells with the same keys manage the same set of observers', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      final observer1 = addObserver(b1, MockValueObserver());
+      final observer2 = addObserver(b2, MockValueObserver());
+
+      b1.value = 10;
+      b2.value = 20;
+      b1.value = 30;
+      b2.value = 40;
+
+      b2.removeObserver(observer1);
+      b1.value = 50;
+
+      b2.removeObserver(observer2);
+      b1.value = 60;
+      b2.value = 70;
+
+      expect(observer1.values, equals([10, 20, 30, 40]));
+      expect(observer2.values, equals([10, 20, 30, 40, 50]));
+    });
+
+    test('Cells with different keys do not share the same state', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key2'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      observeCell(b1);
+      observeCell(b2);
+
+      b1.value = 10;
+      expect(a.value, 15);
+      expect(b1.value, 10);
+      expect(b2.value, 16);
+
+      b2.value = 20;
+      expect(a.value, 25);
+      expect(b1.value, 26);
+      expect(b2.value, 20);
+    });
+
+    test('Cells with different keys manage different sets of observers', () {
+      final a = MutableCell(0);
+
+      final b1 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      final b2 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key2'
+      );
+
+      addTearDown(() {
+        b1.dispose();
+        b2.dispose();
+      });
+
+      observeCell(b1);
+      observeCell(b2);
+
+      final observer1 = addObserver(b1, MockValueObserver());
+      final observer2 = addObserver(b2, MockValueObserver());
+
+      b1.value = 10;
+      b2.value = 20;
+      b1.value = 30;
+      b2.value = 40;
+
+      b2.removeObserver(observer1);
+      b1.value = 50;
+
+      b1.removeObserver(observer2);
+      b1.value = 60;
+      b2.value = 70;
+
+      expect(observer1.values, equals([10, 26, 30, 46, 50, 60, 76]));
+      expect(observer2.values, equals([16, 20, 36, 40, 56, 66, 70]));
+    });
+
+    test('State recreated after disposal when using keys', () {
+      final a = MutableCell(0);
+
+      final b = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b.dispose();
+      });
+
+      addTearDown(() => b.dispose());
+
+      b.value = 5;
+
+      // The cell's value is recomputed when its state is initialized
+      final observer1 = addObserver(b, MockSimpleObserver());
+      expect(b.value, 11);
+
+      b.value = 10;
+      b.value = 15;
+
+      // The cell's value is recomputed when its state is recreated
+      b.removeObserver(observer1);
+      expect(b.value, 21);
+
+      b.value = 16;
+      expect(b.value, 16);
+
+      // The cell's value is recomputed when its state is initialized
+      addObserver(b, MockSimpleObserver());
+      expect(b.value, 22);
+
+      b.value = 17;
+      expect(b.value, 17);
+    });
+
+    test('Cells with keys do not leak resources', () {
+      final resource = MockResource();
+      final testCell = TestManagedCell(resource, 1);
+
+      final a = MutableCell(0);
+
+      final b = MutableCell.computed(() => a() + testCell(), (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() {
+        b.dispose();
+      });
+
+      b.value = 5;
+
+      observeCell(b);
+      observeCell(b);
+
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNotNull);
+
+      verifyNever(resource.dispose());
+
+      b.dispose();
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNull);
+
+      verify(resource.dispose()).called(1);
+    });
+
+    test('All observers removed after calling dispose', () {
+      final a = MutableCell(0);
+
+      final b = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
+          key: 'mutable-cell-key1'
+      );
+
+      addTearDown(() => b.dispose());
+
+      b.value = 5;
+
+      final listener1 = addListener(b, MockSimpleListener());
+      final listener2 = addListener(b, MockSimpleListener());
+
+      b.value = 6;
+      b.value = 7;
+
+      verify(listener1()).called(2);
+      verify(listener2()).called(2);
+
+      b.dispose();
+      b.value = 8;
+
+      verifyNoMoreInteractions(listener1);
+      verifyNoMoreInteractions(listener2);
     });
   });
 

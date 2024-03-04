@@ -149,6 +149,7 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
     super.init();
 
     try {
+      stale = true;
       setValue(value);
     }
     catch (e) {
