@@ -34,6 +34,49 @@ part 'cell_observer_state.dart';
 ///
 /// In the above example, the widget is rebuilt automatically whenever the
 /// value of cell `a` is changed.
+///
+/// Cells defined directly within the [build] will have their state persisted
+/// between builds. For this to happen the following rules have to be
+/// observed:
+///
+/// 1. Cells should not be defined in conditionals or loops.
+/// 2. Cells should not be defined in callback or builder functions of widgets
+///    nested in this widget.
+///
+/// The following is an example of correctly placed cell definitions:
+///
+/// ```dart
+/// @override
+/// Widget build (BuildContext context) {
+///   final count = MutableCell(0);
+///   final next = ValueCell.computed(() => count() + 1);
+///   ...
+/// }
+/// ```
+///
+/// The following is an example of incorrectly placed cell definitions:
+///
+/// ```dart
+/// @override
+/// Widget build (BuildContext context) {
+///   if (...) {
+///     // This is bad because the definition appears within a conditional
+///     final count = MutableCell(0);
+///   }
+///
+///   while (...) {
+///     // This is bad because the definition appears within a loop
+///     final count = MutableCell(0);
+///   }
+///
+///   return Builder((context) {
+///     // This is bad because the definition appears in a builder function
+///     // of a nested widget and the [CellWidget] will not be able to persist
+///     // its state between builds.
+///     final count = MutableCell(0);
+///   });
+/// }
+/// ```
 abstract class CellWidget extends StatelessWidget {
   /// Restoration ID to use for restoring the cell state
   ///
@@ -50,20 +93,19 @@ abstract class CellWidget extends StatelessWidget {
   /// This allows a widget, which is dependent on the values of one or more cells,
   /// to be defined without subclassing.
   ///
-  /// The returned widget includes the [CellInitializer] mixin, which allows the
-  /// [CellWidgetContextExtension.cell] method to be called on the [BuildContext]
-  /// passed to [builder].
+  /// [builder] is provided a [CellHookContext], instead of a [BuildContext],
+  /// which allows cells to be defined within the builder using [CellHookContext.cell],
+  /// and watch functions to be defined using [CellHookContext.watch].
   ///
   /// If [restorationId] is non-null it is used as the restoration ID for
-  /// restoring the state of the cells created using
-  /// [CellWidgetContextExtension.cell].
+  /// restoring the state of the cells created within [builder].
   ///
   /// Example:
   ///
   /// ```dart
   /// WidgetCell.builder((context) => Text('The value of cell a is ${a()}'))
   /// ```
-  factory CellWidget.builder(WidgetBuilder builder, {
+  factory CellWidget.builder(Widget Function(CellHookContext context) builder, {
     Key? key,
     String? restorationId
   }) => _WidgetCellBuilder(builder,
@@ -80,7 +122,7 @@ abstract class CellWidget extends StatelessWidget {
 /// [CellWidget] with the [build] method defined by [builder].
 class _WidgetCellBuilder extends CellWidget with CellInitializer {
   /// Widget builder function
-  final WidgetBuilder builder;
+  final Widget Function(CellHookContext context) builder;
 
   /// Create a [CellWidget] with [build] defined by [builder].
   _WidgetCellBuilder(this.builder, {
@@ -89,7 +131,7 @@ class _WidgetCellBuilder extends CellWidget with CellInitializer {
   });
 
   @override
-  Widget build(BuildContext context) => builder(context);
+  Widget build(BuildContext context) => builder(context as CellHookContext);
 }
 
 /// Element for [CellWidget].

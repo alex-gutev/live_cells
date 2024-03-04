@@ -12,7 +12,7 @@ export 'src/cell_widget/cell_widget.dart'
         CellWidget,
         CreateCell,
         CellInitializer,
-        CellWidgetContextExtension,
+        CellHookContext,
         CellObserverState;
 
 export 'src/cell_widget/static_widget.dart' show StaticWidget;

@@ -103,37 +103,27 @@ mixin CellInitializer on CellWidget {
   static _CellStorageElement? _activeCellElement;
 }
 
-/// Provides the [cell] method for creating and retrieving instances of [ValueCell]'s.
-extension CellWidgetContextExtension on BuildContext {
+/// Interface providing methods for defining cells and watch functions that are persisted between builds of a widget.
+abstract class CellHookContext extends BuildContext {
   /// Return an instance of a [ValueCell] that is kept between builds of the widget.
   ///
   /// The functionality of this method is the same as [CellInitializer.cell].
-  ///
-  /// **NOTE**: This method may only be called if [this] is the [BuildContext]
-  /// of a [CellWidget] with the [CellInitializer] mixin.
-  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) {
-    final element = this as _CellStorageElement;
-
-    return element.getCell(create);
-  }
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create);
 
   /// Register a callback function to be called whenever the values of cells change.
   ///
   /// The functionality of this method is the same as [CellInitializer.watch].
-  ///
-  /// **NOTE**: This method may only be called if [this] is the [BuildContext]
-  /// of a [CellWidget] with the [CellInitializer] mixin.
-  void watch(VoidCallback watch) {
-    final element = this as _CellStorageElement;
-    element.getWatcher(watch);
-  }
+  void watch(VoidCallback watch);
+
+  /// Prevent construction
+  CellHookContext._internal();
 }
 
 /// Widget element for [CellWidget]
 /// 
 /// Keeps track of the cell instances that were created during the lifetime of
 /// the widget.
-class _CellStorageElement extends _CellWidgetElement {
+class _CellStorageElement extends _CellWidgetElement implements CellHookContext {
   _CellStorageElement(super.widget);
 
   /// List of created cells
@@ -237,6 +227,12 @@ class _CellStorageElement extends _CellWidgetElement {
 
     super.unmount();
   }
+
+  @override
+  V cell<T, V extends ValueCell<T>>(CreateCell<V> create) => getCell(create);
+
+  @override
+  void watch(VoidCallback watch) => getWatcher(watch);
 }
 
 /// A [_CellStorageElement] which restores the state of the cells created within it.
