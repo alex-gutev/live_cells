@@ -1,3 +1,10 @@
+## 0.17.0
+
+New features:
+
+* Functionality for automatically generating cell keys, using `AutoKey`.
+* Mutable cells can now have keys.
+
 ## 0.16.1
 
 * Add exception handling in initial call to cell watch functions.
