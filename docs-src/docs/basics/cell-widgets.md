@@ -77,7 +77,7 @@ CellWidget.builder((context) {
 
     return ElevatedButton(
         child: Text('${count()}'),
-        onPressed: count.value++
+        onPressed: () => count.value++
     );
 });
 ```
@@ -97,11 +97,11 @@ CellWidget.builder((context) {
         children: [
             ElevatedButton(
                 child: Text('${count1()}'),
-                onPressed: count1.value++
+                onPressed: () => count1.value++
             ),
             ElevatedButton(
                 child: Text('${count2()}'),
-                onPressed: count2.value++
+                onPressed: () => count2.value++
             )
         ]
     );
@@ -202,7 +202,7 @@ CellWidget.builder((context) {
 
     return ElevatedButton(
         child: Text('${count()}'),
-        onPressed: count.value++
+        onPressed: () => count.value++
     );
 });
 ```
@@ -237,7 +237,7 @@ class Counter extends CellWidget with CellHooks {
 
         return ElevatedButton(
             child: Text('${count()}'),
-            onPressed: count.value++
+            onPressed: () => count.value++
         );
     }
 }
