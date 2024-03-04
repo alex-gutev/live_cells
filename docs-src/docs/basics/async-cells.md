@@ -541,12 +541,12 @@ with the following widget:
 
 
 ```dart
-CellWidget.builder((c) {
-  final content = c.cell(() => MutableCell(''));
-  final debounced = c.cell(() => content
+CellWidget.builder((_) {
+  final content = MutableCell('');
+  final debounced = content
       .delayed(Duration(seconds: 3)
       .waitLast
-      .onError<UninitializedCellError>(''.cell));
+      .initialValue(''.cell);
     
   return Column(
     children: [
@@ -595,9 +595,9 @@ Column(
     CellTextField(content: search),
     
     // Display results
-    CellWidget.builder((c) {
-      items = c.cell(() => results.waitLast
-            .onError<UninitializedCellError>([].cell));
+    CellWidget.builder((_) {
+      items = results.waitLast
+            .initialValue([].cell);
             
       Column(
         children: items()

@@ -42,39 +42,14 @@ observing the previous `a`. More importantly, the new `a` shares the
 same state (and hence the same value) as the previous `a`. In-effect
 it is the same cell, just referenced by a different object.
 
-Previously, we said cells should be created in a `CellWidget` with
-`context.cell`. So why the need for keys? Keys, are especially useful
-for extension properties which return cells. They allow you to write
-the following:
+Remember we said `CellWidget` automatically generates a key for cells
+defined within its build method. That's how the magic works, it's not
+really magic now is it, and how the state of cells can be persisted
+across builds. `CellWidget` automatically generates a key for each
+cell defined in its build function/method that does not already have a
+key.
 
-```dart
-CellWidget.builder((c) => {
-    final l = c.cell(() => MutableCell([1, 2, 3]));
-    final a = l.first;
-    
-    return Text('${a()}');
-});
-```
-
-instead of:
-
-```dart
-CellWidget.builder((c) => {
-    final l = c.cell(() => MutableCell([1, 2, 3]));
-    final a = c.cell(() => l.first);
-    
-    return Text('${a()}');
-});
-```
-
-Spot the difference? We didn't wrap `l.first` in `cell(...)` in the
-first example. We don't have to because the `first` property returns a
-keyed cell so in-effect it will always return the same cell, given
-that the property getter is called on the same cell. The first code
-snippet is much simpler, more intuitive and more readable than the
-second snippet.
-
-Keys are not only useful in cell widgets, but also in computed cells:
+Keys are not only useful in widgets, but also in computed cells:
 
 ```dart
 final a = MutableCell(0);
@@ -82,10 +57,10 @@ final sum = ValueCell.computed(() => a() + a.previous());
 ```
 
 Notice, we directly referenced the `previous` property (which
-references the previous value of cell `a`). in the computed cell. We
+references the previous value of cell `a`), in the computed cell. We
 are able to do this because `previous` returns a keyed cell. If it
-weren't for keyed cells we would have to write to store `a.previous`
-in a local variable first and referenced that in the computed cell,
+weren't for keyed cells we would have to store `a.previous`
+in a local variable first and reference that in the computed cell,
 i.e. something similar to the following:
 
 ```dart
@@ -189,7 +164,8 @@ class MyKey {
 
 :::danger
 
-Don't give unrelated cells the same key. **Don't do this**
+Don't give the same key to functionally different cells. **Don't do
+this**
 
 ```dart
 final a = ValueCell.computed(() => a() + b(),
@@ -205,9 +181,44 @@ Not unless you want bad things to happen.
 
 :::
 
+## Keys for mutable cells
+
+If you assign a key to a mutable cell, created with `MutableCell` or
+`MutableCell.computed`, you'll have to manually dispose the cell when
+you're no longer using it, by calling its `.dispose()`. 
+
+```dart
+final a = MutableCell(0);
+...
+// When `a` will no longer be used
+a.dispose();
+```
+
+This is because automatic disposal happens when the cell's last
+observer is removed. However a mutable cell can reasonably be expected
+to have its value assigned even when it doesn't have any observers. All
+mutable cells with the same key, will have to share the same state and
+hence the same value. This means the state has to be kept in the
+global cell state table, even when it doesn't have any observers.
+
+You don't have to manually dispose mutable cells without a key, since
+their state is not shared with other cells and hence not kept in a
+global state table.
+
+:::important
+
+`CellWidget` takes care of automatically disposing all `MutableCell`s
+defined within it when the widget's element is unmounted, so you don't
+have to call `dispose` manually.
+
+:::
+
 :::info
 
-Mutable cells, with the exception of lightweight mutable computed
-cells, cannot be assigned a key.
+Stateless mutable computed cells do not require a `dispose` method to
+be called, since they do not have any state to speak of. Most methods
+and properties, provided by this library, that return keyed mutable
+computed cells actually return stateless mutable computed cells. These
+will be covered in the next section.
 
 :::

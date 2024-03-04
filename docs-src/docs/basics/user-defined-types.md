@@ -7,10 +7,9 @@ sidebar_position: 8
 # User Defined Types
 
 So far we've used cells holding strings and numbers, and an
-`enum`. What about types defined by your own classes?
-
-A cell can generally hold a value of any type, as long as `==` is
-suitably defined.
+`enum`. What about types defined by your own classes? A cell can
+generally hold a value of any type. This section goes over the tools
+to make working with user defined types more convenient.
 
 ## Live Cell Extension
 
@@ -94,7 +93,7 @@ to the `dev_dependencies` of your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-    live_cell_extension: 0.4.7
+    live_cell_extension: 0.4.11
     ...
 ```
 
@@ -146,7 +145,13 @@ populating the class properties simply by binding the property cells,
 retrieved using the generated accessors, to the appropriate widgets.
 
 ```dart title="Binding directly to properties"
-Widget personForm(MutableCell<Person> person) => Column(
+class PersonForm extends CellWidget {
+    final MutableCell<Person> person;
+    
+    PersonForm(this.person);
+    
+    @override
+    Widget build(BuildContext context) => Column(
     children: [
         Text('First Name:'),
         CellTextField(
@@ -167,15 +172,15 @@ property.
 
 :::info
 
-We defined the form as a function, rather than a widget class since it
-will only be used within a `StaticWidget`.
+We defined the form as a class because we intend to reuse it in other
+widgets.
 
 :::
 
 We can then use this form as follows:
 
 ```dart
-StaticWidget.builder((_) {
+CellWidget.builder((_) {
   final person = MutableCell(
       Person(
           firstName: 'John',
@@ -186,7 +191,7 @@ StaticWidget.builder((_) {
     
   return Column(
     children: [
-      personForm(person),
+      PersonForm(person),
       CellText(
         data: ValueCell.computed(
           () => '${person.firstName()} ${person.lastName()}: ${person.age()} years'

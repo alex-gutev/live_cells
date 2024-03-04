@@ -184,15 +184,6 @@ directly with `.value`, the returned widget is rebuilt whenever the
 value of the cell changes.
 :::
 
-:::note
-You may have noticed we did not wrap the `children.cellList` cell in a
-call to the `cell(...)` method. The `cell` method is not necessary in
-this example because `cellList` has a key which uniquely identifies
-the cell. This means even though a new cell is created during each
-build, it shares the same state with all the other cells which have
-the same key.
-:::
-
 Here's what's going on in the example above:
 
 1. `children` is a cell holding the list of child `Widgets`

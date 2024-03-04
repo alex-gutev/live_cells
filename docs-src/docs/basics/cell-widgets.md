@@ -62,16 +62,18 @@ define cells that depend on other cells also defined in the same
 `State` class. Besides that having to use a `StatefulWidget` just to
 define a cell is verbose and annoying.
 
-Luckily `CellWidget` provides functionality for defining cells
-directly in the widget build function. The `cell` method, of the
-`context` parameter passed to the widget build function, creates a
-cell which is persisted between builds of the widget.
+Luckily you can define cells directly in the build function of a
+`CellWidget.builder`. `CellWidget` keeps track of the cells that were
+defined in the build function and persists their state between builds
+of the widget, so you don't have to use a `StatefulWidget`. This is
+very convenient for cells which manage state that is local to a
+widget.
 
 Using `CellWidget.builder`, the counter can be implemented as follows:
 
-```dart title="Defining cells using context.cell"
+```dart title="Defining cells directly in CellWidget.builder"
 CellWidget.builder((context) {
-    final count = context.cell(() => MutableCell(0));
+    final count = MutableCell(0);
 
     return ElevatedButton(
         child: Text('${count()}'),
@@ -80,23 +82,16 @@ CellWidget.builder((context) {
 });
 ```
 
-The `count` cell is defined directly in the build function of
-`CellWidget.builder`, using `context.cell`.
+The `count` cell is defined directly in the build function provided to
+`CellWidget.builder`. This is functionally equivalent to the
+implementation using `StatefulWidget`, however much more succinct.
 
-The `cell` method takes a function which defines the cell. This
-function is called the first time the widget is built. On subsequent
-builds, the cell created during the first build is returned.
+More than one cell can be defined in the build function:
 
-This is functionally equivalent to the implementation using
-`StatefulWidget`, however much more succinct.
-
-The `cell` method can be used to define multiple cells in a single
-build function:
-
-```dart title="Multiple cells defined using context.cell"
+```dart title="Multiple cells defined in CellWidget.builder"
 CellWidget.builder((context) {
-    final count1 = context.cell(() => MutableCell(0));
-    final count2 = context.cell(() => MutableCell(0));
+    final count1 = MutableCell(0);
+    final count2 = MutableCell(0);
 
     return Column(
         children: [
@@ -113,34 +108,95 @@ CellWidget.builder((context) {
 });
 ```
 
-In the example above, two separate cells are defined in a single
-build function using `context.cell`, each representing a different
-counter.
+In the example above, two separate cells are defined in a single build
+function, each representing a different counter.
 
-:::warning
-Calls to `context.cell` should not be placed in:
+:::warning 
+
+When defining cells directly within `CellWidget.builder`,
+the definitions not be placed in:
 
 * Conditionals
 * Loops
-* Nested widget builder functions such as those used with `Builder`
-  and `ValueListenableBuilder`.
+* Callback and builder functions of widgets nested within the `CellWidget`.
+
 :::
 
-:::warning
-`context.cell` should only be called on the `BuildContext` of a widget
-created using `CellWidget.builder`, or a `CellWidget` subclass that
-mixes in `CellInitializer`, more on this in the next section.
+:::tip[Examples of good definitions]
+
+The following cell definitions within `CellWidget.builder` are good:
+
+```dart
+CellWidget.builder((_) {
+    final a = MutableCell(0);
+    final b = MutableCell(1);
+    ...
+});
+```
+
 :::
 
-You can also define watch functions within `CellWidget.builder` using
-`context.watch`. Like `context.cell`, the watch function is only set up
-during the first build. Unlike a watch function defined using
-`ValueCell.watch`, the watch function is automatically stopped when
-the `CellWidget`, in which it is defined, is removed from the tree.
+:::danger[Examples of badly placed definitions]
+
+The following are examples of badly placed cell definitions in
+`CellWidget.builder`. Don't do the following:
+
+```dart
+CellWidget.builder((_) {
+    if (...) {
+        // Bad because the definition appears
+        // within a conditional
+        final a = MutableCell(0);
+    }
+    
+    while (...) {
+        // Bad because the definition appears
+        // within a loop
+        final b = MutableCell(1);
+    }
+    
+    return Builder((_) {
+        // Bad because the definition is no longer in
+        // the build function provided to CellWidget.builder,
+        // but in a nested widget builder function.
+        final c = MutableCell(2);
+        ...
+    });
+});
+```
+
+If you end up doing something similar to the above, `CellWidget` will
+not be able to persist the state of the defined cells between builds.
+
+:::
+
+## Watching cells in widgets
+
+Watch functions can be defined within `CellWidget.builder` using
+the `.watch` method of the `context` provided to the build function.
+
+Unlike a watch function defined using `ValueCell.watch`, the watch
+function is automatically stopped when the `CellWidget`, in which it
+is defined, is removed from the tree.
+
+:::note
+
+Watch functions defined with `.watch` are only set up once during the
+first build.
+
+:::
+
+:::caution
+
+The same rules apply to the placement of `.watch`, that apply to the
+placement of cell definitions within `CellWidget.builder`.
+
+:::
+
 
 ```dart title="Watch function in widget"
 CellWidget.builder((context) {
-    final count = context.cell(() => MutableCell(0));
+    final count = MutableCell(0);
 
     context.watch(() => print('Count ${count()}'));
 
@@ -158,21 +214,26 @@ since its succinct and convenient. However, if you want to make a
 widget which will be used in more than one place, you should subclass
 `CellWidget` instead.
 
+A `CellWidget` subclass can observe and define cells in the `build`
+method, just like `CellWidget.builder`:
+
 :::important
 
-To use the `cell` and `watch` methods, the mixin `CellInitializer` has
-to be included by the subclass. This mixin also provides `cell` and
-`watch` methods directly to the subclass.
+To use the `watch` method, the mixin `CellHooks` has to be included by
+the subclass, which provides the `watch` method directly to the
+subclass.
 
 :::
 
 The counter example using a `CellWidget` subclass:
 
 ```dart title="CellWidget subclass"
-class Counter extends CellWidget with CellInitializer {
+class Counter extends CellWidget with CellHooks {
     @override
     Widget build(BuildContext context) {
-        final count = cell(() => MutableCell(0));
+        final count = MutableCell(0);
+
+        watch(() => print('Count: ${count()}'));
 
         return ElevatedButton(
             child: Text('${count()}'),
@@ -181,3 +242,15 @@ class Counter extends CellWidget with CellInitializer {
     }
 }
 ```
+
+:::note
+
+The magic works that allows you to define cells directly within
+`CellWidget.builder` works by assigning a numerically indexed key to
+each cell that is defined within the build function/method. That's why
+you should avoid placing definitions within loops and
+conditionals. Cell keys will be covered in the advanced section of the
+documentation but if you're curious you can skip ahead to [Cell
+Keys](/docs/advanced/cell-keys).
+
+:::

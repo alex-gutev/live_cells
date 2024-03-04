@@ -5,12 +5,20 @@ sidebar_position: 1
 
 # Getting Started
 
-To start using Live Cells run: `flutter pub add live_cells`, or add the
+To start using Live Cells with Flutter run: `flutter pub add live_cells`, or add the
 following to your `pubspec.yaml`:
 
 ```dart title="pubspec.yaml"
 dependencies:
-    live_cells: ^0.15.1
+    live_cells: ^0.17.0
+```
+
+To use Live Cells in a dart only project run: `dart pub add
+live_cells_core`, or add the following to your `pubspec.yaml`:
+
+```dart title="pubspec.yaml"
+dependencies:
+    live_cells_core: ^0.17.0
 ```
 
 Now your project is set up to use Live Cells. Follow the remainder of

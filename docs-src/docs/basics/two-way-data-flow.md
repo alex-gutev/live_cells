@@ -66,7 +66,7 @@ the `mutableString` cell to the *content* property of a
 `CellTextField`:
 
 ```dart title="Text field for numeric input"
-StaticWidget.builder((_) {
+CellWidget.builder((_) {
   final a = MutableCell<num>(0);
   final square = a * a;
     
@@ -100,7 +100,7 @@ a widget which displays the sum of the two numbers entered and a
 "Reset" button:
 
 ```dart title="Text field for numeric input"
-StaticWidget.builder((_) {
+CellWidget.builder((_) {
   final a = MutableCell<num>(0);
   final b = MutableCell<num>(0);
     
@@ -197,7 +197,7 @@ is to add a `CellTextField` and bind its content to the `sum` cell.
 Here's the full example with a `CellTextField` for the result of the addition:
 
 ```dart title="Multi-argument mutable computed cell"
-StaticWidget.builder((_) {
+CellWidget.builder((_) {
   final a = MutableCell<num>(0);
   final b = MutableCell<num>(0);
     

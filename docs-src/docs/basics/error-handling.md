@@ -67,7 +67,7 @@ an error message when an invalid value is entered, can be implemented
 with the following:
 
 ```dart title="Numeric text field with error handling"
-class NumberField extends StaticWidget {
+class NumberField extends CellWidget {
   final MutableCell<num> n;
   
   NumberField(this.n);
@@ -91,7 +91,7 @@ class NumberField extends StaticWidget {
 
 :::note
 
-We've packaged the input field in a `StaticWidget` subclass which
+We've packaged the input field in a `CellWidget` subclass which
 takes the cell to which to bind the content of the field as an
 argument. This allows us to reuse this error handling logic wherever a
 numeric input text field is required.
@@ -107,7 +107,7 @@ The error message can be made more descriptive by also checking
 whether the field is empty, or not:
 
 ```dart title="Numeric text field with error handling"
-class NumberField extends StaticWidget {
+class NumberField extends CellWidget {
   final MutableCell<num> n;
   
   NumberField(this.n);
@@ -135,7 +135,7 @@ Now that we have a reusable numeric input text field with error
 handling, let's use it to reimplement the sum example from earlier.
 
 ```dart title="Sum example using numberField()"
-StaticWidget.builder((_) {
+CellWidget.builder((_) {
   final a = MutableCell<num>(0);
   final b = MutableCell<num>(0);
     
@@ -174,3 +174,23 @@ entirely in a separate class, that can be reused, all without writing
 or passing a single `onChanged` callback and at the same time being
 able to reset the content of the fields simply by changing the values
 of the cells holding our data.
+
+:::caution
+
+The same cell should be provided to `NumberField` between builds. Do
+not conditionally selected between multiple cells. **Don't do this**:
+
+```dart
+NumberField(cond ? n1 : n2)
+```
+
+**Don't do this either**:
+
+```dart
+cond ? NumberField(n1) : NumberField(n2)
+```
+
+If you need to do this consider adding a key to `NumberField` that
+is changed whenever a different cell is selected.
+
+:::

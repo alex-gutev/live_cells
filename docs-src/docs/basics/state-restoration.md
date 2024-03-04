@@ -14,25 +14,25 @@ it was when terminated.
 ## Restoration ID
 
 For the most part all you need to do to restore the state of your
-cells is to provide a `restorationId` when creating the `CellWidget`
-or `StaticWidget`. The `restorationId` associates the saved state with
-the widget, See
+cells is to provide a `restorationId` when creating the `CellWidget`,
+and call `.restore()` on your cells. The `restorationId` associates
+the saved state with the widget, See
 [`RestorationMixin.restorationId`](https://api.flutter.dev/flutter/widgets/RestorationMixin/restorationId.html),
 for more information.
 
 When a `restorationId` is given to `CellWidget.builder`, the state of
-the cells created using `BuildContext.cell` will be saved and restored
+the cells created within the build function will be saved and restored
 automatically.
 
 Here is a simple example:
 
 ```dart title="Cell state restoration using CellWidget"
 CellWidget.builder((ctx) {
-  final sliderValue = ctx.cell(() => MutableCell(0.0));
-  final switchValue = ctx.cell(() => MutableCell(false));
-  final checkboxValue = ctx.cell(() => MutableCell(true));
+  final sliderValue = MutableCell(0.0).restore();
+  final switchValue = MutableCell(false).restore();
+  final checkboxValue = MutableCell(true).restore();
 
-  final textValue = ctx.cell(() => MutableCell(''));
+  final textValue = MutableCell('').restore();
 
   return Column(
     children: [
@@ -76,7 +76,7 @@ call to the super class constructor.
 The `build` method defines four widgets, a slider, a switch, a
 checkbox and a text field as well as four cells, created using `cell`
 for holding the state of the widgets. The code defining the cells is
-exactly the same as it would be without state restoration, however
+almost the same as it would be without state restoration, however
 when the app is resumed the state of the cells, and likewise the
 widgets which are dependent on the cells, is restored.
 
@@ -87,9 +87,9 @@ widgets which are dependent on the cells, is restored.
   `Slider`, `SwitchListTile` and `CheckboxListTile` which allow their
   state to be controlled by a `ValueCell`.
 * You can use any widgets not just those provided by
-  `live_cell_widgets`. The state of the cells defined by `cell(...)`
-  within a `CellWidget` will be restored regardless of the widgets you
-  use.
+  `live_cell_widgets`. The state of the cells within `CellWidget` on
+  which `restore()` is called will be restored regardless of the widgets
+  you use.
   
 :::
 
@@ -100,18 +100,13 @@ In order for cell state restoration to be successful, the following has to be ta
   their state restored. All cells provided by **Live Cells** implement
   this interface except:
   + *Lightweight computed cells*, which do not have a state
-  + `DelayCell`
-* The values of the cells to be restored must be encodable by
+  + Asynchronous cells
+* The values of the cells must be encodable by
   `StandardMessageCodec`. This means that only cells holding primitive
   values (`num`, `bool`, `null`, `String`, `List`, `Map`) can have
   their state saved and restored.
 * To support state restoration of cells holding values not supported
   by `StandardMessageCodec`, a `CellValueCoder` has to be provided.
-
-:::important
-If a cell holds a non-restorable value pass `restorable: false` to
-`.cell(...)`. This prevents the cell's state from being saved and restored.
-:::
 
 ## User-Defined Types
 
@@ -153,10 +148,8 @@ class RadioValueCoder implements CellValueCoder {
 ```dart title="Example of state restoration with user-defined CellValueCode"
 
 CellWidget.builder((ctx) => {
-  final radioValue = cell(
-    () => MutableCell<RadioValue?>(RadioValue.value1),
-    coder: RadioValueCoder.new
-  );
+  final radioValue = MutableCell<RadioValue?>(RadioValue.value1)
+	.restore(coder: RadioValueCoder.new);
 
   return Column(
     children: [
@@ -189,61 +182,13 @@ CellWidget.builder((ctx) => {
 `RadioValueCoder` is a `CellValueCoder` subclass which encodes the
 `RadioValue` enum class to a string. In the definition of the
 `radioValue` cell, the constructor of `RadioValueCoder`
-(`RadioValueCoder.new`) is provided to `cell()` in the `coder`
+(`RadioValueCoder.new`) is provided to `restore()` in the `coder`
 argument.
-
-## State Restoration in StaticWidget
-
-Like with `CellWidget`, to achieve cell state restoration inside a
-`StaticWidget` a `restorationId` has to be provided when creating the
-widget. Unlike `CellWidget`, where cells are created using the `cell`
-method, the `restore` method has to be called on all cells which need
-to have their state restored.
-
-The `CellRadio` example using `StaticWidget`:
-
-```dart title="State Restoration using StaticWidget"
-StaticWidget.builder((_) => {
-  final radioValue = MutableCell<RadioValue?>(RadioValue.value1)
-      .restore(coder: RadioValueCoder());
-
-  return Column(
-    children: [
-      const Text('Radio Buttons:',),
-      CellWidget.builder((context) => Text('Selected option: ${radioValue()?.name}')),
-      Column(
-        children: [
-          CellRadioListTile(
-            groupValue: radioValue,
-            value: RadioValue.value1.cell,
-            title: Text('value1').cell,
-          ),
-          CellRadioListTile(
-            groupValue: radioValue,
-            value: RadioValue.value2.cell,
-            title: Text('value2').cell,
-          ),
-          CellRadioListTile(
-            groupValue: radioValue,
-            value: RadioValue.value3.cell,
-            title: Text('value3').cell,
-          ),
-        ],
-      ),
-    ],
-  );
-}, restorationId: 'cell_restoration_example');
-```
-
-:::tip
-If you're subclassing `StaticWidget`, provide the `restorationId` in the
-call to the super class constructor.
-:::
 
 :::danger[Important]
 
 The `restore()` method should only be called directly within a
-`StaticWidget` with a non-null `restorationId`.
+`CellWidget` with a non-null `restorationId`.
 
 :::
 
@@ -256,7 +201,7 @@ recomputed.
 Example:
 
 ```dart title="Recomputed Cell State"
-StaticWidget.builder((_) {
+CellWidget.builder((_) {
   final numValue = MutableCell<num>(1).restore();
   final numMaybe = numValue.maybe();
   final numError = numMaybe.error;
@@ -303,8 +248,8 @@ when you left.
 
 Some points to note from this example:
 
-* The `restore` method is called only on those cells we want to have
-  their state restored.
+* The `restore` method is called only on those cells which should (and
+  can) have their state saved.
 
 * Computed cells don't require their state to be saved, e.g. the state
   of the `a1` cell is not saved, however it is *restored* (the same

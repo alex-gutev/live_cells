@@ -28,7 +28,7 @@ updated to reflect the value of the cell.
 
 ```dart title="CellText example"
 CellWidget.builder((c) {
-    final content = c.cell(() => MutableCell(''));
+    final content = MutableCell('');
     
     return Column(
         children: [
@@ -73,15 +73,16 @@ the switch, the value of the cell is changed to reflect the state.
 
 ```dart title="CellSwitch example"
 CellWidget.builder((c) {
-    final state = c.cell(() => MutableCell(false));
-    final text = c.cell(() => state.select(
-        'The switch is on'.cell,
-        'The switch is off'.cell
-    ));
+    final state = MutableCell(false);
     
     return Column(
         children: [
-            CellText(data: text),
+            CellText(
+                data: state.select(
+                    'The switch is on'.cell,
+                    'The switch is off'.cell
+                )
+            ),
             CellSwitch(value: state),
         ]
     );
@@ -91,9 +92,9 @@ CellWidget.builder((c) {
 In this example:
 
 * The state (`value`) of the switch is bound to cell `state`. 
-* The `state` cell is used by cell `text` to select between two
-  strings describing the state of the switch.
-* The content (`data`) of the `CellText` widget is bound to cell `text`.
+* The content (`data`) of the `CellText` widget is bound to a cell
+  that selects between two strings describing the state of the switch
+  based on the value of the `state` cell.
 
 Toggling the switch automatically changes the value of the `state`
 cell and hence changes the text that is displayed in the `CellText`
@@ -115,7 +116,7 @@ the field to a `CellText` widget.
 
 ```dart title="CellTextField example"
 CellWidget.builder((c) {
-    final content = c.cell(() => MutableCell(''));
+    final content = MutableCell('');
     
     return Column(
         children: [
@@ -146,105 +147,4 @@ is bound to a mutable cell.
 :::caution
 If you provide a cell for the `selection` property of `CellTextField`,
 it has to be reset as well as the content cell when clearing the text field.
-:::
-
-## Static Widgets
-
-What has probably become an annoyance throughout these examples is
-having to use the `cell` method to create the cells which are bound to
-widget properties. In these examples we don't need to observe the
-values of cells directly in the `CellWidget`, nor does the structure
-of the widget change between builds. This is where `StaticWidget`
-comes in handy.
-
-`StaticWidget.builder` creates a widget with a build function that is
-only called when the widget is inserted in the tree for the first
-time. When the `StaticWidget` is rebuilt, the same widget that was
-returned by the build function during the first build is
-returned. This allows us to define our cells directly in the build
-function without having to use the `cell` method.
-
-With `StaticWidget` the `CellSwitch` example becomes:
-
-```dart title="StaticWidget example"
-StaticWidget.builder((c) {
-    final state = MutableCell(false);
-    
-    return Column(
-        children: [
-            CellText(
-              data: state.select(
-                  'The switch is on'.cell,
-                  'The switch is off'.cell
-              )
-            ),
-            CellSwitch(value: state),
-        ]
-    );
-});
-```
-
-And the `CellTextField` example becomes:
-
-```dart title="CellText example with StaticWidget"
-StaticWidget.builder((c) {
-    final content = MutableCell('');
-    
-    return Column(
-        children: [
-            CellText(data: content),
-            CellTextField(content: content),
-            ElevatedButton(
-                child: Text('Clear'),
-                onPressed: () => content.value = ''
-            )
-        ]
-    );
-});
-```
-
-:::tip
-Subclassing `StaticWidget` and overriding the `build`
-method is equivalent to using `StaticWidget.builder`.
-:::
-
-If you know that your widget is only going to be used inside a
-`StaticWidget`, you can define your widget entirely as a function:
-
-```dart title="CellText example as a function"
-Widget example() {
-    final content = MutableCell('');
-    
-    return Column(
-        children: [
-            CellText(data: content),
-            CellTextField(content: content),
-            ElevatedButton(
-                child: Text('Clear'),
-                onPressed: () => content.value = ''
-            )
-        ]
-    );
-}
-```
-
-:::danger
-
-Do not conditionally select a `build` function that is passed to
-`StaticWidget.builder`. If the condition changes the widget will not
-be rebuilt with the new build function (in-fact it is not rebuilt at
-all).
-
-**Don't do this:**
-
-```dart
-StaticWidget.builder(cond ? (c) { ... } : (c) { ... })
-```
-
-**Don't do this either:**
-
-```dart
-cond ? StaticWidget.builder(...) : StaticWidget.builder(...)
-```
-
 :::
