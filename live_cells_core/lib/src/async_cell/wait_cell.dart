@@ -72,7 +72,7 @@ class _WaitCellState<T> extends CellState<WaitCell<T>>
 }
 
 /// Key identifying a [WaitCell].
-class _WaitCellKey<T> extends ValueKey2<ValueCell<T>, bool> {
+class _WaitCellKey<T> extends CellKey2<ValueCell<T>, bool> {
   /// Create a key for identifying a [WaitCell].
   ///
   /// The key identifies a [WaitCell] which waits for the value held in argument

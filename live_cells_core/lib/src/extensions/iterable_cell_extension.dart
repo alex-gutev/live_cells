@@ -59,7 +59,7 @@ extension IterableCellExtension<T> on ValueCell<Iterable<T>> {
 }
 
 /// Key identifying a [ValueCell], which accesses an [Iterable] property.
-class _IterablePropKey extends ValueKey2<ValueCell, Symbol> {
+class _IterablePropKey extends CellKey2<ValueCell, Symbol> {
   /// Create the key.
   ///
   /// [value1] is a [ValueCell] holding an [Iterable] and [value2] is the property
@@ -68,6 +68,6 @@ class _IterablePropKey extends ValueKey2<ValueCell, Symbol> {
 }
 
 /// Key identifying a [ValueCell], which access an [Iterable] property with a type parameter.
-class _IterableTypedPropKey<T> extends ValueKey2<ValueCell, Symbol> {
+class _IterableTypedPropKey<T> extends CellKey2<ValueCell, Symbol> {
   _IterableTypedPropKey(super.value1, super.value2);
 }

@@ -17,11 +17,11 @@ extension SetCellExtension<T> on ValueCell<Set<T>> {
 }
 
 /// Key identifying a cell which applies the [Set.contains] method.
-class _SetContainsKey extends ValueKey2<ValueCell, ValueCell> {
+class _SetContainsKey extends CellKey2<ValueCell, ValueCell> {
   _SetContainsKey(super.value1, super.value2);
 }
 
 /// Key identifying a cell which applies the [Set.containsAll] method.
-class _SetContainsAllKey extends ValueKey2<ValueCell, ValueCell> {
+class _SetContainsAllKey extends CellKey2<ValueCell, ValueCell> {
   _SetContainsAllKey(super.value1, super.value2);
 }

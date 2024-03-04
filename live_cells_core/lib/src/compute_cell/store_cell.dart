@@ -150,6 +150,6 @@ class StoreCellChangesOnlyState<T> extends StoreCellState<T> with ChangesOnlyCel
   });
 }
 
-class _StoreCellKey extends ValueKey1<ValueCell> {
+class _StoreCellKey extends CellKey1<ValueCell> {
   _StoreCellKey(super.value);
 }

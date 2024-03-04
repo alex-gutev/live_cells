@@ -110,7 +110,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
 }
 
 /// Key identifying a [ValueCell], which accesses a [List] property.
-class _ListPropKey extends ValueKey2<ValueCell, Symbol> {
+class _ListPropKey extends CellKey2<ValueCell, Symbol> {
   /// Create the key.
   ///
   /// [value1] is a [ValueCell] holding a list and [value2] is the property
@@ -118,12 +118,12 @@ class _ListPropKey extends ValueKey2<ValueCell, Symbol> {
   _ListPropKey(super.value1, super.value2);
 }
 /// Key identifying a [ValueCell], which access a [List] property with a type parameter.
-class _ListTypedPropKey<T> extends ValueKey2<ValueCell, Symbol> {
+class _ListTypedPropKey<T> extends CellKey2<ValueCell, Symbol> {
   _ListTypedPropKey(super.value1, super.value2);
 }
 
 /// Key identifying a [MutableCell], which accesses a [List] property.
-class _MutableListPropKey extends ValueKey2<MutableCell, Symbol> {
+class _MutableListPropKey extends CellKey2<MutableCell, Symbol> {
   /// Create the key.
   ///
   /// [value1] is a [MutableCell] holding a list and [value2] is the property
@@ -132,7 +132,7 @@ class _MutableListPropKey extends ValueKey2<MutableCell, Symbol> {
 }
 
 /// Key identifying a [ValueCell] which access an element with a [List]
-class _ListIndexKey extends ValueKey2<ValueCell, ValueCell> {
+class _ListIndexKey extends CellKey2<ValueCell, ValueCell> {
   /// Create the key.
   ///
   /// [value1] is a [ValueCell] holding a list and [value2] is a [ValueCell]
@@ -141,17 +141,17 @@ class _ListIndexKey extends ValueKey2<ValueCell, ValueCell> {
 }
 
 /// Key identifying a [ValueCell] which maps a function over the elements of a [List]
-class _ListMapKey extends ValueKey2<ValueCell, Function> {
+class _ListMapKey extends CellKey2<ValueCell, Function> {
   _ListMapKey(super.value1, super.value2);
 }
 
 /// Key identifying a [ValueCell] which applies a function on a cell held in a [List].
-class _ElementMapKey extends ValueKey2<ValueCell, Function> {
+class _ElementMapKey extends CellKey2<ValueCell, Function> {
   _ElementMapKey(super.value1, super.value2);
 }
 
 /// Key identifying a [MutableCell] which access an element with a [List]
-class _MutableListIndexKey extends ValueKey2<MutableCell, ValueCell> {
+class _MutableListIndexKey extends CellKey2<MutableCell, ValueCell> {
   /// Create the key.
   ///
   /// [value1] is a [ValueCell] holding a list and [value2] is a [ValueCell]

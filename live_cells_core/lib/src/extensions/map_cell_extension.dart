@@ -74,19 +74,19 @@ extension MutableMapCellExtension<K,V> on MutableCell<Map<K,V>> {
 }
 
 /// Key identifying a cell which accesses a [Map] property
-class _MapPropKey extends ValueKey2<ValueCell, Symbol> {
+class _MapPropKey extends CellKey2<ValueCell, Symbol> {
   /// [value1] is the map cell and [value2] is the property identifier
   _MapPropKey(super.value1, super.value2);
 }
 
 /// Key identifying a cell which calls a [Map] method
-class _MapMethodKey extends ValueKey3<ValueCell, Symbol, ValueCell> {
+class _MapMethodKey extends CellKey3<ValueCell, Symbol, ValueCell> {
   /// [value1] is the map cell and [value2] is the method identifier
   _MapMethodKey(super.value1, super.value2, super.value3);
 }
 
 /// Key identifying a mutable cell which calls a [Map] method
-class _MutableMapMethodKey extends ValueKey3<ValueCell, Symbol, ValueCell> {
+class _MutableMapMethodKey extends CellKey3<ValueCell, Symbol, ValueCell> {
   /// [value1] is the map cell and [value2] is the method identifier
   _MutableMapMethodKey(super.value1, super.value2, super.value3);
 }

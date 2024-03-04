@@ -66,7 +66,7 @@ class _AwaitCellState<T> extends CellState<AwaitCell<T>>
 }
 
 /// Key identifying an [AwaitCell].
-class _AwaitCellKey<T> extends ValueKey1<ValueCell<T>> {
+class _AwaitCellKey<T> extends CellKey1<ValueCell<T>> {
   /// Create a key for identifying a [WaitCell].
   ///
   /// The key identifies a [AwaitCell] which waits for the value held in argument

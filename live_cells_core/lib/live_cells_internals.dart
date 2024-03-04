@@ -6,3 +6,4 @@ library live_cells_internals;
 
 export 'src/compute_cell/dynamic_compute_cell.dart' show ComputeArgumentsTracker;
 export 'src/base/auto_key.dart' show AutoKey;
+export 'src/base/keys.dart';

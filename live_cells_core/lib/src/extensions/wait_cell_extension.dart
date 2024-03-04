@@ -150,21 +150,21 @@ to function.'''
 }
 
 /// A key which identifies a record of cells
-class _CombinedCellKey<T> extends ValueKey2<T, bool> {
+class _CombinedCellKey<T> extends CellKey2<T, bool> {
   _CombinedCellKey(super.value1, super.value2);
 }
 
 /// A key which identifies a record of cells used with `.awaited`
-class _CombinedAwaitCellKey<T> extends ValueKey1<T> {
+class _CombinedAwaitCellKey<T> extends CellKey1<T> {
   _CombinedAwaitCellKey(super.value);
 }
 
 /// Key identifying a delayed cell.
-class _DelayCellKey<T> extends ValueKey2<ValueCell<T>, Duration> {
+class _DelayCellKey<T> extends CellKey2<ValueCell<T>, Duration> {
   _DelayCellKey(super.value1, super.value2);
 }
 
 /// Identifies a cell created with `.isCompleted`
-class _IsCompleteCellKey<T> extends ValueKey1<T> {
+class _IsCompleteCellKey<T> extends CellKey1<T> {
   _IsCompleteCellKey(super.value);
 }

@@ -42,16 +42,16 @@ extension BoolCellExtension on ValueCell<bool> {
 }
 
 /// Key identifying a cell created with [BoolCellExtension.and]
-class _AndCellKey extends ValueKey2<ValueCell<bool>, ValueCell<bool>> {
+class _AndCellKey extends CellKey2<ValueCell<bool>, ValueCell<bool>> {
   _AndCellKey(super.value1, super.value2);
 }
 
 /// Key identifying a cell created with [BoolCellExtension.or]
-class _OrCellKey extends ValueKey2<ValueCell<bool>, ValueCell<bool>> {
+class _OrCellKey extends CellKey2<ValueCell<bool>, ValueCell<bool>> {
   _OrCellKey(super.value1, super.value2);
 }
 
 /// Key identifying a cell created with [BoolCellExtension.not]
-class _NotCellKey extends ValueKey1<ValueCell<bool>> {
+class _NotCellKey extends CellKey1<ValueCell<bool>> {
   _NotCellKey(super.value);
 }

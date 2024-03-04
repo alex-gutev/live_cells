@@ -63,11 +63,11 @@ extension ErrorCellExtension<T> on ValueCell<T> {
 }
 
 /// Key identifying a cell created with `onError`
-class _OnErrorKey<T> extends ValueKey2<ValueCell, ValueCell> {
+class _OnErrorKey<T> extends CellKey2<ValueCell, ValueCell> {
   _OnErrorKey(super.value1, super.value2);
 }
 
 /// Key identifying a cell created with `error()`
-class _ErrorCellKey<T> extends ValueKey2<ValueCell, bool> {
+class _ErrorCellKey<T> extends CellKey2<ValueCell, bool> {
   _ErrorCellKey(super.value1, super.value2);
 }
