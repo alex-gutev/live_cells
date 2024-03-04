@@ -69,10 +69,9 @@ class CellRestorationManagerState extends State<CellRestorationManager> with
       return;
     }
 
-    if (_curCellState < _cellStates.length) {
-      cell.restoreState(_cellStates[_curCellState], coder);
-    }
-    else {
+    var isSaved = _curCellState < _cellStates.length;
+
+    if (!isSaved) {
       _cellStates.add(cell.dumpState(coder));
     }
 
@@ -85,6 +84,14 @@ class CellRestorationManagerState extends State<CellRestorationManager> with
     );
 
     _curCellState++;
+
+    /// Restoration needs to happen after the cell is observed
+    /// since some cells are not fully functional until they
+    /// have at least one observer,
+
+    if (isSaved) {
+      cell.restoreState(_cellStates[index], coder);
+    }
   }
 
   @override
