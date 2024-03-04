@@ -286,7 +286,7 @@ ValueCell<Future<int>> cell2;
 final isLoading = (cell1, cell2).isCompleted.not();
 ```
 
-## ValueListenable
+### ValueListenable (Integration with other tools)
 
 The `.listenable` property returns a `ValueListenable` that notifies its observers whenever the
 value of the cell changes:
