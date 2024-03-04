@@ -1,3 +1,47 @@
+## 0.17.0
+
+New features:
+
+* Automatic key generation for unkeyed cells defined in the `build` method of `CellWidget` and
+  `CellWidget.builder`.
+
+  This allows cells local to a `CellWidget` to be defined directly in the build method/function
+  without having to use `.cell(() => ...)`
+
+  With version 0.4.0:
+
+  ```dart
+  class Example extends CellWidget with CellInitializer {
+    @override
+    Widget build(BuildContext context) {
+      final count = cell(() => MutableCell(0));
+      ...
+    }
+  }
+  ```
+
+  This can now be simplified to the following with version 0.5.0:
+
+  ```dart
+  class Example extends CellWidget {
+    @override
+    Widget build(BuildContext context) {
+      final count = MutableCell(0);
+      ...
+    }
+  }
+  ```
+
+**Breaking Changes**:
+
+* `CellInitializer` has been renamed to `CellHooks`
+*
+* `.cell()` and `.watch()` have been moved from `BuildContext` to `CellHookContext`.
+
+  This will not affect code that uses `CellWidget.builder`.
+
+* State restoration options have been removed from `.cell()`. Use `.restore()` instead.
+
 ## 0.16.2
 
 Changes from core:
