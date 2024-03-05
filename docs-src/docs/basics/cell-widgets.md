@@ -114,7 +114,7 @@ function, each representing a different counter.
 :::warning 
 
 When defining cells directly within `CellWidget.builder`,
-the definitions not be placed in:
+the definitions should not be placed in:
 
 * Conditionals
 * Loops
@@ -245,7 +245,7 @@ class Counter extends CellWidget with CellHooks {
 
 :::note
 
-The magic works that allows you to define cells directly within
+The magic that allows you to define cells directly within
 `CellWidget.builder` works by assigning a numerically indexed key to
 each cell that is defined within the build function/method. That's why
 you should avoid placing definitions within loops and
