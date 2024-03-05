@@ -65,6 +65,11 @@ const config = {
         // },
         items: [
           {
+              to: '/why-live-cells',
+              label: 'Why Live Cells?',
+              position: 'left'
+          },
+          {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
@@ -89,6 +94,10 @@ const config = {
           {
             title: 'Docs',
             items: [
+              {
+                label: 'Why Live Cells?',
+                to: '/why-live-cells',
+              },
               {
                 label: 'Basics',
                 to: '/docs/intro',
