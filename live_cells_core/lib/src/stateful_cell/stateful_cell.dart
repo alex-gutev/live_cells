@@ -33,10 +33,12 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   ///
   /// If this is [null] then this [ValueCell] is unique from all other [ValueCell]
   /// objects including those with a [key] equal to [null].
-  final dynamic key;
+  late final dynamic key;
 
   /// Create a cell identified by [key].
-  StatefulCell({key}) : key = key ?? AutoKey.autoKey();
+  StatefulCell({key}) {
+    this.key = key ?? AutoKey.autoKey(this);
+  }
 
   @override
   bool operator ==(Object other) => other is StatefulCell && key != null

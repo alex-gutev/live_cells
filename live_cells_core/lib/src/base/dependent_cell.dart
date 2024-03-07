@@ -15,7 +15,7 @@ abstract class DependentCell<T> extends ValueCell<T> {
   /// Since [DependentCell] is a stateless cell that always computes its value
   /// when referenced, this just ensures that [DependentCell]'s with the same
   /// key compare equal under [==].
-  final dynamic key;
+  late final dynamic key;
 
   /// Set of argument cells.
   @protected
@@ -30,7 +30,9 @@ abstract class DependentCell<T> extends ValueCell<T> {
   /// [==] to all [DependentCell] objects with the same [key] under [==].
   DependentCell(this.arguments, {
     key,
-  }) : key = key ?? AutoKey.autoKey();
+  }) {
+    this.key = key ?? AutoKey.autoKey(this);
+  }
 
   @override
   bool operator ==(other) => other is DependentCell && key != null

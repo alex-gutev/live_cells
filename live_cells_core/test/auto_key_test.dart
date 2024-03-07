@@ -14,7 +14,7 @@ void main() {
 
     var i = 0;
 
-    AutoKey.withAutoKeys(() => 'test_key_${i++}', () {
+    AutoKey.withAutoKeys((_) => 'test_key_${i++}', () {
       c1 = (a, b).apply((a, b) => a + b);
       c2 = (a, b).apply((a, b) => a + b, key: 'preset_key');
       c3 = (a, b).apply((a, b) => a + b);
@@ -42,7 +42,7 @@ void main() {
 
     var i = 0;
 
-    AutoKey.withAutoKeys(() => 'test2_key_${i++}', () {
+    AutoKey.withAutoKeys((_) => 'test2_key_${i++}', () {
       c1 = ValueCell.computed(() => a() + b());
       c2 = ValueCell.computed(() => a() + b(), key: 'preset_key');
       c3 = ValueCell.computed(() => a() + b());
@@ -67,7 +67,7 @@ void main() {
 
     var i = 10;
 
-    AutoKey.withAutoKeys(() => 'test3_key_${i += 5}', () {
+    AutoKey.withAutoKeys((_) => 'test3_key_${i += 5}', () {
       c1 = MutableCell(5);
       c2 = MutableCell(5, key: 'preset_key');
       c3 = MutableCell(5);
@@ -95,7 +95,7 @@ void main() {
 
     var i = 5;
 
-    AutoKey.withAutoKeys(() => 'test4_key_${i++}', () {
+    AutoKey.withAutoKeys((_) => 'test4_key_${i++}', () {
       c1 = (a,b).mutableApply((a,b) => a + b, (_) { });
       c2 = MutableComputeCell(
           arguments: {a,b},
@@ -145,7 +145,7 @@ void main() {
 
     var i = 0;
 
-    AutoKey.withAutoKeys(() => 'test5_key_${i++}', () {
+    AutoKey.withAutoKeys((_) => 'test5_key_${i++}', () {
       c1 = MutableCell.computed(() => a() + b(), (_) { });
       c2 = MutableCell.computed(() => a() + b(), (_) { }, key: 'preset_key');
       c3 = MutableCell.computed(() => a() + b(), (_) { });
@@ -172,7 +172,7 @@ void main() {
 
     var i = 0;
 
-    AutoKey.withAutoKeys(() => 'test6_key_${i++}', () {
+    AutoKey.withAutoKeys((_) => 'test6_key_${i++}', () {
       c1 = a.mutableApply((p0) => p0 + 1, (p0) { });
       c2 = a.mutableApply((p0) => p0 + 1, (p0) { }, key: 'preset_key');
       c3 = a.mutableApply((p0) => p0 + 1, (p0) { });
@@ -198,8 +198,8 @@ void main() {
 
     var i = 0;
 
-    AutoKey.withAutoKeys(() => 'level1_key_${i++}', () {
-      AutoKey.withAutoKeys(() => 'level2_key_${i++}', () {
+    AutoKey.withAutoKeys((_) => 'level1_key_${i++}', () {
+      AutoKey.withAutoKeys((_) => 'level2_key_${i++}', () {
         c1 = a.apply((value) => value + 1);
       });
 
