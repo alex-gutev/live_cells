@@ -147,6 +147,9 @@ class _CellWidgetElement extends StatelessElement {
   Set<ValueCell> _arguments = HashSet();
   late _WidgetCellObserver _observer;
 
+  /// Observer used to keep the cells active
+  final _holdObserver = _HoldCellObserver();
+
   /// If true the widget hasn't been built for the first time yet.
   var _firstBuild = true;
 
@@ -154,7 +157,7 @@ class _CellWidgetElement extends StatelessElement {
   var _numCells = 0;
 
   /// Generate a key for the cell at index [index].
-  _WidgetCellKey _generateCellKey(int index) {
+  _WidgetCellKey _generateCellKey(ValueCell cell, int index) {
     if (_firstBuild) {
       assert(index == _numCells, 'This indicates a bug in live_cell_widgets. '
           'Please report it.');
@@ -168,6 +171,7 @@ class _CellWidgetElement extends StatelessElement {
         'widget than in the previous build. This usually happens when a cell definition '
         'is placed within a conditional or loop inside the CellWidget.build method.'
     );
+
     return _cellKeyForIndex(index);
   }
 
@@ -183,8 +187,19 @@ class _CellWidgetElement extends StatelessElement {
 
     late final Widget widget;
 
+    // List of cells to keep active while widget is mounted
+    final holdCells = <ValueCell>[];
+
+    generateKey(ValueCell cell) {
+      if (_firstBuild && cell is StatefulCell) {
+        holdCells.add(cell);
+      }
+
+      return _generateCellKey(cell, keyIndex++);
+    }
+
     try {
-      AutoKey.withAutoKeys(() => _generateCellKey(keyIndex++), () {
+      AutoKey.withAutoKeys(generateKey, () {
         widget = ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
           newArguments.add(cell);
 
@@ -197,6 +212,10 @@ class _CellWidgetElement extends StatelessElement {
     }
     finally {
       _firstBuild = false;
+    }
+
+    for (final cell in holdCells) {
+      cell.addObserver(_holdObserver);
     }
 
     // Stop observing cells which are no longer referenced
@@ -232,7 +251,7 @@ class _CellWidgetElement extends StatelessElement {
   void _disposeCells() {
     for (var i = 0; i < _numCells; i++) {
       final key = _cellKeyForIndex(i);
-      CellState.maybeGetState(key)?.removeAllObservers();
+      CellState.maybeGetState(key)?.removeObserver(_holdObserver);
     }
   }
 }
@@ -282,6 +301,15 @@ class _WidgetCellObserver extends CellObserver {
       _waitingForChange = false;
     }
   }
+}
+
+/// A 'dummy' observer used to keep a cell active while a CellWidget is mounted
+class _HoldCellObserver extends CellObserver {
+  @override
+  void update(ValueCell<dynamic> cell, bool didChange) {}
+
+  @override
+  void willUpdate(ValueCell<dynamic> cell) {}
 }
 
 /// Key identifying a cell defined within CellWidget.build.

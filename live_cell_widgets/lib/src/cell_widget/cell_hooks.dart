@@ -154,7 +154,7 @@ class _CellStorageElement extends _CellWidgetElement implements CellHookContext 
     if (_isFirstBuild) {
       late final V cell;
 
-      AutoKey.withAutoKeys(() => null, () {
+      AutoKey.withAutoKeys((_) => null, () {
         cell = create();
       });
 

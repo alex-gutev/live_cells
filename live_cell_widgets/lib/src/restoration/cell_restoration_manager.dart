@@ -71,10 +71,6 @@ class CellRestorationManagerState extends State<CellRestorationManager> with
 
     var isSaved = _curCellState < _cellStates.length;
 
-    if (!isSaved) {
-      _cellStates.add(cell.dumpState(coder));
-    }
-
     final index = _curCellState;
 
     _observer.addCell(
@@ -89,7 +85,10 @@ class CellRestorationManagerState extends State<CellRestorationManager> with
     /// since some cells are not fully functional until they
     /// have at least one observer,
 
-    if (isSaved) {
+    if (!isSaved) {
+      _cellStates.add(cell.dumpState(coder));
+    }
+    else {
       cell.restoreState(_cellStates[index], coder);
     }
   }
