@@ -1,12 +1,5 @@
 part of 'mutable_cell.dart';
 
-/// Represents an attempt to read/write the value of an inactive mutable cell.
-class InactiveMutableCellError implements Exception {
-  @override
-  String toString() => 'The value of a mutable cell was read/written while '
-      'the cell is inactive (has no observers).';
-}
-
 /// Base class implementing the [MutableCell] interface, for values of type [T].
 ///
 /// **NOTE**: Unlike [StatefulCell], this cell always has a [CellState] object
@@ -14,7 +7,7 @@ class InactiveMutableCellError implements Exception {
 ///
 /// **NOTE**: Subclasses should override [createMutableState] instead of
 /// [createState].
-abstract class MutableCellBase<T> extends StatefulCell<T> implements MutableCell<T> {
+abstract class MutableCellBase<T> extends PersistentStatefulCell<T> implements MutableCell<T> {
   /// Mutable cell base constructor.
   ///
   /// If [key] is non-null it is used to identify the cell. **NOTE**, if [key]
@@ -32,8 +25,7 @@ abstract class MutableCellBase<T> extends StatefulCell<T> implements MutableCell
   @override
   @protected
   MutableCellState<T, MutableCellBase<T>> get state =>
-      (super.state as MutableCellState<T,MutableCellBase<T>>?) ??
-          _ensureState;
+      super.state as MutableCellState<T,MutableCellBase<T>>;
 
   @override
   MutableCellState<T, MutableCellBase<T>> createState() {
@@ -63,14 +55,6 @@ abstract class MutableCellBase<T> extends StatefulCell<T> implements MutableCell
   // Private
 
   MutableCellState<T, MutableCellBase<T>>? _mutableState;
-
-  MutableCellState<T, MutableCellBase<T>> get _ensureState {
-    if (key != null && (_mutableState?.isDisposed ?? true)) {
-      throw InactiveMutableCellError();
-    }
-
-    return createState();
-  }
 }
 
 class MutableCellState<T, S extends StatefulCell<T>> extends CellState<S> {
