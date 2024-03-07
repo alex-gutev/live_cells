@@ -61,14 +61,6 @@ abstract class MutableDependentCell<T> extends MutableCellBase<T>
   /// This method is executed in a [MutableCell.batch] call.
   void reverseCompute(T value);
 
-  @override
-  T get value => state.value;
-
-  @override
-  set value(T value) {
-    state.value = value;
-  }
-
   // Private
 
   @override

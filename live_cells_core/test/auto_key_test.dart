@@ -73,21 +73,9 @@ void main() {
       c3 = MutableCell(5);
     });
 
-    addTearDown(() {
-      c1.dispose();
-      c2.dispose();
-      c3.dispose();
-    });
-
     final k1 = MutableCell(5, key: 'test3_key_15');
     final k2 = MutableCell(5, key: 'preset_key');
     final k3 = MutableCell(5, key: 'test3_key_20');
-
-    addTearDown(() {
-      k1.dispose();
-      k2.dispose();
-      k3.dispose();
-    });
 
     expect(c1 == k1, isTrue);
     expect(c2 == k2, isTrue);
@@ -118,12 +106,6 @@ void main() {
       c3 = (a,b).mutableApply((a,b) => a + b, (_) { });
     });
 
-    addTearDown(() {
-      c1.dispose();
-      c2.dispose();
-      c3.dispose();
-    });
-
     final k1 = MutableComputeCell(
       arguments: {a,b},
       compute: () => a.value + b.value,
@@ -144,12 +126,6 @@ void main() {
         reverseCompute: (_) {},
         key: 'test4_key_6'
     );
-
-    addTearDown(() {
-      k1.dispose();
-      k2.dispose();
-      k3.dispose();
-    });
 
     expect(c1 == k1, isTrue);
     expect(c2 == k2, isTrue);
@@ -175,21 +151,9 @@ void main() {
       c3 = MutableCell.computed(() => a() + b(), (_) { });
     });
 
-    addTearDown(() {
-      c1.dispose();
-      c2.dispose();
-      c3.dispose();
-    });
-
     final k1 = MutableCell.computed(() => a() + b(), (_) { }, key: 'test5_key_0');
     final k2 = MutableCell.computed(() => a() + b(), (_) { }, key: 'preset_key');
     final k3 = MutableCell.computed(() => a() + b(), (_) { }, key: 'test5_key_1');
-
-    addTearDown(() {
-      k1.dispose();
-      k2.dispose();
-      k3.dispose();
-    });
 
     expect(c1 == k1, isTrue);
     expect(c2 == k2, isTrue);

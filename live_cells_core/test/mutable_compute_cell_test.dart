@@ -435,11 +435,6 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
-
       expect(b1 == b2, isTrue);
       expect(b1.hashCode == b2.hashCode, isTrue);
     });
@@ -460,11 +455,6 @@ void main() {
           reverseCompute: (v) => a.value = v - 1,
           key: 'mutable-cell-key2'
       );
-
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
 
       expect(b1 != b2, isTrue);
       expect(b1 == b1, isTrue);
@@ -506,11 +496,6 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
-
       observeCell(b1);
       observeCell(b2);
 
@@ -542,10 +527,8 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
+      observeCell(b1);
+      observeCell(b2);
 
       final observer1 = addObserver(b1, MockValueObserver());
       final observer2 = addObserver(b2, MockValueObserver());
@@ -583,11 +566,6 @@ void main() {
           key: 'mutable-cell-key2'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
-
       observeCell(b1);
       observeCell(b2);
 
@@ -618,11 +596,6 @@ void main() {
           reverseCompute: (v) => a.value = v + 5,
           key: 'mutable-cell-key2'
       );
-
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
 
       observeCell(b1);
       observeCell(b2);
@@ -656,31 +629,21 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b.dispose();
-      });
-
-      addTearDown(() => b.dispose());
-
-      b.value = 5;
-
       // The cell's value is recomputed when its state is initialized
       final observer1 = addObserver(b, MockSimpleObserver());
-      expect(b.value, 11);
+      expect(b.value, 1);
 
       b.value = 10;
       b.value = 15;
 
+      expect(b.value, 15);
+
       // The cell's value is recomputed when its state is recreated
       b.removeObserver(observer1);
-      expect(b.value, 21);
-
-      b.value = 16;
-      expect(b.value, 16);
 
       // The cell's value is recomputed when its state is initialized
       addObserver(b, MockSimpleObserver());
-      expect(b.value, 22);
+      expect(b.value, 21);
 
       b.value = 17;
       expect(b.value, 17);
@@ -699,53 +662,17 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b.dispose();
-      });
+      final observer = addObserver(b, MockSimpleObserver());
+
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNotNull);
+      verifyNever(resource.dispose());
 
       b.value = 5;
 
-      observeCell(b);
-      observeCell(b);
-
-      expect(CellState.maybeGetState('mutable-cell-key1'), isNotNull);
-
-      verifyNever(resource.dispose());
-
-      b.dispose();
+      b.removeObserver(observer);
       expect(CellState.maybeGetState('mutable-cell-key1'), isNull);
 
       verify(resource.dispose()).called(1);
-    });
-
-    test('All observers removed after calling dispose', () {
-      final a = MutableCell(0);
-
-      final b = MutableComputeCell(
-          arguments: {a},
-          compute: () => a.value + 1,
-          reverseCompute: (v) => a.value = v + 5,
-          key: 'mutable-cell-key1'
-      );
-
-      addTearDown(() => b.dispose());
-
-      b.value = 5;
-
-      final listener1 = addListener(b, MockSimpleListener());
-      final listener2 = addListener(b, MockSimpleListener());
-
-      b.value = 6;
-      b.value = 7;
-
-      verify(listener1()).called(2);
-      verify(listener2()).called(2);
-
-      b.dispose();
-      b.value = 8;
-
-      verifyNoMoreInteractions(listener1);
-      verifyNoMoreInteractions(listener2);
     });
   });
 
@@ -1250,11 +1177,6 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
-
       expect(b1 == b2, isTrue);
       expect(b1.hashCode == b2.hashCode, isTrue);
     });
@@ -1275,11 +1197,6 @@ void main() {
           reverseCompute: (v) => a.value = v - 1,
           key: 'mutable-cell-key2'
       );
-
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
 
       expect(b1 != b2, isTrue);
       expect(b1 == b1, isTrue);
@@ -1315,11 +1232,6 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
-
       observeCell(b1);
       observeCell(b2);
 
@@ -1345,10 +1257,8 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
+      observeCell(b1);
+      observeCell(b2);
 
       final observer1 = addObserver(b1, MockValueObserver());
       final observer2 = addObserver(b2, MockValueObserver());
@@ -1380,11 +1290,6 @@ void main() {
           key: 'mutable-cell-key2'
       );
 
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
-
       observeCell(b1);
       observeCell(b2);
 
@@ -1409,11 +1314,6 @@ void main() {
       final b2 = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
           key: 'mutable-cell-key2'
       );
-
-      addTearDown(() {
-        b1.dispose();
-        b2.dispose();
-      });
 
       observeCell(b1);
       observeCell(b2);
@@ -1444,31 +1344,21 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b.dispose();
-      });
-
-      addTearDown(() => b.dispose());
-
-      b.value = 5;
-
       // The cell's value is recomputed when its state is initialized
       final observer1 = addObserver(b, MockSimpleObserver());
-      expect(b.value, 11);
+      expect(b.value, 1);
 
       b.value = 10;
       b.value = 15;
 
+      expect(b.value, 15);
+
       // The cell's value is recomputed when its state is recreated
       b.removeObserver(observer1);
-      expect(b.value, 21);
-
-      b.value = 16;
-      expect(b.value, 16);
 
       // The cell's value is recomputed when its state is initialized
       addObserver(b, MockSimpleObserver());
-      expect(b.value, 22);
+      expect(b.value, 21);
 
       b.value = 17;
       expect(b.value, 17);
@@ -1484,50 +1374,17 @@ void main() {
           key: 'mutable-cell-key1'
       );
 
-      addTearDown(() {
-        b.dispose();
-      });
+      final observer = addObserver(b, MockSimpleObserver());
+
+      expect(CellState.maybeGetState('mutable-cell-key1'), isNotNull);
+      verifyNever(resource.dispose());
 
       b.value = 5;
 
-      observeCell(b);
-      observeCell(b);
-
-      expect(CellState.maybeGetState('mutable-cell-key1'), isNotNull);
-
-      verifyNever(resource.dispose());
-
-      b.dispose();
+      b.removeObserver(observer);
       expect(CellState.maybeGetState('mutable-cell-key1'), isNull);
 
       verify(resource.dispose()).called(1);
-    });
-
-    test('All observers removed after calling dispose', () {
-      final a = MutableCell(0);
-
-      final b = MutableCell.computed(() => a() + 1, (v) => a.value = v + 5,
-          key: 'mutable-cell-key1'
-      );
-
-      addTearDown(() => b.dispose());
-
-      b.value = 5;
-
-      final listener1 = addListener(b, MockSimpleListener());
-      final listener2 = addListener(b, MockSimpleListener());
-
-      b.value = 6;
-      b.value = 7;
-
-      verify(listener1()).called(2);
-      verify(listener2()).called(2);
-
-      b.dispose();
-      b.value = 8;
-
-      verifyNoMoreInteractions(listener1);
-      verifyNoMoreInteractions(listener2);
     });
   });
 

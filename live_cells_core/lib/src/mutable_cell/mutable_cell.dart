@@ -65,14 +65,6 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// 3. [CellObserver.update()]
   set value(T value);
 
-  /// Dispose the cell and its state.
-  ///
-  /// It is only necessary to call this method if this cell has a non-null [key].
-  ///
-  /// When this method is called, its observers and all references to its state
-  /// are removed. The value of the cell is lost.
-  void dispose();
-
   /// Set the value of multiple [MutableCell]'s simultaneously.
   ///
   /// [fn] is called. Within [fn] setting [MutableCell.value] sets the value
