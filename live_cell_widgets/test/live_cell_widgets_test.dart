@@ -244,6 +244,22 @@ class CellWidgetTest7 extends CellWidget {
   }
 }
 
+/// Tests that the widget stops observing cells when it is unmounted
+class CellWidgetTest8 extends CellWidget {
+  final ValueCell<int> a;
+
+  const CellWidgetTest8(this.a, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final b = MutableCell(1);
+    final c = ValueCell.computed(() => a() + b());
+    final d = MutableCell.computed(() => a() + b(), (value) => b.value = value);
+
+    return Text('C = ${c()}, D = ${d()}');
+  }
+}
+
 /// Tests StaticWidget subclass with cells defined in build method
 class StaticWidgetTest1 extends StaticWidget {
   const StaticWidgetTest1({super.key});
@@ -863,6 +879,68 @@ void main() {
       verifyNever(tracker.init());
       verify(tracker.dispose()).called(1);
     });
+
+    testWidgets('Dependencies untracked when unmounted', (tester) async {
+      final tracker = MockCellStateTracker();
+      final a = TestManagedCell(tracker, 0);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) => Text('A = ${a()}')),
+      ));
+
+      expect(find.text('A = 0'), findsOneWidget);
+
+      // Test that the dependency cell state was initialized
+      verify(tracker.init()).called(1);
+      verifyNever(tracker.dispose());
+
+      await tester.pumpWidget(TestApp(
+        child: Container(),
+      ));
+
+      // Test that the dependency cell state was disposed
+      verifyNever(tracker.init());
+      verify(tracker.dispose()).called(1);
+    });
+
+    testWidgets('Does not leak resources when unmounted', (tester) async {
+      final tracker = MockCellStateTracker();
+      final a = TestManagedCell(tracker, 0);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          final b = MutableCell(1);
+          final c = ValueCell.computed(() => a() + b());
+          final d = MutableCell.computed(() => a() + b(), (value) => b.value = value);
+
+          return Text('C = ${c()}, D = ${d()}');
+        }),
+      ));
+
+      expect(find.text('C = 1, D = 1'), findsOneWidget);
+
+      // Test that the dependency cell state was initialized
+      verify(tracker.init()).called(1);
+      verifyNever(tracker.dispose());
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          final b = MutableCell(1);
+          final c = ValueCell.computed(() => a() + b());
+          final d = MutableCell.computed(() => a() + b(), (value) => b.value = value);
+
+          return Text('C = ${c()}, D = ${d()}');
+        }),
+      ));
+
+      await tester.pumpWidget(TestApp(
+        child: Container(),
+      ));
+
+      // Test that the dependency cell state was disposed
+      verifyNever(tracker.init());
+      verify(tracker.dispose()).called(1);
+    });
   });
 
   group('CellWidget subclass', () {
@@ -1164,6 +1242,33 @@ void main() {
 
       expect(find.text('2'), findsOneWidget);
       expect(find.text('12'), findsOneWidget);
+    });
+
+    testWidgets('Does not leak resources when unmounted', (tester) async {
+      final tracker = MockCellStateTracker();
+      final a = TestManagedCell(tracker, 0);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidgetTest8(a),
+      ));
+
+      expect(find.text('C = 1, D = 1'), findsOneWidget);
+
+      // Test that the dependency cell state was initialized
+      verify(tracker.init()).called(1);
+      verifyNever(tracker.dispose());
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidgetTest8(a),
+      ));
+
+      await tester.pumpWidget(TestApp(
+        child: Container(),
+      ));
+
+      // Test that the dependency cell state was disposed
+      verifyNever(tracker.init());
+      verify(tracker.dispose()).called(1);
     });
   });
 
