@@ -1,3 +1,12 @@
+## 0.6.0
+
+New widgets:
+
+* `CellElevatedButton`
+* `CellFilledButton`
+* `CellOutlinedButton`
+* `CellTextButton`
+
 ## 0.5.0
 
 New features:
