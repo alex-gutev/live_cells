@@ -161,11 +161,37 @@ class MyKey {
 }
 ```
 
+The
+[`live_cells_internals`](https://pub.dev/documentation/live_cells_core/latest/live_cells_internals/live_cells_internals-library.html)
+library provides the key base classes `CellKey1`, `CellKey2` up to
+`CellKey5`, which allow you to quickly create a key that is identified
+by 1, 2 up to 5 values. These cells already implement `==` and
+`hashCode`.
+
+:::important
+
+The `runtimeType` is taken into account in the imlementation of `==`
+and `hashCode`. Therefore two keys of different subclasses of
+`CellKey2`, for example, will not compare `==` even if the key values
+are `==`.
+
+:::
+
+`MyKey` can also be implemented using `CellKey2` as follows:
+
+```dart title="Implementation of MyKey using CellKey2"
+import 'package:live_cells_core/live_cells_internals.dart';
+
+class MyKey extends CellKey2 {
+    MyKey(super.value1, super.value2);
+}
+```
+
 
 :::danger
 
 Don't give the same key to functionally different cells. **Don't do
-this**
+this**:
 
 ```dart
 final a = ValueCell.computed(() => a() + b(),
@@ -183,42 +209,75 @@ Not unless you want bad things to happen.
 
 ## Keys for mutable cells
 
-If you assign a key to a mutable cell, created with `MutableCell` or
-`MutableCell.computed`, you'll have to manually dispose the cell when
-you're no longer using it, by calling its `.dispose()`. 
+You can also assign keys to mutable cells, however if you do the
+cell's value may not be read or written while it is inactive,
+i.e. while it has no observers. This restriction applies to cells
+created with `MutableCell` and `MutableCell.computed`. If the value of
+a keyed mutable cell is read before an observer is added an
+`InactivePersistentStatefulCellError` exception is thrown.
 
 ```dart
-final a = MutableCell(0);
-...
-// When `a` will no longer be used
-a.dispose();
+final a = MutableCell(0, key: MyKey(...));
+
+// Throws InactivePersistentStatefulCellError
+print(a.value);
 ```
 
-This is because automatic disposal happens when the cell's last
-observer is removed. However a mutable cell can reasonably be expected
-to have its value assigned even when it doesn't have any observers. All
-mutable cells with the same key, will have to share the same state and
-hence the same value. This means the state has to be kept in the
-global cell state table, even when it doesn't have any observers.
+The reason for this restriction is that the cell's state is
+automatically removed from the global cell state table when the cell's
+last observer is removed. Mutable cells without a key can safely
+maintain a reference to that state, even after it has technically been
+*disposed*, because they do not share the state with other
+cells. However, mutable cells with a key share their state with other
+cells which have the same key, therefore they cannot maintain a
+reference to their state after it has been removed from the global
+state table, since there is no guarantee at that point that all such
+cells will be referencing the same state object.
 
-You don't have to manually dispose mutable cells without a key, since
-their state is not shared with other cells and hence not kept in a
-global state table.
+To be able to read/write the value of a keyed `MutableCell` when it
+may be inactive, you'll have to call `.hold()` to keep the cell's
+state from being disposed.
+
+```dart
+final a = MutableCell(0, key: MyKey(...));
+
+// Ensure the state of a will not be disposed
+final hold = a.hold();
+
+print(a.value);
+a.value = 10;
+
+...
+// Call release when you will no longer use `a`
+hold.release();
+```
+
+Note `.release()` is called, on the object returned by `hold()`, when
+the mutable cell will no longer be used. This allows its state to be
+disposed.
+
+:::caution
+
+When the state of a keyed mutable cell is recreated after disposal,
+due to being observed again, it's value will be reset which is not the
+case with non-keyed mutable cells.
+
+:::
+
 
 :::important
 
-`CellWidget` takes care of automatically disposing all `MutableCell`s
-defined within it when the widget's element is unmounted, so you don't
-have to call `dispose` manually.
+`CellWidget` ensures that all mutable cells created within it are
+active while the widget is mounted.
 
 :::
 
 :::info
 
-Stateless mutable computed cells do not require a `dispose` method to
-be called, since they do not have any state to speak of. Most methods
-and properties, provided by this library, that return keyed mutable
-computed cells actually return stateless mutable computed cells. These
-will be covered in the next section.
+This restriction does not apply to stateless mutable computed cells
+since they don't have a state. Most methods and properties, provided
+by this library, that return keyed mutable computed cells actually
+return stateless mutable computed cells. These will be covered in the
+next section.
 
 :::
