@@ -2,23 +2,13 @@
 
 library live_cells;
 
-export 'src/value_cell.dart' show ValueCell, ConstantCell, DependentCell;
-
-export 'src/base/cell_equality_factory.dart'
-    show EqualityCellFactory, DefaultCellEqualityFactory;
-
-export 'src/base/cell_observer.dart' show CellObserver;
+export 'src/value_cell.dart' show ValueCell, ConstantCell;
 
 export 'src/base/types.dart' show WatchCallback;
 export 'src/base/exceptions.dart' show UninitializedCellError;
 
-export 'src/stateful_cell/cell_state.dart' show CellState;
-export 'src/stateful_cell/observer_cell_state.dart' show ObserverCellState;
-export 'src/stateful_cell/stateful_cell.dart' show StatefulCell;
-
 export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
 export 'src/mutable_cell/action_cell.dart' show ActionCell;
-export 'src/mutable_cell/mutable_dependent_cell.dart' show MutableDependentCell;
 export 'src/mutable_cell/mutable_cell_view.dart' show MutableCellView;
 
 export 'src/compute_cell/compute_cell.dart' show ComputeCell;

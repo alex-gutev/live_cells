@@ -1,4 +1,7 @@
-import 'package:live_cells_core/live_cells_core.dart';
+import '../stateful_cell/cell_state.dart';
+import '../stateful_cell/observer_cell_state.dart';
+import '../stateful_cell/stateful_cell.dart';
+import '../value_cell.dart';
 
 /// Thrown when accessing the value of a MetaCell that is not pointing to any cell
 class EmptyMetaCellError implements Exception {

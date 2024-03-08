@@ -1,4 +1,5 @@
 import 'package:live_cells_core/live_cells_core.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
