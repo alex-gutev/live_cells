@@ -597,7 +597,7 @@ the cell.'''
         WidgetPropertySpec<void>(
             name: #onPressed,
             defaultValue: null,
-            optional: false,
+            optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
@@ -625,7 +625,7 @@ the cell.'''
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
         #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
@@ -680,7 +680,7 @@ the cell.'''
         WidgetPropertySpec<void>(
             name: #onPressed,
             defaultValue: null,
-            optional: false,
+            optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
@@ -708,7 +708,7 @@ the cell.'''
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
         #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
@@ -1048,7 +1048,7 @@ the cell.'''
         WidgetPropertySpec<void>(
             name: #onPressed,
             defaultValue: null,
-            optional: false,
+            optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
@@ -1076,7 +1076,7 @@ the cell.'''
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
         #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
@@ -1119,7 +1119,7 @@ triggered when the button is pressed and long pressed respectively. Similarly,
         WidgetPropertySpec<void>(
             name: #onPressed,
             defaultValue: null,
-            optional: false,
+            optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
@@ -1147,7 +1147,7 @@ triggered when the button is pressed and long pressed respectively. Similarly,
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
         #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
