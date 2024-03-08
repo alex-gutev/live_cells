@@ -2188,4 +2188,81 @@ void main() {
       expect(finder('init'), findsNothing);
     });
   });
+
+  group('CellElevatedButton', () {
+    testWidgets('onPressed observers notified when button is tapped.', (tester) async {
+      final onPressed = MetaCell<void>();
+      final listener = MockSimpleListener();
+
+      onPressed.listenable.addListener(listener);
+      addTearDown(() => onPressed.listenable.removeListener(listener));
+
+      await tester.pumpWidget(TestApp(
+        child: CellElevatedButton(
+            onPressed: onPressed,
+            child: const Text('Click Me').cell
+        ),
+      ));
+
+      verifyNever(listener());
+
+      final finder = find.text('Click Me');
+
+      expect(finder, findsOneWidget);
+
+      await tester.tap(finder);
+      await tester.tap(finder);
+
+      verify(listener()).called(2);
+
+      await tester.pumpWidget(TestApp(
+        child: CellElevatedButton(
+            onPressed: onPressed,
+            child: const Text('Click Me').cell
+        ),
+      ));
+
+      await tester.tap(finder);
+
+      verify(listener()).called(1);
+    });
+
+    testWidgets('onLongPress observers notified when button is long pressed.', (tester) async {
+      final onLongPress = MetaCell<void>();
+      final listener = MockSimpleListener();
+
+      onLongPress.listenable.addListener(listener);
+      addTearDown(() => onLongPress.listenable.removeListener(listener));
+
+      await tester.pumpWidget(TestApp(
+        child: CellElevatedButton(
+            onLongPress: onLongPress,
+            child: const Text('Click Me').cell
+        ),
+      ));
+
+      verifyNever(listener());
+
+      final finder = find.text('Click Me');
+
+      expect(finder, findsOneWidget);
+
+      await tester.longPress(finder);
+      await tester.longPress(finder);
+      verify(listener()).called(2);
+
+      await tester.pumpWidget(TestApp(
+        child: CellElevatedButton(
+            onLongPress: onLongPress,
+            child: const Text('Click Me').cell
+        ),
+      ));
+
+      await tester.longPress(finder);
+      verify(listener()).called(1);
+
+      await tester.tap(finder);
+      verifyNoMoreInteractions(listener);
+    });
+  });
 }
