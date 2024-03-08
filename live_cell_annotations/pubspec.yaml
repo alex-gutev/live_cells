@@ -1,6 +1,6 @@
 name: live_cell_annotations
 description: "Provides the annotations for use with the live_cells package."
-version: 0.4.0
+version: 0.4.1
 repository: https://github.com/alex-gutev/live_cells/tree/master/live_cell_annotations
 issue_tracker: https://github.com/alex-gutev/live_cells/issues
 

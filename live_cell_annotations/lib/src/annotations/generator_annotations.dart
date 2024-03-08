@@ -50,6 +50,18 @@ class WidgetSpec<T extends Object> {
   /// properties.
   final List<Symbol> includeSuperProperties;
 
+  /// List of mixins to include in the generated widget class
+  final List<Symbol> mixins;
+
+  /// List of interface that the generated widget class should implement
+  final List<Symbol> interfaces;
+
+  /// Name of the class that the generated Widget should extend
+  final Symbol baseClass;
+
+  /// Name of the build method to generate
+  final Symbol buildMethod;
+  
   /// Documentation comment for the generated class.
   final String? documentation;
 
@@ -63,6 +75,10 @@ class WidgetSpec<T extends Object> {
     this.propertyTypes = const {},
     this.addProperties = const [],
     this.includeSuperProperties = const [],
+    this.mixins = const [],
+    this.interfaces = const [],
+    this.baseClass = #CellWidget,
+    this.buildMethod = #build,
     this.documentation
   });
 }
@@ -73,7 +89,7 @@ class WidgetSpec<T extends Object> {
 /// package.
 ///
 /// A property of type `ValueCell` holding a [T] is generated.
-class WidgetPropertySpec<T extends Object> {
+class WidgetPropertySpec<T> {
   /// Property name
   final Symbol name;
 
@@ -86,6 +102,9 @@ class WidgetPropertySpec<T extends Object> {
   /// Should this property be held in a `MutableCell`?
   final bool mutable;
 
+  /// Should this property be held in a `MetaCell`?
+  final bool meta;
+
   /// Documentation comment for this property
   final String? documentation;
 
@@ -94,6 +113,7 @@ class WidgetPropertySpec<T extends Object> {
     required this.defaultValue,
     this.optional = true,
     this.mutable = false,
+    this.meta = false,
     this.documentation
   });
 }

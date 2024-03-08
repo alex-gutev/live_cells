@@ -1,3 +1,14 @@
+## 0.4.1
+
+This release doesn't bring any new user-facing features.
+
+* Add the following properties to `WidgetSpec`:
+
+  * `mixins`
+  * `interfaces`
+  * `baseClass`
+  * `buildMethod`
+
 ## 0.4.0
 
 This release doesn't bring any new user-facing features.
