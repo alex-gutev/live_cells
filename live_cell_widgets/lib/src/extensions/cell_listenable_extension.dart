@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:live_cells_core/live_cells_core.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 
 /// Provides a method for creating a [ValueListenable] from a cell
 extension CellListenableExtension<T> on ValueCell<T> {

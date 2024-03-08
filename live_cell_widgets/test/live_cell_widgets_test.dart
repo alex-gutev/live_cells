@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:live_cell_widgets/live_cell_widgets.dart';
 import 'package:live_cell_widgets/live_cell_widgets_base.dart';
 import 'package:live_cells_core/live_cells_core.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 import 'package:mockito/mockito.dart';
 
 /// Track calls to [init] and [dispose] of a [ManagedCellState]

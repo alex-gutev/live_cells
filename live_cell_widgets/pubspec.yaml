@@ -13,7 +13,7 @@ environment:
 dependencies:
   collection: ^1.18.0
   live_cell_annotations: ^0.4.0
-  live_cells_core: ^0.17.0
+  live_cells_core: ^0.18.0
 
   flutter:
     sdk: flutter

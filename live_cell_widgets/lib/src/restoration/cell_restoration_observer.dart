@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:live_cells_core/live_cells_core.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 
 import 'restorable_cell_state_list.dart';
 
