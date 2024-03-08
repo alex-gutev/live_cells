@@ -1,3 +1,7 @@
+## 0.18.2
+
+* Add `.withDefault()` and `.onTrigger` methods for handling `EmptyMetaCellError`.
+
 ## 0.18.1
 
 * Add `key` argument to `ActionCell` constructor.
