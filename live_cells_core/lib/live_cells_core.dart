@@ -26,6 +26,9 @@ export 'src/compute_cell/store_cell.dart' show StoreCell, StoreCellExtension;
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
 export 'src/compute_cell/peek_cell.dart' show PeekCellExtension;
 
+export 'src/meta_cell/meta_cell.dart'
+    show MetaCell, InactiveMetaCelLError, EmptyMetaCellError;
+
 export 'src/maybe_cell/maybe.dart'
     show Maybe, MaybeCell, CellMaybeExtension, MaybeCellExtension;
 
@@ -50,6 +53,7 @@ export 'src/extensions/set_cell_extension.dart';
 export 'src/extensions/map_cell_extension.dart';
 export 'src/extensions/wait_cell_extension.dart';
 export 'src/extensions/value_change_extension.dart';
+export 'src/extensions/hold_cell_extension.dart';
 
 export 'package:live_cell_annotations/live_cell_annotations.dart'
     show CellExtension;
