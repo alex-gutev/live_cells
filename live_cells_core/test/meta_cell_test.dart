@@ -212,4 +212,40 @@ void main() {
       expect(CellState.maybeGetState('meta-cell-key-1'), isNull);
     });
   });
+
+  group('MetaCellExtension', () {
+    test('.withDefault() takes value of given cell when MetaCell is empty', () {
+      final meta = MetaCell<int>();
+      final cell = meta.withDefault((-1).cell);
+
+      observeCell(cell);
+
+      expect(cell.value, -1);
+
+      final a = MutableCell(0);
+      meta.setCell(a);
+
+      a.value = 10;
+      expect(cell.value, 10);
+    });
+
+    test('.ignoreEmpty prevents EmptyMetaCellError from being thrown', () {
+      final meta = MetaCell<void>();
+      final cell = meta.onTrigger;
+
+      final listener = addListener(cell, MockSimpleListener());
+
+      expect(Future(() => cell.value), completes);
+
+      final a = ActionCell();
+      meta.setCell(a);
+
+      expect(Future(() => cell.value), completes);
+
+      a.trigger();
+      a.trigger();
+
+      verify(listener()).called(2);
+    });
+  });
 }
