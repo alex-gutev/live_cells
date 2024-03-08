@@ -3279,4 +3279,32 @@ void main() {
       });
     });
   });
+
+  group('HoldCellExtension', () {
+    test('Cell activated when .hold() is called', () {
+      final resource = MockResource();
+      final a = TestManagedCell(resource, 1);
+      final b = ValueCell.computed(() => a());
+
+      final hold = b.hold();
+      addTearDown(() => hold.release());
+
+      verify(resource.init()).called(1);
+      verifyNever(resource.dispose());
+    });
+
+    test('Cell activated when .release() is called', () {
+      final resource = MockResource();
+      final a = TestManagedCell(resource, 1);
+      final b = ValueCell.computed(() => a());
+
+      final hold = b.hold();
+      addTearDown(() => hold.release());
+
+      hold.release();
+
+      verify(resource.init()).called(1);
+      verify(resource.dispose()).called(1);
+    });
+  });
 }
