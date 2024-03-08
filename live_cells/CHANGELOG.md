@@ -1,3 +1,57 @@
+## 0.18.0
+
+New features from core:
+
+* Meta Cells
+
+  A meta cell (`MetaCell`) is a cell that points to another cell. The value of a meta cell is the
+  value of the pointed to cell, and its observers are notified when the pointed to cell's value
+  changes.
+
+  The pointed to cell can be changed multiple times.
+
+  Example:
+
+  ```dart
+  final a = MutableCell(0);
+  final b = MutableCell(1);
+  
+  final meta = MetaCell<int>();
+  
+  meta.setCell(a);
+  print(meta.value); // 0
+  
+  meta.setCell(b);
+  print(meta.value); // 1
+  ```
+
+* A `.hold()` method for keeping a cell active until it is released with `.release()`
+
+  ```dart
+  final a = MutableCell(0, key: aKey);
+  
+  // Ensure that a is active
+  final hold = a.hold();
+  ...
+  // Allow a to be disposed
+  hold.release();
+  ```
+
+New widgets:
+
+* `CellElevatedButton`
+* `CellFilledButton`
+* `CellOutlinedButton`
+* `CellTextButton`
+
+Breaking Changes:
+
+* Removed `dispose()` method from `MutableCell` interface.
+* Reading/writing the value of a keyed `MutableCell` while it is inactive now throws an
+  `InactivePersistentStatefulCellError`.
+
+  Use `.hold()` to ensure a keyed `MutableCell` is active before using it.
+
 ## 0.17.0
 
 New features:
