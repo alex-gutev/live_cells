@@ -6,6 +6,20 @@ import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cells_core/live_cells_internals.dart';
 import 'package:mockito/mockito.dart';
 
+/// Mock class interface for recording whether a listener was called
+abstract class SimpleListener {
+  /// Method added as listener function
+  void call();
+}
+
+/// Mock class implementing [SimpleListener]
+///
+/// Usage:
+///
+///   - Add instance as a listener of a cell
+///   - verify(instance())
+class MockSimpleListener extends Mock implements SimpleListener {}
+
 /// Track calls to [init] and [dispose] of a [ManagedCellState]
 abstract class CellStateTracker {
   void init();
@@ -349,6 +363,83 @@ enum RadioTestValue {
 }
 
 void main() {
+  group('ValueCell.listenable', () {
+    test('Listeners called when value of cell changes', () {
+      final cell = MutableCell(10);
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+
+      cell.listenable.addListener(listener1);
+      cell.listenable.addListener(listener2);
+
+      cell.value = 30;
+
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+    });
+
+    test('Listeners not called after they are removed', () {
+      final cell = MutableCell(10);
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+
+      cell.listenable.addListener(listener1);
+      cell.listenable.addListener(listener2);
+
+      cell.value = 30;
+      cell.listenable.removeListener(listener1);
+
+      cell.value = 40;
+
+      verify(listener1()).called(1);
+      verify(listener2()).called(2);
+    });
+
+    test('init() called when first listener is added', () {
+      final tracker = MockCellStateTracker();
+      final cell = TestManagedCell(tracker, 1);
+
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+
+      cell.listenable.addListener(listener1);
+      cell.listenable.addListener(listener2);
+
+      verify(tracker.init()).called(1);
+    });
+
+    test('dispose() called when all listeners are removed', () {
+      final tracker = MockCellStateTracker();
+      final cell = TestManagedCell(tracker, 1);
+
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+
+      cell.listenable.addListener(listener1);
+      cell.listenable.addListener(listener2);
+
+      cell.listenable.removeListener(listener2);
+      cell.listenable.removeListener(listener1);
+
+      verify(tracker.dispose()).called(1);
+    });
+
+    test('dispose() not called when not all listeners are removed', () {
+      final tracker = MockCellStateTracker();
+      final cell = TestManagedCell(tracker, 1);
+
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+
+      cell.listenable.addListener(listener1);
+      cell.listenable.addListener(listener2);
+
+      cell.listenable.removeListener(listener1);
+
+      verifyNever(tracker.dispose());
+    });
+  });
+
   group('CellWidget.builder', () {
     testWidgets('Rebuilt when referenced cell changes', (tester) async {
       final count = MutableCell(0);
