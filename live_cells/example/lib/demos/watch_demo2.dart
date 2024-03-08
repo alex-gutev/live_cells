@@ -26,7 +26,7 @@ class WatchDemo2 extends StatelessWidget {
             // removed once the widget is removed from the tree.
             context.watch(() {
               final snackbar = SnackBar(
-                content: Text('Counters incremented to: ${counter1()}, ${counter2()}'),
+                content: Text('Counters: ${counter1()}, ${counter2()}'),
                 duration: Duration(milliseconds: 500),
               );
 

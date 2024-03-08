@@ -59,7 +59,7 @@ class CellRestorationDemo extends CellWidget {
     final numValue = MutableCell<num>(1).restore();
 
     // The state of this cannot be saved since it holds a [Maybe] which is
-    // not a value that can be saved, hence the `restorable: false`.
+    // not a value that can be saved.
     //
     // Although its state cannot be saved, its state is recomputed on state
     // restoration and effectively restored
@@ -160,9 +160,7 @@ class CellRestorationDemo extends CellWidget {
               ),
               const SizedBox(height: 10),
 
-              // Notice the use of CellWidget here.
-              // The state of the a1 cell defined below is not saved,
-              // since it is defined within a CellWidget's context. However,
+              // The state of the a1 cell defined below is not saved. However,
               // it's state is restored because it is recomputed from `numValue`.
               CellWidget.builder((context) {
                 final a1 = context.cell(() => numValue + 1.cell);

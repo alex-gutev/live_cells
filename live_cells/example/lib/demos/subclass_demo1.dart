@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 
 class ClampCell<T extends num> extends DependentCell<T> {
   final ValueCell<T> argValue;

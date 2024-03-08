@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 
 class CountCell extends StatefulCell<int> {
   final int start;

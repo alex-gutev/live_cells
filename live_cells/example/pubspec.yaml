@@ -40,6 +40,8 @@ dependencies:
   live_cells:
     path: ../
 
+  live_cells_core:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
