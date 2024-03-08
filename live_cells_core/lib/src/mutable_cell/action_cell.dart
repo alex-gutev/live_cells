@@ -4,6 +4,11 @@ import 'mutable_cell.dart';
 
 /// A cell without a value, which is used to trigger an action
 class ActionCell extends StatefulCell<void> {
+  /// Create a cell that represents an action.
+  ///
+  /// The cell is identified by [key] if it is non-null.
+  ActionCell({super.key});
+
   /// Trigger the action represented by the cell.
   ///
   /// The observers of the cell are notified as though the value of the cell

@@ -1,3 +1,7 @@
+## 0.18.1
+
+* Add `key` argument to `ActionCell` constructor.
+
 ## 0.18.0
 
 New features:
