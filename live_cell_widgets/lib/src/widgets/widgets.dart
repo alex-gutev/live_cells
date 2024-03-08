@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:live_cell_widgets/src/extensions/widget_extension.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cell_annotations/live_cell_annotations.dart';
+import 'package:live_cells_core/live_cells_internals.dart';
 
 import '../cell_widget/cell_widget.dart';
 
@@ -578,6 +579,77 @@ property to which it is bound is automatically updated to reflect the value of
 the cell.'''
   ),
 
+  WidgetSpec<ElevatedButton>(
+      includeSuperProperties: [
+        #child,
+        #style,
+        #autofocus,
+        #clipBehavior,
+      ],
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            defaultValue: 'true',
+            optional: false,
+            documentation: 'Is the widget enabled for user input?'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onPressed,
+            defaultValue: null,
+            optional: false,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onLongPress,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onHover,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onFocusChange,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+        )
+      ],
+
+      propertyValues: {
+        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
+        #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
+      },
+
+      mixins: [#_ElevatedButtonMixin],
+      baseClass: #_WrapperInterface,
+      buildMethod: #_buildWrappedWidget,
+
+      documentation: '''An [ElevatedButton] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes mostly same arguments as the unnamed constructor of [ElevatedButton],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.
+
+Instead of taking callback functions for [onPressed] and [onLongPress], the
+constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
+triggered when the button is pressed and long pressed respectively. Similarly,
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+'''
+  ),
+
   WidgetSpec<ExcludeSemantics>(
       includeSuperProperties: [#child],
 
@@ -588,6 +660,77 @@ but as [ValueCell]'s. This binds each property value to the [ValueCell] given
 in the constructor. If the cell value is changed, the value of the corresponding
 property to which it is bound is automatically updated to reflect the value of
 the cell.'''
+  ),
+
+  WidgetSpec<FilledButton>(
+      includeSuperProperties: [
+        #child,
+        #style,
+        #autofocus,
+        #clipBehavior,
+      ],
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            defaultValue: 'true',
+            optional: false,
+            documentation: 'Is the widget enabled for user input?'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onPressed,
+            defaultValue: null,
+            optional: false,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onLongPress,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onHover,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onFocusChange,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+        )
+      ],
+
+      propertyValues: {
+        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
+        #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
+      },
+
+      mixins: [#_ElevatedButtonMixin],
+      baseClass: #_WrapperInterface,
+      buildMethod: #_buildWrappedWidget,
+
+      documentation: '''A [FilledButton] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes mostly same arguments as the unnamed constructor of [FilledButton],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.
+
+Instead of taking callback functions for [onPressed] and [onLongPress], the
+constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
+triggered when the button is pressed and long pressed respectively. Similarly,
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+'''
   ),
 
   WidgetSpec<FittedBox>(
@@ -826,7 +969,7 @@ See [CellSwitch] for a more detailed explanation.
 The [groupValue] is controlled by a [MutableCell] which is passed on construction.
 When the value of the cell changes, the radio button state is updated to reflect the
 value of the cell. Similarly when the selected radio button is changed by the
-user, the value of the [groupValue[ cell is updated to reflect the [value] of
+user, the value of the [groupValue] cell is updated to reflect the [value] of
 the selected button.
 '''
   ),
@@ -886,5 +1029,150 @@ in the constructor. If the cell value is changed, the value of the corresponding
 property to which it is bound is automatically updated to reflect the value of
 the cell.'''
   ),
+
+  WidgetSpec<OutlinedButton>(
+      includeSuperProperties: [
+        #child,
+        #style,
+        #autofocus,
+        #clipBehavior,
+      ],
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            defaultValue: 'true',
+            optional: false,
+            documentation: 'Is the widget enabled for user input?'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onPressed,
+            defaultValue: null,
+            optional: false,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onLongPress,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onHover,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onFocusChange,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+        )
+      ],
+
+      propertyValues: {
+        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
+        #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
+      },
+
+      mixins: [#_ElevatedButtonMixin],
+      baseClass: #_WrapperInterface,
+      buildMethod: #_buildWrappedWidget,
+
+      documentation: '''An [OutlinedButton] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes mostly same arguments as the unnamed constructor of [OutlinedButton],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.
+
+Instead of taking callback functions for [onPressed] and [onLongPress], the
+constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
+triggered when the button is pressed and long pressed respectively. Similarly,
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+'''
+  ),
+
+  WidgetSpec<TextButton>(
+      includeSuperProperties: [
+        #child,
+        #style,
+        #autofocus,
+        #clipBehavior,
+      ],
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            defaultValue: 'true',
+            optional: false,
+            documentation: 'Is the widget enabled for user input?'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onPressed,
+            defaultValue: null,
+            optional: false,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+        ),
+        WidgetPropertySpec<void>(
+            name: #onLongPress,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onHover,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onFocusChange,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+        )
+      ],
+
+      propertyValues: {
+        #onPressed: 'enabled() ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
+        #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
+      },
+
+      mixins: [#_ElevatedButtonMixin],
+      baseClass: #_WrapperInterface,
+      buildMethod: #_buildWrappedWidget,
+
+      documentation: '''A [TextButton] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes mostly same arguments as the unnamed constructor of [TextButton],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.
+
+Instead of taking callback functions for [onPressed] and [onLongPress], the
+constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
+triggered when the button is pressed and long pressed respectively. Similarly,
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+'''
+  ),
 ])
 part 'widgets.g.dart';
+
+part 'wrapper_interface.dart';
+part 'mixins.dart';
