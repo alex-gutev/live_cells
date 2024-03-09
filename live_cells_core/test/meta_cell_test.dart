@@ -247,5 +247,26 @@ void main() {
 
       verify(listener()).called(2);
     });
+
+    test('.whenReady stops execution of watch function', () {
+      final meta = MetaCell<int>();
+
+      final listener = MockSimpleListener();
+      final watch = ValueCell.watch(() {
+        meta.whenReady();
+        listener();
+      });
+
+      addTearDown(() => watch.stop());
+      verifyNever(listener());
+
+      final a = MutableCell(0);
+      meta.setCell(a);
+
+      a.value = 1;
+      a.value = 2;
+
+      verify(listener()).called(2);
+    });
   });
 }

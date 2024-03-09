@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import '../base/exceptions.dart';
 import '../base/types.dart';
 import '../base/cell_observer.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
@@ -51,6 +52,9 @@ class _CellWatchObserver implements CellObserver {
   _CellWatchObserver(this.watch) {
     try {
       _callWatchFn();
+    }
+    on StopComputeException {
+      // Stop execution of watch function
     }
     catch (e, st) {
       debugPrint('Unhandled exception in ValueCell.watch(): $e\n$st');
