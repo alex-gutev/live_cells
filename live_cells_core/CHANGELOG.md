@@ -1,3 +1,12 @@
+## 0.18.3
+
+* Add `.whenReady` property on `MetaCell`s.
+
+  This property creates a cell that evaluates to `ValueCell.none` while the meta cell is empty.
+
+* Add `MetaCell.inject` method as an alias for `MetaCell.setCell`.
+* Allow watch functions to be terminated using `ValueCell.none()` like compute functions.
+
 ## 0.18.2
 
 * Add `.withDefault()` and `.onTrigger` methods for handling `EmptyMetaCellError`.
