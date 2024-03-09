@@ -76,6 +76,9 @@ class MetaCell<T> extends StatefulCell<T> {
     _ensureState.refCell = cell;
   }
 
+  /// Alias of [setCell].
+  void inject(ValueCell<T> cell) => setCell(cell);
+
   @override
   CellState<StatefulCell> createState() => MetaCellState<T>(
       cell: this,
