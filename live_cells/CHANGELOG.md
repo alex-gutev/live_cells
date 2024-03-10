@@ -1,3 +1,7 @@
+## 0.18.2
+
+* Allow setting cell values in watch functions.
+
 ## 0.18.1
 
 Additions from core:
