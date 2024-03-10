@@ -81,13 +81,12 @@ by displaying an error notice to the user, but there is no way to
 offer a retry functionality to the user.
 
 This is where `ActionCell`s come in handy. All we need to do to add
-retry functionality is to defined an `ActionCell`, which will serve to
-trigger the retrying of the request and observe it in our cell defined
+retry functionality is to define an `ActionCell`, which will serve to
+trigger the retrying of the request, and observe it in our cell defined
 above.
 
 ```dart
 final onRetry = ActionCell();
-
 
 final countries = ValueCell.computed(() async {
     // Observe the retry cell.
@@ -123,10 +122,10 @@ be run again, because `onRetry` is observed by `countries`.
 This is very handy for implementing a reusable error handling widget
 that displays the child widget, which displays the result of the
 request, if the request was successful or an error notice if it failed
-with a retry button to retry the request.
+with a button to retry the request.
 
-To achieve this we'll need to define a widget which takes a `child` as
-a cell, and an `ActionCell` for retrying the action.
+To achieve this we'll need to define a widget that takes a `child`
+widget as a cell, and an `ActionCell` for retrying the action.
 
 ```dart title="Reusable error handling widget"
 class ErrorHandler extends CellWidget {
@@ -226,9 +225,9 @@ Some points to note from this example:
 * The child widget is defined in a computed cell, which awaits the
   `Future` held in the *countries* cell using `.awaited`.
   
-* `.initialValue([].cell)` so that the cell evaluates to the empty
-  list while the response is still pending, rather than throwing an
-  `UninitializedCellError`.
+* `.initialValue([].cell)` is used so that the cell evaluates to the
+  empty list while the response is still pending, rather than throwing
+  an `UninitializedCellError`.
   
 Notice we've successfuly decoupled the data loading, presentation and
 error handling steps from each other and factored them out into three
@@ -236,7 +235,7 @@ reusable components:
 
 1. The *countries* cell, which is only concerned with performing the
    HTTP request that loads the data, and doesn't care how that data is
-   presented, how errors are handled or how the operation is retry.
+   presented, how errors are handled or how the operation is retried.
    
 2. The `child` widget, which is only concerned with presenting the data to
    the user when the request is successful, and not handling errors.
@@ -250,7 +249,7 @@ separation of concerns without a mess of callbacks and *controller*
 objects.
 
 We've glossed over styling and UI design in these examples, since
-that's beyond the scope of this library, but we can make our examples
+that's beyond the scope of this library, but we can make this example
 more user friendly by providing a loading indication while the data is
 loading, rather than showing an empty list. We can do this easily
 using, the `.isCompleted` property of cells holding a `Future`, and
