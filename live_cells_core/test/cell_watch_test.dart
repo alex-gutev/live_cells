@@ -213,6 +213,53 @@ void main() {
       watcher1.stop();
       verifyNever(resource.dispose());
     });
+
+    test('Setting cells in watch function', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+
+      final listener = addListener(b, MockSimpleListener());
+
+      final watch = ValueCell.watch(() {
+        b.value = a() + 1;
+      });
+
+      addTearDown(() => watch.stop());
+
+      expect(b.value, 1);
+      verify(listener()).called(1);
+
+      a.value = 5;
+      expect(b.value, 6);
+      verify(listener()).called(1);
+    });
+
+    test('Setting cells with MutableCell.batch in watch function', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+      final c = MutableCell(0);
+      final d = (b + c).store();
+
+      final observer = addObserver(d, MockValueObserver());
+
+      final watch = ValueCell.watch(() {
+        MutableCell.batch(() {
+          b.value = a() + 1;
+          c.value = a() + 2;
+        });
+      });
+
+      addTearDown(() => watch.stop());
+
+      expect(b.value, 1);
+      expect(c.value, 2);
+      expect(observer.values, equals([3]));
+
+      a.value = 5;
+      expect(b.value, 6);
+      expect(c.value, 7);
+      expect(observer.values, equals([3, 13]));
+    });
   });
 
   group('changesOnly cell option', () {
