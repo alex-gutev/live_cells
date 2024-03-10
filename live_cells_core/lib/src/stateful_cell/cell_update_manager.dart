@@ -50,14 +50,15 @@ class CellUpdateManager {
   static var _isUpdating = false;
 
   /// List of scheduled post update callbacks.
-  static final List<PostUpdateCallback> _postUpdateCallbacks = [];
+  static var _postUpdateCallbacks = <PostUpdateCallback>[];
 
   /// Run all scheduled post update callbacks and clear the list.
   static void _runPostUpdateCallbacks() {
-    for (final callback in _postUpdateCallbacks) {
+    final callbacks = _postUpdateCallbacks;
+    _postUpdateCallbacks = [];
+
+    for (final callback in callbacks) {
       callback();
     }
-
-    _postUpdateCallbacks.clear();
   }
 }
