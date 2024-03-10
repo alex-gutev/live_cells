@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 
 import '../compute_cell/dynamic_mutable_compute_cell.dart';
 import '../restoration/restoration.dart';
+import '../stateful_cell/cell_update_manager.dart';
 import '../stateful_cell/cell_state.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
@@ -117,6 +118,8 @@ abstract class MutableCell<T> extends ValueCell<T> {
 
   /// End a batch update and notify the observers of the affected cells.
   static void _endBatch() {
+    var wasUpdating = CellUpdateManager.beginCellUpdates();
+
     _batched = false;
 
     for (final entry in _batchList.entries) {
@@ -124,6 +127,8 @@ abstract class MutableCell<T> extends ValueCell<T> {
     }
 
     _batchList.clear();
+
+    CellUpdateManager.endCellUpdates(wasUpdating);
   }
 }
 

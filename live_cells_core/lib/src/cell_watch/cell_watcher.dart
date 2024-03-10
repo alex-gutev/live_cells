@@ -4,6 +4,7 @@ import '../base/exceptions.dart';
 import '../base/types.dart';
 import '../base/cell_observer.dart';
 import '../compute_cell/dynamic_compute_cell.dart';
+import '../stateful_cell/cell_update_manager.dart';
 import '../value_cell.dart';
 
 /// Maintains the state of a *cell watcher*.
@@ -17,7 +18,7 @@ class CellWatcher {
   /// Create a *cell watcher*
   ///
   /// The function [watch] is called whenever the values of the cells referenced
-  /// within the function with the [call] method changes. The function is always
+  /// within the function changes. The function is always
   /// called once immediately before this constructor returns.
   CellWatcher(this.watch) :
       _observer = _CellWatchObserver(watch);
@@ -80,6 +81,11 @@ class _CellWatchObserver implements CellObserver {
     });
   }
 
+  /// Schedule the watch function to be called.
+  void _scheduleWatchFn() {
+    CellUpdateManager.addPostUpdateCallback(_callWatchFn);
+  }
+
   @override
   bool get shouldNotifyAlways => false;
 
@@ -90,7 +96,7 @@ class _CellWatchObserver implements CellObserver {
       _waitingForChange = !didChange;
       
       if (didChange) {
-        _callWatchFn();
+        _scheduleWatchFn();
       }
     }
   }

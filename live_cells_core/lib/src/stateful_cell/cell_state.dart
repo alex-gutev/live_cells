@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 
 import '../base/types.dart';
 import '../base/cell_observer.dart';
+import 'cell_update_manager.dart';
 import 'stateful_cell.dart';
 
 /// Holds the state of a [StatefulCell].
@@ -151,6 +152,8 @@ class CellState<T extends StatefulCell> {
   }) {
     assert(!_isDisposed);
 
+    final wasUpdating = CellUpdateManager.beginCellUpdates();
+
     for (final observer in _observers.keys.toList(growable: false)) {
       try {
         if (!isEqual || observer.shouldNotifyAlways) {
@@ -161,6 +164,8 @@ class CellState<T extends StatefulCell> {
         debugPrint('Unhandled exception in CellObserver.update: $e\n$st');
       }
     }
+
+    CellUpdateManager.endCellUpdates(wasUpdating);
   }
 
   // Private

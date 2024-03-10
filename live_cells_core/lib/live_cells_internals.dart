@@ -17,6 +17,7 @@ export 'src/base/cell_equality_factory.dart'
 
 export 'src/base/cell_observer.dart' show CellObserver;
 
+export 'src/stateful_cell/cell_update_manager.dart' show CellUpdateManager;
 export 'src/stateful_cell/cell_state.dart' show CellState;
 export 'src/stateful_cell/observer_cell_state.dart' show ObserverCellState;
 
