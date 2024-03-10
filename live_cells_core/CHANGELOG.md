@@ -1,3 +1,7 @@
+## 0.18.4
+
+* Allow setting cell values in watch functions.
+
 ## 0.18.3
 
 * Add `.whenReady` property on `MetaCell`s.
