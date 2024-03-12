@@ -53,8 +53,8 @@ bound to different cells.
 
 ```dart title="bind method"
 final text = CellText()
-    .data(content) // Copy CellText with `data` bound to `content`
-    .style(style); // Copy CellText with a new binding for `style`
+    .bind(data: content) // Copy CellText with `data` bound to `content`
+    .bind(style: style); // Copy CellText with a new binding for `style`
 ```
 
 ## User input
