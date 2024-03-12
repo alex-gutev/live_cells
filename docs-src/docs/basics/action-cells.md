@@ -76,9 +76,9 @@ HTTP requests.
 As the cell is defined in the example above, there is no way to retry
 the network request if it fails for some reason e.g. the Internet
 connection is down, the server is down, the request times
-out. Observers of the cell will observe the error and can handle it,
-by displaying an error notice to the user, but there is no way to
-offer a retry functionality to the user.
+out. Observers of the cell will observe the error and can handle it by
+displaying an error notice, but there is no way to offer a retry
+functionality to the user.
 
 This is where `ActionCell`s come in handy. All we need to do to add
 retry functionality is to define an `ActionCell`, which will serve to
@@ -86,11 +86,11 @@ trigger the retrying of the request, and observe it in our cell defined
 above.
 
 ```dart
-final onRetry = ActionCell();
+final retry = ActionCell();
 
 final countries = ValueCell.computed(() async {
     // Observe the retry cell.
-    onRetry();
+    retry();
     
     final response = 
         await dio.get('https://api.sampleapis.com/countries/countries');
@@ -104,11 +104,11 @@ computation function. To retry the network request all we need to do
 is trigger the retry cell with:
 
 ```dart
-onRetry.trigger();
+retry.trigger();
 ```
 
 This will cause the compute value function of the `countries` cell to
-be run again, because `onRetry` is observed by `countries`.
+be run again, because `retry` is observed by `countries`.
 
 :::tip
 
@@ -121,8 +121,8 @@ be run again, because `onRetry` is observed by `countries`.
 
 This is very handy for implementing a reusable error handling widget
 that displays the child widget, which displays the result of the
-request, if the request was successful or an error notice if it failed
-with a button to retry the request.
+request, if the request was successful or an error notice with a
+button to retry the request if it failed.
 
 To achieve this we'll need to define a widget that takes a `child`
 widget as a cell, and an `ActionCell` for retrying the action.
@@ -161,7 +161,7 @@ class ErrorHandler extends CellWidget {
 A couple of things to note from this definition:
 
 * The `child` widget is provided as a cell rather than a widget to allow
-  us to handles errors using `try` and `catch`.
+  us to handle errors using `try` and `catch`.
 * The value of `child` is referenced inside a `try` block, and
   returned if the child widget is created successfully.
 * If an error occurred while computing the `child` widget, an error
@@ -187,7 +187,7 @@ ValueCell<List> countries(ValueCell<void> onRetry) =>
   
 :::note
 
-This example will use the parsed JSON response directly. In production
+This example uses the parsed JSON response directly. In production
 code, you would deserialize the response to a model object.
 
 :::
@@ -235,7 +235,7 @@ reusable components:
 
 1. The *countries* cell, which is only concerned with performing the
    HTTP request that loads the data, and doesn't care how that data is
-   presented, how errors are handled or how the operation is retried.
+   presented, how errors are handled nor how the operation is retried.
    
 2. The `child` widget, which is only concerned with presenting the data to
    the user when the request is successful, and not handling errors.
