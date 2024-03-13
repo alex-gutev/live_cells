@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'demos/async_demo.dart';
-import 'demos/action_cell_demo.dart';
+import 'demos/action_cell_demo1.dart';
+import 'demos/action_cell_demo2.dart';
 import 'demos/cell_text_field_demo1.dart';
 import 'demos/cell_text_field_demo2.dart';
 import 'demos/counter_demo.dart';
@@ -233,10 +234,18 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('Action Cells'),
+                        child: const Text('Action Cells 1'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ActionCellDemo()
+                              builder: (context) => ActionCellDemo1()
+                          ));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Action Cells 2'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ActionCellDemo2()
                           ));
                         },
                       ),
