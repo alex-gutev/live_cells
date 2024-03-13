@@ -169,19 +169,41 @@ A couple of things to note from this definition:
 * The `onPressed` handler of the retry button calls `retry.trigger()`
   which triggers the retry action.
 
+Before we update the definition of the `countries` cell let's define a
+simple data model:
+
+```dart
+class Country {
+  /// Name of the country
+  final String name;
+
+  const Country({
+    required this.name
+  });
+
+  Country.fromJson(Map<String, dynamic> json) :
+        name = json['name'];
+}
+```
+
+This defines a model `Country` with a single field `name`, and a
+constructor for creating instances of the model from JSON.
+
 Let's place the definition of the `countries` cell inside a function
 that creates the cell using a given retry cell:
 
 ```dart
-FutureCell<List> countries(ValueCell<void> onRetry) => 
+FutureCell<List<Country>> countries(ValueCell<void> onRetry) => 
     ValueCell.computed(() async {
         // Observe the retry cell.
         onRetry();
     
         final response = 
             await dio.get('https://api.sampleapis.com/countries/countries');
-        
-        return response.data;
+      
+      
+        final results = response.data as List;
+        return results.map((e) => Country.fromJson(e)).toList();
     });
 ```
 
@@ -194,8 +216,8 @@ e.g. `FutureCell<List>` is equivalent to `ValueCell<Future<List>>`.
 
 :::note
 
-This example uses the parsed JSON response directly. In production
-code, you would deserialize the response to a model object.
+This definition of the countries cell returns a list of `Country`s,
+whereas the previous definition returns the raw parsed JSON response.
 
 :::
 
@@ -203,7 +225,7 @@ The `ErrorHandler` widget can now be used as follows
 
 ```dart
 class Countries extends CellWidget {
-  static final _initalData = [];
+  static final _initalData = <Country>[];
   
   @override
   Widget build(BuildContext context) {
@@ -216,11 +238,15 @@ class Countries extends CellWidget {
         final data = results.awaited
             .initialValue(_initialData.cell);
       
-        return Column(
-          children: [
-            for (final country in data())
-              Text('${country['name']}')
-          ]
+        final countries = data();
+      
+        return ListView.builder(
+            itemCount: countries.length,
+
+            itemBuilder: (_, index) => Text(
+              countries[index].name,
+              textAlign: TextAlign.center,
+            )
         );
       })
     );
@@ -272,7 +298,8 @@ To do that we'll first update `_initialData` to a list of five
 *skeletonizer* to display a shimmer effect:
 
 ```dart
-static final _initialData = List.filled(5, { 'name': 'placeholder' });
+static final _initialData = 
+    List.filled(5, const Country(name: 'placeholder'));
 ```
 
 Finally the `child` widget is wrapped in a `Skeletonizer` widget that
@@ -284,13 +311,17 @@ ValueCell.computed(() {
   final data = results.awaited
     .initialValue(_initialData.cell);
       
+  final countries = data();
+      
   return Skeletonizer(
     enabled: !results.isCompleted()
-    child: Column(
-      children: [
-        for (final country in data())
-          Text('${country['name']}')
-        ]
+    child: ListView.builder(
+        itemCount: countries.length,
+
+        itemBuilder: (_, index) => Text(
+          countries[index].name,
+          textAlign: TextAlign.center,
+        )
     )
   );
 })

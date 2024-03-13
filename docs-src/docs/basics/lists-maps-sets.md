@@ -229,57 +229,6 @@ children[1] = Text('Updated Child 2');
 
 With this only the second child widget of the `Column` is rebuilt.
 
-If we have a common layout for the child widgets, we can do even
-better. In the example above every widget is a `Text` widget
-displaying a string. Instead of a list of `Widgets`, we could
-represent our data as a list of `Strings`, and the map that list to a
-list of `Widgets`.
-
-Let's start off with our data:
-
-```dart
-final data = MutableCell([
-    'Child 1',
-    'Child 2',
-    'Child 3'
-]);
-```
-
-To map that data to a list of Widgets, we could do something like the
-following:
-
-```dart
-final children = ValueCell.computed(() => data()
-    .map((s) => Text(s))
-    .toList()
-)
-```
-
-However that will result in the entire `children` list being
-recomputed, whenever a single element of `data` changes. We can avoid
-that by mapping the `cellList` instead:
-
-```dart
-final children = ValueCell.computed(() => data.cellList()
-    .map((c) => CellText(data: c))
-    .toList()
-)
-```
-
-The `cellList` is mapped to a list of `CellText` widgets, with each
-cell in the list to the `data` property of the `CellText`.
-
-With this definition for `children` we can now update a child widget
-using the following:
-
-```dart
-children[1] = 'Updated Child 2';
-```
-
-What we've gained with this definition is that the presentation logic
-is not only effectively separated from the data but is only specified
-in one place.
-
 ## Map and Set Properties
 
 The following properties and methods are provided by cells holding
