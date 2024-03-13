@@ -195,25 +195,30 @@ code, you would deserialize the response to a model object.
 The `ErrorHandler` widget can now be used as follows
 
 ```dart
-CellWidget.builder((_) {
-  final retry = ActionCell();
-  final results = countries(retry);
+class Countries extends CellWidget {
+  static final _initalData = [];
   
-  return ErrorHandler(
-    retry: retry,
-    child: ValueCell.computed(() {
-      final data = results.awaited
-          .initialValue([].cell);
+  @override
+  Widget build(BuildContext context) {
+    final retry = ActionCell();
+    final results = countries(retry);
+  
+    return ErrorHandler(
+      retry: retry,
+      child: ValueCell.computed(() {
+        final data = results.awaited
+            .initialValue(_initialData.cell);
       
-      return Column(
-        children: [
-          for (final country in data())
-            Text('${country['name']}')
-        ]
-      );
-    })
-  );
-});
+        return Column(
+          children: [
+            for (final country in data())
+              Text('${country['name']}')
+          ]
+        );
+      })
+    );
+  }
+}
 ```
 
 Some points to note from this example:
@@ -225,7 +230,7 @@ Some points to note from this example:
 * The child widget is defined in a computed cell, which awaits the
   `Future` held in the *countries* cell using `.awaited`.
   
-* `.initialValue([].cell)` is used so that the cell evaluates to the
+* `.initialValue(_initialData)` is used so that the cell evaluates to the
   empty list while the response is still pending, rather than throwing
   an `UninitializedCellError`.
   
@@ -255,15 +260,22 @@ loading, rather than showing an empty list. We can do this easily
 using, the `.isCompleted` property of cells holding a `Future`, and
 the [skeletonizer](https://pub.dev/packages/skeletonizer) package.
 
-This is the definition of the `child` widget cell which displays a
-loading indication:
+To do that we'll first update `_initialData` to a list of five
+*placeholder* items, which are only used to create an element on the
+screen on which the shimmer effect will be displayed:
+
+```dart
+static final _initialData = List.filled(5, { 'name': '' });
+```
+
+Finally the `child` widget is wrapped in a `Skeletonizer` widget that
+draws its child elements using a Shimmer effect when `.isCompleted()` is
+false, that is while the data is still loading:
 
 ```dart title="Displaying a loading indication"
 ValueCell.computed(() {
   final data = results.awaited
-    .initialValue(
-        List.filled(5, { 'name': '' }).cell
-    );
+    .initialValue(_initialData.cell);
       
   return Skeletonizer(
     enabled: !results.isCompleted()
@@ -277,6 +289,8 @@ ValueCell.computed(() {
 })
 ```
 
+A summary of the changes:
+
 * The child widget is wrapped in a `Skeletonizer`, from the
   [skeletonizer](https://pub.dev/packages/skeletonizer) package, that
   displays its children using a shimmer effect while it is enabled.
@@ -287,3 +301,15 @@ ValueCell.computed(() {
 * The initial data is now set to a list containing five *dummy*
   items. These items aren't actually displayed but are required by
   `Skeletonizer` to display a shimmer effect.
+
+:::caution
+
+When using `initialValue` directly within a `build` method or a
+`ValueCell.computed`, the value passed to `initialValue` must
+implement `==` and `hashCode`, such that different objects
+representing the same value compare equal under `==`. If that's not
+the case, then the initial value should be stored in a `static`
+`final` variable on the class defining the widget, as was done in this
+example.
+
+:::

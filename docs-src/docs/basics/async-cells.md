@@ -597,7 +597,7 @@ Column(
     // Display results
     CellWidget.builder((_) {
       items = results.waitLast
-            .initialValue([].cell);
+            .initialValue(const [].cell);
             
       Column(
         children: items()
