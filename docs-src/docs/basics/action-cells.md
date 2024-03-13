@@ -173,7 +173,7 @@ Let's place the definition of the `countries` cell inside a function
 that creates the cell using a given retry cell:
 
 ```dart
-ValueCell<List> countries(ValueCell<void> onRetry) => 
+FutureCell<List> countries(ValueCell<void> onRetry) => 
     ValueCell.computed(() async {
         // Observe the retry cell.
         onRetry();
@@ -184,7 +184,14 @@ ValueCell<List> countries(ValueCell<void> onRetry) =>
         return response.data;
     });
 ```
-  
+
+:::tip
+
+`FutureCell` is a shorthand for a `ValueCell` that holds a `Future`,
+e.g. `FutureCell<List>` is equivalent to `ValueCell<Future<List>>`.
+
+:::
+
 :::note
 
 This example uses the parsed JSON response directly. In production
@@ -261,11 +268,11 @@ using, the `.isCompleted` property of cells holding a `Future`, and
 the [skeletonizer](https://pub.dev/packages/skeletonizer) package.
 
 To do that we'll first update `_initialData` to a list of five
-*placeholder* items, which are only used to create an element on the
-screen on which the shimmer effect will be displayed:
+*placeholder* items. These wont be displayed but are required by
+*skeletonizer* to display a shimmer effect:
 
 ```dart
-static final _initialData = List.filled(5, { 'name': '' });
+static final _initialData = List.filled(5, { 'name': 'placeholder' });
 ```
 
 Finally the `child` widget is wrapped in a `Skeletonizer` widget that
