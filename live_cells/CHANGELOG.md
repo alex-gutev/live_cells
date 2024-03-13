@@ -1,3 +1,7 @@
+## 0.18.3
+
+* Add example of action cells to example project.
+
 ## 0.18.2
 
 * Allow setting cell values in watch functions.
