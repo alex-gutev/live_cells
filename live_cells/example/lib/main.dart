@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'demos/async_demo.dart';
+import 'demos/action_cell_demo.dart';
 import 'demos/cell_text_field_demo1.dart';
 import 'demos/cell_text_field_demo2.dart';
 import 'demos/counter_demo.dart';
@@ -228,6 +229,14 @@ class MyHomePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => AsyncDemo()
+                          ));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Action Cells'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ActionCellDemo()
                           ));
                         },
                       ),

@@ -40,7 +40,8 @@ dependencies:
   live_cells:
     path: ../
 
-  live_cells_core:
+  dio: ^5.4.1
+  skeletonizer: ^1.1.0
 
 dev_dependencies:
   flutter_test:
