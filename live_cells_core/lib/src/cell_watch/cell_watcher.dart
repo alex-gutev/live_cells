@@ -51,15 +51,7 @@ class _CellWatchObserver implements CellObserver {
 
   /// Create a cell observer which calls *cell watcher* [watch]
   _CellWatchObserver(this.watch) {
-    try {
-      _callWatchFn();
-    }
-    on StopComputeException {
-      // Stop execution of watch function
-    }
-    catch (e, st) {
-      debugPrint('Unhandled exception in ValueCell.watch(): $e\n$st');
-    }
+    _callWatchFn();
   }
 
   /// Remove the observer from the referenced cells
@@ -73,12 +65,20 @@ class _CellWatchObserver implements CellObserver {
 
   /// Call [watch] and track referenced cells
   void _callWatchFn() {
-    ComputeArgumentsTracker.computeWithTracker(watch, (cell) {
-      if (!_arguments.contains(cell)) {
-        _arguments.add(cell);
-        cell.addObserver(this);
-      }
-    });
+    try {
+      ComputeArgumentsTracker.computeWithTracker(watch, (cell) {
+        if (!_arguments.contains(cell)) {
+          _arguments.add(cell);
+          cell.addObserver(this);
+        }
+      });
+    }
+    on StopComputeException {
+      // Stop execution of watch function
+    }
+    catch (e, st) {
+      debugPrint('Unhandled exception in ValueCell.watch(): $e\n$st');
+    }
   }
 
   /// Schedule the watch function to be called.
