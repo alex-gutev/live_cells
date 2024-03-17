@@ -1,3 +1,17 @@
+## 0.7.0
+
+Breaking Changes:
+
+* Rename `onPressed` and `onLongPress` of cell Material buttons to `press` and `longPress`,
+  respectively.
+
+  The purpose of this change, is to later allow callback based event handlers to be added using
+  `onPressed` and `onLongPress`
+
+Bug Fixes:
+
+* Fix bug with exception handling in `toWidget()`.
+
 ## 0.6.0
 
 New widgets:
