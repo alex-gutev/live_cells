@@ -31,6 +31,15 @@ like a regular cell. The only difference is that calling the cell does
 not actually return a value, since the value type of the cell is
 `void`.
 
+:::tip
+
+You can use the `.observe()` method instead of calling the cell
+directly, e.g. `action.observe()`. There is no difference between the
+two but using `observe`, in this case, makes the code more
+self-documenting.
+
+:::
+
 To allow observing an `ActionCell` but disallow triggering it, using
 the `trigger` method, it should be cast to `ValueCell<void>`:
 
@@ -90,7 +99,7 @@ final retry = ActionCell();
 
 final countries = ValueCell.computed(() async {
     // Observe the retry cell.
-    retry();
+    retry.observe();
     
     final response = 
         await dio.get('https://api.sampleapis.com/countries/countries');
@@ -120,9 +129,8 @@ be run again, because `retry` is observed by `countries`.
 ## Practical Example
 
 This is very handy for implementing a reusable error handling widget
-that displays the child widget, which displays the result of the
-request, if the request was successful or an error notice with a
-button to retry the request if it failed.
+that displays the result of a request when it is successful and an
+error notice with a button to retry the request, when it fails.
 
 To achieve this we'll need to define a widget that takes a `child`
 widget as a cell, and an `ActionCell` for retrying the action.
@@ -193,10 +201,10 @@ Let's place the definition of the `countries` cell inside a function
 that creates the cell using a given retry cell:
 
 ```dart
-FutureCell<List<Country>> countries(ValueCell<void> onRetry) => 
+FutureCell<List<Country>> countries(ValueCell<void> retry) => 
     ValueCell.computed(() async {
         // Observe the retry cell.
-        onRetry();
+        retry.observe();
     
         final response = 
             await dio.get('https://api.sampleapis.com/countries/countries');
@@ -225,7 +233,7 @@ The `ErrorHandler` widget can now be used as follows
 
 ```dart
 class Countries extends CellWidget {
-  static final _initalData = <Country>[];
+  static final _loadingData = <Country>[];
   
   @override
   Widget build(BuildContext context) {
@@ -236,7 +244,7 @@ class Countries extends CellWidget {
       retry: retry,
       child: ValueCell.computed(() {
         final data = results.awaited
-            .initialValue(_initialData.cell);
+            .loadingValue(_loadingData.cell);
       
         final countries = data();
       
@@ -263,9 +271,9 @@ Some points to note from this example:
 * The child widget is defined in a computed cell, which awaits the
   `Future` held in the *countries* cell using `.awaited`.
   
-* `.initialValue(_initialData)` is used so that the cell evaluates to the
+* `.loadingValue(_loadingData)` is used so that the cell evaluates to the
   empty list while the response is still pending, rather than throwing
-  an `UninitializedCellError`.
+  a `PendingAsyncValueError`.
   
 Notice we've successfuly decoupled the data loading, presentation and
 error handling steps from each other and factored them out into three
@@ -293,12 +301,12 @@ loading, rather than showing an empty list. We can do this easily
 using, the `.isCompleted` property of cells holding a `Future`, and
 the [skeletonizer](https://pub.dev/packages/skeletonizer) package.
 
-To do that we'll first update `_initialData` to a list of five
+To do that we'll first update `_loadingData` to a list of five
 *placeholder* items. These wont be displayed but are required by
 *skeletonizer* to display a shimmer effect:
 
 ```dart
-static final _initialData = 
+static final _loadingData = 
     List.filled(5, const Country(name: 'placeholder'));
 ```
 
@@ -309,7 +317,7 @@ false, that is while the data is still loading:
 ```dart title="Displaying a loading indication"
 ValueCell.computed(() {
   final data = results.awaited
-    .initialValue(_initialData.cell);
+    .loadingValue(_loadingData.cell);
       
   final countries = data();
       
@@ -336,17 +344,17 @@ A summary of the changes:
 * The `Skeletonizer` is only enabled when `isCompleted()` is
   false,that is when the response is still pending.
   
-* The initial data is now set to a list containing five *dummy*
+* The loading data is now set to a list containing five *dummy*
   items. These items aren't actually displayed but are required by
   `Skeletonizer` to display a shimmer effect.
 
 :::caution
 
-When using `initialValue` directly within a `build` method or a
-`ValueCell.computed`, the value passed to `initialValue` must
+When using `loadingValue` directly within a `build` method or a
+`ValueCell.computed`, the value passed to `loadingValue` must
 implement `==` and `hashCode`, such that different objects
 representing the same value compare equal under `==`. If that's not
-the case, then the initial value should be stored in a `static`
+the case, then the loading value should be stored in a `static`
 `final` variable on the class defining the widget, as was done in this
 example.
 

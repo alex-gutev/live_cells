@@ -147,17 +147,17 @@ immediately. Instead it is only updated when the `Future` held in `n`
 completes. That's the effect of the `n.wait` cell.
 
 Until the `Future` awaited by a `.wait` cell completes, accessing the
-cell's value will result in an `UninitializedCellError` exception
+cell's value will result in a `PendingAsyncValueError` exception
 being thrown. Once the `Future` completes, it will retain its value
 until the next `Future` completes.
 
 For example accessing the value of `next` above before the first value
-update of `n.wait`, will result in an `UninitializedCellError`
+update of `n.wait`, will result in a `PendingAsyncValueError`
 exception being thrown. This can be handled with `onError` to give an
 initial value to a wait cell:
 
 ```dart
-final waitN = n.wait.onError<UninitializedCellError>(0.cell);
+final waitN = n.wait.onError<PendingAsyncValueError(0.cell);
 print(waitN.value); // Prints: 0
 
 final next = ValueCell.computed(() => waitN() + 1);
@@ -365,13 +365,14 @@ The `.awaited` cell is similar to `.waitLast`, however it does not
 retain the completed value of the previous `Future`. If the current
 `Future` has completed, the value of the `.awaited` cell is the
 completed value of the `Future`. If the `Future` has not completed, an
-`UninitializedCellError` exception is thrown when accessing the value
+`PendingAsyncValueError` exception is thrown when accessing the value
 of `.awaited`.
 
 :::tip
 
 The `.initialValue(...)` method, on all cells can be used to handle
-`UninitializedCellError`, by returning the value of another cell:
+`UninitializedCellError` and `PendingAsyncValueError`, by returning
+the value of another cell:
 
 ```dart
 final f = Future.delayed(Duration(seconds: 10), 1)
@@ -383,6 +384,22 @@ final f = Future.delayed(Duration(seconds: 10), 1)
 // which happens when the Future completes.
 print(f.value) // Prints: 0
 ```
+
+If you only want to handle `PendingAsyncValueError`, use
+`loadingValue` instead.
+
+:::
+
+:::caution
+
+Both `initialValue` and `loadingValue` return keyed cells, which means
+the returned cells can be used within `ValueCell.computed` without
+assigning them to a local variable first. **However**, this only works
+if the initial value cell, provided to `initialValue`/`loadingValue`,
+is also a keyed cell. For constant cells this is the case when the
+constant value type defines `==` and `hashCode` such that different
+objects representing the same value compare equal under `==`. `List`s
+and `Map`s do not satisfy this requirement.
 
 :::
 
