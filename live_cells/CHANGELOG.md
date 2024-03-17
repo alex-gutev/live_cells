@@ -1,3 +1,65 @@
+## 0.19.0
+
+New features:
+
+* Effect Cells
+
+  These can be created with `.effect()` on an action cell (`ValueCell<void>`). An effect cell
+  is guaranteed to only be run once per trigger of the action cell on which the `.effect()` method
+  is called. This is useful for running side effects, while still being able to observe the result
+  of the effect as a cell.
+
+  Example:
+
+  ```dart
+  final result = action.effect(() async {
+  return await submitForm();
+  });
+  ```
+
+* Combining Action Cells:
+
+  Multiple action cells can now be combined into a single cell, which notifies its observers, whenever
+  any of the actions trigger, using `List.combined`
+
+  Example:
+
+  ```dart
+  final a1 = ActionCell();
+  final a2 = ActionCell();
+  
+  final all = [a1, a2].combined;
+  ```
+
+Breaking Changes:
+
+* Async cells created with `.wait`, `.waitLast`, `.awaited` now throw an `PendingAsyncValueError`
+  instead of `UninitializedCellError` when the cell value is referenced while the future is pending.
+
+  This does not affect code which uses `.initialValue` to handle these errors.
+
+* Renamed `onPressed` and `onLongPress` of cell Material buttons to `press` and `longPress`,
+  respectively.
+
+  The purpose of this change, is to later allow callback based event handlers to be added using
+  `onPressed` and `onLongPress`
+
+Other Changes:
+
+* Computed cells no longer run the computation function on initialization. Instead the first run
+  of the computation function is deferred to the first time the cell value is referenced.
+
+  NOTE: This changes slightly the semantics of computed cells, especially dynamic computed cells
+  which are now dormant until their value is referenced at least once.
+
+* Clarify semantics of `ValueCell.none`:
+
+  If a `null` default value is given and `ValueCell.none` is used during the computation of the
+  initial value of a cell, `UninitializedCellError` is thrown.
+
+* Bug fix: Unhandled exceptions in a `ValueCell.watch` no longer propagate out of the watch function.
+
+
 ## 0.18.4
 
 * Improve action cell example.
