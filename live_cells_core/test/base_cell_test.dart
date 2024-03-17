@@ -653,7 +653,7 @@ void main() {
       final effect = a.effect(() {
         listener();
 
-        return i += delta.peek();
+        return i += delta();
       });
 
       final observer = addObserver(effect, MockValueObserver());
