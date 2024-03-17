@@ -6,6 +6,7 @@ import 'demos/action_cell_demo2.dart';
 import 'demos/cell_text_field_demo1.dart';
 import 'demos/cell_text_field_demo2.dart';
 import 'demos/counter_demo.dart';
+import 'demos/effect_cells_demo.dart';
 import 'demos/mutable_computed_cell_demo.dart';
 import 'demos/mutable_computed_cell_demo2.dart';
 import 'demos/error_handling_demo1.dart';
@@ -246,6 +247,14 @@ class MyHomePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => ActionCellDemo2()
+                          ));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Effect Cells'),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => EffectCellDemo()
                           ));
                         },
                       ),
