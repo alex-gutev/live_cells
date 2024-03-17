@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:live_cells_core/live_cells_core.dart';
-import 'cell_listenable_extension.dart';
+
+import '../cell_widget/cell_listener_widget.dart';
 
 /// Provides functionality for creating [Widget]'s from [ValueCell]'s
 extension WidgetExtension<T> on ValueCell<T> {
@@ -18,18 +19,11 @@ extension WidgetExtension<T> on ValueCell<T> {
   /// value changes.
   Widget toWidget(ValueWidgetBuilder<T> builder, {
     Widget? child
-  }) {
-    return ValueListenableBuilder(
-        // Prevent exceptions from reaching ValueListenableBuilder
-        valueListenable: onError(ComputeCell(
-            compute: () => ValueCell.none(),
-            arguments: {},
-            key: ValueCell.none
-        )).listenable,
-        builder: builder,
-        child: child
-    );
-  }
+  }) => CellListenerWidget(
+      cell: this,
+      builder: builder,
+      child: child
+  );
 }
 
 /// Provides the [widget] method for directly creating a [Widget] from a [ValueCell] which holds a [Widget].
