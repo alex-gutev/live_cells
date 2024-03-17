@@ -2199,7 +2199,7 @@ void main() {
 
       await tester.pumpWidget(TestApp(
         child: CellElevatedButton(
-            onPressed: onPressed,
+            press: onPressed,
             child: const Text('Click Me').cell
         ),
       ));
@@ -2217,7 +2217,7 @@ void main() {
 
       await tester.pumpWidget(TestApp(
         child: CellElevatedButton(
-            onPressed: onPressed,
+            press: onPressed,
             child: const Text('Click Me').cell
         ),
       ));
@@ -2236,7 +2236,7 @@ void main() {
 
       await tester.pumpWidget(TestApp(
         child: CellElevatedButton(
-            onLongPress: onLongPress,
+            longPress: onLongPress,
             child: const Text('Click Me').cell
         ),
       ));
@@ -2253,7 +2253,7 @@ void main() {
 
       await tester.pumpWidget(TestApp(
         child: CellElevatedButton(
-            onLongPress: onLongPress,
+            longPress: onLongPress,
             child: const Text('Click Me').cell
         ),
       ));

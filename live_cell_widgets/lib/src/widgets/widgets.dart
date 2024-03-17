@@ -595,14 +595,14 @@ the cell.'''
             documentation: 'Is the widget enabled for user input?'
         ),
         WidgetPropertySpec<void>(
-            name: #onPressed,
+            name: #press,
             defaultValue: null,
             optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
-            name: #onLongPress,
+            name: #longPress,
             defaultValue: null,
             optional: true,
             meta: true,
@@ -625,13 +625,13 @@ the cell.'''
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_ElevatedButtonMixin],
+      mixins: [#_MaterialButtonMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
@@ -678,14 +678,14 @@ the cell.'''
             documentation: 'Is the widget enabled for user input?'
         ),
         WidgetPropertySpec<void>(
-            name: #onPressed,
+            name: #press,
             defaultValue: null,
             optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
-            name: #onLongPress,
+            name: #longPress,
             defaultValue: null,
             optional: true,
             meta: true,
@@ -708,13 +708,13 @@ the cell.'''
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_ElevatedButtonMixin],
+      mixins: [#_MaterialButtonMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
@@ -1046,14 +1046,14 @@ the cell.'''
             documentation: 'Is the widget enabled for user input?'
         ),
         WidgetPropertySpec<void>(
-            name: #onPressed,
+            name: #press,
             defaultValue: null,
             optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
-            name: #onLongPress,
+            name: #longPress,
             defaultValue: null,
             optional: true,
             meta: true,
@@ -1076,13 +1076,13 @@ the cell.'''
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_ElevatedButtonMixin],
+      mixins: [#_MaterialButtonMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
@@ -1117,14 +1117,14 @@ triggered when the button is pressed and long pressed respectively. Similarly,
             documentation: 'Is the widget enabled for user input?'
         ),
         WidgetPropertySpec<void>(
-            name: #onPressed,
+            name: #press,
             defaultValue: null,
             optional: true,
             meta: true,
             documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
-            name: #onLongPress,
+            name: #longPress,
             defaultValue: null,
             optional: true,
             meta: true,
@@ -1147,13 +1147,13 @@ triggered when the button is pressed and long pressed respectively. Similarly,
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && onPressed != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && onLongPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
+        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_ElevatedButtonMixin],
+      mixins: [#_MaterialButtonMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
