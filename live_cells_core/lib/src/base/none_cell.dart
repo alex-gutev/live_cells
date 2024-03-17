@@ -7,6 +7,8 @@ import 'cell_observer.dart';
 /// a [ValueCell] with a specific type is expected. Otherwise the type argument
 /// has no effect on its functionality, since it never returns a value.
 class NoneCell<T> extends ValueCell<T> {
+  const NoneCell();
+
   @override
   void addObserver(CellObserver observer) {}
 
@@ -15,4 +17,10 @@ class NoneCell<T> extends ValueCell<T> {
 
   @override
   T get value => ValueCell.none();
+
+  @override
+  bool operator ==(Object other) => runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
 }
