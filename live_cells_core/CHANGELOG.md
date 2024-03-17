@@ -1,3 +1,40 @@
+## 0.19.0
+
+New features:
+
+* Effect Cells
+
+  These can be created with `.effect()` on an action cell (`ValueCell<void>`). An effect cell
+  is guaranteed to only be run once per trigger of the action cell on which the `.effect()` method
+  is called. This is useful for running side effects, while still being able to observe the result
+  of the effect as a cell.
+
+  Example:
+  
+  `final result = action.effect(() async {
+    return await submitForm();
+  });`
+
+Breaking Changes:
+
+* Async cells created with `.wait`, `.waitLast`, `.awaited` now throw an `PendingAsyncValueError`
+  instead of `UninitializedCellError` when the cell value is referenced while the future is pending.
+
+  This does not affect code which uses `.initialValue` to handle these errors.
+
+Other Changes:
+
+* Computed cells no longer run the computation function on initialization. Instead the first run
+  of the computation function is deferred to the first time the cell value is referenced.
+
+  NOTE: This changes slightly the semantics of computed cells, especially dynamic computed cells
+  which are now dormant until their value is referenced at least once.
+
+* Clarify semantics of `ValueCell.none`:
+
+  If a `null` default value is given and `ValueCell.none` is used during the computation of the
+  initial value of a cell, `UninitializedCellError` is thrown.
+
 ## 0.18.4
 
 * Allow setting cell values in watch functions.

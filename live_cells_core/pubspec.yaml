@@ -2,7 +2,7 @@ name: live_cells_core
 description: > 
   Provides the core of live cells: A replacement for ChangeNotifier and ValueNotifier
   that is easier to use and more flexible
-version: 0.18.4
+version: 0.19.0
 repository: https://github.com/alex-gutev/live_cells/tree/master/live_cells_core
 issue_tracker: https://github.com/alex-gutev/live_cells/issues
 
