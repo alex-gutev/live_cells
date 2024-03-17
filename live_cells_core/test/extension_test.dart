@@ -3289,6 +3289,9 @@ void main() {
       final hold = b.hold();
       addTearDown(() => hold.release());
 
+      // Reference cell to initialize it
+      b.value;
+
       verify(resource.init()).called(1);
       verifyNever(resource.dispose());
     });
@@ -3300,6 +3303,9 @@ void main() {
 
       final hold = b.hold();
       addTearDown(() => hold.release());
+
+      // Reference cell to initialize it
+      b.value;
 
       hold.release();
 

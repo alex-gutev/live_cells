@@ -127,6 +127,16 @@ T addObserver<T extends CellObserver>(ValueCell cell, T observer) {
   cell.addObserver(observer);
   addTearDown(() => cell.removeObserver(observer));
 
+  try {
+    // Reference value to "activate" cell since cells are lazy by default
+    cell.value;
+  }
+  catch (e) {
+    // Prevent exception produced by cell computation function from failing test
+    //
+    // The exception thrown may be legitimate and even expected by the test.
+  }
+
   return observer;
 }
 
