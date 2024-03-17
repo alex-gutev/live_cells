@@ -33,7 +33,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      b.addObserver(observer);
+      addObserver(b, observer);
       a.value = 5;
 
       expect(b.value, equals(6));
@@ -55,7 +55,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       a.value = 5;
 
       expect(c.value, equals(8));
@@ -77,7 +77,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       b.value = 9;
 
       expect(c.value, equals(10));
@@ -99,7 +99,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       b.value = 9;
       a.value = 10;
 
@@ -123,8 +123,8 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      c.addObserver(observer1);
-      c.addObserver(observer2);
+      addObserver(c, observer1);
+      addObserver(c, observer2);
       b.value = 9;
 
       c.removeObserver(observer1);
@@ -173,9 +173,9 @@ void main() {
       final observerB = MockSimpleObserver();
       final observerC = MockSimpleObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
 
       c.value = 10;
 
@@ -202,9 +202,9 @@ void main() {
       final observerB = MockSimpleObserver();
       final observerC = MockSimpleObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
 
       c.value = 10;
       c.value = 12;
@@ -236,10 +236,10 @@ void main() {
       final observerC = MockValueObserver();
       final observerE = MockValueObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
-      e.addObserver(observerE);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
+      addObserver(e, observerE);
 
       MutableCell.batch(() {
         c.value = 10;
@@ -274,10 +274,10 @@ void main() {
       final observerC = MockSimpleObserver();
       final observerE = MockSimpleObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
-      e.addObserver(observerE);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
+      addObserver(e, observerE);
 
       MutableCell.batch(() {
         c.value = 10;
@@ -306,8 +306,8 @@ void main() {
       final observerC = MockSimpleObserver();
       final observerD = MockSimpleObserver();
 
-      c.addObserver(observerC);
-      d.addObserver(observerD);
+      addObserver(c, observerC);
+      addObserver(d, observerD);
 
       MutableCell.batch(() {
         a.value = 2;
@@ -344,8 +344,8 @@ void main() {
       final observerC = MockValueObserver();
       final observerD = MockValueObserver();
 
-      c.addObserver(observerC);
-      d.addObserver(observerD);
+      addObserver(c, observerC);
+      addObserver(d, observerD);
 
       MutableCell.batch(() {
         a.value = 2;
@@ -695,7 +695,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      b.addObserver(observer);
+      addObserver(b, observer);
       a.value = 5;
 
       expect(b.value, equals(6));
@@ -714,7 +714,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       a.value = 5;
 
       expect(c.value, equals(8));
@@ -733,7 +733,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       b.value = 9;
 
       expect(c.value, equals(10));
@@ -752,7 +752,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       b.value = 9;
       a.value = 10;
 
@@ -773,8 +773,8 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      c.addObserver(observer1);
-      c.addObserver(observer2);
+      addObserver(c, observer1);
+      addObserver(c, observer2);
       b.value = 9;
 
       c.removeObserver(observer1);
@@ -817,9 +817,9 @@ void main() {
       final observerB = MockSimpleObserver();
       final observerC = MockSimpleObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
 
       c.value = 10;
 
@@ -843,9 +843,9 @@ void main() {
       final observerB = MockSimpleObserver();
       final observerC = MockSimpleObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
 
       c.value = 10;
       c.value = 12;
@@ -874,10 +874,10 @@ void main() {
       final observerC = MockValueObserver();
       final observerE = MockValueObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
-      e.addObserver(observerE);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
+      addObserver(e, observerE);
 
       MutableCell.batch(() {
         c.value = 10;
@@ -909,10 +909,10 @@ void main() {
       final observerC = MockSimpleObserver();
       final observerE = MockSimpleObserver();
 
-      a.addObserver(observerA);
-      b.addObserver(observerB);
-      c.addObserver(observerC);
-      e.addObserver(observerE);
+      addObserver(a, observerA);
+      addObserver(b, observerB);
+      addObserver(c, observerC);
+      addObserver(e, observerE);
 
       MutableCell.batch(() {
         c.value = 10;
@@ -941,8 +941,8 @@ void main() {
       final observerC = MockSimpleObserver();
       final observerD = MockSimpleObserver();
 
-      c.addObserver(observerC);
-      d.addObserver(observerD);
+      addObserver(c, observerC);
+      addObserver(d, observerD);
 
       MutableCell.batch(() {
         a.value = 2;
@@ -979,8 +979,8 @@ void main() {
       final observerC = MockValueObserver();
       final observerD = MockValueObserver();
 
-      c.addObserver(observerC);
-      d.addObserver(observerD);
+      addObserver(c, observerC);
+      addObserver(d, observerD);
 
       MutableCell.batch(() {
         a.value = 2;
@@ -1013,7 +1013,7 @@ void main() {
       });
 
       final observer = MockValueObserver();
-      d.addObserver(observer);
+      addObserver(d, observer);
 
       b.value = 1;
       a.value = false;
@@ -1043,7 +1043,7 @@ void main() {
       });
 
       final observer = MockValueObserver();
-      f.addObserver(observer);
+      addObserver(f, observer);
 
       b.value = 1;
       e.value = 10;
@@ -1071,7 +1071,7 @@ void main() {
       });
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       a.value = 2;
       a.value = 6;
@@ -1093,7 +1093,7 @@ void main() {
       });
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       MutableCell.batch(() {
         select.value = true;

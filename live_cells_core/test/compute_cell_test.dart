@@ -52,7 +52,7 @@ void main() {
       final c = (a,b).apply((a, b) => a + b);
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       a.value = 8;
 
@@ -66,7 +66,7 @@ void main() {
       final c = (a,b).apply((a, b) => a + b);
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       b.value = 8;
 
@@ -80,7 +80,7 @@ void main() {
       final c = (a,b).apply((a, b) => a + b);
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       b.value = 8;
       a.value = 10;
@@ -97,7 +97,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       a.value = 8;
 
       c.removeObserver(observer);
@@ -116,10 +116,10 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      c.addObserver(observer1);
+      addObserver(c, observer1);
       a.value = 8;
 
-      c.addObserver(observer2);
+      addObserver(c, observer2);
       b.value = 10;
       a.value = 100;
 
@@ -173,7 +173,7 @@ void main() {
       final b = ValueCell.computed(() => a() + 1);
 
       final observer = MockSimpleObserver();
-      b.addObserver(observer);
+      addObserver(b, observer);
 
       a.value = 5;
 
@@ -187,7 +187,7 @@ void main() {
       final c = ValueCell.computed(() => a() + b());
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       a.value = 5;
 
@@ -201,7 +201,7 @@ void main() {
       final c = ValueCell.computed(() => a() + b());
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       b.value = 8;
 
@@ -215,7 +215,7 @@ void main() {
       final c = ValueCell.computed(() => a() + b());
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       a.value = 8;
 
@@ -229,7 +229,7 @@ void main() {
       final c = ValueCell.computed(() => a() + b());
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       b.value = 8;
 
@@ -243,7 +243,7 @@ void main() {
       final c = ValueCell.computed(() => a() + b());
 
       final observer = MockSimpleObserver();
-      c.addObserver(observer);
+      addObserver(c, observer);
 
       b.value = 8;
       a.value = 10;
@@ -260,7 +260,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      c.addObserver(observer);
+      addObserver(c, observer);
       a.value = 8;
 
       c.removeObserver(observer);
@@ -279,10 +279,10 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      c.addObserver(observer1);
+      addObserver(c, observer1);
       a.value = 8;
 
-      c.addObserver(observer2);
+      addObserver(c, observer2);
       b.value = 10;
       a.value = 100;
 
@@ -298,7 +298,7 @@ void main() {
       final d = ValueCell.computed(() => a() ? b() : c());
 
       final observer = MockValueObserver();
-      d.addObserver(observer);
+      addObserver(d, observer);
 
       b.value = 1;
       a.value = false;
@@ -319,7 +319,7 @@ void main() {
       final f = ValueCell.computed(() => d() + e());
 
       final observer = MockValueObserver();
-      f.addObserver(observer);
+      addObserver(f, observer);
 
       b.value = 1;
       e.value = 10;
@@ -449,7 +449,7 @@ void main() {
       final observer = MockSimpleObserver();
 
       a.value = 'bye';
-      store.addObserver(observer);
+      addObserver(store, observer);
 
       expect(store.value, equals('bye'));
     });
@@ -460,7 +460,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      store.addObserver(observer);
+      addObserver(store, observer);
       a.value = 'bye';
       a.value = 'goodbye';
 
@@ -474,10 +474,10 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      store.addObserver(observer1);
+      addObserver(store, observer1);
       a.value = 'bye';
 
-      store.addObserver(observer2);
+      addObserver(store, observer2);
       a.value = 'goodbye';
 
       verify(observer1.update(store, any)).called(2);
@@ -490,7 +490,7 @@ void main() {
 
       final observer = MockSimpleObserver();
 
-      store.addObserver(observer);
+      addObserver(store, observer);
       a.value = 'bye';
 
       store.removeObserver(observer);
@@ -505,7 +505,7 @@ void main() {
 
       final observer = MockValueObserver();
 
-      store.addObserver(observer);
+      addObserver(store, observer);
 
       cell.value = 'bye';
       verify(observer.gotValue('bye'));
@@ -623,7 +623,7 @@ void main() {
       final cell = MutableCell(10);
       final observer = MockSimpleObserver();
 
-      cell.addObserver(observer);
+      addObserver(cell, observer);
       cell.value = 15;
 
       verifyInOrder([
@@ -641,7 +641,7 @@ void main() {
       final result = sum + prod;
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       a.value = 2;
       a.value = 6;
@@ -656,7 +656,7 @@ void main() {
       final result = sum + prod;
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       a.value = 2;
       a.value = 6;
@@ -671,7 +671,7 @@ void main() {
       final result = (sum + prod).store();
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       a.value = 2;
       a.value = 6;
@@ -686,7 +686,7 @@ void main() {
       final result = ValueCell.computed(() => sum() + prod());
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       a.value = 2;
       a.value = 6;
@@ -704,7 +704,7 @@ void main() {
       final result = ValueCell.computed(() => sum() + prod());
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       a.value = 2;
       a.value = 6;
@@ -722,7 +722,7 @@ void main() {
           .apply((a, b, op, sum) => '$a $op $b = $sum');
 
       final observer = MockValueObserver();
-      msg.addObserver(observer);
+      addObserver(msg, observer);
 
       MutableCell.batch(() {
         a.value = 1;
@@ -752,7 +752,7 @@ void main() {
           .apply((a, b, op, sum) => '$a $op $b = $sum');
 
       final observer = MockValueObserver();
-      msg.addObserver(observer);
+      addObserver(msg, observer);
 
       MutableCell.batch(() {
         a.value = 1;
@@ -782,7 +782,7 @@ void main() {
       final result = ValueCell.computed(() => select() ? c() : sum());
 
       final observer = MockValueObserver();
-      result.addObserver(observer);
+      addObserver(result, observer);
 
       MutableCell.batch(() {
         select.value = true;
@@ -809,8 +809,8 @@ void main() {
       final observerC = MockSimpleObserver();
       final observerD = MockSimpleObserver();
 
-      c.addObserver(observerC);
-      d.addObserver(observerD);
+      addObserver(c, observerC);
+      addObserver(d, observerD);
 
       MutableCell.batch(() {
         a.value = 2;
@@ -842,8 +842,8 @@ void main() {
       final observerC = MockValueObserver();
       final observerD = MockValueObserver();
 
-      c.addObserver(observerC);
-      d.addObserver(observerD);
+      addObserver(c, observerC);
+      addObserver(d, observerD);
 
       MutableCell.batch(() {
         a.value = 2;
@@ -880,8 +880,8 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      cell.addObserver(observer1);
-      cell.addObserver(observer2);
+      addObserver(cell, observer1);
+      addObserver(cell, observer2);
 
       verify(resource.init()).called(1);
     });
@@ -893,8 +893,8 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      cell.addObserver(observer1);
-      cell.addObserver(observer2);
+      addObserver(cell, observer1);
+      addObserver(cell, observer2);
 
       cell.removeObserver(observer1);
 
@@ -908,8 +908,8 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      cell.addObserver(observer1);
-      cell.addObserver(observer2);
+      addObserver(cell, observer1);
+      addObserver(cell, observer2);
 
       cell.removeObserver(observer1);
       cell.removeObserver(observer2);
@@ -924,13 +924,13 @@ void main() {
       final observer1 = MockSimpleObserver();
       final observer2 = MockSimpleObserver();
 
-      cell.addObserver(observer1);
-      cell.addObserver(observer2);
+      addObserver(cell, observer1);
+      addObserver(cell, observer2);
 
       cell.removeObserver(observer1);
       cell.removeObserver(observer2);
 
-      cell.addObserver(observer1);
+      addObserver(cell, observer1);
 
       verify(resource.init()).called(2);
     });
