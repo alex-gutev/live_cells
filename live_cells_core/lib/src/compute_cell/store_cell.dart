@@ -44,6 +44,10 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
         return argCell.value;
       }
       on StopComputeException catch (e) {
+        if (e.defaultValue == null && null is! T) {
+          throw UninitializedCellError();
+        }
+
         return e.defaultValue;
       }
     }

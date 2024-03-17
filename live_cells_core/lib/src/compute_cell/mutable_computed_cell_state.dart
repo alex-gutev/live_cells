@@ -64,6 +64,10 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
       }
       on StopComputeException catch (e) {
         if (!_hasValue) {
+          if (e.defaultValue == null && null is! T) {
+            throw UninitializedCellError();
+          }
+
           setValue(e.defaultValue);
         }
       }

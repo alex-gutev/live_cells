@@ -730,6 +730,72 @@ void main() {
       verify(listener()).called(4);
     });
 
+    test('UninitializedCellError thrown if defaultValue given to ValueCell.none is null', () {
+      final a = ActionCell();
+      final listener = MockSimpleListener();
+
+      var i = 1;
+
+      final effect = a.effect<int>(() {
+        listener();
+
+        final next = i++;
+        return next.isEven ? next : ValueCell.none();
+      });
+
+      observeCell(effect);
+
+      a.trigger();
+      expect(() => effect.value, throwsA(isA<UninitializedCellError>()));
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      a.trigger();
+      expect(effect.value, 4);
+
+      verify(listener()).called(4);
+    });
+
+    test('Value initialized to null if defaultValue given to ValueCell.none is null', () {
+      final a = ActionCell();
+      final listener = MockSimpleListener();
+
+      var i = 1;
+
+      final effect = a.effect<int?>(() {
+        listener();
+
+        final next = i++;
+
+        return next.isEven ? next : ValueCell.none();
+      });
+
+      final observer = addObserver(effect, MockValueObserver());
+
+      // A non-null 'sentinal' has to be added since MockValueObserver does not
+      // record initial null values
+      observer.values.add(0);
+
+      a.trigger();
+      expect(effect.value, null);
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      a.trigger();
+      expect(effect.value, 4);
+
+      expect(observer.values, equals([0, null, 2, 4]));
+      verify(listener()).called(4);
+    });
+
     test('Exception reproduced when value accessed', () {
       final a = ActionCell();
       final listener = MockSimpleListener();

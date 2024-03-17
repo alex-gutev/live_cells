@@ -358,6 +358,34 @@ void main() {
       expect(observer.values, equals([0, 4, 6]));
     });
 
+    test('UninitializedCellError thrown if defaultValue given to ValueCell.none is null', () {
+      final a = MutableCell(1);
+      final evens = ValueCell<int>.computed(() => a().isEven ? a() : ValueCell.none());
+
+      expect(() => evens.value, throwsA(isA<UninitializedCellError>()));
+
+      addListener(evens, MockSimpleListener());
+      expect(() => evens.value, throwsA(isA<UninitializedCellError>()));
+    });
+
+    test('Value initialized to null if defaultValue given to ValueCell.none is null', () {
+      final a = MutableCell(1);
+      final evens = ValueCell<int?>.computed(() => a().isEven ? a() : ValueCell.none());
+
+      final observer = addObserver(evens, MockValueObserver());
+
+      // A non-null 'sentinal' has to be added since MockValueObserver does not
+      // record initial null values
+      observer.values.add(0);
+
+      a.value = 3;
+      a.value = 4;
+      a.value = 5;
+      a.value = 6;
+
+      expect(observer.values, equals([0, null, 4, 6]));
+    });
+
     test('Exception on initialization of value reproduced on value access', () {
       final cell = ValueCell.computed(() => throw Exception());
 
@@ -538,6 +566,34 @@ void main() {
       a.value = 6;
 
       expect(observer.values, equals([10, 4, 6]));
+    });
+
+    test('UninitializedCellError thrown if defaultValue given to ValueCell.none is null', () {
+      final a = MutableCell(1);
+      final evens = a.apply<int>((a) => a.isEven ? a : ValueCell.none()).store();
+
+      expect(() => evens.value, throwsA(isA<UninitializedCellError>()));
+
+      addListener(evens, MockSimpleListener());
+      expect(() => evens.value, throwsA(isA<UninitializedCellError>()));
+    });
+
+    test('Value initialized to null if defaultValue given to ValueCell.none is null', () {
+      final a = MutableCell(1);
+      final evens = a.apply<int?>((a) => a.isEven ? a : ValueCell.none()).store();
+
+      final observer = addObserver(evens, MockValueObserver());
+
+      // A non-null 'sentinal' has to be added since MockValueObserver does not
+      // record initial null values
+      observer.values.add(0);
+
+      a.value = 3;
+      a.value = 4;
+      a.value = 5;
+      a.value = 6;
+
+      expect(observer.values, equals([0, null, 4, 6]));
     });
 
     test('Exception on initialization of value reproduced on value access', () {

@@ -39,6 +39,10 @@ class DynamicComputeCell<T> extends StatefulCell<T> implements RestorableCell<T>
         return _untrackedCompute();
       }
       on StopComputeException catch (e) {
+        if (e.defaultValue == null && null is! T) {
+          throw UninitializedCellError();
+        }
+
         return e.defaultValue;
       }
     }

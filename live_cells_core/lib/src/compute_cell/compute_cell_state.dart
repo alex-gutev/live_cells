@@ -48,6 +48,10 @@ abstract class ComputeCellState<T, S extends StatefulCell> extends CellState<S>
       }
       on StopComputeException catch (e) {
         if (!_hasValue) {
+          if (e.defaultValue == null && null is! T) {
+            throw UninitializedCellError();
+          }
+
           _value = e.defaultValue;
         }
       }
