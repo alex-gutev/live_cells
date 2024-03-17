@@ -1947,6 +1947,20 @@ void main() {
         });
       });
 
+      test('Is true when UninitializedCellError is thrown', () {
+        fakeAsync((async) {
+          final f = Future.error(UninitializedCellError()).cell;
+          final complete = f.isCompleted;
+
+          observeCell(complete);
+
+          expect(complete.value, false);
+
+          async.elapse(Duration(seconds: 1));
+          expect(complete.value, true);
+        });
+      });
+
       test('Two constant cells', () {
         fakeAsync((self) {
           final cellA = Future.value(1).cell;
@@ -2106,6 +2120,21 @@ void main() {
 
           expect(c1.value, true);
           expect(c2.value, true);
+        });
+      });
+
+      test('Is true when UninitializedCellError thrown in two Future cells', () {
+        fakeAsync((async) {
+          final f1 = Future.error(UninitializedCellError()).cell;
+          final f2 = Future.value(1).cell;
+
+          final c1 = (f1, f2).isCompleted;
+
+          observeCell(c1);
+          expect(c1.value, false);
+
+          async.elapse(Duration(seconds: 1));
+          expect(c1.value, true);
         });
       });
 
