@@ -153,18 +153,6 @@ class DynamicComputeCellState<T> extends ComputeCellState<T, DynamicComputeCell<
       arguments.add(arg);
     }
   });
-
-  @override
-  void init() {
-    super.init();
-
-    try {
-      setValue(value);
-    }
-    catch (e) {
-      // Prevent exception from being propagated to caller
-    }
-  }
 }
 
 /// A [DynamicComputeCellState] that only notifies observers if [cell]'s value has changed.

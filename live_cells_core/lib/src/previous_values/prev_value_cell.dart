@@ -150,6 +150,8 @@ class PrevValueState<T> extends CellState with ObserverCellState {
   void init() {
     super.init();
     arg.addObserver(this);
+
+    _currentValue = Maybe.wrap(() => arg.value);
   }
 
   @override

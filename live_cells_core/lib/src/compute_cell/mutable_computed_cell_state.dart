@@ -148,14 +148,6 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
   void init() {
     super.init();
 
-    try {
-      stale = true;
-      setValue(value);
-    }
-    catch (e) {
-      // Prevent exception from being propagated to callers
-    }
-
     for (final arg in arguments) {
       arg.addObserver(this);
     }
