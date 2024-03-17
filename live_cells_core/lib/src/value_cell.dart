@@ -70,6 +70,10 @@ abstract class ValueCell<T> {
   ///
   /// If this method is called when a cell's initial value is being computed,
   /// the cell's initial value is set to [defaultValue].
+  ///
+  /// If [defaultValue] is null, and this method is used during the computation
+  /// of the initial value of a cell with a value type that is not nullable,
+  /// an `UninitializedCellError` is thrown.
   static none([defaultValue]) => throw StopComputeException(defaultValue);
 
   /// Retrieve the value of the cell.
