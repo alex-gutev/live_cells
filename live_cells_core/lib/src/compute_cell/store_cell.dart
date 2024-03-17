@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 
 import '../base/keys.dart';
+import '../maybe_cell/maybe.dart';
 import '../stateful_cell/changes_only_cell_state.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
@@ -8,6 +9,8 @@ import 'compute_cell_state.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
+
+part 'effect_cell.dart';
 
 /// Value cell which stores the computed value of another [ValueCell] in memory.
 ///
@@ -19,9 +22,14 @@ class StoreCell<T> extends StatefulCell<T> implements RestorableCell<T> {
   ///
   /// If [changesOnly] is true, the returned cell only notifies its observers
   /// if its value has actually changed.
+  ///
+  /// The returned cell is identified by [key] if it is non-null. Otherwise if
+  /// [key] is null, the returned cell has a key which uniquely identifies the
+  /// [StoreCell] for a given [argCell].
   StoreCell(this.argCell, {
-    this.changesOnly = false
-  }) : super(key: _StoreCellKey(argCell));
+    this.changesOnly = false,
+    dynamic key,
+  }) : super(key: key ?? _StoreCellKey(argCell));
 
   @override
   T get value {

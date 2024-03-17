@@ -13,7 +13,10 @@ export 'src/mutable_cell/action_cell.dart' show ActionCell;
 export 'src/mutable_cell/mutable_cell_view.dart' show MutableCellView;
 
 export 'src/compute_cell/compute_cell.dart' show ComputeCell;
-export 'src/compute_cell/store_cell.dart' show StoreCell, StoreCellExtension;
+
+export 'src/compute_cell/store_cell.dart'
+    show StoreCell, StoreCellExtension, EffectCell, EffectCellExtension;
+
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
 export 'src/compute_cell/peek_cell.dart' show PeekCellExtension;
 
