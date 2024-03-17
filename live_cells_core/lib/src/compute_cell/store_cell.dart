@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:meta/meta.dart';
 
 import '../base/keys.dart';
@@ -9,6 +11,8 @@ import 'compute_cell_state.dart';
 import '../restoration/restoration.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
+import 'dynamic_compute_cell.dart';
+import 'peek_cell.dart';
 
 part 'effect_cell.dart';
 

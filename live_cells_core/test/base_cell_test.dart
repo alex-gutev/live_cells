@@ -526,6 +526,294 @@ void main() {
 
       expect(observer.values, equals([1, 12]));
     });
+
+    test('List.combined notifies observers when any action triggers', () {
+      final a1 = ActionCell();
+      final a2 = ActionCell();
+      final a3 = ActionCell();
+
+      final b = [a1, a2, a3].combined;
+      final listener = addListener(b, MockSimpleListener());
+
+      a1.trigger();
+      a1.trigger();
+
+      a2.trigger();
+      a3.trigger();
+
+      a2.trigger();
+
+      verify(listener()).called(5);
+    });
+  });
+
+  group('EffectCell', () {
+    test('Throws UninitializedCellError before observer added', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+      final effect = a.effect(() {
+        listener();
+        return 1;
+      });
+
+      expect(() => effect.value, throwsA(isA<UninitializedCellError>()));
+
+      verifyZeroInteractions(listener);
+    });
+
+    test('Throws UninitializedCellError before first value change', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+      final effect = a.effect(() {
+        listener();
+        return 1;
+      });
+
+      observeCell(effect);
+      expect(() => effect.value, throwsA(isA<UninitializedCellError>()));
+
+      verifyZeroInteractions(listener);
+    });
+
+    test('Runs effect when action triggered', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+      final effect = a.effect(() {
+        listener();
+        return 1;
+      });
+
+      final observer = addObserver(effect, MockValueObserver());
+
+      a.trigger();
+
+      expect(effect.value, 1);
+      expect(observer.values, equals([1]));
+
+      verify(listener()).called(1);
+    });
+
+    test('Runs effect only one per action trigger', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+      final effect = a.effect(() {
+        listener();
+        return 1;
+      });
+
+      final observer = addObserver(effect, MockValueObserver());
+
+      a.trigger();
+
+      expect(effect.value, 1);
+
+      // Reference the value multiple times to check whether the effect will be
+      // run again
+      effect.value;
+      effect.value;
+
+      expect(observer.values, equals([1]));
+
+      verify(listener()).called(1);
+    });
+
+    test('Runs effect every time action is triggered', () {
+      final a = ActionCell();
+      final listener = MockSimpleListener();
+
+      var i = 1;
+      final effect = a.effect(() {
+        listener();
+        return i++;
+      });
+
+      final observer = addObserver(effect, MockValueObserver());
+
+      a.trigger();
+      a.trigger();
+      a.trigger();
+
+      expect(effect.value, 3);
+      expect(observer.values, equals([1, 2, 3]));
+
+      verify(listener()).called(3);
+    });
+
+    test('Effect not run when peeked cell changed.', () {
+      final a = ActionCell();
+      final delta = MutableCell(1);
+
+      final listener = MockSimpleListener();
+
+      var i = 0;
+      final effect = a.effect(() {
+        listener();
+
+        return i += delta.peek();
+      });
+
+      final observer = addObserver(effect, MockValueObserver());
+
+      a.trigger();
+      delta.value = 2;
+      expect(effect.value, 1);
+
+      a.trigger();
+      expect(effect.value, 3);
+
+      expect(observer.values, equals([1, 3]));
+      verify(listener()).called(2);
+    });
+
+    test('Previous value preserved if ValueCell.none is used', () {
+      final a = ActionCell();
+      final listener = MockSimpleListener();
+
+      var i = 0;
+
+      final effect = a.effect(() {
+        listener();
+
+        final next = i++;
+
+        return next.isEven ? next : ValueCell.none();
+      });
+
+      final observer = addObserver(effect, MockValueObserver());
+
+      a.trigger();
+      expect(effect.value, 0);
+
+      a.trigger();
+      expect(effect.value, 0);
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      expect(observer.values, equals([0, 2]));
+      verify(listener()).called(3);
+    });
+
+    test('value initialized to defaultValue if ValueCell.none is used', () {
+      final a = ActionCell();
+      final listener = MockSimpleListener();
+
+      var i = 1;
+
+      final effect = a.effect(() {
+        listener();
+
+        final next = i++;
+
+        return next.isEven ? next : ValueCell.none(-1);
+      });
+
+      final observer = addObserver(effect, MockValueObserver());
+
+      a.trigger();
+      expect(effect.value, -1);
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      a.trigger();
+      expect(effect.value, 4);
+
+      expect(observer.values, equals([-1, 2, 4]));
+      verify(listener()).called(4);
+    });
+
+    test('Exception reproduced when value accessed', () {
+      final a = ActionCell();
+      final listener = MockSimpleListener();
+
+      var i = 1;
+
+      final effect = a.effect(() {
+        listener();
+
+        final next = i++;
+
+        return next.isEven ? next : throw ArgumentError();
+      });
+
+      observeCell(effect);
+
+      a.trigger();
+
+      // Do the check twice to ensure the effect is only run once
+      expect(() => effect.value, throwsArgumentError);
+      expect(() => effect.value, throwsArgumentError);
+
+      a.trigger();
+      expect(effect.value, 2);
+
+      verify(listener()).called(2);
+    });
+
+    test('Compares == if same argument key', () {
+      final a = ActionCell();
+      final c1 = a.effect(() => 1, key: 'effect-cell-1');
+      final c2 = a.effect(() => 1, key: 'effect-cell-1');
+
+      expect(c1 == c2, isTrue);
+      expect(c1.hashCode == c2.hashCode, isTrue);
+    });
+
+    test('Compares != if different keys', () {
+      final a = ActionCell();
+      final c1 = a.effect(() => 1, key: 'effect-cell-1');
+      final c2 = a.effect(() => 1, key: 'effect-cell-2');
+
+      expect(c1 != c2, isTrue);
+      expect(c1 == c1, isTrue);
+    });
+
+    test('Manages the same set of observers when keys equal', () {
+      final resource = MockResource();
+      final m = TestManagedCell(resource, 2);
+      final a = ActionCell();
+
+      f() => a.effect(() => m.peek(), key: 'effect-cell-1');
+
+      verifyNever(resource.init());
+
+      final observer = addObserver(f(), MockValueObserver());
+      a.trigger();
+
+      f().removeObserver(observer);
+
+      verify(resource.init()).called(1);
+      verify(resource.dispose()).called(1);
+    });
+
+    test('State recreated on adding observer after dispose', () {
+      final resource = MockResource();
+      final m = TestManagedCell(resource, 2);
+      final a = ActionCell();
+
+      f() => a.effect(() => m.peek(), key: 'effect-cell-1');
+
+      verifyNever(resource.init());
+
+      final observer = addObserver(f(), MockValueObserver());
+      a.trigger();
+
+      f().removeObserver(observer);
+
+      addObserver(f(), MockValueObserver());
+      a.trigger();
+
+      verify(resource.init()).called(2);
+      verify(resource.dispose()).called(1);
+    });
   });
 
   group('PrevValueCell', () {

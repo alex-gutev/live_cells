@@ -54,7 +54,7 @@ class EffectCell<T> extends StoreCell<T> {
       return state!;
     }
 
-    return EffectCellState(
+    return EffectCellState<T>(
         cell: this,
         key: key
     );
@@ -76,11 +76,29 @@ class EffectCellState<T> extends StoreCellState<T> {
   @override
   T compute() {
     if (_shouldCompute) {
-      _value = Maybe.wrap(() => cell.argCell.value);
+      _value = Maybe.wrap(_computeValue);
       _shouldCompute = false;
     }
 
     return _value.unwrap;
+  }
+
+  @override
+  void onUpdate(bool didChange) {
+    if (didChange) {
+      _shouldCompute = true;
+    }
+
+    super.onUpdate(didChange);
+  }
+
+  @override
+  void dispose() {
+    for (final arg in _arguments) {
+      arg.peek.removeObserver(this);
+    }
+
+    super.dispose();
   }
 
   // Private
@@ -88,8 +106,18 @@ class EffectCellState<T> extends StoreCellState<T> {
   /// Should the value of the argument cell be referenced?
   var _shouldCompute = false;
 
+  /// Set of arguments reference by argument cell
+  final Set<ValueCell> _arguments = HashSet();
+
   /// The cached value wrapped in a [Maybe].
   Maybe<T> _value = Maybe.error(UninitializedCellError());
+
+  T _computeValue() => ComputeArgumentsTracker.computeWithTracker(() => cell.argCell.value, (arg) {
+    if (!_arguments.contains(arg)) {
+      _arguments.add(arg);
+      arg.peek.addObserver(this);
+    }
+  });
 }
 
 /// Provides the [effect] method for creating a cell for observing side effects.
@@ -122,8 +150,8 @@ extension EffectCellExtension<T> on ValueCell<T> {
   /// referenced, then these guarantees no longer hold.
   ///
   /// It should also be noted that these guarantees hold only when interacting
-  /// with this cell via the cell returned by this method.
-  ValueCell<T> effect() => EffectCell(this);
+  /// with this cell via the cell returned by this property.
+  ValueCell<T> get effectCell => EffectCell(this);
 }
 
 /// Key identifying an [EffectCell]

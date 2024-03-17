@@ -49,6 +49,7 @@ export 'src/extensions/wait_cell_extension.dart';
 export 'src/extensions/value_change_extension.dart';
 export 'src/extensions/hold_cell_extension.dart';
 export 'src/extensions/meta_cell_extension.dart';
+export 'src/extensions/action_cell_extension.dart';
 
 export 'package:live_cell_annotations/live_cell_annotations.dart'
     show CellExtension;
