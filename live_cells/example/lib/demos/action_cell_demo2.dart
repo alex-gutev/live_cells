@@ -41,7 +41,7 @@ class ActionCellDemo2 extends CellWidget {
   // NOTE: Since lists do not compare == if they are different objects, this
   // is placed in a static final variable to ensure the same list is always
   // passed to initialValue.
-  static final _initialData = List.filled(5, const Country.blank());
+  static final _loadingData = List.filled(5, const Country.blank());
 
   /// Cell that retrieves the list of countries.
   ///
@@ -77,9 +77,9 @@ class ActionCellDemo2 extends CellWidget {
             // NOTE: child is a cell so that errors thrown within it are
             // captured and handled by the [ErrorHandler] widget.
             child: ValueCell.computed(() {
-              // Await future list. Use [_initialData] while loading.
+              // Await future list. Use [_loadingData] while loading.
               final data = results.awaited
-                  .initialValue(_initialData.cell);
+                  .loadingValue(_loadingData.cell);
 
               // The difference between this implementation and [ActionCellDemo1]
               // is that in this implementation this cell only observes
