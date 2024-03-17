@@ -1,5 +1,7 @@
 import '../base/exceptions.dart';
 import '../base/keys.dart';
+import '../compute_cell/compute_cell.dart';
+import '../meta_cell/meta_cell.dart';
 import '../value_cell.dart';
 
 /// Extends [ValueCell] with facilities for handling exceptions thrown while computing values
@@ -73,6 +75,29 @@ extension ErrorCellExtension<T> on ValueCell<T> {
   /// A keyed cell is returned, which is unique for a given [this] and [value].
   ValueCell<T> loadingValue(ValueCell<T> value) =>
       onError<PendingAsyncValueError>(value);
+
+  /// Create a cell that evaluates to [ValueCell.none()] while the cell's value is uninitialized.
+  ///
+  /// The returned cell evaluates to [ValueCell.none()], when this cell throws
+  /// an [UninitializedCellError], [PendingAsyncValueError] or [EmptyMetaCellError]
+  ValueCell<T> get whenReady => ComputeCell(
+    key: _WhenReadyKey(this),
+    arguments: {this},
+    compute: () {
+      try {
+        return value;
+      }
+      on UninitializedCellError {
+        return ValueCell.none();
+      }
+      on PendingAsyncValueError {
+        return ValueCell.none();
+      }
+      on EmptyMetaCellError{
+        return ValueCell.none();
+      }
+    },
+  );
 }
 
 /// Key identifying a cell created with `onError`
@@ -83,4 +108,9 @@ class _OnErrorKey<T> extends CellKey2<ValueCell, ValueCell> {
 /// Key identifying a cell created with `error()`
 class _ErrorCellKey<T> extends CellKey2<ValueCell, bool> {
   _ErrorCellKey(super.value1, super.value2);
+}
+
+/// Key identifying a cell created with .whenReady
+class _WhenReadyKey extends CellKey1<ValueCell> {
+  _WhenReadyKey(super.value);
 }

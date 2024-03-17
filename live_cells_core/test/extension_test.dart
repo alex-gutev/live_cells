@@ -711,6 +711,48 @@ void main() {
         expect(c1 == c1, isTrue);
       });
     });
+
+    group('.whenReady', () {
+      test('Stops execution of watch function on UninitializedCellError', () {
+        final a = MutableCell(-1);
+        final cell = ValueCell.computed(() => a() > 0 ? a() : throw UninitializedCellError());
+
+        final listener = MockSimpleListener();
+        final watch = ValueCell.watch(() {
+          cell.whenReady();
+          listener();
+        });
+
+        addTearDown(() => watch.stop());
+        verifyNever(listener());
+
+        a.value = 0;
+        a.value = 1;
+        a.value = 2;
+
+        verify(listener()).called(2);
+      });
+
+      test('Stops execution of watch function on PendingAsyncValueError', () {
+        final a = MutableCell(-1);
+        final cell = ValueCell.computed(() => a() > 0 ? a() : throw PendingAsyncValueError());
+
+        final listener = MockSimpleListener();
+        final watch = ValueCell.watch(() {
+          cell.whenReady();
+          listener();
+        });
+
+        addTearDown(() => watch.stop());
+        verifyNever(listener());
+
+        a.value = 0;
+        a.value = 1;
+        a.value = 2;
+
+        verify(listener()).called(2);
+      });
+    });
   });
 
   group('Type Conversions', () {

@@ -248,7 +248,7 @@ void main() {
       verify(listener()).called(2);
     });
 
-    test('.whenReady stops execution of watch function', () {
+    test('.whenReady stops execution of watch function on EmptyMetaCellError', () {
       final meta = MetaCell<int>();
 
       final listener = MockSimpleListener();

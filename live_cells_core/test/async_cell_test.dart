@@ -1,5 +1,6 @@
 import 'package:fake_async/fake_async.dart';
 import 'package:live_cells_core/live_cells_core.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'util.dart';
@@ -1548,6 +1549,31 @@ void main() {
 
           async.elapse(Duration(seconds: 6));
           expect(wait.value, -1);
+        });
+      });
+
+      test('.whenReady Stops execution of watch function while Future is pending', () {
+        fakeAsync((async) {
+          final a = MutableCell(Future.delayed(const Duration(seconds: 5)));
+          final cell = a.awaited;
+
+          final listener = MockSimpleListener();
+          final watch = ValueCell.watch(() {
+            cell.whenReady();
+            listener();
+          });
+
+          addTearDown(() => watch.stop());
+          verifyNever(listener());
+
+          async.elapse(Duration(seconds: 6));
+          verify(listener()).called(1);
+
+          a.value = Future.delayed(const Duration(seconds: 1));
+          verifyNever(listener());
+
+          async.elapse(Duration(seconds: 2));
+          verify(listener()).called(1);
         });
       });
 
