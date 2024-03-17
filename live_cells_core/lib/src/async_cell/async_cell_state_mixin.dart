@@ -14,7 +14,7 @@ mixin AsyncCellStateMixin<T, S extends StatefulCell> on ObserverCellState<S> {
   bool get lastOnly;
 
   /// Awaited [Future] value
-  Maybe<T> awaitedValue = Maybe.error(UninitializedCellError());
+  Maybe<T> awaitedValue = Maybe.error(PendingAsyncValueError());
 
   /// Cancellation handler for currently awaited future
   AsyncCancellationHandler? _handler;

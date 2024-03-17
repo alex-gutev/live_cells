@@ -10,7 +10,7 @@ import 'async_cell_state_mixin.dart';
 /// A cell which `await`s a [Future] held in another cell
 ///
 /// While the cell is waiting for the [Future] to complete, accessing its value
-/// will throw an [UninitializedCellError].
+/// will throw a [PendingAsyncValueError].
 class AwaitCell<T> extends StatefulCell<T> {
   /// Create a cell that awaits the [Future] held in [arg]
   AwaitCell({
@@ -57,7 +57,7 @@ class _AwaitCellState<T> extends CellState<AwaitCell<T>>
   @override
   T get value {
     if (stale) {
-      awaitedValue = Maybe.error(UninitializedCellError());
+      awaitedValue = Maybe.error(PendingAsyncValueError());
       stale = false;
     }
 

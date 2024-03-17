@@ -42,7 +42,7 @@ extension WaitCellExtension1<T> on FutureCell<T> {
   /// new [Future] and updates its value accordingly.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
-  /// will throw an [UninitializedCellError].
+  /// will throw a [PendingAsyncValueError].
   ///
   /// **NOTE**: The returned cell must have at least one observer in order
   /// to function.
@@ -59,7 +59,7 @@ Whenever the values of the cells in [this] change, the returned cell
 awaits the new [Future] and updates its value accordingly.
 
 Until the [Future] completes, accessing the [value] of the returned cell
-will throw an [UninitializedCellError].
+will throw a [PendingAsyncValueError].
 
 **NOTE**: The returned cell must have at least one observer in order
 to function.'''
@@ -73,7 +73,7 @@ to function.'''
   /// completed, the previous value is dropped.
   ///
   /// Until the [Future] completes, accessing the [value] of the returned cell
-  /// will throw an [UninitializedCellError].
+  /// will throw a [PendingAsyncValueError].
   ///
   /// **NOTE**: The returned cell must have at least one observer in order
   /// to function.
@@ -91,7 +91,7 @@ the cells in [this] change, before the previous values have
 completed, the previous values are dropped.
 
 Until the [Future] completes, accessing the [value] of the returned cell
-will throw an [UninitializedCellError].
+will throw a [PendingAsyncValueError].
 
 **NOTE**: The returned cell must have at least one observer in order
 to function.'''
@@ -106,7 +106,7 @@ to function.'''
   /// The returned cell is like [waitLast] with the difference that whenever
   /// the value of [this] is changed to a new [Future], accessing the value of
   /// the returned cell before the new [Future] has completed, will throw
-  /// an [UninitializedCellError].
+  /// a [PendingAsyncValueError].
   ///
   /// **NOTE**: The returned cell must have at least one observer in order
   /// to function.
@@ -121,7 +121,7 @@ to function.'''
 The returned cell is like [waitLast] with the difference that whenever
 the values of the cells in [this] change, accessing the value of
 the returned cell before the new [Future]s have completed, will throw
-an [UninitializedCellError].
+a [PendingAsyncValueError].
 
 **NOTE**: The returned cell must have at least one observer in order
 to function.'''
@@ -135,7 +135,7 @@ to function.'''
   @RecordExtensionElement(
     type: 'ValueCell<bool>',
     implementation: '''return awaited.apply((_) => true, key: _IsCompleteCellKey(this))
-      .initialValue(false.cell)
+      .loadingValue(false.cell)
       .onError(true.cell);''',
 
   documentation: '''A cell that is true when the [Future]s in the cells in this have completed, false otherwise.
@@ -145,7 +145,7 @@ to function.'''
 )
   ValueCell<bool> get isCompleted => awaited
       .apply((_) => true, key: _IsCompleteCellKey(this))
-      .initialValue(false.cell)
+      .loadingValue(false.cell)
       .onError(true.cell);
 }
 

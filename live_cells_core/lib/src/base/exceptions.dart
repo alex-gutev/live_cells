@@ -28,3 +28,10 @@ class UninitializedCellError implements Exception {
   String toString() =>
       'The value of a cell was referenced before it was initialized.';
 }
+
+/// Thrown when an async cell value is reference before it is available.
+class PendingAsyncValueError implements Exception {
+  @override
+  String toString() =>
+      'The value of an async cell was referenced before the Future has completed.';
+}

@@ -135,11 +135,11 @@ void main() {
           f.value = Future.delayed(Duration(seconds: 30), () => 3);
           f.value = Future.value(4);
 
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 5));
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 6));
@@ -288,11 +288,11 @@ void main() {
 
           c1.value = Future.value(100);
 
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 5));
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 6));
@@ -306,6 +306,78 @@ void main() {
           self.elapse(Duration(seconds: 10));
           expect(w.value, 107);
           expect(observer.values, equals([3, 12, 27, 107]));
+        });
+      });
+
+      test('Returns value given by .loadingValue() while pending', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.delayed(const Duration(seconds: 5), () => 1));
+          final wait = cell.wait.loadingValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, 1);
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
+        });
+      });
+
+      test('.loadingValue() passes rethrows UninitializedCellError exception', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future<int>.delayed(const Duration(seconds: 5), () => throw UninitializedCellError()));
+          final wait = cell.wait.loadingValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(() => wait.value, throwsA(isA<UninitializedCellError>()));
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
+        });
+      });
+
+      test('Returns value given by .initialValue() while pending', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.delayed(const Duration(seconds: 5), () => 1));
+          final wait = cell.wait.initialValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, 1);
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
+        });
+      });
+
+      test('.initialValue() handles UninitializedCellError exception', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future<int>.delayed(const Duration(seconds: 5), () => throw UninitializedCellError()));
+          final wait = cell.wait.initialValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
         });
       });
 
@@ -635,7 +707,7 @@ void main() {
           f.value = Future.delayed(Duration(seconds: 30), () => 3);
           f.value = Future.value(4);
 
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 5));
@@ -793,7 +865,7 @@ void main() {
 
           c1.value = Future.value(100);
 
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 5));
@@ -816,6 +888,68 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(w.value, 1007);
           expect(observer.values, equals([107, 1007]));
+        });
+      });
+
+      test('Returns value given by .loadingValue() while pending', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.delayed(const Duration(seconds: 5), () => 1));
+          final wait = cell.waitLast.loadingValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
+        });
+      });
+
+      test('.loadingValue() passes rethrows UninitializedCellError exception', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future<int>.delayed(const Duration(seconds: 5), () => throw UninitializedCellError()));
+          final wait = cell.waitLast.loadingValue((-1).cell);
+
+          observeCell(wait);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(() => wait.value, throwsA(isA<UninitializedCellError>()));
+        });
+      });
+
+      test('Returns value given by .initialValue() while pending', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.delayed(const Duration(seconds: 5), () => 1));
+          final wait = cell.waitLast.initialValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
+        });
+      });
+
+      test('.initialValue() handles UninitializedCellError exception', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future<int>.delayed(const Duration(seconds: 5), () => throw UninitializedCellError()));
+          final wait = cell.waitLast.initialValue((-1).cell);
+
+          observeCell(wait);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, -1);
         });
       });
 
@@ -1046,7 +1180,7 @@ void main() {
           final cell = Future.value(12).cell.awaited;
           observeCell(cell);
 
-          expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
           // .flushMicrotasks doesn't work
           self.elapse(Duration(seconds: 1));
@@ -1066,7 +1200,7 @@ void main() {
           expect(cell.value, 12);
 
           future.value = Future.value(100);
-          expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 1));
           expect(cell.value, 100);
@@ -1106,13 +1240,13 @@ void main() {
           expect(cell.value, 3);
 
           cellA.value = Future.value(5);
-          expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 1));
           expect(cell.value, 7);
 
           cellB.value = Future.value(10);
-          expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 1));
           expect(cell.value, 15);
@@ -1122,7 +1256,7 @@ void main() {
             cellB.value = Future.value(30);
           });
 
-          expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 1));
           expect(cell.value, 50);
@@ -1150,10 +1284,10 @@ void main() {
             cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
           });
 
-          expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 5));
-          expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 6));
           expect(cell.value, 50);
@@ -1171,7 +1305,7 @@ void main() {
           f.value = Future.delayed(Duration(seconds: 30), () => 3);
           f.value = Future.value(4);
 
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 5));
@@ -1230,13 +1364,13 @@ void main() {
           expect(sum.value, 3);
 
           cellA.value = Future.value(5);
-          expect(() => sum.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => sum.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 1));
           expect(sum.value, 7);
 
           cellB.value = Future.value(10);
-          expect(() => sum.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => sum.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 1));
           expect(sum.value, 15);
@@ -1246,7 +1380,7 @@ void main() {
             cellB.value = Future.value(30);
           });
 
-          expect(() => sum.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => sum.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 1));
           expect(sum.value, 50);
@@ -1298,10 +1432,10 @@ void main() {
             cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
           });
 
-          expect(() => sum.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => sum.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 5));
-          expect(() => sum.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => sum.value, throwsA(isA<PendingAsyncValueError>()));
 
           self.elapse(Duration(seconds: 6));
           expect(sum.value, 50);
@@ -1329,7 +1463,7 @@ void main() {
 
           c1.value = Future.value(100);
 
-          expect(() => w.value, throwsA(isA<UninitializedCellError>()));
+          expect(() => w.value, throwsA(isA<PendingAsyncValueError>()));
           expect(observer.values, equals([]));
 
           self.elapse(Duration(seconds: 5));
@@ -1352,6 +1486,68 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(w.value, 1007);
           expect(observer.values, equals([107, 1007]));
+        });
+      });
+
+      test('Returns value given by .loadingValue() while pending', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.delayed(const Duration(seconds: 5), () => 1));
+          final wait = cell.awaited.loadingValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
+        });
+      });
+
+      test('.loadingValue() passes rethrows UninitializedCellError exception', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future<int>.delayed(const Duration(seconds: 5), () => throw UninitializedCellError()));
+          final wait = cell.awaited.loadingValue((-1).cell);
+
+          observeCell(wait);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(() => wait.value, throwsA(isA<UninitializedCellError>()));
+        });
+      });
+
+      test('Returns value given by .initialValue() while pending', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.delayed(const Duration(seconds: 5), () => 1));
+          final wait = cell.awaited.initialValue((-1).cell);
+
+          observeCell(wait);
+
+          cell.value = Future.delayed(const Duration(seconds: 10), () => 2);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 5));
+          expect(wait.value, 2);
+        });
+      });
+
+      test('.initialValue() handles UninitializedCellError exception', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future<int>.delayed(const Duration(seconds: 5), () => throw UninitializedCellError()));
+          final wait = cell.awaited.initialValue((-1).cell);
+
+          observeCell(wait);
+          expect(wait.value, -1);
+
+          async.elapse(Duration(seconds: 6));
+          expect(wait.value, -1);
         });
       });
 
@@ -2132,7 +2328,7 @@ void main() {
         final cell = 1.cell.delayed(Duration(seconds: 5)).wait;
         observeCell(cell);
 
-        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+        expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
       });
     });
 
@@ -2141,10 +2337,10 @@ void main() {
         final cell = 1.cell.delayed(Duration(seconds: 5)).wait;
         observeCell(cell);
 
-        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+        expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
         async.elapse(Duration(seconds: 3));
-        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+        expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
         async.elapse(Duration(seconds: 3));
         expect(cell.value, 1);
@@ -2157,10 +2353,10 @@ void main() {
         final cell = src.delayed(Duration(seconds: 10)).wait;
         observeCell(cell);
 
-        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+        expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
         async.elapse(Duration(seconds: 6));
-        expect(() => cell.value, throwsA(isA<UninitializedCellError>()));
+        expect(() => cell.value, throwsA(isA<PendingAsyncValueError>()));
 
         async.elapse(Duration(seconds: 5));
         expect(cell.value, 1);

@@ -12,7 +12,7 @@ import '../value_cell.dart';
 /// A cell which waits for a [Future] held in another cell to complete.
 ///
 /// Until the [Future] completes, accessing the [value] of the cell will throw
-/// an [UninitializedCellError].
+/// a [PendingAsyncValueError].
 class WaitCell<T> extends StatefulCell<T> {
   /// Create a cell which waits for the [Future] held in [arg] to complete
   WaitCell({

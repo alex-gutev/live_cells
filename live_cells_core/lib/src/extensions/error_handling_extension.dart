@@ -57,9 +57,22 @@ extension ErrorCellExtension<T> on ValueCell<T> {
 
   /// Returns a cell that evaluates to the value of [value] when the value of this is uninitialized.
   ///
+  /// The returned cell evaluates to the value of the cell [value] if this cell
+  /// throws an [UninitializedCellError] or [PendingAsyncValueError] exception.
+  ///
   /// A keyed cell is returned, which is unique for a given [this] and [value].
   ValueCell<T> initialValue(ValueCell<T> value) =>
-      onError<UninitializedCellError>(value);
+      onError<UninitializedCellError>(value)
+          .loadingValue(value);
+
+  /// Returns a cell that evaluates to the value of [value] while an async value is loading..
+  ///
+  /// The returned cell evaluates to the value of the cell [value] if this cell
+  /// throws a [PendingAsyncValueError] exception.
+  ///
+  /// A keyed cell is returned, which is unique for a given [this] and [value].
+  ValueCell<T> loadingValue(ValueCell<T> value) =>
+      onError<PendingAsyncValueError>(value);
 }
 
 /// Key identifying a cell created with `onError`
