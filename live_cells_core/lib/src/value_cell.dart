@@ -88,6 +88,12 @@ abstract class ValueCell<T> {
     return value;
   }
 
+  /// Synonym for [call].
+  ///
+  /// This is provided to increase readability in the case that the value of a
+  /// cell is not used, but is required to trigger updates to the current cell.
+  T observe() => call();
+
   /// Returns a new [ValueCell] which compares the value of this cell to another cell for equality.
   ///
   /// The returned [ValueCell] has a value of true when this cell and [other] have the same
