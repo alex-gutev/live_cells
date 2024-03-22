@@ -1,5 +1,6 @@
 import '../compute_cell/compute_cell.dart';
 import '../compute_cell/store_cell.dart';
+import '../mutable_cell/action_cell.dart';
 import '../value_cell.dart';
 
 /// Provides the [effect] method for creating an [EffectCell] triggered by an [ActionCell].
@@ -18,6 +19,25 @@ extension ActionCellEffectExtension on ValueCell<void> {
       arguments: {this},
       key: key
   ).effectCell;
+}
+
+/// Provides functionality for chaining action cells
+extension ActionCellExtension on ActionCell {
+  /// Create an action cell that is chained to this cell.
+  ///
+  /// An action cell is created that when triggered, [action] is called first.
+  /// [action] can either call [trigger] on this cell thus allowing the action
+  /// triggering the action represented by this cell, or it can prevent the
+  /// action from being triggering by not calling [trigger].
+  ///
+  /// See [ActionCell.chain] for more details.
+  ActionCell chain(void Function() action, {
+    dynamic key
+  }) => ActionCell.chain(
+      this,
+      action: action,
+      key: key
+  );
 }
 
 /// Provides the [combined] property for combining multiple action cells into one cell.
