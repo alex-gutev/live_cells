@@ -1,3 +1,7 @@
+## 0.4.2
+
+* Add `nullable` option to `CellExtension` annotation.
+
 ## 0.4.1
 
 This release doesn't bring any new user-facing features.

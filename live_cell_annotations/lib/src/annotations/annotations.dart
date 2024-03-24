@@ -94,9 +94,16 @@ class CellExtension {
   /// Should an extension on [MutableCell] be generated?
   final bool mutable;
 
+  /// Should extension on cells holding a nullable type be generated?
+  final bool nullable;
+
   /// Annotate a class to generate an extension on [ValueCell] for the class's properties.
   ///
   /// If [mutable] is true an extension on [MutableCell] is also generated.
+  ///
+  /// If [nullable] is true extensions on the nullable type of the annotated
+  /// class are generated. This only affects the extension on [ValueCell] and
+  /// not [MutableCell].
   ///
   /// The name of the generated `ValueCell` extension is [name] and the name
   /// of the `MutableCell` extension, if one is generated, is [mutableName]. If
@@ -107,6 +114,7 @@ class CellExtension {
   const CellExtension({
     this.name,
     this.mutableName,
-    this.mutable = false
+    this.mutable = false,
+    this.nullable = false
   });
 }
