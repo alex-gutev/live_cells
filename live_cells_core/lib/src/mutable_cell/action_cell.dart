@@ -44,11 +44,11 @@ class _ActionCellImpl extends StatefulCell<void> implements ActionCell {
 
   @override
   void trigger() {
-    (state as ActionCellState?)?.trigger();
+    (state as _ActionCellState?)?.trigger();
   }
 
   @override
-  CellState<StatefulCell> createState() => ActionCellState(
+  CellState<StatefulCell> createState() => _ActionCellState(
       cell: this,
       key: key
   );
@@ -58,8 +58,8 @@ class _ActionCellImpl extends StatefulCell<void> implements ActionCell {
 }
 
 /// [_ActionCellImpl] state
-class ActionCellState extends MutableCellState<void, _ActionCellImpl> {
-  ActionCellState({
+class _ActionCellState extends MutableCellState<void, _ActionCellImpl> {
+  _ActionCellState({
     required super.cell,
     required super.key
   });

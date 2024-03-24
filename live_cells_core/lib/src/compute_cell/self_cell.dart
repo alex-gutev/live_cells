@@ -67,7 +67,7 @@ class SelfCell<T> extends DynamicComputeCell<T> {
 
   @override
   @protected
-  _SelfCellState<T>? get state => super.state as _SelfCellState<T>?;
+  SelfCellState<T>? get state => super.state as SelfCellState<T>?;
 
   @override
   CellState<StatefulCell> createState() {
@@ -78,7 +78,7 @@ class SelfCell<T> extends DynamicComputeCell<T> {
       return state!;
     }
 
-    return _SelfCellState<T>(
+    return SelfCellState<T>(
       cell: this,
       key: key,
     );
@@ -86,8 +86,8 @@ class SelfCell<T> extends DynamicComputeCell<T> {
 }
 
 /// State for a [SelfCell].
-class _SelfCellState<T> extends DynamicComputeChangesOnlyCellState<T> {
-  _SelfCellState({
+class SelfCellState<T> extends DynamicComputeChangesOnlyCellState<T> {
+  SelfCellState({
     required super.cell,
     required super.key
   });
