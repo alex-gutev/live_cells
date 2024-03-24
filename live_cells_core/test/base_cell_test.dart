@@ -547,6 +547,100 @@ void main() {
     });
   });
 
+  group('ActionCell.chain', () {
+    test('action function is called when triggered', () {
+      final action = ActionCell();
+      final listener = MockSimpleListener();
+
+      final chain = action.chain(() {
+        listener();
+        action.trigger();
+      });
+
+      chain.trigger();
+      verify(listener()).called(1);
+
+      chain.trigger();
+      verify(listener()).called(1);
+    });
+
+    test('Original action is triggered', () {
+      final action = ActionCell();
+      final chain = action.chain(action.trigger);
+
+      final listener1 = addListener(action, MockSimpleListener());
+      final listener2 = addListener(chain, MockSimpleListener());
+
+      chain.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      chain.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+    });
+
+    test('Conditionally triggering original action', () {
+      var trigger = false;
+
+      final action = ActionCell();
+      final chain = action.chain(() {
+        if (trigger) {
+          action.trigger();
+        }
+      });
+
+      final listener1 = addListener(action, MockSimpleListener());
+      final listener2 = addListener(chain, MockSimpleListener());
+
+      chain.trigger();
+      verifyNever(listener1());
+      verifyNever(listener2());
+
+      chain.trigger();
+      verifyNever(listener1());
+      verifyNever(listener2());
+
+      trigger = true;
+
+      chain.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      chain.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+    });
+
+    test('Compare == when same keys', () {
+      final action = ActionCell();
+
+      final c1 = action.chain(action.trigger, key: 'key1');
+      final c2 = action.chain(action.trigger, key: 'key1');
+
+      expect(c1 == c2, isTrue);
+      expect(c1.hashCode == c2.hashCode, isTrue);
+    });
+
+    test('Compare != when different keys', () {
+      final action = ActionCell();
+
+      final c1 = action.chain(action.trigger, key: 'key1');
+      final c2 = action.chain(action.trigger, key: 'key2');
+
+      expect(c1 != c2, isTrue);
+    });
+
+    test('Compare != when null keys', () {
+      final action = ActionCell();
+
+      final c1 = action.chain(action.trigger);
+      final c2 = action.chain(action.trigger);
+
+      expect(c1 != c2, isTrue);
+    });
+  });
+
   group('EffectCell', () {
     test('Throws UninitializedCellError before observer added', () {
       final a = ActionCell();
