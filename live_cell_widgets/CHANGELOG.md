@@ -1,3 +1,11 @@
+## 0.8.0
+
+New widgets:
+
+* `CellBanner`
+* `CellBlockSemantics`
+* `CellVisibility`
+
 ## 0.7.0
 
 Breaking Changes:
