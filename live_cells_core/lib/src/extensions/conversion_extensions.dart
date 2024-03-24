@@ -2,6 +2,7 @@ import '../base/exceptions.dart';
 import '../base/keys.dart';
 import 'compute_extension.dart';
 import '../compute_cell/mutable_compute_cell.dart';
+import '../compute_cell/store_cell.dart';
 import '../value_cell.dart';
 import '../maybe_cell/maybe.dart';
 import '../mutable_cell/mutable_cell.dart';
@@ -191,7 +192,7 @@ extension NullCheckExtension<T> on ValueCell<T?> {
   ValueCell<T> coalesce(ValueCell<T> ifNull) =>
       (this, ifNull).apply((v, n) => v ?? n,
           key: _NullCheckCoalesceKey(this, ifNull)
-      );
+      ).store(changesOnly: true);
 }
 
 /// Key identifying a cell created with [NullCheckExtension.notNull].
