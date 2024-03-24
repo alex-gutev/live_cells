@@ -1,3 +1,6 @@
+import '../base/exceptions.dart';
+import '../base/keys.dart';
+import 'compute_extension.dart';
 import '../compute_cell/mutable_compute_cell.dart';
 import '../value_cell.dart';
 import '../maybe_cell/maybe.dart';
@@ -168,4 +171,35 @@ extension ParseMaybeNumExtension on MaybeCell<num> {
             this.value = Maybe.wrap(() => num.parse(value));
           }
       );
+}
+
+/// Provides methods for checking for handling null values.
+extension NullCheckExtension<T> on ValueCell<T?> {
+  /// A cell that is guaranteed to hold a non-null value.
+  ///
+  /// If the value of [this] cell is null, accessing the value of the [notNull]
+  /// cell results in a [NullCellError] exception being thrown.
+  ValueCell<T> get notNull => apply((value) => value ?? (throw NullCellError()),
+    key: _NullCheckExtensionKey(this)
+  );
+
+  /// Replace null values in this cell with value of another cell.
+  ///
+  /// The value of the returned cell is the value of this cell if it is not null.
+  /// If the value of this cell is null, the value of the returned cell is the
+  /// value of the [ifNull] cell.
+  ValueCell<T> coalesce(ValueCell<T> ifNull) =>
+      (this, ifNull).apply((v, n) => v ?? n,
+          key: _NullCheckCoalesceKey(this, ifNull)
+      );
+}
+
+/// Key identifying a cell created with [NullCheckExtension.notNull].
+class _NullCheckExtensionKey<T> extends CellKey1<ValueCell<T?>> {
+  _NullCheckExtensionKey(super.value1);
+}
+
+/// Key identifying a cell created with [NullCheckExtension.coalesce].
+class _NullCheckCoalesceKey<T> extends CellKey2<ValueCell<T?>, ValueCell<T>> {
+  _NullCheckCoalesceKey(super.value1, super.value2);
 }

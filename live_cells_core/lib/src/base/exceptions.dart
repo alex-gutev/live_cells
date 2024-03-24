@@ -35,3 +35,10 @@ class PendingAsyncValueError implements Exception {
   String toString() =>
       'The value of an async cell was referenced before the Future has completed.';
 }
+
+/// Thrown when [NullCheckExtension.notNull] is used on a cell holding a null value.
+class NullCellError implements Exception {
+  @override
+  String toString() =>
+      '.notNull was used on a cell which holds a null value.';
+}
