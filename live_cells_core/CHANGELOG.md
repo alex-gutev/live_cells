@@ -1,3 +1,36 @@
+## 0.20.0
+
+New features:
+
+* `SelfCell`
+
+  A computed cell which can access it's own value via the `self` argument:
+
+  ```dart
+  final increment = ActionCell();
+  final cell = SelfCell((self) {
+    increment.observe();
+    return self() + 1;
+  });
+  ```
+
+* Action cell chaining with `.chain(...)`
+
+  `.chain(...)` creates an action cell that calls a user provided function when triggered. This
+  function can decide whether to trigger the chained action or not.
+
+* Null checking utilities:
+
+  * `.notNull`
+
+    Returns a cell with a value guaranteed to be non-null. If the value of the cell, on which the
+    property is used, is `null`, a `NullCellError` exception is thrown.
+  
+  * `.coalesce(...)`
+
+    Returns a cell that replaces null values in the cell, on which the method is used, with the value
+    of another cell.
+
 ## 0.19.0
 
 New features:
@@ -11,9 +44,11 @@ New features:
 
   Example:
   
-  `final result = action.effect(() async {
+  ```dart
+  final result = action.effect(() async {
     return await submitForm();
-  });`
+  });
+  ```
 
 Breaking Changes:
 
