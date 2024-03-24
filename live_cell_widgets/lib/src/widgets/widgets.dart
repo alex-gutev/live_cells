@@ -732,6 +732,10 @@ triggered when the button is pressed and long pressed respectively. Similarly,
 [bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
 '''
   ),
+
+  WidgetSpec<Visibility>(
+      includeSuperProperties: [#child],
+  ),
 ])
 part 'widgets.g.dart';
 
