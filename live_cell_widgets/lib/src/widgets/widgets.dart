@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:live_cell_widgets/src/extensions/widget_extension.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cell_annotations/live_cell_annotations.dart';
@@ -95,9 +96,23 @@ import '../cell_widget/cell_widget.dart';
   ),
 
   WidgetSpec<Badge>(),
+  WidgetSpec<Banner>(
+    propertyDefaultValues: {
+      #color: 'Color(0xA0B71C1C)',
+      #textStyle: 'TextStyle(color: '
+        'Color(0xFFFFFFFF),'
+        'fontSize: 12.0 * 0.85,'
+        'fontWeight: FontWeight.w900,'
+        'height: 1.0)'
+    }
+  ),
 
   WidgetSpec<Baseline>(
     includeSuperProperties: [#child],
+  ),
+
+  WidgetSpec<BlockSemantics>(
+    includeSuperProperties: [#child]
   ),
 
   WidgetSpec<Card>(
