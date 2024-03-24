@@ -991,4 +991,327 @@ void main() {
       verify(resource.init()).called(2);
     });
   });
+
+  group('SelfCell', () {
+    test('Correctly references previous value', () {
+      final increment = ActionCell();
+      final cell = SelfCell((self) {
+        increment.observe();
+        return self() + 1;
+      }, initialValue: 0);
+
+      final observer = addObserver(cell, MockValueObserver());
+
+      expect(cell.value, 1);
+
+      increment.trigger();
+      increment.trigger();
+      increment.trigger();
+
+      expect(observer.values, equals([2, 3, 4]));
+    });
+
+    test('Exceptions rethrown when self accessed', () {
+      final increment = ActionCell();
+
+      final cell = SelfCell((self) {
+        increment.observe();
+
+        int count;
+
+        try {
+          count = self() + 1;
+        }
+        on ArgumentError {
+          return 2;
+        }
+
+        if (count.isEven) {
+          throw ArgumentError();
+        }
+
+        return count;
+      }, initialValue: 0);
+
+      observeCell(cell);
+      expect(cell.value, 1);
+
+      increment.trigger();
+      expect(() => cell.value, throwsArgumentError);
+
+      increment.trigger();
+      expect(cell.value, 2);
+
+      increment.trigger();
+      expect(cell.value, 3);
+
+      increment.trigger();
+      expect(() => cell.value, throwsArgumentError);
+
+      increment.trigger();
+      expect(cell.value, 2);
+    });
+
+    test('Correctly tracks dependencies', () {
+      final increment = ActionCell();
+      final delta = MutableCell(1);
+
+      final cell = SelfCell((self) {
+        increment.observe();
+        return self() + delta();
+      }, initialValue: 0);
+
+      final observer = addObserver(cell, MockValueObserver());
+      expect(cell.value, 1);
+
+      increment.trigger();
+      delta.value = 5;
+
+      increment.trigger();
+      increment.trigger();
+
+      delta.value = 10;
+      increment.trigger();
+
+      expect(observer.values, equals([2, 7, 12, 17, 27, 37]));
+    });
+
+    test('Works correctly with .peek', () {
+      final increment = ActionCell();
+      final delta = MutableCell(1);
+
+      final cell = SelfCell((self) {
+        increment.observe();
+        return self() + delta.peek();
+      }, initialValue: 0);
+
+      final observer = addObserver(cell, MockValueObserver());
+      expect(cell.value, 1);
+
+      increment.trigger();
+      delta.value = 5;
+
+      increment.trigger();
+      increment.trigger();
+
+      delta.value = 10;
+      increment.trigger();
+
+      expect(observer.values, equals([2, 7, 12, 22]));
+    });
+
+    test('Initialized to null if no initial value given', () {
+      final increment = ActionCell();
+
+      final cell = SelfCell<int?>((self) {
+        increment.observe();
+
+        final count = self();
+
+        return count == null
+            ? 0
+            : count + 1;
+      });
+
+      final observer = addObserver(cell, MockValueObserver());
+
+      expect(cell.value, 0);
+
+      increment.trigger();
+      increment.trigger();
+      increment.trigger();
+
+      expect(observer.values, equals([1, 2, 3]));
+    });
+
+    test('Uninitialized cell error thrown when no initial value and not nullable', () {
+      final increment = ActionCell();
+
+      final cell = SelfCell<int>((self) {
+        increment.observe();
+
+        try {
+          return self() + 1;
+        }
+        on UninitializedCellError {
+          return 0;
+        }
+      });
+
+      final observer = addObserver(cell, MockValueObserver());
+
+      expect(cell.value, 0);
+
+      increment.trigger();
+      increment.trigger();
+      increment.trigger();
+
+      expect(observer.values, equals([1, 2, 3]));
+    });
+
+    test('Previous value preserved if ValueCell.none is used', () {
+      final increment = ActionCell();
+      final delta = MutableCell(1);
+
+      final cell = SelfCell((self) {
+        increment.observe();
+
+        final count = self() + delta.peek();
+
+        if (count.isOdd) {
+          ValueCell.none();
+        }
+
+        return count;
+      }, initialValue: -1);
+
+      final observer = addObserver(cell, MockValueObserver());
+
+      expect(cell.value, 0);
+      increment.trigger();
+      increment.trigger();
+
+      expect(cell.value, 0);
+
+      delta.value = 2;
+
+      increment.trigger();
+      increment.trigger();
+      increment.trigger();
+
+      expect(observer.values, equals([0, 2, 4, 6]));
+    });
+
+    test('Initialized to defaultValue if ValueCell.none is used', () {
+      final increment = ActionCell();
+      final delta = MutableCell(1);
+
+      final cell = SelfCell((self) {
+        increment.observe();
+
+        final count = self() + delta.peek();
+
+        if (count.isOdd) {
+          ValueCell.none(1);
+        }
+
+        return count;
+      }, initialValue: 0);
+
+      final observer = addObserver(cell, MockValueObserver());
+
+      expect(cell.value, 1);
+      increment.trigger();
+      increment.trigger();
+      expect(cell.value, 2);
+
+      delta.value = 2;
+
+      increment.trigger();
+      increment.trigger();
+      increment.trigger();
+
+      expect(observer.values, equals([2, 4, 6, 8]));
+    });
+
+    test('Pagination test', () {
+      final pageIndex = MutableCell(0);
+
+      final page = ValueCell.computed(() {
+        final start = pageIndex() * 3;
+        return List.generate(3, (index) => start + index);
+      });
+
+      final cell = SelfCell((self) => [...self(), ...page()],
+          initialValue: []
+      );
+
+      observeCell(cell);
+      expect(cell.value, equals([0, 1, 2]));
+
+      pageIndex.value = 1;
+      expect(cell.value, equals([0, 1, 2, 3, 4, 5]));
+
+      pageIndex.value = 2;
+      expect(cell.value, equals([0, 1, 2, 3, 4, 5, 6, 7, 8]));
+    });
+
+    test('Compares == when same keys', () {
+      final increment = ActionCell();
+
+      final c1 = SelfCell((self) {
+        increment.observe();
+
+        return self() + 1;
+      }, initialValue: 0, key: 'self-key-1');
+
+      final c2 = SelfCell((self) {
+        increment.observe();
+
+        return self() + 1;
+      }, initialValue: 0, key: 'self-key-1');
+
+      expect(c1 == c2, isTrue);
+      expect(c1.hashCode == c2.hashCode, isTrue);
+    });
+
+    test('Compares != when different keys', () {
+      final increment = ActionCell();
+
+      final c1 = SelfCell((self) {
+        increment.observe();
+
+        return self() + 1;
+      }, initialValue: 0, key: 'self-key-1');
+
+      final c2 = SelfCell((self) {
+        increment.observe();
+
+        return self() + 1;
+      }, initialValue: 0, key: 'self-key-2');
+
+      expect(c1 != c2, isTrue);
+    });
+
+    test('Compares != when null keys', () {
+      final increment = ActionCell();
+
+      final c1 = SelfCell((self) {
+        increment.observe();
+
+        return self() + 1;
+      }, initialValue: 0);
+
+      final c2 = SelfCell((self) {
+        increment.observe();
+
+        return self() + 1;
+      }, initialValue: 0);
+
+      expect(c1 != c2, isTrue);
+    });
+
+    test('Manage the same set of observers when same keys', () {
+      final increment = ActionCell();
+
+      final resource = MockResource();
+      final delta = TestManagedCell(resource, 1);
+
+      f() => SelfCell((self) {
+        increment.observe();
+
+        return self() + delta();
+      }, initialValue: 0, key: 'self-key-1');
+
+      verifyNever(resource.init());
+
+      final observer = addObserver(f(), MockSimpleObserver());
+      f().removeObserver(observer);
+
+      observeCell(f());
+
+      verify(resource.init()).called(2);
+      verify(resource.dispose()).called(1);
+    });
+  });
 }
