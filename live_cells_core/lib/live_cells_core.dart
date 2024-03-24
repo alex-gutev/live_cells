@@ -6,7 +6,7 @@ export 'src/value_cell.dart' show ValueCell, ConstantCell;
 
 export 'src/base/types.dart' show WatchCallback;
 export 'src/base/exceptions.dart'
-    show UninitializedCellError, PendingAsyncValueError;
+    show UninitializedCellError, PendingAsyncValueError, NullCellError;
 export 'src/base/none_cell.dart' show NoneCell;
 
 export 'src/mutable_cell/mutable_cell.dart' show MutableCell;
