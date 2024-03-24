@@ -20,6 +20,7 @@ export 'src/compute_cell/store_cell.dart'
 
 export 'src/compute_cell/mutable_compute_cell.dart' show MutableComputeCell;
 export 'src/compute_cell/peek_cell.dart' show PeekCellExtension;
+export 'src/compute_cell/dynamic_compute_cell.dart' show SelfCell;
 
 export 'src/meta_cell/meta_cell.dart'
     show MetaCell, InactiveMetaCelLError, EmptyMetaCellError;

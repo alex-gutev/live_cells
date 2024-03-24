@@ -2,6 +2,8 @@ import 'dart:collection';
 
 import 'package:meta/meta.dart';
 
+import '../base/types.dart';
+import '../maybe_cell/maybe.dart';
 import '../stateful_cell/cell_state.dart';
 import '../base/exceptions.dart';
 import '../restoration/restoration.dart';
@@ -9,6 +11,8 @@ import '../stateful_cell/changes_only_cell_state.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
 import 'compute_cell_state.dart';
+
+part 'self_cell.dart';
 
 /// A computational cell which determines its dependencies at runtime
 /// 
