@@ -22,7 +22,7 @@ extension ActionCellEffectExtension on ValueCell<void> {
 }
 
 /// Provides functionality for chaining action cells
-extension ActionCellExtension on ActionCell {
+extension ActionCellExtension on ValueCell<void> {
   /// Create an action cell that is chained to this cell.
   ///
   /// An action cell is created that when triggered, [action] is called first.
@@ -42,7 +42,7 @@ extension ActionCellExtension on ActionCell {
 
 /// Provides the [combined] property for combining multiple action cells into one cell.
 extension CombineActionCellExtension on List<ValueCell<void>> {
-  /// Return an action cell that notifies its observers when any of the cells in this is triggered.
+  /// Return an action cell that notifies its observers when any of the cells in [this] is triggered.
   ValueCell<void> get combined => ComputeCell(
     compute: () {},
     arguments: toSet()

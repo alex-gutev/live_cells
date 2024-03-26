@@ -23,7 +23,7 @@ abstract class ActionCell implements ValueCell<void> {
   /// directly, the observers of the returned cell are also notified.
   ///
   /// The cell is identified by [key] if it is non-null.
-  factory ActionCell.chain(ActionCell cell, {
+  factory ActionCell.chain(ValueCell<void> cell, {
     dynamic key,
     required void Function() action
   }) = _ChainedActionCell;
@@ -82,7 +82,7 @@ class _ChainedActionCell extends DependentCell<void> implements ActionCell {
   /// Function to cal when triggered.
   final void Function() action;
 
-  _ChainedActionCell(ActionCell cell, {
+  _ChainedActionCell(ValueCell<void> cell, {
     super.key,
     required this.action
   }) : super({cell});
