@@ -327,7 +327,7 @@ button is pressed.
 
 The action button takes a `MetaCell` rather than an `ActionCell` since
 triggering the action outside the button will not result in any
-changes to the button. This is different from `CellSwicth` which takes
+changes to the button. This is different from `CellSwitch` which takes
 a `MutableCell`. When the cell is set from outside the switch, the
 state of the switch changes.
 
@@ -362,6 +362,102 @@ result is still pending.
 change events.
 
 :::
+
+## Code Organization
+
+So far not much thought has been given to the organization of our
+code. Instead we've directly placed all the cell definitions in the
+`build` method of the widget. For this simple example its not an issue
+but for larger applications its best to separate the cell definitions
+from the UI.
+
+A recommended approach for achieving separation of concerns is to use
+cell factory functions. This is a fancy term for a function which
+creates a cell. For example, the `submit` action cell and `submission`
+effect cell can be defined in a factory function:
+
+```dart title="Cell Factory Function"
+final (ActionCell, ValueCell<bool>) submissionCells(ValueCell<bool> succeed) {
+  final submit = ActionCell();
+
+  final submission = submit.effect(() async {
+    final result = succeed();
+    
+    return await Future.delayed(Duration(seconds: 3), () => result);
+  });
+  
+  return (submit, submission);
+}
+```
+
+The `submissionCells` function creates the `submit` and `submission`
+cells and returns them in a record containing the action cell in the
+first element, and the effect cell in the second element. The factory
+function can then be used in the widget build method as follows:
+
+```dart
+@override
+Widget build(BuildContext context) {
+  final succeed = MutableCell(true);
+  
+  final (submit, submission) = submissionCells(succeed);
+  
+  ...
+}
+```
+
+The significance of this is that the code defining the cells is now
+moved out of the widget body, and can be reused throughout the app.
+
+For more than two related cells, it is better to opt for a more
+structured return type such as class that holds all the related cells:
+
+```dart
+@immutable
+class Submission {
+  final ActionCell action;
+  final ValueCell<bool> result;
+    
+  factory Submission(ValueCell<bool> succeed) {
+    final submit = ActionCell();
+
+    final submission = submit.effect(() async {
+      final result = succeed();
+    
+      return await Future.delayed(Duration(seconds: 3), () => result);
+    });
+  
+    return Submission._internal(
+      action: submit,
+      result: submission
+    );
+  }
+    
+  const Submission._internal({
+    this.action,
+    this.result
+  });
+}
+```
+
+:::note
+
+The `@immutable` annotation is not required but is recommended so that
+a warning is emitted if you end up storing state directly in the
+`Submission` class rather than inside the cells.
+
+:::
+
+This class can then be used in the build method as follows:
+
+```dart
+@override
+Widget build(BuildContext context) {
+  final succeed = MutableCell(true);
+  final submission = Submission(succeed);
+  ...
+}
+```
 
 ## Why use Effect Cells?
 
