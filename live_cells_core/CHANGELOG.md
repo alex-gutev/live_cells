@@ -1,3 +1,15 @@
+## 0.20.1
+
+New features:
+
+* `MutableMetaCell` and `ActionMetaCell`, which allow `MutableCell`s to have their values set,
+  and `ActionCell`s to be triggered from `MetaCell`s.
+
+Minor changes:
+
+* The `.chain(...)` method can now be called on `ValueCell<void>`. Previously it could only be
+  called on an `ActionCell`.
+
 ## 0.20.0
 
 New features:
