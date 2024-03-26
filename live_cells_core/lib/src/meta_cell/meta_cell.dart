@@ -1,7 +1,12 @@
+import '../mutable_cell/action_cell.dart';
+import '../mutable_cell/mutable_cell.dart';
 import '../stateful_cell/cell_state.dart';
 import '../stateful_cell/observer_cell_state.dart';
 import '../stateful_cell/stateful_cell.dart';
 import '../value_cell.dart';
+
+part 'mutable_meta_cell.dart';
+part 'action_meta_cell.dart';
 
 /// Thrown when accessing the value of a MetaCell that is not pointing to any cell
 class EmptyMetaCellError implements Exception {
@@ -64,6 +69,16 @@ class MetaCell<T> extends StatefulCell<T> {
   ///
   /// The created cell is identified by [key] if it is non-null.
   MetaCell({super.key});
+
+  /// Create a [MetaCell] that points to a [MutableCell].
+  ///
+  /// The created cell is identified by [key] if it is non-null.
+  static MutableMetaCell<T> mutable<T>({key}) => MutableMetaCell(key: key);
+
+  /// Create a [MetaCell] that points to an [ActionCell].
+  ///
+  /// The created cell is identified by [key] if it is non-null.
+  static ActionMetaCell action({key}) => ActionMetaCell(key: key);
 
   /// Set the cell to which this cell points to.
   ///
