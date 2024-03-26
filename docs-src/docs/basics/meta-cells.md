@@ -58,10 +58,10 @@ final b = MutableCell(1);
 
 final m = MetaCell<int>();
 
-m.inject(a);
-
 // Called when `m` notifies its observers
-ValueCell.watch(() => print(m.value));
+ValueCell.watch(() => print(m()));
+
+m.inject(a);
 
 a.value = 2; // Prints 2
 a.value = 3; // Prints 3
@@ -83,22 +83,63 @@ to is changed with `.inject`.
 
 :::
 
+:::caution
+
+A meta cell has to be observed before `.inject` can be called. If
+`.inject` is called before the cell is observed
+`InactiveMetaCelLError` is thrown. You will have noticed the cell
+watch function is defined before `.inject` is called.
+
+:::
+
+
 Meta cells allow for a rudimentary form of *dependency
 inversion*. They are useful when you need to observe a cell without
 controlling how the cell is created.
+
+You may have noticed that an unhandled `EmptyMetaCellError` exception
+notice is being printed to the console. This is because the watch
+function is called initially when it is defined. At that point the
+meta cell does not point to any cell when its value is accessed, which
+results in the `EmptyMetaCellError` exception being thrown.
+
+You can silence these notices with the `.whenReady`:
+
+```dart
+final m = MetaCell<int>();
+
+// Called when `m` notifies its observers
+ValueCell.watch(() => print(m.whenReady()));
+```
+
+When `.whenReady` is used within a watch function it aborts the watch
+function, if the meta cell does not point to any cell, without
+printing a notice to the console.
+
+## Mutable and Action Meta Cells
+
+`MutableMetaCell` and `ActionMetaCell` are variants of `MetaCell`s
+which allow you to set the value of a mutable cell and trigger an
+action cell, respectively, from a `MetaCell`. A `MutableMetaCell` and
+`ActionMetaCell` can be created with `MetaCell.mutable` and
+`MetaCell.action` respectively.
+
+```dart title="Mutable/Action meta cells"
+final m = MetaCell.mutable<int>();
+final a = MetaCell.action();
+
+...
+
+// Set the value of the MutableCell pointed to by `m`
+m.value = 2;
+
+// Trigger the ActionCell pointed to by `a`
+a.trigger();
+```
 
 ## Differences from Mutable Cells
 
 Meta cells are different from mutable cells, in that a meta cell does
 not actually implement the functionality of a cell but delegates its
 implementation to the cell it points to, whereas a mutable cell is an
-actual implementation of a cell that can have its value set. Meta
-cells do not allow their value to be set, but only allow changing the
-cell to which the meta cell points to.
-
-:::note
-
-In the current version of Live Cells, setting the value of a cell via
-a meta cell is not supported.
-
-:::
+actual implementation of a cell that can have its value set.
