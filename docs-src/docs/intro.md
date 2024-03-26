@@ -10,7 +10,7 @@ following to your `pubspec.yaml`:
 
 ```dart title="pubspec.yaml"
 dependencies:
-    live_cells: ^0.19.0
+    live_cells: ^0.20.1
 ```
 
 To use Live Cells in a dart only project run: `dart pub add
@@ -18,7 +18,7 @@ live_cells_core`, or add the following to your `pubspec.yaml`:
 
 ```dart title="pubspec.yaml"
 dependencies:
-    live_cells_core: ^0.19.0
+    live_cells_core: ^0.20.1
 ```
 
 Now your project is set up to use Live Cells. Follow the remainder of
