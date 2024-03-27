@@ -359,3 +359,91 @@ the case, then the loading value should be stored in a `static`
 example.
 
 :::
+
+## Chaining Actions
+
+An action cell can be chained to another cell, in which case
+triggering the cell triggers the action cell to, which it is
+chained. Chained action cells are created with the `.chain(...)`
+method which takes an action function that is called when the chained
+action cell is triggered.
+
+```dart title="Chained action cells"
+final action = ActionCell();
+
+final chained = action.chain(() {
+    action.trigger();
+});
+```
+
+In this example a `chained` action cell is created, which is chained
+to `action`. When `trigger()` is called on `chained`, the function
+provided to `.chain(...)` is called. In this example the function
+calls `trigger()` on `action`. As a result triggering `chained`
+triggers `action`.
+
+:::important
+
+The observers of `chained` are notified whenever `action` notifies its
+observers, whether due to being triggered from `chained` or directly.
+
+:::
+
+The function provided to `.chain` can do more than merely calling
+`.trigger()` on another action cell. It can also omit a call to
+trigger if some condition is not met.
+
+For example consider the following action cell, which asks the user
+whether to proceed with the action or not, _via a hypothetical
+`showConfirmPrompt` function_:
+
+```dart
+final chained = action.chain(() async {
+    final confirm = await showConfirmPrompt();
+    
+    if (confirm) {
+        action.trigger();
+    }
+});
+```
+
+The original action is only triggered if `showConfirmPrompt()` returns
+true.
+
+This allows you to package the "confirmation" functionality in an
+extension on `ActionCell`:
+
+```dart
+extension ConfirmActionExtension on ActionCell {
+    ActionCell confirmed() => action.chain(() async {
+        final confirm = await showConfirmPrompt();
+    
+        if (confirm) {
+            action.trigger();
+        }
+    });
+}
+```
+
+Which can then be applied on any action cell:
+
+```dart
+final submitForm = ActionCell();
+
+final confirmed = submitForm.confirmed()
+
+// This will show a confirmation prompt before
+// triggering the submitForm action.
+confirmed.trigger();
+```
+
+:::caution
+
+This example also demonstrates that you can provide an asynchronous
+function to `.chain`. However, keep in mind that if
+`chained.trigger()` is called inside `MutableCell.batch(...)`, the
+batch update will not be in effect when the original action is
+triggered. This only applies if an asynchronous function is provided
+to `.chain`.
+
+:::
