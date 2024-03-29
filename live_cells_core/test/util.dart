@@ -23,19 +23,48 @@ class MockValueObserver extends MockSimpleObserver implements ValueObserver {
   /// List of values obtained (duplicates are removed)
   final values = [];
 
+  var _updating = false;
+  var _notifyCount = 0;
+  var _didChange = false;
+
+  @override
+  void willUpdate(ValueCell? cell) {
+    if (!_updating) {
+      assert(_notifyCount == 0);
+
+      _updating = true;
+      _notifyCount = 0;
+      _didChange = false;
+    }
+
+    _notifyCount++;
+  }
+
   @override
   void update(covariant ValueCell cell, covariant bool didChange) {
-    try {
-      final value = cell.value;
+    if (_updating) {
+      assert(_notifyCount > 0);
 
-      if (values.lastOrNull != value) {
-        values.add(value);
+      _didChange = _didChange || didChange;
+
+      if (--_notifyCount == 0) {
+        _updating = false;
+
+        if (_didChange) {
+          try {
+            final value = cell.value;
+
+            if (values.lastOrNull != value) {
+              values.add(value);
+            }
+
+            gotValue(value);
+          }
+          catch (e) {
+            // Prevent exception from being printed to log
+          }
+        }
       }
-
-      gotValue(value);
-    }
-    catch (e) {
-      // Prevent exception from being printed to log
     }
   }
 }

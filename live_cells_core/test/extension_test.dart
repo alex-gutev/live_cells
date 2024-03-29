@@ -2915,10 +2915,12 @@ void main() {
           'b': 100
         };
 
+        expect(k.value, true);
+
         m.value = {'d': 9};
         m.value = {'d': 9, 'b': 5};
 
-        expect(obs.values, equals([true, false, true]));
+        expect(obs.values, equals([false, true]));
       });
 
       test('compares == when same map and key cells', () {

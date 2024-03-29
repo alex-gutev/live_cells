@@ -1179,7 +1179,7 @@ void main() {
       increment.trigger();
       increment.trigger();
 
-      expect(observer.values, equals([0, 2, 4, 6]));
+      expect(observer.values, equals([2, 4, 6]));
     });
 
     test('Initialized to defaultValue if ValueCell.none is used', () {
