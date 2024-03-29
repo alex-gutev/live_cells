@@ -1,3 +1,8 @@
+## 0.20.2
+
+* Improvements to cell updating algorithm.
+* Fixed bug in `awaited` cells.
+
 ## 0.20.1
 
 New features:
