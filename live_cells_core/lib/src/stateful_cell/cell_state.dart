@@ -124,6 +124,15 @@ class CellState<T extends StatefulCell> {
   }) {
     assert(!_isDisposed);
 
+    assert(++_notifyCount > 0, 'Notify count is less than zero at the start of the update cycle.\n\n'
+      'This indicates that there have been more calls to CellState.notifyUpdate '
+        'than CellState.notifyWillUpdate, in the previous update cycle. The number of '
+        'calls to notifyUpdate should match exactly the number of calls to notifyWillUpdate.\n\n'
+        'This indicates a bug in Live Cells unless the error originates from a'
+        'ValueCell subclass provided by a third party, in which case it indicates'
+        "a bug in the third party's code."
+    );
+
     for (final observer in _observers.keys.toList(growable: false)) {
       try {
         if (!isEqual || observer.shouldNotifyAlways) {
@@ -151,6 +160,14 @@ class CellState<T extends StatefulCell> {
     bool didChange = true
   }) {
     assert(!_isDisposed);
+    assert(--_notifyCount >= 0, 'Notify count is less than zero when calling CellState.notifyUpdate.\n\n'
+        'This indicates that there have been more calls to CellState.notifyUpdate '
+        'than CellState.notifyWillUpdate, in the current update cycle. The number of '
+        'calls to notifyUpdate should match exactly the number of calls to notifyWillUpdate.\n\n'
+        'This indicates a bug in Live Cells unless the error originates from a'
+        'ValueCell subclass provided by a third party, in which case it indicates'
+        "a bug in the third party's code."
+    );
 
     final wasUpdating = CellUpdateManager.beginCellUpdates();
 
@@ -176,6 +193,17 @@ class CellState<T extends StatefulCell> {
   static final Map<dynamic, CellState> _cellStates = HashMap();
 
   var _isDisposed = false;
+
+  /// Number of times the observers were notified of changes to this cell,
+  /// during the current update cycle.
+  ///
+  /// This is increment when [notifyWillUpdate] is called, and decrement when
+  /// [notifyUpdate] is called. The purpose of this counter is to ensure, that
+  /// the number of times [notifyWillUpdate] is called matches, the number of times
+  /// [notifyUpdate] is called, ideally that should only be once.
+  ///
+  /// NOTE: This counter is only used during debug mode.
+  var _notifyCount = 0;
 
   /// Map of cell observers
   ///
