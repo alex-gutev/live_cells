@@ -22,10 +22,6 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
   @protected
   var updating = false;
 
-  /// Is the observer waiting for [update] to be called with didChange = true?
-  @protected
-  var waitingForChange = false;
-
   /// Check whether the cell's value has changed.
   ///
   /// This method is called when calling [update] on the observers of the cell.
@@ -73,24 +69,51 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
       preUpdate();
 
       updating = true;
-      waitingForChange = false;
+
+      _didChange = false;
+      _changedDependencies = 0;
 
       onWillUpdate();
       stale = true;
     }
+
+    _changedDependencies++;
   }
 
   @override
   void update(ValueCell cell, bool didChange) {
-    if (updating || (didChange && waitingForChange)) {
-      onUpdate(didChange && this.didChange());
+    if (updating) {
+      assert(_changedDependencies > 0, 'CellObserver.update called more times than CellObserver.willUpdate.\n\n'
+          'The number of calls to CellObserver.update must match exactly the '
+          'number of calls to CellObserver.willUpdate\n\n'
+          'This indicates a bug in Live Cells unless the error originates from a'
+          'ValueCell subclass provided by a third party, in which case it indicates'
+          "a bug in the third party's code."
+      );
 
-      waitingForChange = !didChange;
-      updating = false;
+      _didChange |= didChange;
 
-      if (didChange) {
-        postUpdate();
+      if (--_changedDependencies == 0) {
+        onUpdate(_didChange && this.didChange());
+
+        updating = false;
+
+        if (_didChange) {
+          postUpdate();
+        }
       }
     }
   }
+
+  // Private
+
+  /// Number of times [willUpdate] was called.
+  ///
+  /// This indicates, the number of dependency cells that have changed. When
+  /// [update] is called, this counter is decremented and the observers of the
+  /// cell are only notified when its value decreases down to 0.
+  var _changedDependencies = 0;
+
+  /// Have any of the dependency cells actually changed?
+  var _didChange = false;
 }
