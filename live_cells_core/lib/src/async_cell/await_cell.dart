@@ -55,13 +55,12 @@ class _AwaitCellState<T> extends CellState<AwaitCell<T>>
   bool get lastOnly => true;
 
   @override
-  T get value {
-    if (stale) {
+  void onUpdate(bool didChange) {
+    if (didChange) {
       awaitedValue = Maybe.error(PendingAsyncValueError());
-      stale = false;
     }
 
-    return awaitedValue.unwrap;
+    super.onUpdate(didChange);
   }
 }
 
