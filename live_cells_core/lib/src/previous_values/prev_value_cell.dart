@@ -161,12 +161,12 @@ class PrevValueState<T> extends CellState with ObserverCellState {
   }
 
   @override
-  void update(ValueCell cell, bool didChange) {
+  void onUpdate(bool didChange) {
     if (stale) {
       _updateCurrentValue();
     }
 
-    super.update(cell, didChange);
+    super.onUpdate(didChange);
   }
 
   /// Get the current value of the cell and set [_prevValue] to the previous [_currentValue].
