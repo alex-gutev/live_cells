@@ -93,21 +93,19 @@ abstract class MutableCell<T> extends ValueCell<T> {
   /// Is a batch update currently ongoing?
   static var _batched = false;
 
-  /// Set of cell states of which the observers should be notified after the current batch update.
+  /// List of cell states of which the observers should be notified after the current batch update.
   ///
-  /// The map is indexed by the cell stat object, with the value being a boolean
-  /// which is true if the new value of the cell is equal to the previous value.
-  static final Map<CellState, bool> _batchList = HashMap(
-    equals: identical,
-    hashCode: identityHashCode
-  );
+  /// Each element of the list is a record, with the state held in the first
+  /// record element and a boolean indicating whether the assigned value is
+  /// equal to the current value of the cell, held in the second element.
+  static final List<(CellState, bool)> _batchList = [];
 
   /// Add a cell state to the batch update list.
   ///
   /// If [isEqual] is true it indicates that the new value is equal to the
   /// previous value.
   static void _addToBatch(CellState state, bool isEqual) {
-    _batchList.update(state, (value) => value && isEqual, ifAbsent: () => isEqual);
+    _batchList.add((state, isEqual));
   }
 
   /// Begin a update update.
@@ -122,8 +120,8 @@ abstract class MutableCell<T> extends ValueCell<T> {
 
     _batched = false;
 
-    for (final entry in _batchList.entries) {
-      entry.key.notifyUpdate(isEqual: entry.value);
+    for (final (state, isEqual) in _batchList) {
+      state.notifyUpdate(isEqual: isEqual);
     }
 
     _batchList.clear();
