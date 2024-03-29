@@ -139,7 +139,6 @@ class MutableComputedCellState<T, S extends MutableDependentCell<T>>
     }
     else {
       _wasComputed = false;
-      waitingForChange = false;
     }
   }
 
