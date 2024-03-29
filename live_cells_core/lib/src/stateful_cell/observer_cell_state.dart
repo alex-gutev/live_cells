@@ -66,6 +66,15 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
   @override
   void willUpdate(ValueCell cell) {
     if (!updating) {
+      assert(_changedDependencies == 0, 'Number of changed dependencies not equal to zero at start of update cycle.\n\n'
+          'This indicates that CellObserver.update() was not called on the '
+          'observers of the cell, from which this error originates, during the '
+          'previous update cycle\n\n'
+          'This indicates a bug in Live Cells unless the error originates from a'
+          'ValueCell subclass provided by a third party, in which case it indicates'
+          "a bug in the third party's code."
+      );
+
       preUpdate();
 
       updating = true;
@@ -74,7 +83,6 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
       _changedDependencies = 0;
 
       onWillUpdate();
-      stale = true;
     }
 
     _changedDependencies++;
@@ -91,9 +99,10 @@ mixin ObserverCellState<S extends StatefulCell> on CellState<S> implements CellO
           "a bug in the third party's code."
       );
 
-      _didChange |= didChange;
+      _didChange = _didChange || didChange;
 
       if (--_changedDependencies == 0) {
+        stale = stale || _didChange;
         onUpdate(_didChange && this.didChange());
 
         updating = false;
