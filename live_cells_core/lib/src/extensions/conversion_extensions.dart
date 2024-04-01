@@ -1,5 +1,6 @@
 import '../base/exceptions.dart';
 import '../base/keys.dart';
+import '../compute_cell/compute_cell.dart';
 import 'compute_extension.dart';
 import '../compute_cell/mutable_compute_cell.dart';
 import '../compute_cell/store_cell.dart';
@@ -189,10 +190,11 @@ extension NullCheckExtension<T> on ValueCell<T?> {
   /// The value of the returned cell is the value of this cell if it is not null.
   /// If the value of this cell is null, the value of the returned cell is the
   /// value of the [ifNull] cell.
-  ValueCell<T> coalesce(ValueCell<T> ifNull) =>
-      (this, ifNull).apply((v, n) => v ?? n,
-          key: _NullCheckCoalesceKey(this, ifNull)
-      ).store(changesOnly: true);
+  ValueCell<T> coalesce(ValueCell<T> ifNull) => ComputeCell(
+    arguments: {this, ifNull},
+    key: _NullCheckCoalesceKey(this, ifNull),
+    compute: () => value ?? ifNull.value
+  ).store(changesOnly: true);
 }
 
 /// Key identifying a cell created with [NullCheckExtension.notNull].

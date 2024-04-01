@@ -1067,6 +1067,20 @@ void main() {
         expect(observer.values, equals([1, -1, -2, 3, 4, -10]));
       });
 
+      test('Only evaluates coalesce when value is null', () {
+        final a = MutableCell<int?>(null);
+        final b = a.coalesce(ValueCell.computed(() => throw ArgumentError()));
+
+        observeCell(b);
+        expect(() => b.value, throwsArgumentError);
+
+        a.value = 1;
+        expect(b.value, 1);
+
+        a.value = null;
+        expect(() => b.value, throwsArgumentError);
+      });
+
       test('Compares == when same cells', () {
         final a = MutableCell<int?>(0);
         final n = MutableCell<int>(-1);
