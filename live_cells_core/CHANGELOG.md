@@ -1,3 +1,8 @@
+## 0.20.3
+
+* Fixed bug in `.coalesce()`: If coalesce value cell throws an exception it is
+  propagated regardless of whether the cell, on which the method is called, is null or not. 
+
 ## 0.20.2
 
 * Improvements to cell updating algorithm.
