@@ -129,11 +129,16 @@ class MetaCellState<T> extends CellState<MetaCell<T>> with ObserverCellState<Met
 
   /// Set the cell to which the [MetaCell] points to
   set refCell(ValueCell<T>? cell) {
+    if (_refCell == cell) {
+      return;
+    }
+
     _refCell?.removeObserver(this);
     _refCell = cell;
 
     if (_refCell != null && isActive) {
       _refCell!.addObserver(this);
+      _refernceValue();
     }
   }
   
@@ -143,7 +148,9 @@ class MetaCellState<T> extends CellState<MetaCell<T>> with ObserverCellState<Met
   @override
   void init() {
     super.init();
+
     _refCell?.addObserver(this);
+    _refernceValue();
   }
 
   @override
@@ -155,4 +162,14 @@ class MetaCellState<T> extends CellState<MetaCell<T>> with ObserverCellState<Met
   // Private
 
   ValueCell<T>? _refCell;
+
+  /// Reference the value of the injected cell, to ensure that it is tracking its dependencies.
+  void _refernceValue() {
+    try {
+      _refCell?.value;
+    }
+    catch (e) {
+      // Prevent exceptions from propagating outwards
+    }
+  }
 }
