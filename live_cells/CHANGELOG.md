@@ -1,3 +1,10 @@
+## 0.20.4
+
+* Fixed bug with deferred cell initialization not happening in `MetaCell`:
+
+  Sometimes a cell was not initialized when it is injected in a `MetaCell`. This update ensures, that
+  every every cell injected in a `MetaCell` is properly initialized.
+
 ## 0.20.3
 
 * Fixed bug in `.coalesce()`: If coalesce value cell throws an exception it is
