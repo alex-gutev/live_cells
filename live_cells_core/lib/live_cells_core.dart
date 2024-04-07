@@ -31,7 +31,13 @@ export 'src/meta_cell/meta_cell.dart'
         EmptyMetaCellError;
 
 export 'src/maybe_cell/maybe.dart'
-    show Maybe, MaybeCell, CellMaybeExtension, MaybeCellExtension;
+    show
+        Maybe,
+        MaybeValue,
+        MaybeError,
+        MaybeCell,
+        CellMaybeExtension,
+        MaybeCellExtension;
 
 export 'src/previous_values/prev_value_cell.dart'
     show PrevValueCell, PrevValueCellExtension;

@@ -4,22 +4,22 @@ import '../mutable_cell/mutable_cell.dart';
 import '../value_cell.dart';
 
 /// Container that either holds a value or an exception that was raised while computing the value.
-class Maybe<T> {
+sealed class Maybe<T> {
   /// The value or `null` if there was an error during computation
-  final T? value;
+  T? get value;
 
   /// Exception thrown during the computation of [value].
   ///
   /// If [value] was computed successfully, this is `null`.
-  final dynamic error;
+  Object? get error;
 
   /// Create a [Maybe] that holds a computed value.
-  Maybe(this.value) : error = null;
+  const factory Maybe(T value) = MaybeValue;
 
   /// Create a [Maybe] that holds the exception [error].
   ///
   /// The resulting [Maybe] represents a failure to compute a value.
-  Maybe.error(this.error) : value = null;
+  const factory Maybe.error(Object error) = MaybeError;
 
   /// Compute a value using [compute] and wrap the result in a [Maybe].
   ///
@@ -54,7 +54,7 @@ class Maybe<T> {
   /// Get the wrapped value or throw [error] if this [Maybe] represents an error.
   T get unwrap {
     if (error != null) {
-      throw error;
+      throw error!;
     }
 
     return value as T;
@@ -67,6 +67,34 @@ class Maybe<T> {
 
   @override
   int get hashCode => Object.hash(value, error);
+
+  // Private
+
+  const Maybe._internal();
+}
+
+/// A [Maybe] that holds a value that was computed successfully.
+class MaybeValue<T> extends Maybe<T> {
+  @override
+  final T value;
+
+  @override
+  get error => null;
+
+  /// Create a [Maybe] holding a [value].
+  const MaybeValue(this.value) : super._internal();
+}
+
+/// A [Maybe] that holds an error thrown during the computation of a value.
+class MaybeError<T> extends Maybe<T> {
+  @override
+  final Object error;
+
+  @override
+  T? get value => null;
+
+  /// Create a [Maybe] holding an [error]
+  const MaybeError(this.error) : super._internal();
 }
 
 /// A [MutableCell] holding a [Maybe] value
