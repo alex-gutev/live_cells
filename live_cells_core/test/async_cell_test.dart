@@ -1,6 +1,7 @@
 import 'package:fake_async/fake_async.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:mockito/mockito.dart';
+import 'package:test/expect.dart';
 import 'package:test/test.dart';
 
 import 'util.dart';
@@ -2373,6 +2374,459 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(conc.value, true);
         });
+      });
+    });
+
+    group('.asyncState', () {
+      TypeMatcher<T> matchState<T extends AsyncState>({
+        Matcher isLoading = anything,
+        Matcher isData = anything,
+        Matcher isError = anything,
+      }) => isA<T>()
+          .having((p0) => p0.isLoading, 'isLoading', isLoading)
+          .having((p0) => p0.isData, 'isData', isData)
+          .having((p0) => p0.isError, 'isError', isError);
+
+      Matcher matchDataState<T>(T value) => matchState<AsyncStateData<T>>(
+        isLoading: isFalse,
+        isData: isTrue,
+        isError: isFalse,
+      ).having((p0) => p0.value, 'value', equals(value));
+
+      Matcher matchLoadingState() => matchState<AsyncStateLoading>(
+        isLoading: isTrue,
+        isData: isFalse,
+        isError: isFalse,
+      );
+
+      test('One FutureCell with constant value', () {
+        fakeAsync((self) {
+          final cell = Future.value(12).cell.asyncState;
+          observeCell(cell);
+
+          expect(cell.value, matchState<AsyncStateLoading>(
+            isLoading: isTrue,
+            isData: isFalse,
+            isError: isFalse
+          ));
+
+          // .flushMicrotasks doesn't work
+          self.elapse(Duration(seconds: 1));
+
+          expect(cell.value, matchDataState(12));
+        });
+      });
+
+      test('One FutureCell with Mutable value', () {
+        fakeAsync((self) {
+          final future = MutableCell(Future.value(12));
+          final cell = future.asyncState;
+
+          observeCell(cell);
+
+          self.elapse(Duration(seconds: 1));
+
+          expect(cell.value, matchDataState(12));
+
+          future.value = Future.value(100);
+
+          expect(cell.value, matchState<AsyncStateLoading>(
+              isLoading: isTrue,
+              isData: isFalse,
+              isError: isFalse,
+          ));
+
+          self.elapse(Duration(seconds: 1));
+
+          expect(cell.value, matchDataState(100));
+        });
+      });
+
+      test('Notifies observers when value is ready', () {
+        fakeAsync((self) {
+          final future = MutableCell(Future.value(12));
+          final cell = future.asyncState;
+
+          final observer = addObserver(cell, MockValueObserver());
+
+          future.value = Future.value(100);
+          future.value = Future.value(20);
+          future.value = Future.value(30);
+
+          self.elapse(Duration(seconds: 1));
+
+          expect(observer.values, containsAllInOrder([
+            matchLoadingState(),
+            matchDataState(30)
+          ]));
+        });
+      });
+
+      test('Computed FutureCell', () {
+        fakeAsync((self) {
+          final cellA = MutableCell(Future.value(1));
+          final cellB = MutableCell(Future.value(2));
+
+          final sum = ValueCell.computed(() async {
+            final (a, b) = await (cellA(), cellB()).wait;
+            return a + b;
+          });
+
+          final cell = sum.asyncState;
+          observeCell(cell);
+
+          self.elapse(Duration(seconds: 1));
+          expect(cell.value, matchDataState(3));
+
+          cellA.value = Future.value(5);
+          expect(cell.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 1));
+          expect(cell.value, matchDataState(7));
+
+          cellB.value = Future.value(10);
+          expect(cell.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 1));
+          expect(cell.value, matchDataState(15));
+
+          MutableCell.batch(() {
+            cellA.value = Future.value(20);
+            cellB.value = Future.value(30);
+          });
+
+          expect(cell.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 1));
+          expect(cell.value, matchDataState(50));
+        });
+      });
+
+      test('Computed FutureCell with delay', () {
+        fakeAsync((self) {
+          final cellA = MutableCell(Future.value(1));
+          final cellB = MutableCell(Future.value(2));
+
+          final sum = ValueCell.computed(() async {
+            final (a, b) = await (cellA(), cellB()).wait;
+            return a + b;
+          });
+
+          final cell = sum.asyncState;
+          observeCell(cell);
+
+          self.elapse(Duration(seconds: 1));
+          expect(cell.value, matchDataState(3));
+
+          MutableCell.batch(() {
+            cellA.value = Future.value(20);
+            cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
+          });
+
+          expect(cell.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 5));
+          expect(cell.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 6));
+          expect(cell.value, matchDataState(50));
+        });
+      });
+
+      test('Latest value only kept with Futures with varying delays', () {
+        fakeAsync((self) {
+          final f = MutableCell(Future.delayed(Duration(seconds: 10), () => 1));
+          final w = f.asyncState;
+
+          final observer = addObserver(w, MockValueObserver());
+
+          f.value = Future.value(2);
+          f.value = Future.delayed(Duration(seconds: 30), () => 3);
+          f.value = Future.value(4);
+
+          expect(w.value, matchLoadingState());
+          expect(observer.values, containsAllInOrder([
+            matchLoadingState(),
+          ]));
+
+          self.elapse(Duration(seconds: 5));
+          expect(w.value, matchDataState(4));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState(4)
+          ]));
+
+          self.elapse(Duration(seconds: 6));
+          expect(w.value, matchDataState(4));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState(4)
+          ]));
+
+          self.elapse(Duration(seconds: 10));
+          expect(w.value, matchDataState(4));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState(4)
+          ]));
+
+          self.elapse(Duration(seconds: 10));
+          expect(w.value, matchDataState(4));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState(4)
+          ]));
+
+          f.value = Future.value(100);
+          self.elapse(Duration(seconds: 1));
+          expect(w.value, matchDataState(100));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState(4),
+            matchLoadingState(),
+            matchDataState(100)
+          ]));
+        });
+      });
+
+      test('Two constant cells', () {
+        fakeAsync((self) {
+          final cellA = Future.value(1).cell;
+          final cellB = Future.value(2).cell;
+
+          final state = (cellA, cellB).asyncState;
+          observeCell(state);
+
+          expect(state.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 1));
+          expect(state.value, matchDataState((1, 2)));
+        });
+      });
+
+      test('Two mutable cells', () {
+        fakeAsync((self) {
+          final cellA = MutableCell(Future.value(1));
+          final cellB = MutableCell(Future.value(2));
+
+          final state = (cellA, cellB).asyncState;
+          observeCell(state);
+
+          self.elapse(Duration(seconds: 1));
+          expect(state.value, matchDataState((1, 2)));
+
+          cellA.value = Future.value(5);
+          expect(state.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 1));
+          expect(state.value, matchDataState((5, 2)));
+
+          cellB.value = Future.value(10);
+          expect(state.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 1));
+          expect(state.value, matchDataState((5, 10)));
+
+          MutableCell.batch(() {
+            cellA.value = Future.value(20);
+            cellB.value = Future.value(30);
+          });
+
+          expect(state.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 1));
+          expect(state.value, matchDataState((20, 30)));
+        });
+      });
+
+      test('Two mutable cells notify observers', () {
+        fakeAsync((self) {
+          final cellA = MutableCell(Future.value(1));
+          final cellB = MutableCell(Future.value(2));
+
+          final state = (cellA, cellB).asyncState;
+
+          final observer = addObserver(state, MockValueObserver());
+
+          cellA.value = Future.value(15);
+          cellB.value = Future.value(20);
+
+          MutableCell.batch(() {
+            cellA.value = Future.value(100);
+            cellB.value = Future.value(320);
+          });
+
+          self.elapse(Duration(seconds: 1));
+          expect(observer.values, containsAllInOrder([
+            matchLoadingState(),
+            matchDataState((100, 320))
+          ]));
+        });
+      });
+
+      test('Two mutable cells with delay', () {
+        fakeAsync((self) {
+          final cellA = MutableCell(Future.value(1));
+          final cellB = MutableCell(Future.value(2));
+
+          final state = (cellA, cellB).asyncState;
+
+          observeCell(state);
+
+          self.elapse(Duration(seconds: 1));
+          expect(state.value, matchDataState((1, 2)));
+
+          MutableCell.batch(() {
+            cellA.value = Future.value(20);
+            cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
+          });
+
+          expect(state.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 5));
+          expect(state.value, matchLoadingState());
+
+          self.elapse(Duration(seconds: 6));
+          expect(state.value, matchDataState((20, 30)));
+        });
+      });
+
+      test('Two cells: last value kept with Futures with varying delays', () {
+        fakeAsync((self) {
+          final c1 = MutableCell(Future.delayed(Duration(seconds: 10), () => 1));
+          final c2 = MutableCell(Future.value(2));
+          final w = (c1, c2).asyncState;
+
+          final observer = addObserver(w, MockValueObserver());
+
+          c1.value = Future.value(10);
+
+          MutableCell.batch(() {
+            c1.value = Future.delayed(Duration(seconds: 30), () => 20);
+            c2.value = Future.value(7);
+          });
+
+          c1.value = Future.value(100);
+
+          expect(w.value, matchLoadingState());
+          expect(observer.values, equals([
+            matchLoadingState()
+          ]));
+
+          self.elapse(Duration(seconds: 5));
+          expect(w.value, matchDataState((100, 7)));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState((100, 7))
+          ]));
+
+          self.elapse(Duration(seconds: 6));
+          expect(w.value, matchDataState((100, 7)));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState((100, 7))
+          ]));
+
+          self.elapse(Duration(seconds: 10));
+          expect(w.value, matchDataState((100, 7)));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState((100, 7))
+          ]));
+
+          self.elapse(Duration(seconds: 10));
+          expect(w.value, matchDataState((100, 7)));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState((100, 7))
+          ]));
+
+          c1.value = Future.value(1000);
+          self.elapse(Duration(seconds: 1));
+          expect(w.value, matchDataState((1000, 7)));
+          expect(observer.values, equals([
+            matchLoadingState(),
+            matchDataState((100, 7)),
+            matchLoadingState(),
+            matchDataState((1000, 7))
+          ]));
+        });
+      });
+
+      test('Compares equal if same future cells', () {
+        final f = MutableCell(Future.value(1));
+
+        final w1 = f.asyncState;
+        final w2 = f.asyncState;
+
+        expect(w1 == w2, isTrue);
+        expect(w1.hashCode == w2.hashCode, isTrue);
+      });
+
+      test('Compares not equal if different future cells', () {
+        final f1 = MutableCell(Future.value(1));
+        final f2 = MutableCell(Future.value(3));
+
+        final w1 = f1.asyncState;
+        final w2 = f2.asyncState;
+
+        expect(w1 != w2, isTrue);
+        expect(w1 == w1, isTrue);
+      });
+
+      test('Compares not equal with .wait and .waitLast cells', () {
+        final f = MutableCell(Future.value(1));
+
+        final w1 = f.awaited;
+        final w2 = f.wait;
+        final w3 = f.waitLast;
+        final w4 = f.asyncState;
+
+        expect(w4 == w4, isTrue);
+        expect(w1 != w4, isTrue);
+        expect(w2 != w4, isTrue);
+        expect(w3 != w4, isTrue);
+      });
+
+      test('Compare equal if same 2 future cells', () {
+        final f1 = MutableCell(Future.value(1));
+        final f2 = MutableCell(Future.value(3));
+
+        final w1 = (f1, f2).asyncState;
+        final w2 = (f1, f2).asyncState;
+
+        expect(w1 == w2, isTrue);
+        expect(w1.hashCode == w2.hashCode, isTrue);
+      });
+
+      test('Compare not equal if different 2 future cells', () {
+        final f1 = MutableCell(Future.value(1));
+        final f2 = MutableCell(Future.value(3));
+        final f3 = MutableCell(Future.value(5));
+
+        final w1 = (f1, f2).asyncState;
+        final w2 = (f1, f3).asyncState;
+        final w3 = (f3, f2).asyncState;
+
+        expect(w1 == w1, isTrue);
+        expect(w1 != w2, isTrue);
+        expect(w1 != w3, isTrue);
+        expect(w2 != w3, isTrue);
+      });
+
+      test('Compares not equal with .wait and .waitLast cells', () {
+        final f1 = MutableCell(Future.value(1));
+        final f2 = MutableCell(Future.value(3));
+
+        final w1 = (f1, f2).awaited;
+        final w2 = (f1, f2).wait;
+        final w3 = (f1, f2).waitLast;
+        final w4 = (f1, f2).asyncState;
+
+        expect(w4 == w4, isTrue);
+        expect(w1 != w4, isTrue);
+        expect(w2 != w4, isTrue);
+        expect(w3 != w4, isTrue);
       });
     });
   });
