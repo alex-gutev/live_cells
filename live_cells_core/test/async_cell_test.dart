@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fake_async/fake_async.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:mockito/mockito.dart';
@@ -2399,6 +2401,12 @@ void main() {
         isError: isFalse,
       );
 
+      Matcher matchErrorState(Matcher error) => matchState<AsyncStateError>(
+        isLoading: isFalse,
+        isData: isFalse,
+        isError: isTrue
+      ).having((p0) => p0.error, 'error', error);
+
       test('One FutureCell with constant value', () {
         fakeAsync((self) {
           final cell = Future.value(12).cell.asyncState;
@@ -2589,6 +2597,30 @@ void main() {
         });
       });
 
+      test('Error state returned when Future completes with error', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.value(1));
+          final state = cell.asyncState;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          cell.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          cell.value = Future.value(10);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, containsAllInOrder([
+            matchDataState(1),
+            matchLoadingState(),
+            matchErrorState(isA<TestException>()),
+            matchLoadingState(),
+            matchDataState(10)
+          ]));
+        });
+      });
+
       test('Two constant cells', () {
         fakeAsync((self) {
           final cellA = Future.value(1).cell;
@@ -2749,6 +2781,44 @@ void main() {
             matchDataState((100, 7)),
             matchLoadingState(),
             matchDataState((1000, 7))
+          ]));
+        });
+      });
+
+
+      test('Two cells: Error state returned when Futured complete with error', () {
+        fakeAsync((async) {
+          final a = MutableCell(Future.value(1));
+          final b = MutableCell(Future.value(2));
+          final state = (a, b).asyncState;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          a.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          a.value = Future.value(10);
+          b.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          b.value = Future.value(15);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, containsAllInOrder([
+            matchDataState((1, 2)),
+            matchLoadingState(),
+            matchErrorState(isA<ParallelWaitError>()
+                .having((p0) => p0.values, 'values', (null, 2))
+                .having((p0) => p0.errors, 'errors', isA<(AsyncError, Null)>()
+                .having((p0) => p0.$1.error, '\$1.error', isA<TestException>()))),
+          matchLoadingState(),
+            matchErrorState(isA<ParallelWaitError>()
+                .having((p0) => p0.values, 'values', (10, null))
+                .having((p0) => p0.errors, 'errors', isA<(Null, AsyncError)>()
+                .having((p0) => p0.$2.error, '\$2.error', isA<TestException>()))),
+            matchLoadingState(),
+            matchDataState((10, 15))
           ]));
         });
       });

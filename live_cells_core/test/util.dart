@@ -139,6 +139,9 @@ enum TestEnum {
   value3
 }
 
+/// Used to test propagation of exceptions
+class TestException implements Exception {}
+
 // Test utility functions
 
 /// Add an observer to a cell so that it reacts to changes in is dependencies.
