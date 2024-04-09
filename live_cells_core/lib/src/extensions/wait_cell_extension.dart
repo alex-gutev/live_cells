@@ -3,6 +3,7 @@ import 'package:record_extender_annotations/record_extender_annotations.dart';
 import 'compute_extension.dart';
 import 'conversion_extensions.dart';
 import 'error_handling_extension.dart';
+import '../async_cell/async_state.dart';
 import '../async_cell/await_cell.dart';
 import '../async_cell/wait_cell.dart';
 import '../base/keys.dart';
@@ -34,7 +35,7 @@ extension DelayCellExtension<T> on ValueCell<T> {
   size: 9,
   documentation: 'Provides the [wait] method on a record of cells each holding a [Future]'
 )
-extension WaitCellExtension1<T> on FutureCell<T> {
+extension WaitCellExtension<T> on FutureCell<T> {
   /// Return a cell that awaits the [Future] held in [this].
   ///
   /// The value of the returned cell is the completed value of the [Future].
@@ -147,6 +148,23 @@ to function.'''
       .apply((_) => true, key: _IsCompleteCellKey(this))
       .loadingValue(false.cell)
       .onError(true.cell);
+
+  /// A cell that evaluates to the [AsyncState] of the [Future] in this cell.
+  @RecordExtensionElement(
+    type: 'ValueCell<AsyncState<({type-params})>>',
+    implementation: '''return ValueCell.computed(() => AsyncState.makeState(
+      current: awaited,
+    ), key: _AsyncStateCellKey(this));''',
+
+    documentation: '''A cell that evaluates to the [AsyncState] of the [Future] held in this cell.
+
+**NOTE**: The returned cell must have at least one observer in order
+to function.'''
+  )
+  ValueCell<AsyncState<T>> get asyncState => ValueCell.computed(
+      () => AsyncState.forCell(this),
+      key: _AsyncStateCellKey(this)
+  );
 }
 
 /// A key which identifies a record of cells
@@ -167,4 +185,8 @@ class _DelayCellKey<T> extends CellKey2<ValueCell<T>, Duration> {
 /// Identifies a cell created with `.isCompleted`
 class _IsCompleteCellKey<T> extends CellKey1<T> {
   _IsCompleteCellKey(super.value);
+}
+
+class _AsyncStateCellKey<T> extends CellKey1<T> {
+  _AsyncStateCellKey(super.value);
 }

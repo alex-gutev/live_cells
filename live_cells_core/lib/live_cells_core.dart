@@ -48,6 +48,8 @@ export 'src/restoration/restoration.dart' show RestorableCell, CellValueCoder;
 
 export 'src/utilities/cell_observer_model.dart' show CellObserverModel;
 
+export 'src/async_cell/async_state.dart';
+
 export 'src/extensions/compute_extension.dart';
 export 'src/extensions/numeric_extension.dart';
 export 'src/extensions/duration_extension.dart';
