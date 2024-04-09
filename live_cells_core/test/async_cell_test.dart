@@ -160,6 +160,26 @@ void main() {
         });
       });
 
+      test('Exception thrown when Future completes with error', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.value(1));
+          final state = cell.wait;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          cell.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => cell.value, throwsA(isA<TestException>()));
+
+          cell.value = Future.value(10);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, equals([1, 10]));
+        });
+      });
+
       test('Two constant cells', () {
         fakeAsync((self) {
           final cellA = Future.value(1).cell;
@@ -310,6 +330,37 @@ void main() {
           self.elapse(Duration(seconds: 10));
           expect(w.value, 107);
           expect(observer.values, equals([3, 12, 27, 107]));
+        });
+      });
+
+      test('Two cells: Exception thrown when Futures complete wth error', () {
+        fakeAsync((async) {
+          final a = MutableCell(Future.value(1));
+          final b = MutableCell(Future.value(2));
+          final state = (a, b).wait;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          a.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => state.value, throwsA(isA<ParallelWaitError>()
+              .having((p0) => p0.errors, 'error', isA<(AsyncError, Null)>()
+              .having((p0) => p0.$1.error, '\$1.error', isA<TestException>()))));
+
+          a.value = Future.value(10);
+          b.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => state.value, throwsA(isA<ParallelWaitError>()
+              .having((p0) => p0.errors, 'error', isA<(Null, AsyncError)>()
+              .having((p0) => p0.$2.error, '\$2.error', isA<TestException>()))));
+
+          b.value = Future.value(15);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, equals([(1, 2), (10, 2), (10, 15)]));
         });
       });
 
@@ -737,6 +788,26 @@ void main() {
         });
       });
 
+      test('Exception thrown when Future completes with error', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.value(1));
+          final state = cell.waitLast;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          cell.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => cell.value, throwsA(isA<TestException>()));
+
+          cell.value = Future.value(10);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, equals([1, 10]));
+        });
+      });
+
       test('Two constant cells', () {
         fakeAsync((self) {
           final cellA = Future.value(1).cell;
@@ -892,6 +963,37 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(w.value, 1007);
           expect(observer.values, equals([107, 1007]));
+        });
+      });
+
+      test('Two cells: Exception thrown when Futures complete wth error', () {
+        fakeAsync((async) {
+          final a = MutableCell(Future.value(1));
+          final b = MutableCell(Future.value(2));
+          final state = (a, b).waitLast;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          a.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => state.value, throwsA(isA<ParallelWaitError>()
+              .having((p0) => p0.errors, 'error', isA<(AsyncError, Null)>()
+              .having((p0) => p0.$1.error, '\$1.error', isA<TestException>()))));
+
+          a.value = Future.value(10);
+          b.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => state.value, throwsA(isA<ParallelWaitError>()
+              .having((p0) => p0.errors, 'error', isA<(Null, AsyncError)>()
+              .having((p0) => p0.$2.error, '\$2.error', isA<TestException>()))));
+
+          b.value = Future.value(15);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, equals([(1, 2), (10, 15)]));
         });
       });
 
@@ -1335,6 +1437,26 @@ void main() {
         });
       });
 
+      test('Exception thrown when Future completes with error', () {
+        fakeAsync((async) {
+          final cell = MutableCell(Future.value(1));
+          final state = cell.awaited;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          cell.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => cell.value, throwsA(isA<TestException>()));
+
+          cell.value = Future.value(10);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, equals([1, 10]));
+        });
+      });
+
       test('Two constant cells', () {
         fakeAsync((self) {
           final cellA = Future.value(1).cell;
@@ -1490,6 +1612,37 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(w.value, 1007);
           expect(observer.values, equals([107, 1007]));
+        });
+      });
+
+      test('Two cells: Exception thrown when Futures complete wth error', () {
+        fakeAsync((async) {
+          final a = MutableCell(Future.value(1));
+          final b = MutableCell(Future.value(2));
+          final state = (a, b).awaited;
+
+          final observer = addObserver(state, MockValueObserver());
+          async.elapse(Duration(seconds: 1));
+
+          a.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => state.value, throwsA(isA<ParallelWaitError>()
+              .having((p0) => p0.errors, 'error', isA<(AsyncError, Null)>()
+              .having((p0) => p0.$1.error, '\$1.error', isA<TestException>()))));
+
+          a.value = Future.value(10);
+          b.value = Future.error(TestException());
+          async.elapse(Duration(seconds: 1));
+
+          expect(() => state.value, throwsA(isA<ParallelWaitError>()
+              .having((p0) => p0.errors, 'error', isA<(Null, AsyncError)>()
+              .having((p0) => p0.$2.error, '\$2.error', isA<TestException>()))));
+
+          b.value = Future.value(15);
+          async.elapse(Duration(seconds: 1));
+
+          expect(observer.values, equals([(1, 2), (10, 15)]));
         });
       });
 
@@ -2785,8 +2938,7 @@ void main() {
         });
       });
 
-
-      test('Two cells: Error state returned when Futured complete with error', () {
+      test('Two cells: Error state returned when Futures complete with error', () {
         fakeAsync((async) {
           final a = MutableCell(Future.value(1));
           final b = MutableCell(Future.value(2));
