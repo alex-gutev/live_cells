@@ -13,7 +13,7 @@ import '../value_cell.dart';
 ///
 ///   This state indicates that the asynchronous cell value is still pending.
 ///
-/// * The data state represented by the class [AsyncStateData]/
+/// * The data state represented by the class [AsyncStateData].
 ///
 ///   This state indicates that the asynchronous value is ready and has
 ///   been computed successfully.
