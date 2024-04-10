@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:fake_async/fake_async.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:mockito/mockito.dart';
-import 'package:test/expect.dart';
 import 'package:test/test.dart';
 
 import 'util.dart';
