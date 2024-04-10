@@ -57,6 +57,24 @@ The `Maybe` cell provides an `error` property which retrieves a
 `null` if the `Maybe` is holding a value. This can be used to
 determine whether an error occurred while computing a value.
 
+:::tip
+
+`Maybe` is a sealed union of the classes `MaybeValue` and
+`MaybeError`. This allows you to handle errors using `switch` and
+pattern matching:
+
+```dart
+switch (maybe) {
+    case MaybeValue(:final value):
+        /// Do something with `value`
+        
+    case MaybeError(:final error):
+        /// Handle the `error`
+}
+```
+
+:::
+
 To handle errors while parsing a number, `mutableString` should be
 called on a cell containing a `Maybe<num>` rather than a `num`. We can
 then check whether the `error` cell is non-null to check if an error
