@@ -1,4 +1,7 @@
 import '../base/exceptions.dart';
+import '../base/none_cell.dart';
+import '../extensions/conversion_extensions.dart';
+import '../extensions/error_handling_extension.dart';
 import '../extensions/wait_cell_extension.dart';
 import '../value_cell.dart';
 
@@ -29,7 +32,14 @@ sealed class AsyncState<T> {
   /// Is this a pending asynchronous value state?
   bool get isLoading => false;
 
-  const AsyncState();
+  /// The last value to which the [Future] completed or null if none.
+  ///
+  /// **NOTE**: This records the last value completed by a [Future] that was
+  /// held in the cell while the value completed. If a [Future] is replaced with
+  /// another [Future] before it completes, the completed value is not recorded.
+  final T? lastValue;
+
+  const AsyncState([this.lastValue]);
 
   /// Create an async state for a cell holding a [Future].
   ///
@@ -46,16 +56,20 @@ sealed class AsyncState<T> {
       makeState(current: cell.awaited);
   
   static AsyncState<T> makeState<T>({
-    required ValueCell<T> current, 
+    required ValueCell<T> current,
   }) {
+    final last = (current as ValueCell<T?>)
+        .onError(NoneCell())
+        .onError(null.cell);
+
     try {
-      return AsyncStateData(current());
+      return AsyncStateData(current(), last());
     }
     on PendingAsyncValueError {
-      return AsyncStateLoading();
+      return AsyncStateLoading(last());
     }
     catch (e, trace) {
-      return AsyncStateError(e, trace);
+      return AsyncStateError(e, trace, last());
     }
   }
 }
@@ -69,7 +83,7 @@ class AsyncStateData<T> extends AsyncState<T> {
   final T value;
 
   /// Create an [AsyncState] representing the data state with [value].
-  AsyncStateData(this.value);
+  AsyncStateData(this.value, [super.lastValue]);
 
   @override
   bool get isData => true;
@@ -97,7 +111,7 @@ class AsyncStateError<T> extends AsyncState<T> {
   final StackTrace stackTrace;
 
   /// Create an [AsyncState] representing the error state with [error].
-  AsyncStateError(this.error, [StackTrace? trace]) :
+  AsyncStateError(this.error, [StackTrace? trace, super.lastValue]) :
       stackTrace = trace ?? StackTrace.current;
 
   @override
@@ -121,6 +135,8 @@ class AsyncStateError<T> extends AsyncState<T> {
 class AsyncStateLoading<T> extends AsyncState<T> {
   @override
   bool get isLoading => true;
+
+  AsyncStateLoading([super.lastValue]);
 
   @override
   bool operator ==(Object other) =>

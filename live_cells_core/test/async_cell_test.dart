@@ -2537,27 +2537,36 @@ void main() {
         Matcher isLoading = anything,
         Matcher isData = anything,
         Matcher isError = anything,
+        Matcher lastValue = anything
       }) => isA<T>()
           .having((p0) => p0.isLoading, 'isLoading', isLoading)
           .having((p0) => p0.isData, 'isData', isData)
-          .having((p0) => p0.isError, 'isError', isError);
+          .having((p0) => p0.isError, 'isError', isError)
+          .having((p0) => p0.lastValue, 'lastValue', lastValue);
 
       Matcher matchDataState<T>(T value) => matchState<AsyncStateData<T>>(
         isLoading: isFalse,
         isData: isTrue,
         isError: isFalse,
+        lastValue: equals(value)
       ).having((p0) => p0.value, 'value', equals(value));
 
-      Matcher matchLoadingState() => matchState<AsyncStateLoading>(
+      Matcher matchLoadingState({
+        Matcher lastValue = anything
+      }) => matchState<AsyncStateLoading>(
         isLoading: isTrue,
         isData: isFalse,
         isError: isFalse,
+        lastValue: lastValue
       );
 
-      Matcher matchErrorState(Matcher error) => matchState<AsyncStateError>(
+      Matcher matchErrorState(Matcher error, {
+        Matcher lastValue = anything
+      }) => matchState<AsyncStateError>(
         isLoading: isFalse,
         isData: isFalse,
-        isError: isTrue
+        isError: isTrue,
+        lastValue: lastValue
       ).having((p0) => p0.error, 'error', error);
 
       test('One FutureCell with constant value', () {
@@ -2568,7 +2577,8 @@ void main() {
           expect(cell.value, matchState<AsyncStateLoading>(
             isLoading: isTrue,
             isData: isFalse,
-            isError: isFalse
+            isError: isFalse,
+            lastValue: isNull
           ));
 
           // .flushMicrotasks doesn't work
@@ -2595,6 +2605,7 @@ void main() {
               isLoading: isTrue,
               isData: isFalse,
               isError: isFalse,
+              lastValue: equals(12)
           ));
 
           self.elapse(Duration(seconds: 1));
@@ -2617,7 +2628,7 @@ void main() {
           self.elapse(Duration(seconds: 1));
 
           expect(observer.values, containsAllInOrder([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState(30)
           ]));
         });
@@ -2640,13 +2651,13 @@ void main() {
           expect(cell.value, matchDataState(3));
 
           cellA.value = Future.value(5);
-          expect(cell.value, matchLoadingState());
+          expect(cell.value, matchLoadingState(lastValue: equals(3)));
 
           self.elapse(Duration(seconds: 1));
           expect(cell.value, matchDataState(7));
 
           cellB.value = Future.value(10);
-          expect(cell.value, matchLoadingState());
+          expect(cell.value, matchLoadingState(lastValue: equals(7)));
 
           self.elapse(Duration(seconds: 1));
           expect(cell.value, matchDataState(15));
@@ -2656,7 +2667,7 @@ void main() {
             cellB.value = Future.value(30);
           });
 
-          expect(cell.value, matchLoadingState());
+          expect(cell.value, matchLoadingState(lastValue: equals(15)));
 
           self.elapse(Duration(seconds: 1));
           expect(cell.value, matchDataState(50));
@@ -2684,10 +2695,10 @@ void main() {
             cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
           });
 
-          expect(cell.value, matchLoadingState());
+          expect(cell.value, matchLoadingState(lastValue: equals(3)));
 
           self.elapse(Duration(seconds: 5));
-          expect(cell.value, matchLoadingState());
+          expect(cell.value, matchLoadingState(lastValue: equals(3)));
 
           self.elapse(Duration(seconds: 6));
           expect(cell.value, matchDataState(50));
@@ -2705,36 +2716,36 @@ void main() {
           f.value = Future.delayed(Duration(seconds: 30), () => 3);
           f.value = Future.value(4);
 
-          expect(w.value, matchLoadingState());
+          expect(w.value, matchLoadingState(lastValue: isNull));
           expect(observer.values, containsAllInOrder([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
           ]));
 
           self.elapse(Duration(seconds: 5));
           expect(w.value, matchDataState(4));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState(4)
           ]));
 
           self.elapse(Duration(seconds: 6));
           expect(w.value, matchDataState(4));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState(4)
           ]));
 
           self.elapse(Duration(seconds: 10));
           expect(w.value, matchDataState(4));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState(4)
           ]));
 
           self.elapse(Duration(seconds: 10));
           expect(w.value, matchDataState(4));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState(4)
           ]));
 
@@ -2742,9 +2753,9 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(w.value, matchDataState(100));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState(4),
-            matchLoadingState(),
+            matchLoadingState(lastValue: equals(4)),
             matchDataState(100)
           ]));
         });
@@ -2766,9 +2777,9 @@ void main() {
 
           expect(observer.values, containsAllInOrder([
             matchDataState(1),
-            matchLoadingState(),
-            matchErrorState(isA<TestException>()),
-            matchLoadingState(),
+            matchLoadingState(lastValue: equals(1)),
+            matchErrorState(isA<TestException>(), lastValue: equals(1)),
+            matchLoadingState(lastValue: equals(1)),
             matchDataState(10)
           ]));
         });
@@ -2782,7 +2793,7 @@ void main() {
           final state = (cellA, cellB).asyncState;
           observeCell(state);
 
-          expect(state.value, matchLoadingState());
+          expect(state.value, matchLoadingState(lastValue: isNull));
 
           self.elapse(Duration(seconds: 1));
           expect(state.value, matchDataState((1, 2)));
@@ -2801,13 +2812,13 @@ void main() {
           expect(state.value, matchDataState((1, 2)));
 
           cellA.value = Future.value(5);
-          expect(state.value, matchLoadingState());
+          expect(state.value, matchLoadingState(lastValue: equals((1, 2))));
 
           self.elapse(Duration(seconds: 1));
           expect(state.value, matchDataState((5, 2)));
 
           cellB.value = Future.value(10);
-          expect(state.value, matchLoadingState());
+          expect(state.value, matchLoadingState(lastValue: equals((5, 2))));
 
           self.elapse(Duration(seconds: 1));
           expect(state.value, matchDataState((5, 10)));
@@ -2817,7 +2828,7 @@ void main() {
             cellB.value = Future.value(30);
           });
 
-          expect(state.value, matchLoadingState());
+          expect(state.value, matchLoadingState(lastValue: equals((5, 10))));
 
           self.elapse(Duration(seconds: 1));
           expect(state.value, matchDataState((20, 30)));
@@ -2843,7 +2854,7 @@ void main() {
 
           self.elapse(Duration(seconds: 1));
           expect(observer.values, containsAllInOrder([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState((100, 320))
           ]));
         });
@@ -2866,10 +2877,10 @@ void main() {
             cellB.value = Future.delayed(Duration(seconds: 10), () => 30);
           });
 
-          expect(state.value, matchLoadingState());
+          expect(state.value, matchLoadingState(lastValue: equals((1, 2))));
 
           self.elapse(Duration(seconds: 5));
-          expect(state.value, matchLoadingState());
+          expect(state.value, matchLoadingState(lastValue: equals((1, 2))));
 
           self.elapse(Duration(seconds: 6));
           expect(state.value, matchDataState((20, 30)));
@@ -2893,36 +2904,36 @@ void main() {
 
           c1.value = Future.value(100);
 
-          expect(w.value, matchLoadingState());
+          expect(w.value, matchLoadingState(lastValue: isNull));
           expect(observer.values, equals([
-            matchLoadingState()
+            matchLoadingState(lastValue: isNull)
           ]));
 
           self.elapse(Duration(seconds: 5));
           expect(w.value, matchDataState((100, 7)));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState((100, 7))
           ]));
 
           self.elapse(Duration(seconds: 6));
           expect(w.value, matchDataState((100, 7)));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState((100, 7))
           ]));
 
           self.elapse(Duration(seconds: 10));
           expect(w.value, matchDataState((100, 7)));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState((100, 7))
           ]));
 
           self.elapse(Duration(seconds: 10));
           expect(w.value, matchDataState((100, 7)));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState((100, 7))
           ]));
 
@@ -2930,9 +2941,9 @@ void main() {
           self.elapse(Duration(seconds: 1));
           expect(w.value, matchDataState((1000, 7)));
           expect(observer.values, equals([
-            matchLoadingState(),
+            matchLoadingState(lastValue: isNull),
             matchDataState((100, 7)),
-            matchLoadingState(),
+            matchLoadingState(lastValue: equals((100, 7))),
             matchDataState((1000, 7))
           ]));
         });
@@ -2959,17 +2970,20 @@ void main() {
 
           expect(observer.values, containsAllInOrder([
             matchDataState((1, 2)),
-            matchLoadingState(),
+            matchLoadingState(lastValue: equals((1, 2))),
             matchErrorState(isA<ParallelWaitError>()
                 .having((p0) => p0.values, 'values', (null, 2))
                 .having((p0) => p0.errors, 'errors', isA<(AsyncError, Null)>()
-                .having((p0) => p0.$1.error, '\$1.error', isA<TestException>()))),
-          matchLoadingState(),
+                .having((p0) => p0.$1.error, '\$1.error', isA<TestException>())),
+              lastValue: equals((1, 2))
+            ),
+          matchLoadingState(lastValue: equals((1, 2))),
             matchErrorState(isA<ParallelWaitError>()
                 .having((p0) => p0.values, 'values', (10, null))
                 .having((p0) => p0.errors, 'errors', isA<(Null, AsyncError)>()
-                .having((p0) => p0.$2.error, '\$2.error', isA<TestException>()))),
-            matchLoadingState(),
+                .having((p0) => p0.$2.error, '\$2.error', isA<TestException>())),
+            lastValue: equals((1, 2))),
+            matchLoadingState(lastValue: equals((1, 2))),
             matchDataState((10, 15))
           ]));
         });
