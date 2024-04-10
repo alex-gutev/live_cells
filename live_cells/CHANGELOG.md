@@ -1,3 +1,24 @@
+## 0.21.0
+
+New features:
+
+* `.asyncState` for creating a cell that evaluates to the state of a cell holding a `Future`.
+
+  `.asyncState` evaluates to an `AsyncState` which is a sealed union of:
+
+  * `AsyncStateLoading`
+  * `AsyncStateData`
+  * `AsyncStateError`
+
+Changes:
+
+* Convert `Maybe` to a sealed union of:
+
+  * `MaybeValue`
+  * `MaybeError`
+
+  This change does not break existing code.
+
 ## 0.20.4
 
 * Fixed bug with deferred cell initialization not happening in `MetaCell`:
