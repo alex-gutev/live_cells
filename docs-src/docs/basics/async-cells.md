@@ -502,6 +502,83 @@ When the cell holding the `Future` is updated, the value of
 `isCompleted` is also updated to reflect the state of the new
 `Future`.
 
+## Async State
+
+The
+[`.asyncState`](https://pub.dev/documentation/live_cells/latest/live_cells/WaitCellExtension/asyncState.html)
+property of cells holding `Future`s returns a cell that evaluates to
+an
+[`AsyncState`](https://pub.dev/documentation/live_cells/latest/live_cells/AsyncState-class.html)
+describing the state of the `Future`. This class a sealed union of the
+following classes, each of which represents a different state of the
+`Future`:
+
+* [`AsyncStateLoading`](https://pub.dev/documentation/live_cells/latest/live_cells/AsyncStateLoading-class.html)
+
+  This represents the state of a `Future` that is still pending.
+  
+* [`AsyncStateData`](https://pub.dev/documentation/live_cells/latest/live_cells/AsyncStateData-class.html)
+
+  This represents the state of a `Future` that has successfully
+  completed with a value, accessible via the `.value` property.
+
+* [`AsyncStateError`](https://pub.dev/documentation/live_cells/latest/live_cells/AsyncStateError-class.html)
+
+  This represents the state of a `Future` that has completed with an
+  error. The exception thrown is accessible via the `.error` property.
+
+This allows you to handle the different states using a `switch` state
+and pattern matching.
+
+```dart
+CellWidget.builder((_) {
+    FutureCell<String> futureCell;
+    ...
+    
+    return switch(futureCell.asyncState()) {
+      AsyncStateLoading() => Text('Loading...'),
+      AsyncStateData(:final value) => Text(value),
+      AsyncStateError(:final error) => Text('Error: $error')
+    };
+});
+```
+
+The `AsyncState` class also provides the following properties:
+
+* `isData`
+  
+  Does the state represent a `Future` which has completed to a `value`.
+  
+* `isError`
+
+  Does the state represent a `Future` which completed with an `error`.
+  
+* `isLoading`
+
+  Does the state represent a `Future` that is still pending.
+  
+* `lastValue`
+
+  The last value that was loaded successfully.
+  
+  * If the state is an `AsyncStateData` this is identical to the
+    `value` property.
+  * If the state is an `AsyncStateLoading` or `AsyncStateError`, this
+    is the `value` of the last `AsyncStateData` to be held in the cell.
+    
+  If a value hasn't been loaded successfully yet, the value of this
+  property is `null`.
+  
+  :::important
+  
+  If you replace a `Future` `a` held in the cell with another `Future`
+  `b` while `a` is still pending, `lastValue` will never be equal to
+  the completed value of `a` even if it completes successfully and `b`
+  completes with an error.
+  
+  :::
+
+
 ## Delays and Debouncing
 
 Live Cells provides a `delayed(...)` method on cells. This method
