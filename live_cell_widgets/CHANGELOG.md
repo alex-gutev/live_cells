@@ -1,3 +1,7 @@
+## 0.8.1
+
+* Increase `live_cells_core` version to `0.21.0`
+
 ## 0.8.0
 
 New widgets:
