@@ -93,10 +93,11 @@ class AsyncStateData<T> extends AsyncState<T> {
       identical(this, other) ||
       other is AsyncStateData &&
           runtimeType == other.runtimeType &&
-          value == other.value;
+          value == other.value &&
+          lastValue == other.lastValue;
 
   @override
-  int get hashCode => Object.hash(runtimeType, value);
+  int get hashCode => Object.hash(runtimeType, value, lastValue);
 }
 
 /// Represents the error state.
@@ -122,10 +123,11 @@ class AsyncStateError<T> extends AsyncState<T> {
       identical(this, other) ||
       other is AsyncStateError &&
           runtimeType == other.runtimeType &&
-          error == other.error;
+          error == other.error &&
+          lastValue == other.lastValue;
 
   @override
-  int get hashCode => Object.hash(runtimeType, error);
+  int get hashCode => Object.hash(runtimeType, error, lastValue);
 }
 
 /// Represents the loading state.
@@ -141,8 +143,10 @@ class AsyncStateLoading<T> extends AsyncState<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AsyncStateLoading && runtimeType == other.runtimeType;
+      other is AsyncStateLoading &&
+          runtimeType == other.runtimeType &&
+          lastValue == other.lastValue;
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, lastValue);
 }
