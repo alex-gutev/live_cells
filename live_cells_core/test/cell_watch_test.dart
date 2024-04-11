@@ -262,6 +262,122 @@ void main() {
     });
   });
 
+  group('Watch', () {
+    test('.afterInit() stops watch function on first call', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+
+      final listener = MockSimpleListener();
+
+      final watcher = Watch((state) {
+        final sum = a() + b();
+
+        state.afterInit();
+        listener();
+      });
+
+      addTearDown(() => watcher.stop());
+
+      verifyNever(listener());
+
+      a.value = 1;
+      b.value = 2;
+
+      verify(listener()).called(2);
+    });
+
+    test('.stop() stops watch function from being called', () {
+      final a = MutableCell(0);
+      final listener = MockSimpleListener();
+
+      final watcher = Watch((state) {
+        final val = a();
+
+        state.afterInit();
+        listener();
+
+        if (val > 5) {
+          state.stop();
+        }
+      });
+
+      addTearDown(() => watcher.stop());
+
+      verifyNever(listener());
+
+      a.value = 2;
+      a.value = 3;
+      a.value = 4;
+      a.value = 10;
+
+      verify(listener()).called(4);
+
+      a.value = 100;
+      a.value = 1;
+
+      verifyNever(listener());
+    });
+
+    test('Watch function not restarted after .stop() is called', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+
+      final listener = MockSimpleListener();
+
+      final watcher = Watch((state) {
+        final val = a();
+
+        state.afterInit();
+        listener();
+
+        if (val > 5) {
+          state.stop();
+          b();
+        }
+      });
+
+      addTearDown(() => watcher.stop());
+
+      verifyNever(listener());
+
+      a.value = 2;
+      a.value = 3;
+      a.value = 4;
+      a.value = 10;
+      b.value = 100;
+
+      verify(listener()).called(4);
+
+      a.value = 100;
+      a.value = 1;
+      b.value = 200;
+
+      verifyNever(listener());
+    });
+
+    test('.stop() works when called during initial call', () {
+      final a = MutableCell(10);
+      final listener = MockSimpleListener();
+
+      final watcher = Watch((state) {
+        a();
+        listener();
+        state.stop();
+        a();
+      });
+
+      addTearDown(() => watcher.stop());
+
+      verify(listener()).called(1);
+
+      a.value = 20;
+      a.value = 30;
+      a.value = 40;
+
+      verifyNever(listener());
+    });
+  });
+
   group('changesOnly cell option', () {
     test('Observer.update() called with didChange = false, when value unchanged.', () {
       final a = MutableCell([1, 2, 3]);
