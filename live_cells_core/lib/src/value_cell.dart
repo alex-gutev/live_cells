@@ -60,7 +60,7 @@ abstract class ValueCell<T> {
   ///
   /// **NOTE**: [CellWatcher.stop] must be called on the returned object when the
   /// watch function should no longer be called.
-  static CellWatcher watch(WatchCallback watch) => CellWatcher(watch);
+  static CellWatcher watch(WatchCallback watch) => CellWatcher()..init(watch);
 
   /// Stop computation of the current cell's value.
   ///

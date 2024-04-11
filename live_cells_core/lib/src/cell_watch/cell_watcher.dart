@@ -12,16 +12,15 @@ import '../value_cell.dart';
 /// A *cell watcher* is a function which is called whenever the values of the
 /// cells referenced within it change.
 class CellWatcher {
-  /// The watcher function
-  final WatchCallback watch;
-
-  /// Create a *cell watcher*
+  /// Initialize the *cell watcher*
   ///
-  /// The function [watch] is called whenever the values of the cells referenced
-  /// within the function changes. The function is always
-  /// called once immediately before this constructor returns.
-  CellWatcher(this.watch) :
-      _observer = _CellWatchObserver(watch);
+  /// The [watch] function is called immediately to determine the argument cells
+  /// referenced within it.
+  ///
+  /// **NOTE**: This method should be called at most once.
+  void init(WatchCallback watch) {
+    _observer.init(watch);
+  }
 
   /// Stop watching the referenced cells.
   ///
@@ -30,15 +29,51 @@ class CellWatcher {
     _observer.stop();
   }
 
+  /// Exit the watch function on the first call.
+  ///
+  /// When this method is called during the initial call to the watch function,
+  /// the watch function is exited immediately. On subsequent calls this method
+  /// does nothing
+  ///
+  /// **NOTE**: Don't use this method within a try block unless the try block
+  /// excludes [StopComputeException].
+  void afterInit() {
+    if (_observer._initialCall) {
+      throw ValueCell.none();
+    }
+  }
+
   // Private
   
-  final _CellWatchObserver _observer;
+  final _observer = _CellWatchObserver();
+}
+
+/// Watch (with handle argument) callback function signature.
+///
+/// This signatures adds a [CellWatcher] argument to the signature, which is
+/// the handle to the watch function's state.
+typedef WatchStateCallback = void Function(CellWatcher state);
+
+/// A cell watch function which receives the watch state as an argument.
+class Watch extends CellWatcher {
+  /// Register [watch] to be called whenever the values of the cells referenced within it change.
+  ///
+  /// The function [watch] is called, with the created [Watch] object passed to
+  /// it as an argument, whenever the values of the cells referenced within it
+  /// change. [watch] is called once before the constructor returns to determine
+  /// the initial cells referenced within it.
+  ///
+  /// This allows the [stop] and [afterInit] methods to be called from within
+  /// [watch].
+  Watch(WatchStateCallback watch) {
+    init(() => watch(this));
+  }
 }
 
 /// Cell observer which calls a *cell watcher* function
 class _CellWatchObserver implements CellObserver {
   /// The cell watcher function
-  final WatchCallback watch;
+  late final WatchCallback watch;
 
   /// Set of cells referenced within [watch]
   final Set<ValueCell> _arguments = HashSet();
@@ -49,9 +84,17 @@ class _CellWatchObserver implements CellObserver {
   /// Is the observer waiting for [update] to be called with didChange equal to true.
   var _waitingForChange = false;
 
-  /// Create a cell observer which calls *cell watcher* [watch]
-  _CellWatchObserver(this.watch) {
+  /// Has the watch function never been called?
+  var _initialCall = true;
+
+  /// Has the watch function been stopped?
+  var _stopped = false;
+
+  /// Initialize the observer with a [watch] function.
+  void init(WatchCallback watch) {
+    this.watch = watch;
     _callWatchFn();
+    _initialCall = false;
   }
 
   /// Remove the observer from the referenced cells
@@ -61,13 +104,14 @@ class _CellWatchObserver implements CellObserver {
     }
 
     _arguments.clear();
+    _stopped = true;
   }
 
   /// Call [watch] and track referenced cells
   void _callWatchFn() {
     try {
       ComputeArgumentsTracker.computeWithTracker(watch, (cell) {
-        if (!_arguments.contains(cell)) {
+        if (!_stopped && !_arguments.contains(cell)) {
           _arguments.add(cell);
           cell.addObserver(this);
         }

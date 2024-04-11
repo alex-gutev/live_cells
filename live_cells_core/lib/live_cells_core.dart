@@ -42,7 +42,8 @@ export 'src/maybe_cell/maybe.dart'
 export 'src/previous_values/prev_value_cell.dart'
     show PrevValueCell, PrevValueCellExtension;
 
-export 'src/cell_watch/cell_watcher.dart' show CellWatcher;
+export 'src/cell_watch/cell_watcher.dart'
+    show CellWatcher, Watch, WatchStateCallback;
 
 export 'src/restoration/restoration.dart' show RestorableCell, CellValueCoder;
 
