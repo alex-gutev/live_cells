@@ -1,3 +1,7 @@
+## 0.21.1
+
+* Fix bug in `AsyncState` comparison.
+
 ## 0.21.0
 
 New features:
