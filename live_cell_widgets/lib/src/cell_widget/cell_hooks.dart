@@ -185,7 +185,7 @@ class _CellStorageElement extends _CellWidgetElement implements CellHookContext 
   /// The watcher index is advanced when calling this method.
   CellWatcher getWatcher(VoidCallback watch) {
     if (_isFirstBuild) {
-      final watcher = CellWatcher(watch);
+      final watcher = ValueCell.watch(watch);
       _watchers.add(watcher);
       _curWatcher++;
 
