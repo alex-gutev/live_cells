@@ -1,3 +1,29 @@
+## 0.22.0
+
+New Features:
+
+* `Watch`
+
+  Registers a watch function that has access to its own handle. 
+
+  This can be used to 1) stop a watch function directly from within the watch function and 2)
+  prevent code from running on the first call of the watch function.
+
+  ```dart
+  final watch = Watch((state) {
+    final value = a();
+    
+    state.afterInit();
+  
+    // The following is only run after the first call
+    print('A = $value');
+    
+    if (value > 10) {
+      state.stop();
+    }
+  });
+  ```
+
 ## 0.21.1
 
 * Fix bug in `AsyncState` comparison.
