@@ -485,6 +485,70 @@ triggered when the button is pressed and long pressed respectively. Similarly,
     as: #CellText,
   ),
 
+  WidgetSpec<PageView>(
+    baseClass: #_PageViewInterface,
+    stateMixins: [#_CellPageViewMixin],
+
+    excludeProperties: [
+      #controller,
+      #onPageChanged
+    ],
+
+    addProperties: [
+      WidgetPropertySpec<int>(
+          name: #page,
+          defaultValue: null,
+          optional: false,
+          mutable: true,
+
+          documentation: '''Cell holding the selected page index.
+
+When the page is changed, the value of this cell is updated to reflect
+the selected page index. Likewise, when the value of this cell is changed,
+the current page is changed to the page corresponding to the value of
+the cell.
+
+The behaviour on page switching is affected by [animate], [duration] and
+[curve].'''
+      ),
+
+      WidgetPropertySpec<bool>(
+        name: #animate,
+        defaultValue: null,
+        optional: true,
+        documentation: '''Should the transition between pages be animated?
+
+If the value of this cell is true, page transitions are animated using
+the animation duration and curve function given in [duration] and [curve].
+[duration] and [curve] may not be null if the value of this cell is true.
+
+If this property is null, the page transitions are not animated.'''
+      ),
+
+      WidgetPropertySpec<Duration>(
+          name: #duration,
+          defaultValue: null,
+          optional: true,
+          documentation: '''Duration of the page transition animation.'''
+      ),
+
+      WidgetPropertySpec<Curve>(
+        name: #curve,
+        defaultValue: null,
+        optional: true,
+        documentation: '''Curve function to use for page transition animations.'''
+      )
+    ],
+
+    propertyValues: {
+      #controller: '_controller',
+
+      #onPageChanged: '''(index) => _withSuppressed(() {
+        widget.page.value = index;
+      })'''
+    }
+  ),
+
   WidgetSpec<Slider>(
       as: #CellSlider,
       mutableProperties: [#value],
@@ -756,3 +820,4 @@ part 'widgets.g.dart';
 
 part 'wrapper_interface.dart';
 part 'mixins.dart';
+part 'cell_page_view_mixin.dart';
