@@ -65,6 +65,12 @@ class WidgetSpec<T extends Object> {
   /// Documentation comment for the generated class.
   final String? documentation;
 
+  /// List of identifiers of mixins to mix into the generated widget [State] class.
+  ///
+  /// Note: if this is non-empty a [StatefulWidget] is generated instead of a
+  /// [StatelessWidget]
+  final List<Symbol> stateMixins;
+
   const WidgetSpec({
     this.as,
     this.typeArguments = const [],
@@ -79,7 +85,8 @@ class WidgetSpec<T extends Object> {
     this.interfaces = const [],
     this.baseClass = #CellWidget,
     this.buildMethod = #build,
-    this.documentation
+    this.documentation,
+    this.stateMixins = const []
   });
 }
 
