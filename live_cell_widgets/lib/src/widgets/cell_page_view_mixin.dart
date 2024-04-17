@@ -24,9 +24,42 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
   @override
   void initState() {
     super.initState();
+    _watchPage();
+  }
 
-    // TODO: Destroy and recreate watcher when a different page cell is given.
+  @override
+  void dispose() {
+    _pageWatcher.stop();
+    _controller.dispose();
 
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.page != oldWidget.page ||
+        widget.animate != oldWidget.animate ||
+        widget.duration != oldWidget.duration ||
+        widget.curve != oldWidget.curve) {
+      _pageWatcher.stop();
+      _watchPage();
+    }
+  }
+
+  /// Call [fn] while preventing changes to the page cell from affecting the page view.
+  void _withSuppressed(void Function() fn) {
+    try {
+      _suppress = true;
+      fn();
+    }
+    finally {
+      _suppress = false;
+    }
+  }
+
+  void _watchPage() {
     _pageWatcher = Watch((state) {
       final page = widget.page();
 
@@ -45,24 +78,5 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
         }
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _pageWatcher.stop();
-    _controller.dispose();
-
-    super.dispose();
-  }
-
-  /// Call [fn] while preventing changes to the page cell from affecting the page view.
-  void _withSuppressed(void Function() fn) {
-    try {
-      _suppress = true;
-      fn();
-    }
-    finally {
-      _suppress = false;
-    }
   }
 }
