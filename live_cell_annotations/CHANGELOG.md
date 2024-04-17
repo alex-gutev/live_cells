@@ -1,3 +1,9 @@
+## 0.4.3
+
+This release doesn't bring any new user-facing features.
+
+* Add `stateMixins` property to `WidgetSpec` annotation.
+
 ## 0.4.2
 
 * Add `nullable` option to `CellExtension` annotation.
