@@ -1,3 +1,36 @@
+## 0.9.0
+
+New widgets:
+
+* `CellPageView`
+
+  A `PageView` with the current page controlled by a `page` cell:
+
+  ```dart
+  final page = MutableCell(0);
+  
+  return CellPageView(
+    page: page,
+    animate: true.cell
+    duration: Duration(milliseconds: 100).cell,
+    curves: Curves.easeIn.cell
+    
+    children: [
+       Page1(),
+       Page2(),
+       ...
+    ].cell
+  );
+  ```
+  
+  The current page can be changed by setting the `page` cell.
+
+  ```dart
+  page.value = 2;
+  ```
+
+  The current page can also be observed by observing the same `page` cell.
+
 ## 0.8.2
 
 * Increase `live_cells_core` version to `0.22.0`
