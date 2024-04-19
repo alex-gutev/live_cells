@@ -2434,5 +2434,59 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Page 1'), findsOneWidget);
     });
+
+    testWidgets('isAnimating is updated when page is changed', (tester) async {
+      final page = MutableCell(0);
+      final animate = MutableCell(true);
+      final duration = MutableCell(const Duration(seconds: 100));
+
+      final next = ActionCell();
+      final prev = ActionCell();
+
+      final isAnimating = MetaCell<bool>();
+      final listener = MockSimpleListener();
+
+      isAnimating.listenable.addListener(listener);
+      addTearDown(() => isAnimating.listenable.removeListener(listener));
+
+      await tester.pumpWidget(TestApp(
+        child: CellPageView(
+          page: page,
+          animate: animate,
+          duration: duration,
+          curve: Curves.easeIn.cell,
+          isAnimating: isAnimating,
+          nextPage: next,
+          previousPage: prev,
+
+          children: const [
+            Text('Page 1'),
+            Text('Page 2'),
+            Text('Page 3')
+          ].cell,
+        ),
+      ));
+
+      expect(find.text('Page 1'), findsOneWidget);
+      expect(isAnimating.value, false);
+
+      page.value = 2;
+      expect(isAnimating.value, true);
+      await tester.pumpAndSettle();
+      expect(isAnimating.value, false);
+      expect(find.text('Page 3'), findsOneWidget);
+
+      prev.trigger();
+      expect(isAnimating.value, true);
+      await tester.pumpAndSettle();
+      expect(isAnimating.value, false);
+      expect(find.text('Page 2'), findsOneWidget);
+
+      next.trigger();
+      expect(isAnimating.value, true);
+      await tester.pumpAndSettle();
+      expect(isAnimating.value, false);
+      expect(find.text('Page 3'), findsOneWidget);
+    });
   });
 }
