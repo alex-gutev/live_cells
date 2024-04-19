@@ -537,6 +537,26 @@ If this property is null, the page transitions are not animated.'''
         defaultValue: null,
         optional: true,
         documentation: '''Curve function to use for page transition animations.'''
+      ),
+
+      WidgetPropertySpec<void>(
+          name: #nextPage,
+          defaultValue: null,
+          optional: true,
+          documentation: '''Action cell which triggers a transition to the next page.
+
+When this cell is triggered, the view's page is changed to the next page. [duration]
+and [curve] must be non-null, if this property is non-null.'''
+      ),
+
+      WidgetPropertySpec<void>(
+          name: #previousPage,
+          defaultValue: null,
+          optional: true,
+          documentation: '''Action cell which triggers a transition to the previous page.
+
+When this cell is triggered, the view's page is changed to the previous page. 
+[duration] and [curve] must be non-null, if this property is non-null.'''
       )
     ],
 

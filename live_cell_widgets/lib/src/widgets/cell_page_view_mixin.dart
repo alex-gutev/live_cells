@@ -7,16 +7,25 @@ abstract class _PageViewInterface extends StatefulWidget {
   ValueCell<Duration>? get duration;
   ValueCell<Curve>? get curve;
 
+  ValueCell<void>? get nextPage;
+  ValueCell<void>? get previousPage;
+
   const _PageViewInterface({super.key});
 }
 
 /// Implements the functionality of cell-based [PageView]s.
 mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
   /// Page view controller
-  final _controller = PageController();
+  late final PageController _controller;
 
   /// Selected page cell watcher
   late CellWatcher _pageWatcher;
+
+  /// Go to next page action cell watcher
+  CellWatcher? _nextPageWatcher;
+
+  /// Go to previous page action cell watcher
+  CellWatcher? _prevPageWatcher;
 
   /// Should updates to the selected page originating from the page view be suppressed?
   var _suppress = false;
@@ -24,12 +33,21 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
   @override
   void initState() {
     super.initState();
+
+    _controller = PageController(
+        initialPage: widget.page.value
+    );
+
     _watchPage();
+    _watchNextPage();
+    _watchPrevPage();
   }
 
   @override
   void dispose() {
     _pageWatcher.stop();
+    _nextPageWatcher?.stop();
+    _prevPageWatcher?.stop();
     _controller.dispose();
 
     super.dispose();
@@ -45,6 +63,22 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
         widget.curve != oldWidget.curve) {
       _pageWatcher.stop();
       _watchPage();
+    }
+
+    if (widget.nextPage != oldWidget.nextPage ||
+        widget.animate != oldWidget.animate ||
+        widget.duration != oldWidget.duration ||
+        widget.curve != oldWidget.curve) {
+      _nextPageWatcher?.stop();
+      _watchNextPage();
+    }
+
+    if (widget.previousPage != oldWidget.previousPage ||
+        widget.animate != oldWidget.animate ||
+        widget.duration != oldWidget.duration ||
+        widget.curve != oldWidget.curve) {
+      _prevPageWatcher?.stop();
+      _watchPrevPage();
     }
   }
 
@@ -78,5 +112,35 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
         }
       }
     });
+  }
+
+  void _watchNextPage() {
+    if (widget.nextPage != null) {
+      _nextPageWatcher = Watch((state) {
+        widget.nextPage!.observe();
+        
+        state.afterInit();
+
+        _controller.nextPage(
+            duration: widget.duration!.peek(),
+            curve: widget.curve!.peek()
+        );
+      });
+    }
+  }
+
+  void _watchPrevPage() {
+    if (widget.previousPage != null) {
+      _prevPageWatcher = Watch((state) {
+        widget.previousPage!.observe();
+
+        state.afterInit();
+
+        _controller.previousPage(
+            duration: widget.duration!.peek(),
+            curve: widget.curve!.peek()
+        );
+      });
+    }
   }
 }
