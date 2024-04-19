@@ -10,6 +10,8 @@ abstract class _PageViewInterface extends StatefulWidget {
   ValueCell<void>? get nextPage;
   ValueCell<void>? get previousPage;
 
+  MetaCell<bool>? get isAnimating;
+
   const _PageViewInterface({super.key});
 }
 
@@ -30,6 +32,9 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
   /// Should updates to the selected page originating from the page view be suppressed?
   var _suppress = false;
 
+  /// Is a page transition currently being animated?
+  final _isAnimating = MutableCell(false);
+  
   @override
   void initState() {
     super.initState();
@@ -41,6 +46,8 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
     _watchPage();
     _watchNextPage();
     _watchPrevPage();
+    
+    widget.isAnimating?.inject(_isAnimating);
   }
 
   @override
@@ -80,6 +87,10 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
       _prevPageWatcher?.stop();
       _watchPrevPage();
     }
+    
+    if (widget.isAnimating != oldWidget.isAnimating) {
+      widget.isAnimating?.inject(_isAnimating);
+    }
   }
 
   /// Call [fn] while preventing changes to the page cell from affecting the page view.
@@ -101,11 +112,11 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
 
       if (!_suppress) {
         if (widget.animate?.peek() ?? false) {
-          _controller.animateToPage(
+          _withAnimating(() => _controller.animateToPage(
               page,
               duration: widget.duration!.peek(),
               curve: widget.curve!.peek()
-          );
+          ));
         }
         else {
           _controller.jumpToPage(page);
@@ -121,10 +132,10 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
         
         state.afterInit();
 
-        _controller.nextPage(
+        _withAnimating(() => _controller.nextPage(
             duration: widget.duration!.peek(),
             curve: widget.curve!.peek()
-        );
+        ));
       });
     }
   }
@@ -136,11 +147,22 @@ mixin _CellPageViewMixin<T extends _PageViewInterface> on State<T> {
 
         state.afterInit();
 
-        _controller.previousPage(
+        _withAnimating(() => _controller.previousPage(
             duration: widget.duration!.peek(),
             curve: widget.curve!.peek()
-        );
+        ));
       });
+    }
+  }
+
+  /// Call [fn] and set [_isAnimating] to true until [fn] returns.
+  Future<void> _withAnimating(Future<void> Function() fn) async {
+    try {
+      _isAnimating.value = true;
+      await fn();
+    }
+    finally {
+      _isAnimating.value = false;
     }
   }
 }

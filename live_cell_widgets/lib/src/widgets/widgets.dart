@@ -557,6 +557,17 @@ and [curve] must be non-null, if this property is non-null.'''
 
 When this cell is triggered, the view's page is changed to the previous page. 
 [duration] and [curve] must be non-null, if this property is non-null.'''
+      ),
+
+      WidgetPropertySpec<bool>(
+        name: #isAnimating,
+        defaultValue: null,
+        optional: true,
+        meta: true,
+        documentation: '''[MetaCell] injected with a cell that is true while a page transition is in progress.
+        
+NOTE: This cell is only updated if the page change is triggered either by changing
+the value of the [page] cell or trigger [nextPage]/[previousPage].'''
       )
     ],
 
