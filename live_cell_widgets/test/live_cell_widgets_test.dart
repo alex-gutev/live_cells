@@ -2293,6 +2293,40 @@ void main() {
       expect(find.text('Page 2'), findsOneWidget);
     });
 
+    testWidgets('Value of page cell reflects current page', (tester) async {
+      final page = MutableCell(0);
+
+      await tester.pumpWidget(TestApp(
+        child: CellPageView(
+          page: page,
+          children: const [
+            Text('Page 1'),
+            Text('Page 2'),
+            Text('Page 3')
+          ].cell,
+        ),
+      ));
+
+      expect(find.text('Page 1'), findsOneWidget);
+      await tester.fling(find.text('Page 1'), const Offset(-100, 0), 900);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Page 2'), findsOneWidget);
+      expect(page.value, 1);
+
+      await tester.fling(find.text('Page 2'), const Offset(-100, 0), 900);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Page 3'), findsOneWidget);
+      expect(page.value, 2);
+
+      await tester.fling(find.text('Page 3'), const Offset(100, 0), 900);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Page 2'), findsOneWidget);
+      expect(page.value, 1);
+    });
+
     testWidgets('Triggering nextPage advances actual page.', (tester) async {
       final page = MutableCell(0);
       final next = ActionCell();
