@@ -2327,6 +2327,56 @@ void main() {
       expect(page.value, 1);
     });
 
+    testWidgets('Values of animate and duration cells are honored', (tester) async {
+      final page = MutableCell(0);
+      final animate = MutableCell(true);
+      final duration = MutableCell(const Duration(seconds: 100));
+
+      await tester.pumpWidget(TestApp(
+        child: CellPageView(
+          page: page,
+          animate: animate,
+          duration: duration,
+          curve: Curves.easeIn.cell,
+
+          children: const [
+            Text('Page 1'),
+            Text('Page 2'),
+            Text('Page 3')
+          ].cell,
+        ),
+      ));
+
+      expect(find.text('Page 1'), findsOneWidget);
+
+      page.value = 2;
+      await tester.pump();
+      expect(find.text('Page 1'), findsOneWidget);
+      expect(await tester.pumpAndSettle(const Duration(seconds: 10)), allOf(
+          greaterThanOrEqualTo(10),
+          lessThan(15)
+      ));
+      expect(find.text('Page 3'), findsOneWidget);
+
+      animate.value = false;
+      page.value = 1;
+      await tester.pump();
+      expect(find.text('Page 2'), findsOneWidget);
+
+
+      animate.value = true;
+      duration.inSeconds.value = 200;
+      page.value = 2;
+
+      await tester.pump();
+      expect(find.text('Page 2'), findsOneWidget);
+      expect(await tester.pumpAndSettle(const Duration(seconds: 10)), allOf(
+          greaterThanOrEqualTo(20),
+          lessThan(25)
+      ));
+      expect(find.text('Page 3'), findsOneWidget);
+    });
+
     testWidgets('Triggering nextPage advances actual page.', (tester) async {
       final page = MutableCell(0);
       final next = ActionCell();
@@ -2348,11 +2398,11 @@ void main() {
       expect(find.text('Page 1'), findsOneWidget);
 
       next.trigger();
-      await tester.pumpAndSettle(const Duration(seconds: 200));
+      await tester.pumpAndSettle();
       expect(find.text('Page 2'), findsOneWidget);
 
       next.trigger();
-      await tester.pumpAndSettle(const Duration(seconds: 200));
+      await tester.pumpAndSettle();
       expect(find.text('Page 3'), findsOneWidget);
     });
 
@@ -2377,11 +2427,11 @@ void main() {
       expect(find.text('Page 3'), findsOneWidget);
 
       prev.trigger();
-      await tester.pumpAndSettle(const Duration(seconds: 200));
+      await tester.pumpAndSettle();
       expect(find.text('Page 2'), findsOneWidget);
 
       prev.trigger();
-      await tester.pumpAndSettle(const Duration(seconds: 200));
+      await tester.pumpAndSettle();
       expect(find.text('Page 1'), findsOneWidget);
     });
   });
