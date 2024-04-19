@@ -2265,4 +2265,89 @@ void main() {
       verifyNoMoreInteractions(listener);
     });
   });
+
+  group('CellPageView', () {
+    testWidgets('Current page reflects value of page cell', (tester) async {
+      final page = MutableCell(0);
+
+      await tester.pumpWidget(TestApp(
+        child: CellPageView(
+          page: page,
+          children: const [
+            Text('Page 1'),
+            Text('Page 2'),
+            Text('Page 3')
+          ].cell,
+        ),
+      ));
+
+      expect(find.text('Page 1'), findsOneWidget);
+
+      page.value = 2;
+      await tester.pump();
+      expect(find.text('Page 3'), findsOneWidget);
+
+      page.value = 1;
+      await tester.pump();
+      expect(find.text('Page 2'), findsOneWidget);
+    });
+
+    testWidgets('Triggering nextPage advances actual page.', (tester) async {
+      final page = MutableCell(0);
+      final next = ActionCell();
+
+      await tester.pumpWidget(TestApp(
+        child: CellPageView(
+          page: page,
+          nextPage: next,
+          duration: const Duration(seconds: 100).cell,
+          curve: Curves.easeIn.cell,
+          children: const [
+            Text('Page 1'),
+            Text('Page 2'),
+            Text('Page 3')
+          ].cell,
+        ),
+      ));
+
+      expect(find.text('Page 1'), findsOneWidget);
+
+      next.trigger();
+      await tester.pumpAndSettle(const Duration(seconds: 200));
+      expect(find.text('Page 2'), findsOneWidget);
+
+      next.trigger();
+      await tester.pumpAndSettle(const Duration(seconds: 200));
+      expect(find.text('Page 3'), findsOneWidget);
+    });
+
+    testWidgets('Triggering previousPage changes actual page.', (tester) async {
+      final page = MutableCell(2);
+      final prev = ActionCell();
+
+      await tester.pumpWidget(TestApp(
+        child: CellPageView(
+          page: page,
+          previousPage: prev,
+          duration: const Duration(seconds: 100).cell,
+          curve: Curves.easeIn.cell,
+          children: const [
+            Text('Page 1'),
+            Text('Page 2'),
+            Text('Page 3')
+          ].cell,
+        ),
+      ));
+
+      expect(find.text('Page 3'), findsOneWidget);
+
+      prev.trigger();
+      await tester.pumpAndSettle(const Duration(seconds: 200));
+      expect(find.text('Page 2'), findsOneWidget);
+
+      prev.trigger();
+      await tester.pumpAndSettle(const Duration(seconds: 200));
+      expect(find.text('Page 1'), findsOneWidget);
+    });
+  });
 }
