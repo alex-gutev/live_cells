@@ -1,3 +1,22 @@
+## 0.23.0
+
+New features:
+
+* Watch function keys.
+
+  Watch functions can now be identified by keys, like cells, provided in the `ValueCell.watch` and
+  `Watch` constructor.
+
+  ```dart
+  final w1 = ValueCell.watch(() { ... }, key: 'key1');
+  final w2 = ValueCell.watch(() { ... }, key: 'key2');
+  
+  w1 == w2; // true
+  
+  // Stops both w1 and w2 since they have the same keys
+  w1.stop();
+  ```
+
 ## 0.22.0
 
 New Features:
