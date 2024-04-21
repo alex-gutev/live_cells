@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import '../base/auto_key.dart';
 import '../base/exceptions.dart';
 import '../base/types.dart';
 import '../base/cell_observer.dart';
@@ -22,7 +23,8 @@ class CellWatcher {
   /// If [key] is not null and a [CellWatcher] identified by [key] has already
   /// been created, and has not been stopped, this [CellWatcher] object
   /// references the same watch function.
-  CellWatcher({this.key}) {
+  CellWatcher({key}) {
+    this.key = key ?? AutoKey.autoWatchKey(this);
     _observer = _CellWatchTable.getObserver(key, _CellWatchObserver.new);
   }
 
@@ -58,12 +60,20 @@ class CellWatcher {
     }
   }
 
+  @override
+  bool operator ==(Object other) => other is CellWatcher &&
+      runtimeType == other.runtimeType &&
+      (key != null ? key == other.key : super == other);
+
+  @override
+  int get hashCode => Object.hash(runtimeType, key);
+
   // Private
   
   late final _CellWatchObserver _observer;
 
   /// Key identifying watch function
-  final dynamic key;
+  late final dynamic key;
 }
 
 /// Watch (with handle argument) callback function signature.
