@@ -219,4 +219,84 @@ void main() {
     expect(c1 != k2, isTrue);
     expect(c2 != k1, isTrue);
   });
+
+  test('Keys generated automatically for ValueCell.watch', () {
+    late final CellWatcher w1;
+    late final CellWatcher w2;
+    late final CellWatcher w3;
+
+    var i = 0;
+
+    AutoKey.withAutoWatchKeys((p0) => 'test_key_${i++}', () {
+      w1 = ValueCell.watch(() { });
+      w2 = ValueCell.watch(() { });
+      w3 = ValueCell.watch(() { }, key: 'preset_key');
+    });
+
+    final k1 = ValueCell.watch(() { }, key: 'test_key_0');
+    final k2 = ValueCell.watch(() { }, key: 'test_key_1');
+    final k3 = ValueCell.watch(() { }, key: 'preset_key');
+
+
+    expect(w1 == k1, isTrue);
+    expect(w2 == k2, isTrue);
+    expect(w3 == k3, isTrue);
+
+    expect(w1 != k3, isTrue);
+    expect(w3 != k1, isTrue);
+  });
+
+  test('Keys generated automatically for Watch', () {
+    late final Watch w1;
+    late final Watch w2;
+    late final Watch w3;
+
+    var i = 0;
+
+    AutoKey.withAutoWatchKeys((p0) => 'test_key_${i++}', () {
+      w1 = Watch((_) { });
+      w2 = Watch((_) { });
+      w3 = Watch((_) { }, key: 'preset_key');
+    });
+
+    final k1 = Watch((_) { }, key: 'test_key_0');
+    final k2 = Watch((_) { }, key: 'test_key_1');
+    final k3 = Watch((_) { }, key: 'preset_key');
+
+
+    expect(w1 == k1, isTrue);
+    expect(w2 == k2, isTrue);
+    expect(w3 == k3, isTrue);
+
+    expect(w1 != k3, isTrue);
+    expect(w3 != k1, isTrue);
+  });
+
+  test('Previous watch key generation function restored automatically', () {
+    late final CellWatcher w1;
+    late final CellWatcher w2;
+
+    var i = 0;
+
+    AutoKey.withAutoWatchKeys((_) => 'level1_key_${i++}', () {
+      AutoKey.withAutoWatchKeys((_) => 'level2_key_${i++}', () {
+        w1 = ValueCell.watch(() { });
+      });
+
+      w2 = ValueCell.watch(() { });
+    });
+
+    final w3 = ValueCell.watch(() { });
+
+    final k1 = ValueCell.watch(() { }, key: 'level2_key_0');
+    final k2 = ValueCell.watch(() { }, key: 'level1_key_1');
+
+    expect(w1 == k1, isTrue);
+    expect(w2 == k2, isTrue);
+
+    expect(w3.key, isNull);
+
+    expect(w1 != k2, isTrue);
+    expect(w2 != k1, isTrue);
+  });
 }
