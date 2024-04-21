@@ -486,6 +486,118 @@ void main() {
 
       verifyNever(listener());
     });
+
+    test('Watch with the same key initialized once', () {
+      final listener = MockSimpleListener();
+
+      final w1 = Watch((_) => listener(), key: 'watch-function-key1');
+      final w2 = Watch((_) => listener(), key: 'watch-function-key1');
+
+      addTearDown(() => w1.stop());
+      addTearDown(() => w2.stop());
+
+      verify(listener()).called(1);
+    });
+
+    test('Watch with the same key share the same state', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+
+      final w1 = Watch((_) {
+        a.observe();
+        listener();
+      }, key: 'watch-function-key1');
+
+      final w2 = Watch((_) {
+        a.observe();
+        listener();
+      }, key: 'watch-function-key1');
+
+      addTearDown(() => w1.stop());
+      addTearDown(() => w2.stop());
+
+      verify(listener()).called(1);
+
+      a.trigger();
+      verify(listener()).called(1);
+
+      a.trigger();
+      verify(listener()).called(1);
+
+      w1.stop();
+
+      a.trigger();
+      a.trigger();
+
+      verifyNever(listener());
+    });
+
+    test('Watch with keys do not leak resources', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+      final listener = MockSimpleListener();
+
+      final w1 = Watch((_) {
+        cell.observe();
+        listener();
+      }, key: 'watch-function-key1');
+
+      addTearDown(() => w1.stop());
+
+      w1.stop();
+      verify(listener()).called(1);
+      verify(resource.init()).called(1);
+      verify(resource.dispose()).called(1);
+
+      final w2 = Watch((_) {
+        cell.observe();
+        listener();
+      }, key: 'watch-function-key1');
+      addTearDown(() => w2.stop());
+
+      w2.stop();
+      verify(listener()).called(1);
+      verify(resource.init()).called(1);
+      verify(resource.dispose()).called(1);
+    });
+
+    test('Watch with different keys do not share the same state', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+
+      final w1 = Watch((_) {
+        a.observe();
+        listener();
+      }, key: 'watch-function-key1');
+
+      final w2 = Watch((_) {
+        a.observe();
+        listener();
+      }, key: 'watch-function-key2');
+
+      addTearDown(() => w1.stop());
+      addTearDown(() => w2.stop());
+
+      verify(listener()).called(2);
+
+      a.trigger();
+      verify(listener()).called(2);
+
+      a.trigger();
+      verify(listener()).called(2);
+
+      w1.stop();
+
+      a.trigger();
+      verify(listener()).called(1);
+
+      w2.stop();
+      a.trigger();
+
+      verifyNever(listener());
+    });
   });
 
   group('changesOnly cell option', () {
