@@ -7,13 +7,24 @@ import '../compute_cell/dynamic_compute_cell.dart';
 import '../stateful_cell/cell_update_manager.dart';
 import '../value_cell.dart';
 
+part 'cell_watch_table.dart';
+
 /// Maintains the state of a *cell watcher*.
 ///
 /// A *cell watcher* is a function which is called whenever the values of the
 /// cells referenced within it change.
 class CellWatcher {
-  /// Had the watch function been called once to initialize its dependencies.
+  /// Has the watch function been called once to initialize its dependencies.
   bool get isInitialized => !_observer._initialCall;
+
+  /// Create a [CellWatcher] identified by [key].
+  ///
+  /// If [key] is not null and a [CellWatcher] identified by [key] has already
+  /// been created, and has not been stopped, this [CellWatcher] object
+  /// references the same watch function.
+  CellWatcher({this.key}) {
+    _observer = _CellWatchTable.getObserver(key, _CellWatchObserver.new);
+  }
 
   /// Initialize the *cell watcher*
   ///
@@ -30,6 +41,7 @@ class CellWatcher {
   /// The [watch] function is not called again after this method is called.
   void stop() {
     _observer.stop();
+    _CellWatchTable.remove(key);
   }
 
   /// Exit the watch function on the first call.
@@ -48,7 +60,10 @@ class CellWatcher {
 
   // Private
   
-  final _observer = _CellWatchObserver();
+  late final _CellWatchObserver _observer;
+
+  /// Key identifying watch function
+  final dynamic key;
 }
 
 /// Watch (with handle argument) callback function signature.
@@ -68,7 +83,11 @@ class Watch extends CellWatcher {
   ///
   /// This allows the [stop] and [afterInit] methods to be called from within
   /// [watch].
-  Watch(WatchStateCallback watch) {
+  ///
+  /// If [key] is not null and a [CellWatcher] identified by [key] has already
+  /// been created, and has not been stopped, this [CellWatcher] object
+  /// references the same watch function.
+  Watch(WatchStateCallback watch, {super.key}) {
     init(() => watch(this));
   }
 }
