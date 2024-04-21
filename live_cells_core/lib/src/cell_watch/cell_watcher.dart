@@ -114,9 +114,11 @@ class _CellWatchObserver implements CellObserver {
 
   /// Initialize the observer with a [watch] function.
   void init(WatchCallback watch) {
-    this.watch = watch;
-    _callWatchFn();
-    _initialCall = false;
+    if (_initialCall) {
+      this.watch = watch;
+      _callWatchFn();
+      _initialCall = false;
+    }
   }
 
   /// Remove the observer from the referenced cells

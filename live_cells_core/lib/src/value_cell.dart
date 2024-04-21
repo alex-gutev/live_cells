@@ -58,9 +58,14 @@ abstract class ValueCell<T> {
   /// within the function with the [call] method changes. The function is always
   /// called once immediately before [watch] returns.
   ///
+  /// If [key] is not null and a [CellWatcher] identified by [key] has already
+  /// been created, and has not been stopped, this [CellWatcher] object
+  /// references the same watch function.
+  ///
   /// **NOTE**: [CellWatcher.stop] must be called on the returned object when the
   /// watch function should no longer be called.
-  static CellWatcher watch(WatchCallback watch) => CellWatcher()..init(watch);
+  static CellWatcher watch(WatchCallback watch, {key}) =>
+      CellWatcher(key: key)..init(watch);
 
   /// Stop computation of the current cell's value.
   ///
