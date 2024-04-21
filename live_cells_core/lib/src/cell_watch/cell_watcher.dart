@@ -60,6 +60,16 @@ class CellWatcher {
     }
   }
 
+  /// Stop the watch function identified by [key].
+  ///
+  /// If [key] does not identify a watch function, this method does nothing.
+  static void stopByKey(dynamic key) {
+    if (key != null) {
+      _CellWatchTable.maybeGetObserver(key)?.stop();
+      _CellWatchTable.remove(key);
+    }
+  }
+
   @override
   bool operator ==(Object other) => other is CellWatcher &&
       runtimeType == other.runtimeType &&

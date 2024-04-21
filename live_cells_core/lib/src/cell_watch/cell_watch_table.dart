@@ -12,6 +12,10 @@ class _CellWatchTable {
         : create();
   }
 
+  /// Get the observer of the watch function identified by [key] if any.
+  static _CellWatchObserver? maybeGetObserver(key) =>
+      key != null ? _observers[key] : null;
+
   /// Remove the observer associated with [key] if any
   static void remove(key) {
     _observers.remove(key);

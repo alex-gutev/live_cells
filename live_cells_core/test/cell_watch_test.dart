@@ -370,6 +370,30 @@ void main() {
 
       verifyNever(listener());
     });
+
+    test('CellWatcher.stopByKey stops keyed watch function', () {
+      final cell = ActionCell();
+      final listener = MockSimpleListener();
+
+      final w = ValueCell.watch(() {
+        cell.observe();
+        listener();
+      }, key: 'watch-function-key1');
+
+      addTearDown(() => w.stop());
+
+      verify(listener()).called(1);
+
+      cell.trigger();
+      verify(listener()).called(1);
+
+      CellWatcher.stopByKey('watch-function-key1');
+
+      cell.trigger();
+      cell.trigger();
+
+      verifyNever(listener());
+    });
   });
 
   group('Watch', () {
@@ -595,6 +619,30 @@ void main() {
 
       w2.stop();
       a.trigger();
+
+      verifyNever(listener());
+    });
+
+    test('CellWatcher.stopByKey stops keyed watch function', () {
+      final cell = ActionCell();
+      final listener = MockSimpleListener();
+
+      final w = Watch((_) {
+        cell.observe();
+        listener();
+      }, key: 'watch-function-key1');
+
+      addTearDown(() => w.stop());
+
+      verify(listener()).called(1);
+
+      cell.trigger();
+      verify(listener()).called(1);
+
+      CellWatcher.stopByKey('watch-function-key1');
+
+      cell.trigger();
+      cell.trigger();
 
       verifyNever(listener());
     });

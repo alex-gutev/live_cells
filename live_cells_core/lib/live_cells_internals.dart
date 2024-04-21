@@ -9,7 +9,7 @@ export 'src/value_cell.dart' show DependentCell;
 export 'src/compute_cell/dynamic_compute_cell.dart'
     show ComputeArgumentsTracker;
 
-export 'src/base/auto_key.dart' show AutoKey;
+export 'src/base/auto_key.dart' show GenerateCellKey, GenerateWatchKey, AutoKey;
 export 'src/base/keys.dart';
 
 export 'src/base/cell_equality_factory.dart'
