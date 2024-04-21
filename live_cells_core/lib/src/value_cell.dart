@@ -93,11 +93,20 @@ abstract class ValueCell<T> {
     return value;
   }
 
-  /// Synonym for [call].
+  /// Track this cell as an argument of the current compute/watch function.
   ///
   /// This is provided to increase readability in the case that the value of a
   /// cell is not used, but is required to trigger updates to the current cell.
-  T observe() => call();
+  void observe() {
+    ComputeArgumentsTracker.trackArgument(this);
+
+    try {
+      value;
+    }
+    catch (e) {
+      // Prevent exception from propagating to caller
+    }
+  }
 
   /// Returns a new [ValueCell] which compares the value of this cell to another cell for equality.
   ///
