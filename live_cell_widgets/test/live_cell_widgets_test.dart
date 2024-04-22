@@ -276,6 +276,54 @@ class CellWidgetTest8 extends CellWidget {
   }
 }
 
+/// Tests using ValueCell.watch in build method
+class CellWidgetTest9 extends CellWidget {
+  final ValueCell<void> cell;
+  final Function() listener1;
+  final Function() listener2;
+
+  const CellWidgetTest9(this.cell, this.listener1, this.listener2, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    ValueCell.watch(() {
+      cell.observe();
+      listener1();
+    });
+
+    ValueCell.watch(() {
+      cell.observe();
+      listener2();
+    });
+
+    return const SizedBox();
+  }
+}
+
+/// Tests using Watch in build method
+class CellWidgetTest10 extends CellWidget {
+  final ValueCell<void> cell;
+  final Function() listener1;
+  final Function() listener2;
+
+  const CellWidgetTest10(this.cell, this.listener1, this.listener2, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Watch((_) {
+      cell.observe();
+      listener1();
+    });
+
+    Watch((_) {
+      cell.observe();
+      listener2();
+    });
+
+    return const SizedBox();
+  }
+}
+
 /// Tests StaticWidget subclass with cells defined in build method
 class StaticWidgetTest1 extends StaticWidget {
   const StaticWidgetTest1({super.key});
@@ -1034,6 +1082,130 @@ void main() {
       verifyNever(tracker.init());
       verify(tracker.dispose()).called(1);
     });
+
+    testWidgets('Using ValueCell.watch in build method', (tester) async {
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+      final cell = ActionCell();
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          ValueCell.watch(() {
+            cell.observe();
+            listener1();
+          });
+
+          ValueCell.watch(() {
+            cell.observe();
+            listener2();
+          });
+
+          return Container();
+        }),
+      ));
+
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          ValueCell.watch(() {
+            cell.observe();
+            listener1();
+          });
+
+          ValueCell.watch(() {
+            cell.observe();
+            listener2();
+          });
+
+          return const SizedBox();
+        }),
+      ));
+
+      verifyNever(listener1());
+      verifyNever(listener2());
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(
+          const TestApp(child: SizedBox())
+      );
+
+      cell.trigger();
+      cell.trigger();
+
+      verifyNever(listener1());
+      verifyNever(listener2());
+    });
+
+    testWidgets('Using Watch in build method', (tester) async {
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+      final cell = ActionCell();
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          Watch((_) {
+            cell.observe();
+            listener1();
+          });
+
+          Watch((_) {
+            cell.observe();
+            listener2();
+          });
+
+          return Container();
+        }),
+      ));
+
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidget.builder((context) {
+          Watch((_) {
+            cell.observe();
+            listener1();
+          });
+
+          Watch((_) {
+            cell.observe();
+            listener2();
+          });
+
+          return const SizedBox();
+        }),
+      ));
+
+      verifyNever(listener1());
+      verifyNever(listener2());
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(
+          const TestApp(child: SizedBox())
+      );
+
+      cell.trigger();
+      cell.trigger();
+
+      verifyNever(listener1());
+      verifyNever(listener2());
+    });
   });
 
   group('CellWidget subclass', () {
@@ -1362,6 +1534,82 @@ void main() {
       // Test that the dependency cell state was disposed
       verifyNever(tracker.init());
       verify(tracker.dispose()).called(1);
+    });
+
+    testWidgets('Using ValueCell.watch in build method', (tester) async {
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+      final cell = ActionCell();
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidgetTest9(cell, listener1, listener2),
+      ));
+
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidgetTest9(cell, listener1, listener2),
+      ));
+
+      verifyNever(listener1());
+      verifyNever(listener2());
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(
+          const TestApp(child: SizedBox())
+      );
+
+      cell.trigger();
+      cell.trigger();
+
+      verifyNever(listener1());
+      verifyNever(listener2());
+    });
+
+    testWidgets('Using Watch in build method', (tester) async {
+      final listener1 = MockSimpleListener();
+      final listener2 = MockSimpleListener();
+      final cell = ActionCell();
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidgetTest10(cell, listener1, listener2),
+      ));
+
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(TestApp(
+        child: CellWidgetTest10(cell, listener1, listener2),
+      ));
+
+      verifyNever(listener1());
+      verifyNever(listener2());
+
+      cell.trigger();
+      verify(listener1()).called(1);
+      verify(listener2()).called(1);
+
+      await tester.pumpWidget(
+          const TestApp(child: SizedBox())
+      );
+
+      cell.trigger();
+      cell.trigger();
+
+      verifyNever(listener1());
+      verifyNever(listener2());
     });
   });
 

@@ -156,6 +156,9 @@ class _CellWidgetElement extends StatelessElement {
   /// The number of non-keyed cells defined in the [build] method.
   var _numCells = 0;
 
+  /// The number of watch functions registered in the [build] method.
+  var _numWatchers = 0;
+
   /// Generate a key for the cell at index [index].
   _WidgetCellKey _generateCellKey(ValueCell cell, int index) {
     if (_firstBuild) {
@@ -175,6 +178,25 @@ class _CellWidgetElement extends StatelessElement {
     return _cellKeyForIndex(index);
   }
 
+  /// Generate a key for the watch function at index [index].
+  _WidgetCellKey _generateWatchKey(CellWatcher watcher, int index) {
+    if (_firstBuild) {
+      assert(index == _numWatchers, 'This indicates a bug in live_cell_widgets. '
+          'Please report it.');
+      _numWatchers++;
+
+      return _WidgetCellKey(this, index);
+    }
+
+    assert(index < _numWatchers,
+      'More watch functions registered during this build of the '
+        'widget than in the previous build. This usually happens when a watch functionn '
+        'is registered conditionally or in a loop inside the CellWidget.build method.'
+    );
+
+    return _cellKeyForIndex(index);
+  }
+
   _WidgetCellKey _cellKeyForIndex(int index) {
     return _WidgetCellKey(this, index);
   }
@@ -184,6 +206,7 @@ class _CellWidgetElement extends StatelessElement {
     final Set<ValueCell> newArguments = HashSet();
 
     var keyIndex = 0;
+    var watchKeyIndex = 0;
 
     late final Widget widget;
 
@@ -198,15 +221,19 @@ class _CellWidgetElement extends StatelessElement {
       return _generateCellKey(cell, keyIndex++);
     }
 
-    try {
-      AutoKey.withAutoKeys(generateKey, () {
-        widget = ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
-          newArguments.add(cell);
+    generateWatchKey(CellWatcher watcher) => _generateWatchKey(watcher, watchKeyIndex++);
 
-          if (!_arguments.contains(cell)) {
-            _arguments.add(cell);
-            cell.addObserver(_observer);
-          }
+    try {
+      AutoKey.withAutoWatchKeys(generateWatchKey, () {
+        AutoKey.withAutoKeys(generateKey, () {
+          widget = ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
+            newArguments.add(cell);
+
+            if (!_arguments.contains(cell)) {
+              _arguments.add(cell);
+              cell.addObserver(_observer);
+            }
+          });
         });
       });
     }
@@ -240,6 +267,7 @@ class _CellWidgetElement extends StatelessElement {
     _arguments.clear();
 
     _disposeCells();
+    _stopWatchFunctions();
 
     super.unmount();
   }
@@ -252,6 +280,14 @@ class _CellWidgetElement extends StatelessElement {
     for (var i = 0; i < _numCells; i++) {
       final key = _cellKeyForIndex(i);
       CellState.maybeGetState(key)?.removeObserver(_holdObserver);
+    }
+  }
+
+  /// Stop all watch functions defined in the widget build method
+  void _stopWatchFunctions() {
+    for (var i = 0; i < _numWatchers; i++) {
+      final key = _cellKeyForIndex(i);
+      CellWatcher.stopByKey(key);
     }
   }
 }
