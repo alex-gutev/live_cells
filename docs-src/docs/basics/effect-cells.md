@@ -74,7 +74,7 @@ First let's define a widget, with an action cell that is triggered by
 a button.
 
 ```dart
-class Example extends CellWidget with CellHooks {
+class Example extends CellWidget {
   @override
   Widget build(BuildContext context) {
     final submit = ActionCell();
@@ -86,15 +86,6 @@ class Example extends CellWidget with CellHooks {
   }
 }
 ```
-:::note
-
-We've included the
-[`CellHooks`](https://pub.dev/documentation/live_cells/latest/live_cells/CellHooks-mixin.html)
-mixin since we'll be using the
-[`watch`](https://pub.dev/documentation/live_cells/latest/live_cells/CellHooks/watch.html)
-method.
-
-:::
 
 Now let's define the effect that is run when the `submit` action cell
 is triggered, which happens when the button is pressed.
@@ -165,7 +156,7 @@ cell watch function:
 Widget build(BuildContext context) {
   final submission = ...;
     
-  watch(() {
+  ValueCell.watch(() {
     final result = effect.awaited();
     
     if (context.mounted) {
@@ -194,15 +185,6 @@ Widget build(BuildContext context) {
 }
 ```
 
-:::note
-
-We've used the `watch` method provided by `CellHooks` rather than
-`ValueCell.watch` since watch functions defined using the former are
-registered once during the first build and automatically stopped when
-the widget is unmounted.
-
-:::
-
 A watch function is defined that observes the result of the side
 effect using `submission.awaited`. The watch function, which displays
 a dialog showing the status of the submission, is only run when the
@@ -228,7 +210,7 @@ function, but prevents unhandled `UninitializedCellError` and
 console.
 
 ```dart title="Silencing unhandled exception notices with .whenReady"
-watch(() {
+ValueCell.watch(() {
   final result = effect.awaited.whenReady();
     
   if (context.mounted) {
