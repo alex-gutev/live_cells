@@ -1,3 +1,43 @@
+## 0.23.0
+
+New features:
+
+* Watch function keys.
+
+  Watch functions can now be identified by keys, like cells, provided in the `ValueCell.watch` and
+  `Watch` constructor.
+
+  ```dart
+  final w1 = ValueCell.watch(() { ... }, key: 'key1');
+  final w2 = ValueCell.watch(() { ... }, key: 'key2');
+  
+  w1 == w2; // true
+  
+  // Stops both w1 and w2 since they have the same keys
+  w1.stop();
+  ```
+
+* Watch functions can now be defined directly in the build method of a `CellWidget` without
+  `CellHooks`:
+
+  ```dart
+  CellWidget.builder((_) {
+    final cell = MutableCell(...);
+  
+    ValueCell.watch(() {
+      final c = cell();
+      ...
+    })
+    ...
+  });
+  ```
+
+Breaking Changes:
+
+* `ValueCell.observe` no longer returns the value of the cell. Additionally, this eliminates the need
+  to catch exceptions originating from the cell when the caller is only interested in being notified 
+  when the value of the cell changes, but is not interested in the actual value. 
+
 ## 0.22.1
 
 New widgets:
