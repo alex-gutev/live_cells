@@ -1,3 +1,7 @@
+## 0.23.1
+
+* Fixed bug with automatic watch function key generation.
+
 ## 0.23.0
 
 New features:

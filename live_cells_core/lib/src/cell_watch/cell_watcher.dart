@@ -25,7 +25,7 @@ class CellWatcher {
   /// references the same watch function.
   CellWatcher({key}) {
     this.key = key ?? AutoKey.autoWatchKey(this);
-    _observer = _CellWatchTable.getObserver(key, _CellWatchObserver.new);
+    _observer = _CellWatchTable.getObserver(this.key, _CellWatchObserver.new);
   }
 
   /// Initialize the *cell watcher*
