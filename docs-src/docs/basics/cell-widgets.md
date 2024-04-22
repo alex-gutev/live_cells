@@ -172,24 +172,24 @@ not be able to persist the state of the defined cells between builds.
 
 ## Watching cells in widgets
 
-Watch functions can be defined within `CellWidget.builder` using
-the `.watch` method of the `context` provided to the build function.
-
-Unlike a watch function defined using `ValueCell.watch`, the watch
-function is automatically stopped when the `CellWidget`, in which it
-is defined, is removed from the tree.
+Like cells, watch functions can be defined, using `ValueCell.watch`
+directly in the build function of a `CellWidget`. The watch function
+is registered on the first build of the widget, and is automatically
+stopped when the widget is unmounted.
 
 :::note
 
-Watch functions defined with `.watch` are only set up once during the
-first build.
+The `watch` function is called once when it is registered during the
+first build of the widget. Rebuilding the widget does not cause the
+watch function to be called again.
 
 :::
 
 :::caution
 
-The same rules apply to the placement of `.watch`, that apply to the
-placement of cell definitions within `CellWidget.builder`.
+The same rules apply to the placement of watch function definitions,
+that apply to the placement of cell definitions within
+`CellWidget.builder`.
 
 :::
 
@@ -198,7 +198,7 @@ placement of cell definitions within `CellWidget.builder`.
 CellWidget.builder((context) {
     final count = MutableCell(0);
 
-    context.watch(() => print('Count ${count()}'));
+    ValueCell.watch(() => print('Count ${count()}'));
 
     return ElevatedButton(
         child: Text('${count()}'),
@@ -214,26 +214,18 @@ since its succinct and convenient. However, if you want to make a
 widget which will be used in more than one place, you should subclass
 `CellWidget` instead.
 
-A `CellWidget` subclass can observe and define cells in the `build`
-method, just like `CellWidget.builder`:
-
-:::important
-
-To use the `watch` method, the mixin `CellHooks` has to be included by
-the subclass, which provides the `watch` method directly to the
-subclass.
-
-:::
+A `CellWidget` subclass can observe and define cells, and watch
+functions, in the `build` method, just like `CellWidget.builder`:
 
 The counter example using a `CellWidget` subclass:
 
 ```dart title="CellWidget subclass"
-class Counter extends CellWidget with CellHooks {
+class Counter extends CellWidget {
     @override
     Widget build(BuildContext context) {
         final count = MutableCell(0);
 
-        watch(() => print('Count: ${count()}'));
+        ValueCell.watch(() => print('Count: ${count()}'));
 
         return ElevatedButton(
             child: Text('${count()}'),
