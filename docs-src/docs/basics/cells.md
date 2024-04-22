@@ -102,6 +102,69 @@ When you no longer need the watch function to be called, call `stop`
 on the `CellWatcher` object returned by `ValueCell.watch`.
 :::
 
+The
+[`Watch`](https://pub.dev/documentation/live_cells/latest/live_cells/Watch/Watch.html)
+constructor allows you to define a watch function which has access to
+its own handle. This allows you to define a watch function that can be
+stopped from within the function itself:
+
+```dart
+final a = MutableCell(0);
+
+Watch((handle) {
+    print('A = ${a()}')
+    
+    if (a() > 10) {
+        handle.stop();
+    }
+});
+```
+
+In this example a watch function is defined that prints the value of
+cell `a` to the console. When the value of `a` exceeds 10 the watch
+function is stopped, by calling `stop()` on the handle provided to the
+watch function.
+
+```dart
+a.value = 1;  // Prints: A = 1
+a.value = 5;  // Prints: A = 5
+a.value = 11; // Prints: A = 11
+
+// The watch function is stopped at this point
+
+a.value = 7; // Doesn't print anything
+```
+
+The *handle* also provides an
+[`afterInit()`](https://pub.dev/documentation/live_cells/latest/live_cells/CellWatcher/afterInit.html)
+method, which exits the watch function when it is called during the
+first call to the watch function. This is useful when you don't want
+the side effects defined in the watch function to run on the initial
+"setup" call.
+
+```dart
+Watch((handle) {
+    final value = a();
+    
+    handle.afterInit();
+    
+    print('A = ${a()}');
+});
+```
+
+In this example the value of `a` is only printed, when it changes
+**after** the watch function is defined with `Watch`. It is not
+printed when the watch function is called for the first time to
+determine its dependencies.
+
+:::important
+
+The watch function must observe at least one cell, by the function
+call syntax, before the `afterInit()` call. Otherwise, the watch
+function will not observe any cells and will never be called.
+
+:::
+
 ## Computed Cells
 
 A *computed cell*, defined using `ValueCell.computed`, is a cell
