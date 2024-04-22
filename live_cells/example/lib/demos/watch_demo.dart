@@ -5,7 +5,7 @@ import 'package:live_cells/live_cells.dart';
 ///
 /// NOTE: This example uses CellWidget and the watch method instead of
 /// ValueCell.watch.
-class WatchDemo2 extends StatelessWidget {
+class WatchDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,13 +22,18 @@ class WatchDemo2 extends StatelessWidget {
             // Register a watch function to be called when the values of counter1 and
             // counter2 change.
             //
-            // NOTE: Unlike in the previous example, this watch function is automatically
-            // removed once the widget is removed from the tree.
-            context.watch(() {
+            // NOTE: Due to being defined inside a CellWidget, this watch
+            // function is automatically stopped once the widget is removed
+            // from the tree.
+            Watch((state) {
               final snackbar = SnackBar(
                 content: Text('Counters: ${counter1()}, ${counter2()}'),
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
               );
+
+              /// Exit the watch function if this is the first time it is being
+              /// called.
+              state.afterInit();
 
               WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                 ScaffoldMessenger.of(context).showSnackBar(snackbar);

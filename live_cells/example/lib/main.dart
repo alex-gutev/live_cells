@@ -20,8 +20,7 @@ import 'demos/cell_switch_demo.dart';
 import 'demos/previous_value_demo.dart';
 import 'demos/subclass_demo1.dart';
 import 'demos/subclass_demo2.dart';
-import 'demos/watch_demo1.dart';
-import 'demos/watch_demo2.dart';
+import 'demos/watch_demo.dart';
 
 void main() {
   runApp(const MyApp());
@@ -173,18 +172,10 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('Watching Cells 1'),
+                        child: const Text('Watching Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => WatchDemo1()
-                          ));
-                        },
-                      ),
-                      ElevatedButton(
-                        child: const Text('Watching Cells 2'),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => WatchDemo2()
+                              builder: (context) => WatchDemo()
                           ));
                         },
                       ),
