@@ -1,3 +1,22 @@
+## 0.10.0
+
+New features:
+
+* Watch functions can now be defined directly in the build method of a `CellWidget` without 
+  `CellHooks`:
+
+  ```dart
+  CellWidget.builder((_) {
+    final cell = MutableCell(...);
+  
+    ValueCell.watch(() {
+      final c = cell();
+      ...
+    })
+    ...
+  });
+  ```
+
 ## 0.9.0
 
 New widgets:
