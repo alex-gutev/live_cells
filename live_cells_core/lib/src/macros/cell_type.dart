@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:macros/macros.dart';
 
+import 'data_class.dart';
+
 /// Generates an extension on [ValueCell] that provides accessors for the annotated class's properties
 ///
 /// This macro extends [ValueCell]'s holding instances of the annotated class,
@@ -31,7 +33,7 @@ import 'package:macros/macros.dart';
 ///   print('${person.firstName()} ${person.lastName()}: ${person.age()}');
 /// });
 /// ```
-macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
+macro class CellType implements ClassDeclarationsMacro, ClassDefinitionMacro, ClassTypesMacro {
   /// Identifiers reserved for [Object] properties.
   static const reservedObjectFieldNames = {
     'hashCode'
@@ -87,6 +89,9 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
   /// Should an extension on [MutableCell] be generated?
   final bool mutable;
 
+  /// Should extensions on nullable types also be generated?
+  final bool nullable;
+
   /// Generate an extension on [ValueCell] that provides accessors for the class's properties.
   ///
   /// An extension for [ValueCell]s holding instances of this class, is generated.
@@ -111,8 +116,11 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
   /// with the value of the property changed, is created and assigned to the
   /// cell.
   ///
+  /// If [nullable] is true, extensions on [ValueCell] and [MutableCell] holding
+  /// a nullable instance of the class are also generated.
   const CellType({
-    this.mutable = false
+    this.mutable = false,
+    this.nullable = false
   });
 
   @override
@@ -124,11 +132,24 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
       throw Exception('No public final properties found on class ${clazz.identifier.name}.');
     }
 
+    await const DataClass().buildDeclarationsForClass(clazz, builder);
+
     _generateCellExtension(
         clazz: clazz,
         builder: builder,
-        fields: fields
+        fields: fields,
+        nullable: false
     );
+
+    if (nullable) {
+      _generateCellExtension(
+          clazz: clazz,
+          builder: builder,
+          fields: fields,
+          nullable: true,
+          addImport: false
+      );
+    }
 
     if (mutable) {
       final fields = _filterReservedFields(
@@ -147,6 +168,11 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
           fields: fields
       );
     }
+  }
+
+  @override
+  FutureOr<void> buildDefinitionForClass(ClassDeclaration clazz, TypeDefinitionBuilder builder) async {
+    await const DataClass().buildDefinitionForClass(clazz, builder);
   }
 
   @override
@@ -169,16 +195,19 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
   void _generateCellExtension({
     required ClassDeclaration clazz,
     required MemberDeclarationBuilder builder,
-    required List<FieldDeclaration> fields
+    required List<FieldDeclaration> fields,
+    required bool nullable,
+    bool addImport = true
   }) {
     final className = clazz.identifier.name;
-    final extensionName = '${className}CellExtension';
+    final extensionName = '${className}Cell${nullable ? 'N' : ''}Extension';
 
     final typeParams = clazz.typeParameters.map((e) => e.code.parts).toList();
     final typeParamNames = clazz.typeParameters.map((e) => e.name);
 
     builder.declareInLibrary(DeclarationCode.fromParts([
-      "import 'package:live_cells_core/live_cells_core.dart';\n",
+      if (addImport) "import 'package:live_cells_core/live_cells_core.dart';\n",
+
       '/// Extends ValueCell with accessors for $className properties\n',
       'extension $extensionName',
 
@@ -197,12 +226,15 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
         '>'
       ],
 
+      if (nullable) '?',
+
       '> {\n',
 
       for (final field in fields)
         ..._generateCellAccessor(
             field: field,
-            className: className
+            className: className,
+            nullable: nullable
         ),
 
       '}'
@@ -213,15 +245,22 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
   List _generateCellAccessor({
     required FieldDeclaration field,
     required String className,
+    required bool nullable
   }) {
     final name = field.identifier.name;
-    final type = field.type.code;
+
+    final type = nullable
+        ? field.type.code.asNullable
+        : field.type.code;
+
     final keyClass = _propKeyClass(className);
+
+    final nullableSuffix = nullable ? '?' : '';
 
     return [
       'ValueCell<', type, '> ',
       'get $name => apply(\n',
-      '  (value) => value.$name,\n',
+      '  (value) => value$nullableSuffix.$name,\n',
       '  key: $keyClass(this, #$name)\n',
       ').store(changesOnly: true);'
     ];
@@ -262,26 +301,6 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
     ]));
   }
 
-  /// Generate a constructor to use within mutable cell extensions.
-  ///
-  /// The constructor provides named parameters that initialize each field in
-  /// [fields].
-  void _generateConstructor({
-    required String className,
-    required String constructorName,
-    required MemberDeclarationBuilder builder,
-    required List<FieldDeclaration> fields
-  }) {
-    builder.declareInType(DeclarationCode.fromParts([
-      '$className.$constructorName({',
-
-      for (final field in fields)
-        'required this.${field.identifier.name},',
-
-      '});'
-    ]));
-  }
-
   /// Generate an extension for [MutableCell]s holding instances of [clazz].
   void _generateMutableCellExtension({
     required ClassDeclaration clazz,
@@ -290,17 +309,9 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
   }) {
     final className = clazz.identifier.name;
     final extensionName = '${className}MutableCellExtension';
-    final constructorName = '_\$mutableCellExtension';
 
     final typeParams = clazz.typeParameters.map((e) => e.code.parts).toList();
     final typeParamNames = clazz.typeParameters.map((e) => e.name);
-
-    _generateConstructor(
-        className: clazz.identifier.name,
-        constructorName: constructorName,
-        builder: builder,
-        fields: fields
-    );
 
     builder.declareInLibrary(DeclarationCode.fromParts([
       '/// Extends ValueCell with accessors for $className properties\n',
@@ -323,12 +334,6 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
 
       '> {\n',
 
-      ..._generateCopyWithMethod(
-          className: className,
-          constructorName: constructorName,
-          fields: fields
-      ),
-
       for (final field in fields)
         ..._generateMutableAccessor(
             field: field,
@@ -337,31 +342,6 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
 
       '}'
     ]));
-  }
-
-  /// Generate a static `_$copyWith` method for use within the mutable cell extension.
-  List _generateCopyWithMethod({
-    required String className,
-    required String constructorName,
-    required List<FieldDeclaration> fields
-  }) {
-    return [
-      'static $className _\$copyWith($className \$instance, {',
-
-      for (final field in fields) ...[
-        field.type.code.asNullable,
-        ' ${field.identifier.name},'
-      ],
-
-      '}) {',
-      'return $className.$constructorName(',
-
-      for (final field in fields)
-        '${field.identifier.name}: ${field.identifier.name} ?? \$instance.${field.identifier.name},',
-
-      ');',
-      '}'
-    ];
   }
 
   /// Generate a property getter than returns a [MutableCell] observing [field].
@@ -377,7 +357,7 @@ macro class CellType implements ClassDeclarationsMacro, ClassTypesMacro {
       'MutableCell<', type, '> ',
       'get $name => mutableApply(\n',
       '  (value) => value.$name,\n',
-      '  (p) => value = _\$copyWith(value, $name: p),\n',
+      '  (p) => value = value.copyWith($name: p),\n',
       '  key: $keyClass(this, #$name),\n',
       '  changesOnly: true\n',
       ');'
