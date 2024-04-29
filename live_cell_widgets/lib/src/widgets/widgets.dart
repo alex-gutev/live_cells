@@ -162,7 +162,57 @@ See [CellCheckbox] for a more detailed explanation.
 '''
   ),
 
+  WidgetSpec<CheckboxMenuButton>(
+      mutableProperties: [#value],
+      excludeProperties: [#onChanged, #onHover, #onFocusChange],
+      propertyValues: {
+        #onChanged: 'enabled() ? (v) => value.value = v : null',
+        #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
+        #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
+      },
+
+      mixins: [#_HoverFocusChangeCellMixin],
+      baseClass: #_WrapperInterface,
+      buildMethod: #_buildWrappedWidget,
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            optional: false,
+            defaultValue: 'true',
+
+            documentation: 'Is the widget enabled for user input?'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onHover,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+        ),
+        WidgetPropertySpec<bool>(
+            name: #onFocusChange,
+            defaultValue: null,
+            optional: true,
+            meta: true,
+            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+        )
+      ],
+
+      documentation: '''A menu item with a [CellCheckbox], akin to [CheckboxMenuButton].
+  
+  See [CellCheckbox] for a more detailed explanation.'''
+  ),
+
+  WidgetSpec<CheckboxTheme>(
+    includeSuperProperties: [#child]
+  ),
+
   WidgetSpec<Chip>(),
+
+  WidgetSpec<ChipTheme>(
+    includeSuperProperties: [#child]
+  ),
 
   WidgetSpec<CircularProgressIndicator>(
       includeSuperProperties: [
@@ -189,6 +239,14 @@ See [CellCheckbox] for a more detailed explanation.
 
   WidgetSpec<ClipRect>(
       includeSuperProperties: [#child],
+  ),
+
+  WidgetSpec<ColoredBox>(
+    includeSuperProperties: [#child]
+  ),
+
+  WidgetSpec<ColorFiltered>(
+    includeSuperProperties: [#child]
   ),
 
   WidgetSpec<Column>(
