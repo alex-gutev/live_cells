@@ -87,6 +87,47 @@ mixin _HoverFocusChangeCellMixin on _WrapperInterface {
     return _buildWrappedWidget(context);
   }
 }
+
+/// Provides the [tap] cell
+mixin _OnTapCellMixin on _WrapperInterface {
+  /// Meta cell for an on tap event action cell
+  MetaCell<void>? get tap;
+
+  /// Get the action cell representing the on tap event
+  ActionCell _onTapCell(BuildContext context) => ActionCell(
+    key: _WidgetMixinCellKey(context, #tap)
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    if (tap != null) {
+      tap!.inject(_onTapCell(context));
+    }
+
+    return _buildWrappedWidget(context);
+  }
+}
+
+/// Provides the [press] cell
+mixin _onPressMixin on _WrapperInterface {
+  /// Meta cell for an on pressed event action cell
+  MetaCell<void>? get press;
+
+  /// Get the action cell representing the on pressed event.
+  ActionCell _pressActionCell(BuildContext context) => ActionCell(
+      key: _WidgetMixinCellKey(context, #press)
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    if (press != null) {
+      press!.inject(_pressActionCell(context));
+    }
+
+    return _buildWrappedWidget(context);
+  }
+}
+
 /// Key identifying a cell which represents an event.
 class _WidgetMixinCellKey extends CellKey2<BuildContext, Symbol> {
   _WidgetMixinCellKey(super.value1, super.value2);

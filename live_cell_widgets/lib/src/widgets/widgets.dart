@@ -208,10 +208,67 @@ See [CellCheckbox] for a more detailed explanation.
     includeSuperProperties: [#child]
   ),
 
+  WidgetSpec<CheckedPopupMenuItem>(
+    typeArguments: ['T'],
+    mutableProperties: [#value],
+    excludeProperties: [#onTap],
+
+    includeSuperProperties: [
+      #value,
+      #enabled,
+      #padding,
+      #height,
+      #labelTextStyle,
+      #mouseCursor,
+      #child
+    ],
+
+    propertyTypes: {
+      #value: 'T?'
+    },
+
+    propertyValues: {
+      #onTap: 'tap != null ? () => _onTapCell(context).trigger() : null'
+    },
+
+    mixins: [#_OnTapCellMixin],
+    baseClass: #_WrapperInterface,
+    buildMethod: #_buildWrappedWidget,
+
+    addProperties: [
+      WidgetPropertySpec<void>(
+        name: #tap,
+        defaultValue: null,
+        optional: true,
+        meta: true,
+        documentation: 'MetaCell for an action cell that is triggered when the '
+            'item is tapped.'
+      )
+    ]
+  ),
+
+  // TODO: Fix this
   WidgetSpec<Chip>(),
 
   WidgetSpec<ChipTheme>(
     includeSuperProperties: [#child]
+  ),
+
+  WidgetSpec<ChoiceChip>(
+      mutableProperties: [#selected],
+      excludeProperties: [#onSelected, #focusNode],
+      propertyValues: {
+        #onSelected: 'enabled() ? (v) => selected.value = v : null'
+      },
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            optional: false,
+            defaultValue: 'true',
+
+            documentation: 'Is the widget enabled for user input?'
+        )
+      ]
   ),
 
   WidgetSpec<CircularProgressIndicator>(
@@ -241,6 +298,51 @@ See [CellCheckbox] for a more detailed explanation.
       includeSuperProperties: [#child],
   ),
 
+  WidgetSpec<CloseButton>(
+    includeSuperProperties: [
+      #color,
+      #style
+    ],
+
+    addProperties: [
+      WidgetPropertySpec<bool>(
+          name: #enabled,
+          defaultValue: 'true',
+          optional: false,
+          documentation: 'Is the widget enabled for user input?'
+      ),
+      WidgetPropertySpec<void>(
+          name: #press,
+          defaultValue: null,
+          optional: true,
+          meta: true,
+          documentation: 'MetaCell for an ActionCell that is triggered when the '
+              'button is pressed.'
+      ),
+    ],
+
+    propertyValues: {
+      #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
+    },
+
+    mixins: [#_onPressMixin],
+    baseClass: #_WrapperInterface,
+    buildMethod: #_buildWrappedWidget,
+
+    documentation: '''A [CloseButton] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes mostly same arguments as the unnamed constructor of [CloseButton],
+but as [ValueCell]'s. This binds each property value to the [ValueCell] given
+in the constructor. If the cell value is changed, the value of the corresponding
+property to which it is bound is automatically updated to reflect the value of
+the cell.
+
+Instead of taking a callback function for [onPressed], the
+constructor accepts a [MetaCell] that is set to an [ActionCell] which is
+triggered when the button is pressed.
+'''
+  ),
+
   WidgetSpec<ColoredBox>(
     includeSuperProperties: [#child]
   ),
@@ -267,6 +369,10 @@ See [CellCheckbox] for a more detailed explanation.
 
   WidgetSpec<ConstrainedBox>(
       includeSuperProperties: [#child],
+  ),
+
+  WidgetSpec<ConstraintsTransformBox>(
+    includeSuperProperties: [#child]
   ),
 
   WidgetSpec<Container>(),
