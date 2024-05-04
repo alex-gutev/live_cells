@@ -1,3 +1,18 @@
+## 0.23.1
+
+New widgets:
+
+* `CellCheckboxMenuButton`
+* `CellCheckboxTheme`
+* `CellChipTheme`
+* `CellColoredBox`
+* `CellColoredFilter`
+* `CellCheckedPopupMenuItem`
+* `CellChoiceChip`
+* `CellCloseButton`
+* `CellContraintsTransformBox`
+
+
 ## 0.23.0
 
 New features:
