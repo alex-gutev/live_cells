@@ -132,14 +132,11 @@ recomputed when a condition is not met:
 final a = MutableCell(4);
 final b = ValueCell.computed(() => a() < 10 ? a() : ValueCell.none());
 
-a.value = 6;
-print(b.value); // Prints 6
+ValueCell.watch(() => print(b()));
 
-a.value = 15;
-print(b.value); // Prints 6
-
-a.value = 8;
-print(b.value); // Prints 8
+a.value = 6;  // Prints 6
+a.value = 15; // Prints 6
+a.value = 8;  // Prints 8
 ```
 
 If `ValueCell.none()` is called during the computation of the cell's
