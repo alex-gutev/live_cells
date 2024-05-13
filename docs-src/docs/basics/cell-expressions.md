@@ -83,50 +83,46 @@ Cells holding `bool` values are extended with the following methods:
 </dl>
 
 ```dart title="Logic and selection expressions"
+final a = MutableCell(true);
+final b = MutableCell(true);
+
+final c = MutableCell(1);
+final d = MutableCell(2);
+
 final cond = a.or(b);           // cond() is true when a() || b() is true
 final cell = cond.select(c, d); // when cond() is true, cell() == c() else cell() == d()
 
-a.value = true;
-c.value = 1;
-d.value = 2;
+ValueCell.watch(() => print('${cell()}'));
 
-print(cell.value); // Prints: 1
-
-a.value = false;
-b.value = false;
-
-print(cell.value); // Prints: 2
+a.value = true;  // Prints: 1
+a.value = false; // Prints: 2
 ```
 
 The second argument of `select` can be omitted, in which case the
 cell's value will not be updated if the condition is false:
 
 ```dart title="Single argument select"
-final cell = cond.select(c);
+final cond = MutableCell(false);
+final a = MutableCell(1);
 
-cond.value = true;
-a.value = 2;
+final cell = cond.select(a);
 
-print(cell.value); // Prints 2
+ValueCell.watch(() => print('${cell()}'));
 
-cond.value = false;
-a.value = 4;
+cond.value = true;  // Prints: 1
+a.value = 2;        // Prints: 2
 
-print(cell.value); // Prints 2
+cond.value = false; // Prints: 2
+a.value = 4;        // Prints: 2
 ```
 
 ## Aborting a computation
 
-In the previous section we saw that the `select` method creates a cell
-which does not update its argument when the condition cell is `false`
-and its only given one argument. Under the hood, `select` isn't some
-special kind of cell but uses `ValueCell.none` to abort the
-computation.
-
-When `ValueCell.none` is called inside a computed cell, the
-computation of the cell's value is aborted and its current value is
-preserved. This can be used to prevent a cell's value from being
-recomputed when a condition is not met:
+The computation of a computed cell's value can be aborted using
+`ValueCell.none()`. When `ValueCell.none` is called inside a computed
+cell, the value computation function is exited and the cell's current
+value is preserved. This can be used to prevent a cell's value from
+being recomputed when a condition is not met:
 
 ```dart title="Example of ValueCell.none()"
 final a = MutableCell(4);
