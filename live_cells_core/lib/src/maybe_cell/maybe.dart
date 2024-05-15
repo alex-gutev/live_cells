@@ -19,7 +19,7 @@ sealed class Maybe<T> {
   /// Create a [Maybe] that holds the exception [error].
   ///
   /// The resulting [Maybe] represents a failure to compute a value.
-  const factory Maybe.error(Object error) = MaybeError;
+  const factory Maybe.error(Object error, [StackTrace? stackTrace]) = MaybeError;
 
   /// Compute a value using [compute] and wrap the result in a [Maybe].
   ///
@@ -32,8 +32,8 @@ sealed class Maybe<T> {
     try {
       return Maybe(compute());
     }
-    catch (e) {
-      return Maybe.error(e);
+    catch (e, trace) {
+      return Maybe.error(e, trace);
     }
   }
 
@@ -46,18 +46,24 @@ sealed class Maybe<T> {
     try {
       return Maybe(await compute());
     }
-    catch (e) {
-      return Maybe.error(e);
+    catch (e, trace) {
+      return Maybe.error(e, trace);
     }
   }
 
   /// Get the wrapped value or throw [error] if this [Maybe] represents an error.
   T get unwrap {
-    if (error != null) {
-      throw error!;
-    }
+    switch (this) {
+      case MaybeValue<T>(:final value):
+        return value;
 
-    return value as T;
+      case MaybeError<T>(:final error, :final stackTrace):
+        if (stackTrace != null) {
+          Error.throwWithStackTrace(error, stackTrace);
+        }
+
+        throw error;
+    }
   }
 
   @override
@@ -90,11 +96,18 @@ class MaybeError<T> extends Maybe<T> {
   @override
   final Object error;
 
+  /// The stack trace of the thrown exception
+  ///
+  /// If non-null, the exception is rethrown with the stack trace when the
+  /// [Maybe] is unwrapped. If null, the exception is rethrown without the
+  /// stack trace.
+  final StackTrace? stackTrace;
+
   @override
   T? get value => null;
 
   /// Create a [Maybe] holding an [error]
-  const MaybeError(this.error) : super._internal();
+  const MaybeError(this.error, [this.stackTrace]) : super._internal();
 }
 
 /// A [MutableCell] holding a [Maybe] value
