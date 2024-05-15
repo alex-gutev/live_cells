@@ -1,3 +1,10 @@
+## 0.23.2
+
+Debugging Improvements:
+
+* Exceptions held in a `Maybe` are now rethrown with the stack trace of the exception, when the
+  `Maybe` is unwrapped with `Maybe.unwrap`.
+
 ## 0.23.1
 
 New widgets:
