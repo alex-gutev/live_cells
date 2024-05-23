@@ -262,8 +262,7 @@ false` for correctness.
 :::info
 
 `changesOnly: true` changes the evaluation semantics of the cell on
-which it is applied from lazy to eager. This will be explained in more
-detail in the next section of the documentation.
+which it is applied from lazy to eager.
 
 :::
 

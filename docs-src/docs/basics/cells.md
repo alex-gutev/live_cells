@@ -201,6 +201,57 @@ In this example:
 3. The value of `b` is set to `4`, which likewise also results in the
    sum being recomputed and the watch function being called.
 
+The `ValueCell.computed` constructor takes an optional `changesOnly`
+keyword argument, which allows you to control whether the computed
+cell notifies its observers if its value hasn't changed after a
+recomputation. By default this is `false`, which means the computed
+cell notifies its observers whenever it's value is recomputed. If
+`changeOnly` is `true`, the cell only notifies its observers if the
+new value of the cell is not equal to its previous value.
+
+This is demonstrated with the following example:
+
+```dart
+final a = MutableCell(0);
+final b = ValueCell.computed(() => a() % 2, changeOnly: true);
+
+ValueCell.watch(() => print('${b()}'));
+
+a.value = 1;
+a.value = 3;
+a.value = 5;
+a.value = 6;
+a.value = 8;
+```
+
+This results in the following being printed to the console:
+
+```
+0
+1
+0
+```
+
+Notice only three lines are printed to the console even though the
+value of the computed cell argument `a` was changed five times.
+
+If `changesOnly: true` is omitted from the definition of `b`, the
+following is printed to the console:
+
+```
+0
+1
+1
+1
+0
+0
+```
+
+Notice that a new line is printed to the console whenever the value of
+`a`, which is an argument of `b`, is changed. This is because `b`
+notifies its observers whenever the value of its argument `a` has
+changed even when `b`'s new value is equal to its previous value.
+
 ## Batch Updates
 
 The `MutableCell.batch` function allows the values of multiple mutable

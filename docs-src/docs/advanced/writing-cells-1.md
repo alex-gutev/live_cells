@@ -1,7 +1,7 @@
 ---
 title: ValueCell Subclass 1
 description: Part one of how to write your own ValueCell subclass
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 # ValueCell Subclass 1
