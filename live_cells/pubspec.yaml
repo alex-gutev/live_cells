@@ -3,7 +3,7 @@ description: A replacement for ChangeNotifier and ValueNotifier that is easier t
 version: 0.23.3
 repository: https://github.com/alex-gutev/live_cells/tree/master/live_cells
 issue_tracker: https://github.com/alex-gutev/live_cells/issues
-homepage: https://livecells.gutev.dev/
+homepage: https://livecell.gutev.dev/
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
