@@ -67,6 +67,19 @@ class _DynamicMutableComputeCellState<T>
   }) : super(arguments: {});
 
   @override
+  void init() {
+    try {
+      // Determine arguments referenced by cell
+      compute();
+    }
+    catch (e) {
+      // Prevent exception from propagating to caller
+    }
+
+    super.init();
+  }
+
+  @override
   T compute() => ComputeArgumentsTracker.computeWithTracker(cell._compute, (arg) {
     if (!arguments.contains(arg)) {
       if (isActive) {
