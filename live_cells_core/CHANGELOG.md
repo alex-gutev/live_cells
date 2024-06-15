@@ -1,3 +1,7 @@
+# 0.23.3
+
+* Fix issue with dependency tracking in mutable computed cells.
+
 ## 0.23.2
 
 Debugging Improvements:
