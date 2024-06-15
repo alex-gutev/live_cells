@@ -1,3 +1,7 @@
+## 0.23.4
+
+* Fix issue with mutable computed cell dependency tracking.
+
 ## 0.23.3
 
 * Update homepage URL
