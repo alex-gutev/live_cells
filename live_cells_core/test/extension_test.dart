@@ -980,6 +980,66 @@ void main() {
     group('.notNull', () {
       test('Returns value of cell when not null', () {
         final a = MutableCell<int?>(0);
+        final ValueCell<int?> cell = a;
+        final b = cell.notNull;
+
+        final observer = addObserver(b, MockValueObserver());
+        expect(b.value, 0);
+
+        a.value = 1;
+        a.value = 2;
+        a.value = 3;
+
+        expect(observer.values, equals([1, 2, 3]));
+      });
+
+      test('Throws NullCellError when value is null', () {
+        final a = MutableCell<int?>(null);
+        final ValueCell<int?> cell = a;
+        final b = cell.notNull;
+
+        observeCell(b);
+        expect(() => b.value, throwsA(isA<NullCellError>()));
+
+        a.value = 1;
+        expect(b.value, 1);
+
+        a.value = null;
+        expect(() => b.value, throwsA(isA<NullCellError>()));
+
+        a.value = 2;
+        expect(b.value, 2);
+      });
+
+      test('Compares == when same cell', () {
+        final m = MutableCell<int?>(0);
+        final ValueCell<int?> a = m;
+
+        final c1 = a.notNull;
+        final c2 = a.notNull;
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        final m1 = MutableCell<int?>(0);
+        final m2 = MutableCell<int?>(0);
+
+        final ValueCell<int?> a = m1;
+        final ValueCell<int?> b = m2;
+
+        final c1 = a.notNull;
+        final c2 = b.notNull;
+
+        expect(c1 != c2, isTrue);
+        expect(c1 == c1, isTrue);
+      });
+    });
+
+    group('Mutable .notNull', () {
+      test('Returns value of cell when not null', () {
+        final a = MutableCell<int?>(0);
         final b = a.notNull;
 
         final observer = addObserver(b, MockValueObserver());

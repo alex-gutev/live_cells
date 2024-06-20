@@ -175,7 +175,7 @@ extension ParseMaybeNumExtension on MaybeCell<num> {
       );
 }
 
-/// Provides methods for checking for handling null values.
+/// Provides methods that check for and handle null values.
 extension NullCheckExtension<T> on ValueCell<T?> {
   /// A cell that is guaranteed to hold a non-null value.
   ///
@@ -197,9 +197,22 @@ extension NullCheckExtension<T> on ValueCell<T?> {
   ).store(changesOnly: true);
 }
 
+/// Provides methods that check for null values.
+extension MutableNullCheckExtension<T> on MutableCell<T> {
+  /// MutableCell version of [NullCheckExtension.notNull].
+  MutableCell<T> get notNull => (this as ValueCell<T?>).notNull.mutableApply((p0) => p0, (p0) {
+    value = p0;
+  }, key: _MutableNullCheckExtensionKey(this));
+}
+
 /// Key identifying a cell created with [NullCheckExtension.notNull].
 class _NullCheckExtensionKey<T> extends CellKey1<ValueCell<T?>> {
   _NullCheckExtensionKey(super.value1);
+}
+
+/// Key identifying a cell created with [MutableNullCheckExtension.notNull].
+class _MutableNullCheckExtensionKey<T> extends CellKey1<MutableCell<T>> {
+  _MutableNullCheckExtensionKey(super.value);
 }
 
 /// Key identifying a cell created with [NullCheckExtension.coalesce].
