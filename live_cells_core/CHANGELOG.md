@@ -1,3 +1,9 @@
+# 0.23.4
+
+New features:
+
+* `.notNull` extension method on `MutableCell`
+
 # 0.23.3
 
 * Fix issue with dependency tracking in mutable computed cells.
