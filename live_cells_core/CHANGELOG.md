@@ -1,3 +1,7 @@
+# 0.23.5
+
+* Fix issue with return type of `MutableCell.notNull` extension method
+
 # 0.23.4
 
 New features:

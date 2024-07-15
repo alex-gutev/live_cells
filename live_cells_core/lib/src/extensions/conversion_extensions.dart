@@ -198,7 +198,7 @@ extension NullCheckExtension<T> on ValueCell<T?> {
 }
 
 /// Provides methods that check for null values.
-extension MutableNullCheckExtension<T> on MutableCell<T> {
+extension MutableNullCheckExtension<T> on MutableCell<T?> {
   /// MutableCell version of [NullCheckExtension.notNull].
   MutableCell<T> get notNull => (this as ValueCell<T?>).notNull.mutableApply((p0) => p0, (p0) {
     value = p0;
