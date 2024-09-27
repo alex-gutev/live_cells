@@ -3,6 +3,7 @@ import 'package:live_cells_core/src/extensions/transform_extension.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+import 'test_classes.dart';
 import 'util.dart';
 import 'util.mocks.dart';
 
@@ -3526,27 +3527,30 @@ void main() {
   group('TransformExtension', () {
     test('ValueCell can be transformed', () {
       final ValueCell<TestBaseClass> cell = ValueCell.value(
-        TestInheritedClass(testValue: "base", testValueTwo: 2),
+        TestInheritedClass(testValue: "child", testValueTwo: 2),
       );
 
       final castedCell = cell.transform<TestInheritedClass>();
 
-      expect(castedCell().testValueTwo, 2);
+      expect(castedCell.testValue(), "child");
+      expect(castedCell.testValueTwo(), 2);
     });
 
     test('MutableCell can be transformed', () {
       final MutableCell<TestBaseClass> cell =
           MutableCell(TestBaseClass(testValue: "base"));
 
-      final childCell = MutableCell(
-        TestInheritedClass(testValue: "child", testValueTwo: 2),
-      );
+      final childClass =
+          TestInheritedClass(testValue: "child", testValueTwo: 2);
 
-      cell.value = childCell();
+      cell.value = childClass;
 
       final castedCell = cell.transform<TestInheritedClass>();
+      castedCell.testValue.value = "transformed";
+      castedCell.testValueTwo.value = 3;
 
-      expect(castedCell().testValueTwo, 2);
+      expect(cell().testValue, "transformed");
+      expect(castedCell().testValueTwo, 3);
     });
   });
 }

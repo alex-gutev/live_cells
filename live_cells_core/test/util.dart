@@ -94,23 +94,6 @@ class MockResource extends Mock implements TestResource {
   void dispose();
 }
 
-class TestBaseClass {
-  final String testValue;
-
-  const TestBaseClass({
-    required this.testValue,
-  });
-}
-
-class TestInheritedClass extends TestBaseClass {
-  final int testValueTwo;
-
-  const TestInheritedClass({
-    required super.testValue,
-    required this.testValueTwo,
-  });
-}
-
 class ManagedCellState extends CellState {
   final TestResource resource;
 
