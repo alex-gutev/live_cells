@@ -1,7 +1,9 @@
 import 'package:live_cells_core/live_cells_core.dart';
+import 'package:live_cells_core/src/extensions/transform_extension.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+import 'test_classes.dart';
 import 'util.dart';
 import 'util.mocks.dart';
 
@@ -16,7 +18,8 @@ void main() {
       expect(c.value, equals(11));
     });
 
-    test('a - b creates ValueCell which is equal to the difference of a and b', () {
+    test('a - b creates ValueCell which is equal to the difference of a and b',
+        () {
       final a = 13.cell;
       final b = 20.cell;
 
@@ -25,7 +28,8 @@ void main() {
       expect(c.value, equals(-7));
     });
 
-    test('a * b creates ValueCell which is equal to the product of a and b', () {
+    test('a * b creates ValueCell which is equal to the product of a and b',
+        () {
       final a = 10.cell;
       final b = 8.cell;
 
@@ -34,7 +38,8 @@ void main() {
       expect(c.value, equals(80));
     });
 
-    test('a / b creates ValueCell which is equal to the quotient of a and b', () {
+    test('a / b creates ValueCell which is equal to the quotient of a and b',
+        () {
       final a = 7.cell;
       final b = 2.cell;
 
@@ -43,7 +48,9 @@ void main() {
       expect(c.value, equals(3.5));
     });
 
-    test('a ~/ b creates ValueCell which is equal to the truncated quotient of a and b', () {
+    test(
+        'a ~/ b creates ValueCell which is equal to the truncated quotient of a and b',
+        () {
       final a = 7.cell;
       final b = 2.cell;
 
@@ -61,8 +68,9 @@ void main() {
       expect(c.value, equals(2));
     });
 
-
-    test('a.remainder(b) creates ValueCell which is equal to the remainder of a / b', () {
+    test(
+        'a.remainder(b) creates ValueCell which is equal to the remainder of a / b',
+        () {
       final a = 7.cell;
       final b = 2.cell;
 
@@ -104,7 +112,8 @@ void main() {
       expect(gt.value, isTrue);
     });
 
-    test('a > b creates ValueCell which equals true if a is greater than b', () {
+    test('a > b creates ValueCell which equals true if a is greater than b',
+        () {
       final a = 3.cell;
       final b = 8.cell;
 
@@ -115,7 +124,8 @@ void main() {
       expect(gt.value, isTrue);
     });
 
-    test('a >= b creates ValueCell which equals true if a is greater than b', () {
+    test('a >= b creates ValueCell which equals true if a is greater than b',
+        () {
       final a = 3.cell;
       final b = 8.cell;
 
@@ -161,7 +171,8 @@ void main() {
       expect(d.value, isTrue);
     });
 
-    test('a.isFinite creates ValueCell which equals false if a is not finite', () {
+    test('a.isFinite creates ValueCell which equals false if a is not finite',
+        () {
       final a = 3.cell;
       final b = 0.cell;
       final c = a / b;
@@ -170,7 +181,8 @@ void main() {
       expect(d.value, isFalse);
     });
 
-    test('a.isInfinite creates ValueCell which equals false if a is finite', () {
+    test('a.isInfinite creates ValueCell which equals false if a is finite',
+        () {
       final a = 3.cell;
       final c = a / a;
       final d = c.isInfinite;
@@ -178,7 +190,8 @@ void main() {
       expect(d.value, isFalse);
     });
 
-    test('a.isInfinite creates ValueCell which equals true if a is not finite', () {
+    test('a.isInfinite creates ValueCell which equals true if a is not finite',
+        () {
       final a = 3.cell;
       final b = 0.cell;
       final c = a / b;
@@ -360,7 +373,9 @@ void main() {
         expect(observer.values, equals(['false', 'else', 'true']));
       });
 
-      test('Does not update value when condition is false and ifFalse is not given', () {
+      test(
+          'Does not update value when condition is false and ifFalse is not given',
+          () {
         final a = MutableCell('true');
         final cond = MutableCell(true);
 
@@ -415,8 +430,7 @@ void main() {
         final b = ValueCell.computed(() {
           if (a() < 0) {
             throw Exception('A generic exception');
-          }
-          else if (a() == 0) {
+          } else if (a() == 0) {
             throw ArgumentError('A cannot be 0');
           }
 
@@ -538,8 +552,7 @@ void main() {
         final b = ValueCell.computed(() {
           if (a() < 0) {
             throw 'A generic exception';
-          }
-          else if (a() == 0) {
+          } else if (a() == 0) {
             throw ArgumentError('Cannot be zero');
           }
 
@@ -569,8 +582,7 @@ void main() {
         final b = ValueCell.computed(() {
           if (a() < 0) {
             throw 'A generic exception';
-          }
-          else if (a() == 0) {
+          } else if (a() == 0) {
             throw ArgumentError('Cannot be zero');
           }
 
@@ -661,7 +673,8 @@ void main() {
 
       test('Passes through init value when uninitialized', () {
         final a = MutableCell(0);
-        final b = ValueCell.computed(() => a() == 0 ? throw UninitializedCellError() : a());
+        final b = ValueCell.computed(
+            () => a() == 0 ? throw UninitializedCellError() : a());
 
         final init = MutableCell(-1);
         final c = b.initialValue(init);
@@ -715,7 +728,8 @@ void main() {
     group('.whenReady', () {
       test('Stops execution of watch function on UninitializedCellError', () {
         final a = MutableCell(-1);
-        final cell = ValueCell.computed(() => a() > 0 ? a() : throw UninitializedCellError());
+        final cell = ValueCell.computed(
+            () => a() > 0 ? a() : throw UninitializedCellError());
 
         final listener = MockSimpleListener();
         final watch = ValueCell.watch(() {
@@ -735,7 +749,8 @@ void main() {
 
       test('Stops execution of watch function on PendingAsyncValueError', () {
         final a = MutableCell(-1);
-        final cell = ValueCell.computed(() => a() > 0 ? a() : throw PendingAsyncValueError());
+        final cell = ValueCell.computed(
+            () => a() > 0 ? a() : throw PendingAsyncValueError());
 
         final listener = MockSimpleListener();
         final watch = ValueCell.watch(() {
@@ -756,7 +771,8 @@ void main() {
   });
 
   group('Type Conversions', () {
-    test('ParseIntExtension.mutableString() converts argument cell to string', () {
+    test('ParseIntExtension.mutableString() converts argument cell to string',
+        () {
       final a = MutableCell(1);
       final strA = a.mutableString();
 
@@ -768,7 +784,9 @@ void main() {
       expect(strA.value, equals('5'));
     });
 
-    test('ParseIntExtension.mutableString() sets argument cell to parsed integer', () {
+    test(
+        'ParseIntExtension.mutableString() sets argument cell to parsed integer',
+        () {
       final a = MutableCell(1);
       final strA = a.mutableString();
 
@@ -780,12 +798,12 @@ void main() {
       expect(a.value, equals(32));
     });
 
-    test('ParseIntExtension.mutableString() sets cell to errorValue on errors during parsing integer', () {
+    test(
+        'ParseIntExtension.mutableString() sets cell to errorValue on errors during parsing integer',
+        () {
       final a = MutableCell(1);
 
-      final strA = a.mutableString(
-          errorValue: 7.cell
-      );
+      final strA = a.mutableString(errorValue: 7.cell);
 
       strA.value = '25';
       expect(a.value, equals(25));
@@ -797,7 +815,9 @@ void main() {
       expect(a.value, equals(16));
     });
 
-    test('ParseMaybeIntExtension.mutableString() forwards errors to argument cell', () {
+    test(
+        'ParseMaybeIntExtension.mutableString() forwards errors to argument cell',
+        () {
       final a = MutableCell(1);
       final maybe = a.maybe();
       final error = maybe.error;
@@ -820,7 +840,9 @@ void main() {
       expect(error.value, isNull);
     });
 
-    test('ParseDoubleExtension.mutableString() converts argument cell to string', () {
+    test(
+        'ParseDoubleExtension.mutableString() converts argument cell to string',
+        () {
       final a = MutableCell(1.0);
       final strA = a.mutableString();
 
@@ -832,7 +854,9 @@ void main() {
       expect(strA.value, equals('7.5'));
     });
 
-    test('ParseDoubleExtension.mutableString() sets argument cell to parsed double', () {
+    test(
+        'ParseDoubleExtension.mutableString() sets argument cell to parsed double',
+        () {
       final a = MutableCell(1.0);
       final strA = a.mutableString();
 
@@ -844,12 +868,12 @@ void main() {
       expect(a.value, equals(3.5));
     });
 
-    test('ParseDoubleExtension.mutableString() sets cell to errorValue on errors during parsing double', () {
+    test(
+        'ParseDoubleExtension.mutableString() sets cell to errorValue on errors during parsing double',
+        () {
       final a = MutableCell(1.0);
 
-      final strA = a.mutableString(
-          errorValue: 2.5.cell
-      );
+      final strA = a.mutableString(errorValue: 2.5.cell);
 
       strA.value = '7.5';
       expect(a.value, equals(7.5));
@@ -861,7 +885,9 @@ void main() {
       expect(a.value, equals(9.0));
     });
 
-    test('ParseMaybeDoubleExtension.mutableString() forwards errors to argument cell', () {
+    test(
+        'ParseMaybeDoubleExtension.mutableString() forwards errors to argument cell',
+        () {
       final a = MutableCell(1.0);
       final maybe = a.maybe();
       final error = maybe.error;
@@ -884,7 +910,8 @@ void main() {
       expect(error.value, isNull);
     });
 
-    test('ParseNumExtension.mutableString() converts argument cell to string', () {
+    test('ParseNumExtension.mutableString() converts argument cell to string',
+        () {
       final a = MutableCell<num>(1);
       final strA = a.mutableString();
 
@@ -897,7 +924,8 @@ void main() {
       expect(observer.values, equals(['7.5', '3']));
     });
 
-    test('ParseNumExtension.mutableString() sets argument cell to parsed num', () {
+    test('ParseNumExtension.mutableString() sets argument cell to parsed num',
+        () {
       final a = MutableCell<num>(1);
       final strA = a.mutableString();
 
@@ -910,12 +938,12 @@ void main() {
       expect(observer.values, equals([3.5, 100]));
     });
 
-    test('ParseNumExtension.mutableString() sets cell to errorValue on errors during parsing num', () {
+    test(
+        'ParseNumExtension.mutableString() sets cell to errorValue on errors during parsing num',
+        () {
       final a = MutableCell<num>(0);
 
-      final strA = a.mutableString(
-          errorValue: 8.cell
-      );
+      final strA = a.mutableString(errorValue: 8.cell);
 
       strA.value = '7.5';
       expect(a.value, equals(7.5));
@@ -925,10 +953,10 @@ void main() {
 
       strA.value = '5';
       expect(a.value, equals(5));
-
     });
 
-    test('ParseNumExtension.mutableString() forwards errors to argument cell', () {
+    test('ParseNumExtension.mutableString() forwards errors to argument cell',
+        () {
       final a = MutableCell<num>(0);
       final maybe = a.maybe();
       final error = maybe.error;
@@ -951,7 +979,9 @@ void main() {
       expect(error.value, isNull);
     });
 
-    test('ConvertStringExtension.mutableString() converts argument cell to string', () {
+    test(
+        'ConvertStringExtension.mutableString() converts argument cell to string',
+        () {
       final a = MutableCell('');
       final strA = a.mutableString();
 
@@ -963,7 +993,9 @@ void main() {
       expect(strA.value, equals('hello'));
     });
 
-    test('ConvertStringExtension.mutableString() simply sets argument cell value', () {
+    test(
+        'ConvertStringExtension.mutableString() simply sets argument cell value',
+        () {
       final a = MutableCell('');
       final strA = a.mutableString();
 
@@ -1177,8 +1209,7 @@ void main() {
           minutes: 23,
           seconds: 47,
           milliseconds: 100,
-          microseconds: 500
-      );
+          microseconds: 500);
 
       final cell = duration.cell;
       final days = cell.inDays;
@@ -1219,7 +1250,9 @@ void main() {
       expect(microseconds.value, equals(duration.inMicroseconds));
     });
 
-    test('Setting MutableCell Duration properties updates Duration stored in cell', () {
+    test(
+        'Setting MutableCell Duration properties updates Duration stored in cell',
+        () {
       final cell = MutableCell(Duration.zero);
 
       final days = cell.inDays;
@@ -1339,7 +1372,9 @@ void main() {
         expect(observer.values, equals([4, 7, 10]));
       });
 
-      test('ValueCell.first does not notify observers when first element not changed', () {
+      test(
+          'ValueCell.first does not notify observers when first element not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final ValueCell<List<int>> l2 = l;
         final f = l2.first;
@@ -1365,7 +1400,9 @@ void main() {
         verify(listener()).called(1);
       });
 
-      test('MutableCell.first does not notify observers when first element not changed', () {
+      test(
+          'MutableCell.first does not notify observers when first element not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final f = l.first;
 
@@ -1480,7 +1517,9 @@ void main() {
         expect(observer.values, equals([6, 9, 12]));
       });
 
-      test('ValueCell.last does not notify observers when last element not changed', () {
+      test(
+          'ValueCell.last does not notify observers when last element not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final ValueCell<List<int>> l2 = l;
         final f = l2.last;
@@ -1506,7 +1545,9 @@ void main() {
         verify(listener()).called(1);
       });
 
-      test('MutableCell.last does not notify observers when last element not changed', () {
+      test(
+          'MutableCell.last does not notify observers when last element not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final f = l.last;
 
@@ -1610,7 +1651,9 @@ void main() {
         expect(observer.values, equals([true, false, true]));
       });
 
-      test('ValueCell.isEmpty does not notify observers when value has not changed', () {
+      test(
+          'ValueCell.isEmpty does not notify observers when value has not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final f = l.isEmpty;
 
@@ -1680,7 +1723,8 @@ void main() {
         expect(f.value, isTrue);
       });
 
-      test('ValueCell.isNotEmpty notifies observers when list length changes', () {
+      test('ValueCell.isNotEmpty notifies observers when list length changes',
+          () {
         final l = MutableCell([1, 2, 3]);
         final observer = addObserver(l.isNotEmpty, MockValueObserver());
 
@@ -1692,7 +1736,9 @@ void main() {
         expect(observer.values, equals([false, true, false]));
       });
 
-      test('ValueCell.isNotEmpty does not notify observers when value has not changed', () {
+      test(
+          'ValueCell.isNotEmpty does not notify observers when value has not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final f = l.isNotEmpty;
 
@@ -1785,7 +1831,9 @@ void main() {
         expect(observer.values, equals([2, 3, 5]));
       });
 
-      test('ValueCell.length does not notify observers when list length not changed', () {
+      test(
+          'ValueCell.length does not notify observers when list length not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final ValueCell<List<int>> l2 = l;
         final f = l2.length;
@@ -1808,7 +1856,9 @@ void main() {
         verify(listener()).called(1);
       });
 
-      test('MutableCell.length does not notify observers when list length not changed', () {
+      test(
+          'MutableCell.length does not notify observers when list length not changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final f = l.length;
 
@@ -1831,7 +1881,7 @@ void main() {
       });
 
       test('Setting MutableCell.length.value shrinks list', () {
-        final l = MutableCell([1, 2, 3, 4, 5 ,6]);
+        final l = MutableCell([1, 2, 3, 4, 5, 6]);
         final f = l.length;
 
         f.value = 4;
@@ -2005,7 +2055,9 @@ void main() {
         expect(f.value, 20);
       });
 
-      test('ValueCell.operator[] notifies observers when indexed element changed', () {
+      test(
+          'ValueCell.operator[] notifies observers when indexed element changed',
+          () {
         final l = MutableCell([11, 22, 33, 44, 55]);
         final ValueCell<List<int>> l2 = l;
         final observer = addObserver(l2[3.cell], MockValueObserver());
@@ -2017,7 +2069,8 @@ void main() {
         expect(observer.values, equals([4, 14, 16]));
       });
 
-      test('Mutable.operator[] notifies observers when indexed element changed', () {
+      test('Mutable.operator[] notifies observers when indexed element changed',
+          () {
         final l = MutableCell([1, 2, 3]);
         final observer = addObserver(l[3.cell], MockValueObserver());
 
@@ -2028,7 +2081,9 @@ void main() {
         expect(observer.values, equals([4, 14, 16]));
       });
 
-      test('ValueCell.operator[] does not notify observers when indexed element not changed', () {
+      test(
+          'ValueCell.operator[] does not notify observers when indexed element not changed',
+          () {
         final l = MutableCell([1, 2, 3, 4, 5, 6, 7]);
         final ValueCell<List<int>> l2 = l;
         final f = l2[3.cell];
@@ -2054,7 +2109,9 @@ void main() {
         verify(listener()).called(1);
       });
 
-      test('MutableCell.operator[] does not notify observers when indexed element not changed', () {
+      test(
+          'MutableCell.operator[] does not notify observers when indexed element not changed',
+          () {
         final l = MutableCell([1, 2, 3, 4, 5, 6, 7]);
         final f = l[3.cell];
 
@@ -2118,7 +2175,9 @@ void main() {
         expect(observer.values, equals([2, 16, 4]));
       });
 
-      test('ValueCell.operator[] does not notify observers when index not changed', () {
+      test(
+          'ValueCell.operator[] does not notify observers when index not changed',
+          () {
         final l = [2, 4, 8, 16, 32].cell;
         final i = MutableCell(2);
         final e = l[i];
@@ -2141,7 +2200,9 @@ void main() {
         verify(listener()).called(1);
       });
 
-      test('Mutable.operator[] does not notify observers when index not changed', () {
+      test(
+          'Mutable.operator[] does not notify observers when index not changed',
+          () {
         final l = MutableCell([2, 4, 8, 16, 32]);
         final i = MutableCell(2);
         final e = l[i];
@@ -2195,7 +2256,9 @@ void main() {
         expect(observer.values, equals([256]));
       });
 
-      test('ValueCell.operator[] compares == when same list cell and same index', () {
+      test(
+          'ValueCell.operator[] compares == when same list cell and same index',
+          () {
         final l = [1, 2, 3].cell;
         final f1 = l[2.cell];
         final f2 = l[2.cell];
@@ -2225,7 +2288,9 @@ void main() {
         expect(f1 == f1, isTrue);
       });
 
-      test('MutableCell.operator[] compares == when same list cell and same index', () {
+      test(
+          'MutableCell.operator[] compares == when same list cell and same index',
+          () {
         final l = MutableCell([1, 2, 3]);
         final f1 = l[2.cell];
         final f2 = l[2.cell];
@@ -2264,7 +2329,12 @@ void main() {
         l[1] = 10;
         l[2] = 20;
 
-        expect(observer.values, equals([[1, 10, 3], [1, 10, 20]]));
+        expect(
+            observer.values,
+            equals([
+              [1, 10, 3],
+              [1, 10, 20]
+            ]));
       });
     });
 
@@ -2292,7 +2362,9 @@ void main() {
         verify(l()).called(2);
       });
 
-      test('ValueCell.cells returns list of cells which notify observer when element changed', () {
+      test(
+          'ValueCell.cells returns list of cells which notify observer when element changed',
+          () {
         final list = MutableCell([1, 2, 3, 4]);
         final cells = list.cellList.value.toList();
 
@@ -2307,7 +2379,9 @@ void main() {
         expect(o2.values, equals([7, 15, 102]));
       });
 
-      test('ValueCell.cells returns list of cells which do not notify observer when element not changed', () {
+      test(
+          'ValueCell.cells returns list of cells which do not notify observer when element not changed',
+          () {
         final list = MutableCell([1, 2, 3, 4]);
         final cells = list.cellList.value.toList();
 
@@ -2414,8 +2488,10 @@ void main() {
         final map = it.mapCells((e) => e * 2);
 
         final listener1 = addListener(map.value.first, MockSimpleListener());
-        final listener2 = addListener(map.value.elementAt(1), MockSimpleListener());
-        final listener3 = addListener(map.value.elementAt(2), MockSimpleListener());
+        final listener2 =
+            addListener(map.value.elementAt(1), MockSimpleListener());
+        final listener3 =
+            addListener(map.value.elementAt(2), MockSimpleListener());
 
         it.value = [1, 10, 3, 20];
         verifyNever(listener1());
@@ -2474,7 +2550,8 @@ void main() {
         expect(c1.hashCode == c2.hashCode, isTrue);
       });
 
-      test('Element cells compare != when same cell and different function', () {
+      test('Element cells compare != when same cell and different function',
+          () {
         final l = MutableCell([1, 2, 3, 4]);
         final map1 = l.mapCells((a) => a * 2);
         final map2 = l.mapCells((a) => a + 1);
@@ -2530,7 +2607,8 @@ void main() {
         expect(c1.hashCode == c2.hashCode, isTrue);
       });
 
-      test('Element cells compare == after changes to elements and list length', () {
+      test('Element cells compare == after changes to elements and list length',
+          () {
         f(a) => a * 2;
 
         final l = MutableCell([1, 2, 3, 4]);
@@ -2660,14 +2738,16 @@ void main() {
 
     group('.cast()', () {
       test('Returns correct value', () {
-        final ValueCell<Iterable<dynamic>> cell = Iterable.generate(5, (e) => e).cell;
+        final ValueCell<Iterable<dynamic>> cell =
+            Iterable.generate(5, (e) => e).cell;
         final ValueCell<Iterable<num>> cast = cell.cast<num>();
 
         expect(cast.value.toList(), equals([0, 1, 2, 3, 4]));
       });
 
       test('Compares == when same cell and same type', () {
-        final ValueCell<Iterable<dynamic>> cell = Iterable.generate(5, (e) => e).cell;
+        final ValueCell<Iterable<dynamic>> cell =
+            Iterable.generate(5, (e) => e).cell;
         final ValueCell<Iterable<num>> cast1 = cell.cast<num>();
         final ValueCell<Iterable<num>> cast2 = cell.cast<num>();
 
@@ -2676,13 +2756,11 @@ void main() {
       });
 
       test('Compares != when different cells', () {
-        final cell1 = MutableCell<Iterable<dynamic>>(
-            Iterable.generate(5, (e) => e)
-        );
+        final cell1 =
+            MutableCell<Iterable<dynamic>>(Iterable.generate(5, (e) => e));
 
-        final cell2 = MutableCell<Iterable<dynamic>>(
-            Iterable.generate(5, (e) => e)
-        );
+        final cell2 =
+            MutableCell<Iterable<dynamic>>(Iterable.generate(5, (e) => e));
 
         final cast1 = cell1.cast<num>();
         final cast2 = cell2.cast<num>();
@@ -2692,7 +2770,8 @@ void main() {
       });
 
       test('Compares != when different types', () {
-        final ValueCell<Iterable<dynamic>> cell = Iterable.generate(5, (e) => e).cell;
+        final ValueCell<Iterable<dynamic>> cell =
+            Iterable.generate(5, (e) => e).cell;
         final cast1 = cell.cast<num>();
         final cast2 = cell.cast<int>();
 
@@ -2710,9 +2789,7 @@ void main() {
       });
 
       test('Reacts to changes in iterable', () {
-        final it = MutableCell(
-            Iterable.generate(5, (e) => e)
-        );
+        final it = MutableCell(Iterable.generate(5, (e) => e));
 
         final map = it.map((e) => e * 2);
         expect(map.value.toList(), equals([0, 2, 4, 6, 8]));
@@ -2730,9 +2807,7 @@ void main() {
 
         final obs = addObserver(m.isEmpty, MockValueObserver());
 
-        m.value = {
-          'b': 100
-        };
+        m.value = {'b': 100};
 
         m.value = {};
         m.value = {'d': 9, 'b': 5};
@@ -2750,8 +2825,8 @@ void main() {
       });
 
       test('compares != when different map cells', () {
-        final m1 = MutableCell({ 'a': 0 });
-        final m2 = MutableCell({ 'a': 0 });
+        final m1 = MutableCell({'a': 0});
+        final m2 = MutableCell({'a': 0});
 
         final e1 = m1.isEmpty;
         final e2 = m2.isEmpty;
@@ -2766,9 +2841,7 @@ void main() {
         final m = MutableCell({'a': 0, 'b': 1});
         final obs = addObserver(m.isNotEmpty, MockValueObserver());
 
-        m.value = {
-          'b': 100
-        };
+        m.value = {'b': 100};
 
         m.value = {};
         m.value = {'d': 9, 'b': 5};
@@ -2786,8 +2859,8 @@ void main() {
       });
 
       test('compares != when different map cells', () {
-        final m1 = MutableCell({ 'a': 0 });
-        final m2 = MutableCell({ 'a': 0 });
+        final m1 = MutableCell({'a': 0});
+        final m2 = MutableCell({'a': 0});
 
         final e1 = m1.isNotEmpty;
         final e2 = m2.isNotEmpty;
@@ -2802,9 +2875,7 @@ void main() {
         final m = MutableCell({'a': 0, 'b': 1});
         final obs = addObserver(m.length, MockValueObserver());
 
-        m.value = {
-          'b': 100
-        };
+        m.value = {'b': 100};
 
         m.value = {};
         m.value = {'d': 9, 'b': 5};
@@ -2822,8 +2893,8 @@ void main() {
       });
 
       test('compares != when different map cells', () {
-        final m1 = MutableCell({ 'a': 0 });
-        final m2 = MutableCell({ 'a': 0 });
+        final m1 = MutableCell({'a': 0});
+        final m2 = MutableCell({'a': 0});
 
         final e1 = m1.length;
         final e2 = m2.length;
@@ -2848,14 +2919,13 @@ void main() {
 
         final observer = addObserver(keySet, MockValueObserver());
 
-        m.value = {
-          'a': 0,
-          'b': 1,
-          'c': 2,
-          'd': 3
-        };
+        m.value = {'a': 0, 'b': 1, 'c': 2, 'd': 3};
 
-        expect(observer.values, equals([{'a', 'b', 'c', 'd'}]));
+        expect(
+            observer.values,
+            equals([
+              {'a', 'b', 'c', 'd'}
+            ]));
       });
 
       test('ValueCell.keys compare == if same map cell', () {
@@ -2894,14 +2964,13 @@ void main() {
 
         final observer = addObserver(valueSet, MockValueObserver());
 
-        m.value = {
-          'a': 10,
-          'b': 11,
-          'c': 12,
-          'd': 13
-        };
+        m.value = {'a': 10, 'b': 11, 'c': 12, 'd': 13};
 
-        expect(observer.values, equals([{10, 11, 12, 13}]));
+        expect(
+            observer.values,
+            equals([
+              {10, 11, 12, 13}
+            ]));
       });
 
       test('ValueCell.values compare == if same map cell', () {
@@ -2930,13 +2999,10 @@ void main() {
         final m = {'k1': 1, 'k2': 2, 'k3': 3}.cell;
         final entries = m.entries;
 
-        expect(entries.value.map((e) => e.key).toSet(), equals({
-          'k1', 'k2', 'k3'
-        }));
+        expect(entries.value.map((e) => e.key).toSet(),
+            equals({'k1', 'k2', 'k3'}));
 
-        expect(entries.value.map((e) => e.value).toSet(), equals({
-          1, 2, 3
-        }));
+        expect(entries.value.map((e) => e.value).toSet(), equals({1, 2, 3}));
       });
 
       test('ValueCell.entries reacts to changes in map', () {
@@ -2946,15 +3012,12 @@ void main() {
 
         final observer = addObserver(entrySet, MockValueObserver());
 
-        m.value = {
-          'a': 10,
-          'b': 11,
-          'c': 12,
-          'd': 13
-        };
+        m.value = {'a': 10, 'b': 11, 'c': 12, 'd': 13};
 
-        expect(observer.values[0].map((e) => e.key).toSet(), equals({'a', 'b', 'c', 'd'}));
-        expect(observer.values[0].map((e) => e.value).toSet(), equals({10, 11, 12, 13}));
+        expect(observer.values[0].map((e) => e.key).toSet(),
+            equals({'a', 'b', 'c', 'd'}));
+        expect(observer.values[0].map((e) => e.value).toSet(),
+            equals({10, 11, 12, 13}));
       });
 
       test('ValueCell.entries compare == if same map cell', () {
@@ -2985,9 +3048,7 @@ void main() {
 
         final obs = addObserver(k, MockValueObserver());
 
-        m.value = {
-          'b': 100
-        };
+        m.value = {'b': 100};
 
         expect(k.value, true);
 
@@ -3008,7 +3069,7 @@ void main() {
 
       test('compares != when different map cells', () {
         final m1 = {}.cell;
-        final m2 = { 'a': 0 }.cell;
+        final m2 = {'a': 0}.cell;
 
         final e1 = m1.containsKey('key1'.cell);
         final e2 = m2.containsKey('key1'.cell);
@@ -3034,9 +3095,7 @@ void main() {
 
         final obs = addObserver(k, MockValueObserver());
 
-        m.value = {
-          'f': 5
-        };
+        m.value = {'f': 5};
 
         m.value = {'d': 9};
         m.value = {'d': 9, 'b': 5};
@@ -3056,7 +3115,7 @@ void main() {
 
       test('compares != when different map cells', () {
         final m1 = {}.cell;
-        final m2 = { 'a': 0 }.cell;
+        final m2 = {'a': 0}.cell;
 
         final e1 = m1.containsValue(100.cell);
         final e2 = m2.containsValue(100.cell);
@@ -3077,120 +3136,74 @@ void main() {
 
     group('.operator[]', () {
       test('ValueCell.operator[] retrieves entry value', () {
-        const m = ValueCell.value({
-          'a': 10,
-          'b': 4,
-          'c': 1
-        });
+        const m = ValueCell.value({'a': 10, 'b': 4, 'c': 1});
         final v = m['b'.cell];
 
         expect(v.value, 4);
       });
 
       test('MutableCell.operator[] retrieves entry value', () {
-        final m = MutableCell({
-          'a': 10,
-          'b': 4,
-          'c': 1
-        });
+        final m = MutableCell({'a': 10, 'b': 4, 'c': 1});
         final v = m['b'.cell];
 
         expect(v.value, 4);
       });
 
       test('ValueCell.operator[] notifies observers when entry changes', () {
-        final m1 = MutableCell({
-          'a': 10,
-          'b': 4,
-          'c': 1
-        });
+        final m1 = MutableCell({'a': 10, 'b': 4, 'c': 1});
 
         final ValueCell<Map<String, int>> m2 = m1;
 
         final v = m2['b'.cell];
         final observer = addObserver(v, MockValueObserver());
 
-        m1.value = {
-          'a': 0,
-          'b': 34
-        };
+        m1.value = {'a': 0, 'b': 34};
 
-        m1.value = {
-          'b': 7
-        };
+        m1.value = {'b': 7};
 
-        m1.value = {
-          'a': 9,
-          'd': 89
-        };
+        m1.value = {'a': 9, 'd': 89};
 
         expect(observer.values, equals([34, 7, null]));
       });
 
       test('MutableCell.operator[] notifies observers when entry changes', () {
-        final m = MutableCell({
-          'a': 10,
-          'b': 4,
-          'c': 1
-        });
+        final m = MutableCell({'a': 10, 'b': 4, 'c': 1});
 
         final v = m['b'.cell];
         final observer = addObserver(v, MockValueObserver());
 
-        m.value = {
-          'a': 0,
-          'b': 34
-        };
+        m.value = {'a': 0, 'b': 34};
 
-        m.value = {
-          'b': 7
-        };
+        m.value = {'b': 7};
 
-        m.value = {
-          'a': 9,
-          'd': 89
-        };
+        m.value = {'a': 9, 'd': 89};
 
         expect(observer.values, equals([34, 7, null]));
       });
 
-      test('ValueCell.operator[] does not notify observers when entry does not change', () {
-        final m = MutableCell({
-          'a1': 0,
-          'a2': 3,
-          'b3': 5,
-          'c4': 10
-        });
+      test(
+          'ValueCell.operator[] does not notify observers when entry does not change',
+          () {
+        final m = MutableCell({'a1': 0, 'a2': 3, 'b3': 5, 'c4': 10});
 
         final ValueCell<Map<String, int>> m2 = m;
 
         final e = m2['b3'.cell];
         final listener = addListener(e, MockSimpleListener());
 
-        m.value = {
-          'a1': -100,
-          'a2': 70,
-          'b3': 5
-        };
+        m.value = {'a1': -100, 'a2': 70, 'b3': 5};
 
         verifyNever(listener());
 
-        m.value = {
-          'b3': 5
-        };
+        m.value = {'b3': 5};
 
         verifyNever(listener());
 
-        m.value = {
-          'b3': 90
-        };
+        m.value = {'b3': 90};
 
         verify(listener()).called(1);
 
-        m.value = {
-          'b3': 90,
-          'a': 180
-        };
+        m.value = {'b3': 90, 'a': 180};
 
         verifyNever(listener());
 
@@ -3198,41 +3211,27 @@ void main() {
         verify(listener()).called(1);
       });
 
-      test('MutableCell.operator[] does not notify observers when entry does not change', () {
-        final m = MutableCell({
-          'a1': 0,
-          'a2': 3,
-          'b3': 5,
-          'c4': 10
-        });
+      test(
+          'MutableCell.operator[] does not notify observers when entry does not change',
+          () {
+        final m = MutableCell({'a1': 0, 'a2': 3, 'b3': 5, 'c4': 10});
 
         final e = m['b3'.cell];
         final listener = addListener(e, MockSimpleListener());
 
-        m.value = {
-          'a1': -100,
-          'a2': 70,
-          'b3': 5
-        };
+        m.value = {'a1': -100, 'a2': 70, 'b3': 5};
 
         verifyNever(listener());
 
-        m.value = {
-          'b3': 5
-        };
+        m.value = {'b3': 5};
 
         verifyNever(listener());
 
-        m.value = {
-          'b3': 90
-        };
+        m.value = {'b3': 90};
 
         verify(listener()).called(1);
 
-        m.value = {
-          'b3': 90,
-          'a': 180
-        };
+        m.value = {'b3': 90, 'a': 180};
 
         verifyNever(listener());
 
@@ -3241,35 +3240,19 @@ void main() {
       });
 
       test('Setting MutableCell.operator[].value updates map cell value', () {
-        final m = MutableCell({
-          'k1': 2,
-          'k2': 4,
-          'k3': 8
-        });
+        final m = MutableCell({'k1': 2, 'k2': 4, 'k3': 8});
 
         final e = m['k2'.cell];
 
         e.value = 64;
-        expect(m.value, equals({
-          'k1': 2,
-          'k2': 64,
-          'k3': 8
-        }));
+        expect(m.value, equals({'k1': 2, 'k2': 64, 'k3': 8}));
 
         e.value = 100;
-        expect(m.value, equals({
-          'k1': 2,
-          'k2': 100,
-          'k3': 8
-        }));
+        expect(m.value, equals({'k1': 2, 'k2': 100, 'k3': 8}));
       });
 
       test('ValueCell.operator[] notifies observers when key changed', () {
-        const m = ValueCell.value({
-          'a': 3,
-          'b': 9,
-          'c': 27
-        });
+        const m = ValueCell.value({'a': 3, 'b': 9, 'c': 27});
 
         final k = MutableCell('');
         final e = m[k];
@@ -3285,11 +3268,7 @@ void main() {
       });
 
       test('MutableCell.operator[] notifies observers when key changed', () {
-        final m = MutableCell({
-          'a': 3,
-          'b': 9,
-          'c': 27
-        });
+        final m = MutableCell({'a': 3, 'b': 9, 'c': 27});
 
         final k = MutableCell('');
         final e = m[k];
@@ -3315,10 +3294,7 @@ void main() {
 
         MutableCell.batch(() {
           k.value = '5';
-          m.value = {
-            '3': 9,
-            '5': 80
-          };
+          m.value = {'3': 9, '5': 80};
         });
 
         expect(observer.values, equals([80]));
@@ -3333,10 +3309,7 @@ void main() {
 
         MutableCell.batch(() {
           k.value = '5';
-          m.value = {
-            '3': 9,
-            '5': 80
-          };
+          m.value = {'3': 9, '5': 80};
         });
 
         expect(observer.values, equals([80]));
@@ -3353,7 +3326,7 @@ void main() {
 
       test('ValueCell.operator[] compares != when different map cells', () {
         final m1 = {}.cell;
-        final m2 = { 'a': 0 }.cell;
+        final m2 = {'a': 0}.cell;
 
         final e1 = m1['key1'.cell];
         final e2 = m2['key1'.cell];
@@ -3371,7 +3344,8 @@ void main() {
         expect(e1 == e1, isTrue);
       });
 
-      test('MutableCell.operator[] compares == when same map and key cells', () {
+      test('MutableCell.operator[] compares == when same map and key cells',
+          () {
         final map = MutableCell({});
         final e1 = map['key1'.cell];
         final e2 = map['key1'.cell];
@@ -3382,7 +3356,7 @@ void main() {
 
       test('MutableCell.operator[] compares != when different map cells', () {
         final m1 = MutableCell({});
-        final m2 = MutableCell({ 'a': 0 });
+        final m2 = MutableCell({'a': 0});
 
         final e1 = m1['key1'.cell];
         final e2 = m2['key1'.cell];
@@ -3403,20 +3377,19 @@ void main() {
 
     group('.operator[]=', () {
       test('MutableCell.operator[]= updates map cell value', () {
-        final m = MutableCell({
-          'a': 4,
-          'b': 16
-        });
+        final m = MutableCell({'a': 4, 'b': 16});
 
         final observer = addObserver(m, MockValueObserver());
 
         m['a'] = 20;
         m['b'] = 50;
 
-        expect(observer.values, equals([
-          {'a': 20, 'b': 16},
-          {'a': 20, 'b': 50}
-        ]));
+        expect(
+            observer.values,
+            equals([
+              {'a': 20, 'b': 16},
+              {'a': 20, 'b': 50}
+            ]));
       });
     });
   });
@@ -3548,6 +3521,36 @@ void main() {
 
       verify(resource.init()).called(1);
       verify(resource.dispose()).called(1);
+    });
+  });
+
+  group('TransformExtension', () {
+    test('ValueCell can be transformed', () {
+      final ValueCell<TestBaseClass> cell = ValueCell.value(
+        TestInheritedClass(testValue: "child", testValueTwo: 2),
+      );
+
+      final castedCell = cell.transform<TestInheritedClass>();
+
+      expect(castedCell.testValue(), "child");
+      expect(castedCell.testValueTwo(), 2);
+    });
+
+    test('MutableCell can be transformed', () {
+      final MutableCell<TestBaseClass> cell =
+          MutableCell(TestBaseClass(testValue: "base"));
+
+      final childClass =
+          TestInheritedClass(testValue: "child", testValueTwo: 2);
+
+      cell.value = childClass;
+
+      final castedCell = cell.transform<TestInheritedClass>();
+      castedCell.testValue.value = "transformed";
+      castedCell.testValueTwo.value = 3;
+
+      expect(cell().testValue, "transformed");
+      expect(castedCell().testValueTwo, 3);
     });
   });
 }

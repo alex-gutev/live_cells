@@ -59,8 +59,7 @@ class MockValueObserver extends MockSimpleObserver implements ValueObserver {
             }
 
             gotValue(value);
-          }
-          catch (e) {
+          } catch (e) {
             // Prevent exception from being printed to log
           }
         }
@@ -98,11 +97,8 @@ class MockResource extends Mock implements TestResource {
 class ManagedCellState extends CellState {
   final TestResource resource;
 
-  ManagedCellState({
-    required super.cell,
-    required super.key,
-    required this.resource
-  });
+  ManagedCellState(
+      {required super.cell, required super.key, required this.resource});
 
   @override
   void init() {
@@ -126,18 +122,11 @@ class TestManagedCell<T> extends StatefulCell<T> {
   TestManagedCell(this._resource, this.value);
 
   @override
-  CellState<StatefulCell> createState() => ManagedCellState(
-      cell: this,
-      key: key,
-      resource: _resource
-  );
+  CellState<StatefulCell> createState() =>
+      ManagedCellState(cell: this, key: key, resource: _resource);
 }
 
-enum TestEnum {
-  value1,
-  value2,
-  value3
-}
+enum TestEnum { value1, value2, value3 }
 
 /// Used to test propagation of exceptions
 class TestException implements Exception {}
@@ -162,8 +151,7 @@ T addObserver<T extends CellObserver>(ValueCell cell, T observer) {
   try {
     // Reference value to "activate" cell since cells are lazy by default
     cell.value;
-  }
-  catch (e) {
+  } catch (e) {
     // Prevent exception produced by cell computation function from failing test
     //
     // The exception thrown may be legitimate and even expected by the test.
@@ -187,8 +175,7 @@ T addListener<T extends SimpleListener>(ValueCell cell, T? listener) {
   final watcher = ValueCell.watch(() {
     try {
       cell();
-    }
-    catch (e) {
+    } catch (e) {
       // Print exceptions from failing tests
       // The value is only referenced to set up the dependency. An exception
       // doesn't actually mean a test failed
