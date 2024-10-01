@@ -1,3 +1,8 @@
+## 0.11.0
+
+* Update `live_cells_core` dependency to 0.24.0
+* Update widget wrappers to Flutter 3.24.3
+
 ## 0.10.1
 
 New widgets:
