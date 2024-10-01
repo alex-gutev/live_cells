@@ -1,3 +1,20 @@
+# 0.24.0
+
+New features:
+
+* `.transform<...>()` for casting a cell's value type
+
+  Example:
+
+  ```
+  ValueCell<Base> base = ...;
+  final derived = base.transform<Derived>();
+  ```
+
+Bug fixes:
+
+* Fix edge case bug in `mutableApply`.
+
 # 0.23.5
 
 * Fix issue with return type of `MutableCell.notNull` extension method
