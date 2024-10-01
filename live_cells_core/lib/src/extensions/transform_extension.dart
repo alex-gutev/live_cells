@@ -5,7 +5,7 @@ import 'package:live_cells_core/live_cells_internals.dart';
 /// [U] must be  a subtype of [T]
 extension TransformExtension<T> on ValueCell<T> {
   ValueCell<U> transform<U extends T>() => apply((value) => value as U,
-          key: _TransformTypedPropKey(this, #transform))
+          key: _TransformTypedPropKey<U>(this, #transform))
       .store();
 }
 
@@ -14,7 +14,7 @@ extension TransformExtension<T> on ValueCell<T> {
 extension MutableTransformExtension<T> on MutableCell<T> {
   MutableCell<U> transform<U extends T>() =>
       mutableApply((value) => value as U, (v) => value = v as T,
-          key: _TransformTypedPropKey(this, #transform));
+          key: _TransformTypedPropKey<U>(this, #transform));
 }
 
 /// Key identifying a [ValueCell], which access a [List] property with a type parameter.
