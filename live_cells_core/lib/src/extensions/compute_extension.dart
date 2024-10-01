@@ -1,3 +1,5 @@
+import 'package:live_cells_core/live_cells_internals.dart';
+
 import '../compute_cell/store_cell.dart';
 import '../compute_cell/mutable_compute_cell.dart';
 import '../mutable_cell/mutable_cell.dart';
@@ -40,7 +42,7 @@ extension ComputeExtension<T> on ValueCell<T> {
     bool changesOnly = false
   }) {
     if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -107,7 +109,7 @@ extension RecordComputeExtension2<T1, T2> on (ValueCell<T1>, ValueCell<T2>) {
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -178,7 +180,7 @@ extension RecordComputeExtension3<T1, T2, T3> on (
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -250,7 +252,7 @@ extension RecordComputeExtension4<T1, T2, T3, T4> on (
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -323,7 +325,7 @@ extension RecordComputeExtension5<T1, T2, T3, T4, T5> on (
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -397,7 +399,7 @@ extension RecordComputeExtension6<T1, T2, T3, T4, T5, T6> on (
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -471,6 +473,11 @@ extension RecordComputeExtension7<T1, T2, T3, T4, T5, T6, T7> on (
         changesOnly: changesOnly
       );
     }
+    else if (changesOnly) {
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
+          .store(changesOnly: true)
+          .mutableApply((p0) => p0, reverse, key: key);
+    }
 
     return MutableCellView(
       key: key,
@@ -543,7 +550,7 @@ extension RecordComputeExtension8<T1, T2, T3, T4, T5, T6, T7, T8> on (
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -620,7 +627,7 @@ extension RecordComputeExtension9<T1, T2, T3, T4, T5, T6, T7, T8, T9> on (
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -698,7 +705,7 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
       );
     }
     else if (changesOnly) {
-      return apply(fn)
+      return apply(fn, key: key != null ? _MutableApplyKey(this, key) : null)
           .store(changesOnly: true)
           .mutableApply((p0) => p0, reverse, key: key);
     }
@@ -710,4 +717,8 @@ extension RecordComputeExtension10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> on (
       arguments: {$1, $2, $3, $4, $5, $6, $7, $8, $9, $10},
     );
   }
+}
+
+class _MutableApplyKey extends CellKey2 {
+  _MutableApplyKey(super.value1, super.value2);
 }
