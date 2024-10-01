@@ -1,3 +1,24 @@
+## 0.24.0
+
+New features:
+
+* `.transform<...>()` for casting a cell's value type
+
+  Example:
+
+  ```
+  ValueCell<Base> base = ...;
+  final derived = base.transform<Derived>();
+  ```
+
+Bug fixes:
+
+* Fix edge case bug in `mutableApply`.
+
+Other changes:
+
+* Update widget wrappers to Flutter 3.24.3
+
 ## 0.23.6
 
 * Fix issue with return type of `MutableCell.notNull` extension method
