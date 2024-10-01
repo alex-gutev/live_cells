@@ -3552,5 +3552,143 @@ void main() {
       expect(cell().testValue, "transformed");
       expect(castedCell().testValueTwo, 3);
     });
+
+    test('ValueCell.transform compares == when same cell and type', () {
+      final value = TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      );
+
+      final base = ValueCell<TestBaseClass>.value(value);
+
+      final a = base.transform<TestInheritedClass>();
+      final b = base.transform<TestInheritedClass>();
+
+      expect(a == b, isTrue);
+      expect(a.hashCode == b.hashCode, isTrue);
+    });
+
+    test('ValueCell.transform compares != when different cell', () {
+      final base1 = ValueCell<TestBaseClass>.value(TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      ));
+
+      final base2 = ValueCell<TestBaseClass>.value(TestInheritedClass(
+        testValue: 'test2',
+        testValueTwo: 2
+      ));
+
+      final a = base1.transform<TestInheritedClass>();
+      final b = base2.transform<TestInheritedClass>();
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
+
+    test('ValueCell.transform compares != when different cell', () {
+      final base1 = ValueCell<TestBaseClass>.value(TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      ));
+
+      final base2 = ValueCell<TestBaseClass>.value(TestInheritedClass(
+          testValue: 'test2',
+          testValueTwo: 2
+      ));
+
+      final a = base1.transform<TestInheritedClass>();
+      final b = base2.transform<TestInheritedClass>();
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
+
+    test('ValueCell.transform compares != when different type', () {
+      final value = TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      );
+
+      final base = ValueCell<TestBaseClass>.value(value);
+
+      final a = base.transform<TestInheritedClass>();
+
+      // This is a useless cast but it is necessary to test that
+      // cells cast to a different type do not compare equal
+      final b = base.transform<TestBaseClass>();
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
+
+    test('Mutable.transform compares == when same cell and type', () {
+      final value = TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      );
+
+      final base = MutableCell<TestBaseClass>(value);
+
+      final a = base.transform<TestInheritedClass>();
+      final b = base.transform<TestInheritedClass>();
+
+      expect(a == b, isTrue);
+      expect(a.hashCode == b.hashCode, isTrue);
+    });
+
+    test('MutableCell.transform compares != when different cell', () {
+      final base1 = MutableCell<TestBaseClass>(TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      ));
+
+      final base2 = MutableCell<TestBaseClass>(TestInheritedClass(
+          testValue: 'test2',
+          testValueTwo: 2
+      ));
+
+      final a = base1.transform<TestInheritedClass>();
+      final b = base2.transform<TestInheritedClass>();
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
+
+    test('MutableCell.transform compares != when different cell', () {
+      final base1 = MutableCell<TestBaseClass>(TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      ));
+
+      final base2 = MutableCell<TestBaseClass>(TestInheritedClass(
+          testValue: 'test2',
+          testValueTwo: 2
+      ));
+
+      final a = base1.transform<TestInheritedClass>();
+      final b = base2.transform<TestInheritedClass>();
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
+
+    test('MutableCell.transform compares != when different type', () {
+      final value = TestInheritedClass(
+          testValue: 'test',
+          testValueTwo: 1
+      );
+
+      final base = MutableCell<TestBaseClass>(value);
+
+      final a = base.transform<TestInheritedClass>();
+
+      // This is a useless cast but it is necessary to test that
+      // cells cast to a different type do not compare equal
+      final b = base.transform<TestBaseClass>();
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
   });
 }
