@@ -52,6 +52,9 @@ abstract class StatefulCell<T> extends ValueCell<T> {
   @protected
   CellState? get state => _getState();
 
+  /// Does this cell have a state?
+  bool get hasState => _getState() != null;
+
   /// Create the [CellState] for this cell.
   ///
   /// This method should be overridden by subclasses.

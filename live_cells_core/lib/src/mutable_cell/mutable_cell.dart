@@ -11,8 +11,17 @@ part 'mutable_cell_base.dart';
 
 /// Interface for a [ValueCell] of which the [value] property can be set explicitly
 abstract class MutableCell<T> extends ValueCell<T> {
-  /// Create a mutable cell with its value initialized to [value]
-  factory MutableCell(T value, {key}) => _MutableCellImpl(value, key: key);
+  /// Create a mutable cell with its value initialized to [value].
+  ///
+  /// If [reset] is true and a cell with the same [key] has been created,
+  /// the shared value of the cells is reset to [value].
+  factory MutableCell(T value, {
+    key,
+    bool reset = false
+  }) => _MutableCellImpl(value,
+      key: key,
+      reset: reset
+  );
 
   /// Create a computational cell which can also have its value set directly.
   ///
@@ -129,7 +138,14 @@ abstract class MutableCell<T> extends ValueCell<T> {
 }
 
 class _MutableCellImpl<T> extends MutableCellBase<T> implements RestorableCell<T> {
-  _MutableCellImpl(this._initialValue, {super.key});
+  _MutableCellImpl(this._initialValue, {
+    super.key,
+    bool reset = false
+  }) {
+    if (reset && hasState) {
+      state.value = _initialValue;
+    }
+  }
 
   /// The initial value
   final T _initialValue;
