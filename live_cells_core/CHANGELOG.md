@@ -1,3 +1,48 @@
+# 0.24.1
+
+New features:
+
+* `reset` parameter in `MutableCell` constructor.
+
+  This allows the value of a shared state mutable cell to be reset to the initial value
+  when a new cell is created.
+
+  Example:
+
+  ```dart
+  final myKey = MyKey();
+  
+  final a = MutableCell(1, key: myKey);
+  
+  ValueCell.watch(() {
+    print(a.value);
+  }); // Prints 1
+  
+  // Create a new shared state cell and reset the value of all
+  // cells with key 'myKey' to 2
+  
+  final b = MutableCell(2, 
+    key: myKey,
+    reset: true
+  );
+  print(a.value); // Prints 2
+  print(b.value); // Prints 2
+  ```
+  
+* `.mutableCell` property for quickly creating a mutable cell initialized to a given value.
+
+  Example:
+
+  ```dart
+  // Create mutable cell with an initial value of 1
+  final a = 1.mutableCell;
+  
+  print(a.value); // 1
+  a.value = 2
+  
+  print(a.value); // 2
+  ```
+
 # 0.24.0
 
 New features:
