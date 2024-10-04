@@ -12,6 +12,13 @@ import '../mutable_cell/mutable_cell.dart';
 extension ValueCellExtension<T> on T {
   /// Create a constant cell with value equal to [this].
   ValueCell<T> get cell => ValueCell.value(this);
+
+  /// Create a [MutableCell] with value initialized to [this].
+  ///
+  /// **Note**: the cell is created with the "reset" parameter set to true.
+  MutableCell<T> get mutableCell => MutableCell(this,
+    reset: true
+  );
 }
 
 /// Provides methods for converting an integer to a string and vice versa.
