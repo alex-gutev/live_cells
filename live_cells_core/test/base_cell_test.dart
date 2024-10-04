@@ -299,6 +299,55 @@ void main() {
       a.removeObserver(observer);
       expect(CellState.maybeGetState('mutable-cell-key1'), isNull);
     });
+
+    test('Value of mutable cells reset to initial value when reset = true', () {
+      final a = MutableCell(1,
+          key: 'mutable-cell-key1',
+          reset: true
+      );
+
+      final obs = addObserver(a, MockValueObserver());
+      expect(a.value, 1);
+
+      final b = MutableCell(2,
+          key: 'mutable-cell-key1',
+          reset: true
+      );
+
+      expect(a.value, 2);
+      expect(b.value, 2);
+
+      final c = MutableCell(5,
+          key: 'mutable-cell-key1',
+          reset: true
+      );
+
+      expect(a.value, 5);
+      expect(b.value, 5);
+      expect(c.value, 5);
+
+      final d = MutableCell(10, key: 'mutable-cell-key1');
+
+      expect(a.value, 5);
+      expect(b.value, 5);
+      expect(c.value, 5);
+      expect(d.value, 5);
+
+      final e = MutableCell(15,
+          key: 'mutable-cell-key2',
+          reset: true
+      );
+
+      observeCell(e);
+
+      expect(a.value, 5);
+      expect(b.value, 5);
+      expect(c.value, 5);
+      expect(d.value, 5);
+      expect(e.value, 15);
+
+      expect(obs.values, equals([2, 5]));
+    });
   });
 
   group('Equality Comparisons', () {
