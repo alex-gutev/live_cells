@@ -10,7 +10,7 @@ In the previous section we introduced how to handle numeric input
 using mutable computed cells. However, we glossed over what happens if
 the user enters invalid input.
 
-When a cells created by `mutableString()` is assigned a string which
+When a cell created by `mutableString()` is assigned a string which
 does not represent a valid number, a default value of `0` is
 assigned. This default value can be changed using the `errorValue`
 argument:
@@ -95,13 +95,13 @@ class NumberField extends CellWidget {
     final maybe = n.maybe();
     final error = maybe.error;
     
-    return CellTextField(
+    return LiveTextField(
       content: maybe.mutableString(),
-      decoration: ValueCell.computed(() => InputDecoration(
+      decoration: InputDecoration(
           errorText: error() != null 
               ? 'Please enter a valid number' 
               : null
-      ))
+      )
     );
   }
 }
@@ -133,17 +133,18 @@ class NumberField extends CellWidget {
   @override
   Widget build(BuildContext context) {
     final maybe = n.maybe();
+    final content = maybe.mutableString();
     final error = maybe.error;
     
-    return CellTextField(
-      content: maybe.mutableString(),
-      decoration: ValueCell.computed(() => InputDecoration(
-          errorText: error() != null 
-              ? 'Please enter a valid number' 
+    return LiveTextField(
+      content: content,
+      decoration: InputDecoration(
+          errorText: content().isEmpty 
+              ? 'Cannot be empty' 
               : error() != null 
               ? 'Please enter a valid number' 
               : null
-      ))
+      )
     );
   }
 }
@@ -170,11 +171,7 @@ CellWidget.builder((_) {
           NumberField(b),
         ],
       ),
-      CellText(
-        data: ValueCell.computed(
-          () => '${a()} + ${b()} = ${sum()}'
-        )
-      ),
+      Text('${a()} + ${b()} = ${sum()}'),
       ElevatedButton(
         child: Text('Reset'),
         onPressed: () => MutableCell.batch(() {

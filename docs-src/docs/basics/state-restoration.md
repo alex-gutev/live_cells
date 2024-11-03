@@ -39,27 +39,27 @@ CellWidget.builder((ctx) {
       Text('A Slider'),
       Row(
         children: [
-          CellWidget.builder((context) => Text(sliderValue().toStringAsFixed(2))),
+          Text(sliderValue().toStringAsFixed(2)),
           Expanded(
-            child: CellSlider(
-               min: 0.0.cell,
-               max: 10.cell,
+            child: LiveSlider(
+               min: 0.0,
+               max: 10,
                value: sliderValue
             ),
           )
         ],
       ),
-      CellSwitchListTile(
+      LiveSwitchListTile(
         value: switchValue,
-        title: Text('A Switch').cell,
+        title: Text('A Switch')
       ),
-      CellCheckboxListTile(
+      LiveCheckboxListTile(
         value: checkboxValue,
-        title: Text('A checkbox').cell,
+        title: Text('A checkbox')
       ),
       const Text('Enter some text:'),
-      CellTextField(content: textValue),
-      CellWidget.builder((context) => Text('You wrote: ${textValue()}')),
+      LiveTextField(content: textValue),
+      Text('You wrote: ${textValue()}'),
     ],
   );
 }, restorationId: 'cell_restoration_example');
@@ -82,12 +82,12 @@ widgets which are dependent on the cells, is restored.
 
 :::info
 
-* `CellSlider`, `CellSwitchListTile` and `CellCheckboxListTile` are
-  the live cell equivalents, provided by `live_cell_widgets`, of
+* `LiveSlider`, `LiveSwitchListTile` and `LiveCheckboxListTile` are
+  the live cell equivalents, provided by `live_cell_ui`, of
   `Slider`, `SwitchListTile` and `CheckboxListTile` which allow their
   state to be controlled by a `ValueCell`.
 * You can use any widgets not just those provided by
-  `live_cell_widgets`. The state of the cells within `CellWidget` on
+  `live_cells_ui`. The state of the cells within `CellWidget` on
   which `restore()` is called will be restored regardless of the widgets
   you use.
   
@@ -154,23 +154,23 @@ CellWidget.builder((ctx) => {
   return Column(
     children: [
       const Text('Radio Buttons:',),
-      CellWidget.builder((context) => Text('Selected option: ${radioValue()?.name}')),
+      Text('Selected option: ${radioValue()?.name}'),
       Column(
         children: [
-          CellRadioListTile(
+          LiveRadioListTile(
             groupValue: radioValue,
-            value: RadioValue.value1.cell,
-            title: Text('value1').cell,
+            value: RadioValue.value1,
+            title: Text('value1'),
           ),
-          CellRadioListTile(
+          LiveRadioListTile(
             groupValue: radioValue,
-            value: RadioValue.value2.cell,
-            title: Text('value2').cell,
+            value: RadioValue.value2,
+            title: Text('value2'),
           ),
-          CellRadioListTile(
+          LiveRadioListTile(
             groupValue: radioValue,
-            value: RadioValue.value3.cell,
-            title: Text('value3').cell,
+            value: RadioValue.value3,
+            title: Text('value3'),
           ),
         ],
       ),
@@ -212,13 +212,13 @@ CellWidget.builder((_) {
   return Column(
     children: [
       const Text('Text field for numeric input:'),
-      CellTextField(
+      LiveTextField(
         content: numStr,
-        decoration: ValueCell.computed(() => InputDecoration(
+        decoration: InputDecoration(
             errorText: numError() != null
                ? 'Not a valid number'
                : null
-        )),
+        ),
       ),
       const SizedBox(height: 10),
       CellWidget.builder((context) {

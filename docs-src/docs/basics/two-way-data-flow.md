@@ -63,7 +63,7 @@ final strA = a.mutableString();
 
 Implementing a text field for numeric input is as simple as binding
 the `mutableString` cell to the *content* property of a
-`CellTextField`:
+`LiveTextField`:
 
 ```dart title="Text field for numeric input"
 CellWidget.builder((_) {
@@ -72,22 +72,18 @@ CellWidget.builder((_) {
     
   return Column(
     children: [
-      CellTextField(
-        content: a.mutableString()  
-        keyboardType: TextInputType.number.cell
+      LiveTextField(
+        content: a.mutableString()
+        keyboardType: TextInputType.number
       ),
-      CellText(
-        data: ValueCell.computed(
-          () => '${a()}^2 = ${square()}'
-        )
-      )
+      Text('${a()}^2 = ${square()}')
     ]
   );
 });
 ```
 
-An integer is parsed from the `CellTextField`, it's square is computed
-and displayed in a `CellText` below it.
+An integer is parsed from the `LiveTextField`, it's square is computed
+and displayed in a `Text` below it.
 
 :::info
 An explicit generic type parameter is given to `MutableCell` to allow
@@ -96,7 +92,7 @@ deduced type of its initial value `0`.
 :::
 
 Here's a larger example containing two text fields for numeric input,
-a widget which displays the sum of the two numbers entered and a
+a widget that displays the sum of the two numbers entered and a
 "Reset" button:
 
 ```dart title="Text field for numeric input"
@@ -110,24 +106,20 @@ CellWidget.builder((_) {
     children: [
       Row(
         children: [
-          CellTextField(
+          LiveTextField(
             content: a.mutableString(),
-            keyboardType: TextInputType.number.cell
+            keyboardType: TextInputType.number
           ),
           SizedBox(width: 5),
           Text('+'),
           SizedBox(width: 5),
-          CellTextField(
+          LiveTextField(
             content: b.mutableString(),
-            keyboardType: TextInputType.number.cell
+            keyboardType: TextInputType.number
           ),
         ],
       ),
-      CellText(
-        data: ValueCell.computed(
-          () => '${a()} + ${b()} = ${sum()}'
-        )
-      ),
+      Text('${a()} + ${b()} = ${sum()}'),
       ElevatedButton(
         child: Text('Reset'),
         onPressed: () => MutableCell.batch(() {
@@ -140,18 +132,18 @@ CellWidget.builder((_) {
 });
 ```
 
-In this example two `CellTextField`s are defined with their content
+In this example two `LiveTextField`s are defined with their content
 cells bound to the `mutableString()` of cells `a` and `b`,
 respectively. This allows us to handle the input provided in the
 fields as numbers rather than strings.
 
 The `sum` computed cell, defined by a cell expression, computes the
 sum of `a` and `b`. The values of cells `a`, `b` and `sum` are
-displayed in a `CellText` below the fields.
+displayed in a `Text` below the fields.
 
 The "Reset" button resets both fields by setting the value of `a` and
 `b` to `0`. Consequently, this also resets the sum and the value
-displayed in the `CellText`.
+displayed in the `Text`.
 
 :::info
 `MutableCell.batch` was used when resetting the fields, in order to
@@ -161,10 +153,9 @@ reset both fields simultaneously.
 Without mutable computed cells and two-way data flow, this example
 would require that an `onChanged` event callback is added on the
 fields which does the parsing logic and then updates the values of the
-cells. Once again with we were able to implement all our logic in a
-declarative manner without a single `onChanged` callback.
+cells.
 
-The benefits of using `CellTextField` and mutable computed cells are:
+The benefits of using `LiveTextField` and mutable computed cells are:
 
 * No need for a `TextEditingController` which you have to remember to `dispose`.
 * No manual synchronization of state between the `TextEditingController` and the widget `State` / 
@@ -192,9 +183,9 @@ The reverse computation function assigns the sum divided by two to
 both cells `a` and `b`.
 
 All that we need to do add this functionality to the previous example,
-is to add a `CellTextField` and bind its content to the `sum` cell.
+is to add a `LiveTextField` and bind its content to the `sum` cell.
 
-Here's the full example with a `CellTextField` for the result of the addition:
+Here's the full example with a `LiveTextField` for the result of the addition:
 
 ```dart title="Multi-argument mutable computed cell"
 CellWidget.builder((_) {
@@ -211,23 +202,23 @@ CellWidget.builder((_) {
     children: [
       Row(
         children: [
-          CellTextField(
+          LiveTextField(
             content: a.mutableString(),
-            keyboardType: TextInputType.number.cell
+            keyboardType: TextInputType.number
           ),
           SizedBox(width: 5),
           Text('+'),
           SizedBox(width: 5),
-          CellTextField(
+          LiveTextField(
             content: b.mutableString(),
-            keyboardType: TextInputType.number.cell
+            keyboardType: TextInputType.number
           ),
           SizedBox(width: 5),
           Text('='),
           SizedBox(width: 5),
-          CellTextField(
+          LiveTextField(
             content: sum.mutableString(),
-            keyboardType: TextInputType.number.cell
+            keyboardType: TextInputType.number
           )
         ],
       )

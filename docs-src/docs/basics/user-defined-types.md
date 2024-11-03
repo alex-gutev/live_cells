@@ -93,7 +93,7 @@ to the `dev_dependencies` of your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-    live_cell_extension: 0.5.2
+    live_cell_extension: 0.5.9
     ...
 ```
 
@@ -154,11 +154,11 @@ class PersonForm extends CellWidget {
     Widget build(BuildContext context) => Column(
     children: [
         Text('First Name:'),
-        CellTextField(
+        LiveTextField(
             content: person.firstName
         ),
         Text('Last Name:'),
-        CellTextField(
+        LiveTextField(
             content: person.lastName
         ),
         Text('Age:'),
@@ -192,11 +192,7 @@ CellWidget.builder((_) {
   return Column(
     children: [
       PersonForm(person),
-      CellText(
-        data: ValueCell.computed(
-          () => '${person.firstName()} ${person.lastName()}: ${person.age()} years'
-        )
-      ),
+      Text('${person.firstName()} ${person.lastName()}: ${person.age()} years'),
       ElevatedButton(
         child: Text('Save'),
         // A hypothetical savePerson function
@@ -217,7 +213,7 @@ CellWidget.builder((_) {
 
 In this example we used the `personForm` widget defined earlier. 
 
-* The details of the person are displayed in a `CellText`, which is
+* The details of the person are displayed in a `Text`, which is
   automatically updated when the person's details are changed.
 * The "Save" button saves the entered details, which are held in the
   `person` cell.

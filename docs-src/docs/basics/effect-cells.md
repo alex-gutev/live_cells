@@ -249,7 +249,7 @@ which it is tied to, is triggered.
 
 Let's add some data to the submission. We'll add a switch, which when
 it is on the submission succeeds and when it is off the submission
-fails. We'll use `CellSwitch` to bind the state of the switch directly
+fails. We'll use `LiveSwitch` to bind the state of the switch directly
 to a cell.
 
 ```dart
@@ -268,7 +268,7 @@ Widget build(BuildContext context) {
   
   return Column(
     children: [
-      CellSwitch(
+      LiveSwitch(
           value: succeed,
           enabled: submission.isComplete;
       ),
@@ -287,7 +287,7 @@ Toggling the switch will now change the result of the `submission`
 cell, though as mentioned earlier the side effect defined by the
 `submission` cell is only run when the button is
 pressed. Additionally, `submission.isComplete` is bound to the
-`enabled` property of the `CellSwitch`. As a result, the switch is
+`enabled` property of the `LiveSwitch`. As a result, the switch is
 disabled while the submission is still in progress.
 
 ## Cell Buttons
@@ -295,11 +295,11 @@ disabled while the submission is still in progress.
 So far we've used a callback function to handle the button press
 events, which does nothing other than trigger an action cell. This
 library provides a
-[`CellElevatedButton`](https://pub.dev/documentation/live_cells/latest/live_cell_widgets/CellElevatedButton-class.html)
+[`LiveElevatedButton`](https://pub.dev/documentation/live_cell_widgets/latest/live_cells_ui/LiveElevatedButton-class.html)
 which allows you to directly specify an action cell that is triggered
 by button press events without having to provide a callback.
 
-`CellElevatedButton` takes a `press` argument rather than an
+`LiveElevatedButton` takes a `press` argument rather than an
 `onPressed` argument, which takes a `MetaCell<void>` rather than a
 callback. When the button is constructed an action cell is injected
 into the meta cell passed to `press` and is triggered whenever the
@@ -309,29 +309,29 @@ button is pressed.
 
 The action button takes a `MetaCell` rather than an `ActionCell` since
 triggering the action outside the button will not result in any
-changes to the button. This is different from `CellSwitch` which takes
+changes to the button. This is different from `LiveSwitch` which takes
 a `MutableCell`. When the cell is set from outside the switch, the
 state of the switch changes.
 
 :::
 
-To replace `ElevatedButton` with `CellElevatedButton` we first have to
+To replace `ElevatedButton` with `LiveElevatedButton` we first have to
 change the definition of `submit` to the following:
 
 ```dart
 final submit = MetaCell<void>();
 ...
-CellElevatedButton(
+LiveElevatedButton(
     press: submit,
     enabled: submission.isComplete,
     child: isLoading 
-        ? CircularProgressIndicator().cell
-        : Text('Submit').cell
+        ? CircularProgressIndicator()
+        : Text('Submit')
 )
 ```
 
 Note, the `submit` cell is passed to the `press` argument of
-`CellElevatedButton`. This button also takes an `enabled` argument,
+`LiveElevatedButton`. This button also takes an `enabled` argument,
 unlike `ElevatedButton`, for which we've supplied
 `submission.isComplete`. As a result the button is enabled before the
 effect has run and after it has completed, but is disabled while the
@@ -339,7 +339,7 @@ result is still pending.
 
 :::tip
 
-`CellElevatedButton` also accepts meta cells for `longPress`,
+`LiveElevatedButton` also accepts meta cells for `longPress`,
 `onHover` and `onFocusChange` for handling long press, hover and focus
 change events.
 
@@ -457,7 +457,7 @@ For example you would need to do something similar to the following:
 final isLoading = MutableCell(false);
 
 ElevatedButton(
-    onPressed isLoading() ? null : () async {
+    onPressed: isLoading() ? null : () async {
         isLoading.value = true;
         await submitForm();
         isLoading.value = false;

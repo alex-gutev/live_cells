@@ -199,36 +199,6 @@ As a result modifying an element of the `children` list, will only
 result in that child widget of the `Column` being rebuilt and not the
 entire widget hierarchy rooted at the `Column`. 
 
-You wont need `cellList` for this as Live Cells already provides a
-`CellColumn` and a `CellRow`, which is implemented exactly as
-described above, but its still useful to be aware of this pattern so
-you can potentially apply it in other parts of your app which deal
-with lists.
-
-This makes surgical updates to a complex widget hierarchy simple and
-intuitive. For example consider the following widget definition, using
-`CellColumn`:
-
-```dart title="CellColumn example"
-final children = MutableCell(<Widget>[
-    Text('Child 1'),
-    Text('Child 2'),
-    Text('Child 3')
-]);
-
-return CellColumn(
-    children: children
-);
-```
-
-Changing the second child widget is as simple as:
-
-```dart
-children[1] = Text('Updated Child 2');
-```
-
-With this only the second child widget of the `Column` is rebuilt.
-
 ## Map and Set Properties
 
 The following properties and methods are provided by cells holding

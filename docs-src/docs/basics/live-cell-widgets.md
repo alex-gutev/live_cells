@@ -6,84 +6,40 @@ sidebar_position: 4
 
 # Live Cell Widgets
 
-Besides the core cell functionality, this library also comes with a
-collection of widgets that extend the stock Flutter widgets with
-functionality which allows their properties to be accessed and
-controlled by cells.
-
-Quite a mouthful. Let's start with the simple `Text` widget for
-displaying text. Live cells provides a `CellText` widget with a
-constructor that takes the same parameters as the constructor of
-`Text` but allows `ValueCell`s to be given instead of the raw values.
+Besides the core cell functionality, this package comes with a
+`live_cells_ui` library which provides a collection of widgets that
+extend the stock Flutter widgets with functionality which allows their
+properties to be observed and controlled by cells.
 
 :::tip
-The name of a Live Cells equivalent of a Flutter widget is `Cell`
+The name of a Live Cells equivalent of a Flutter widget is `Live`
 followed by the name of the widget class.
 :::
 
 When a cell is given as a parameter for a widget property, the
 property is said to be bound to the cell. This means that when the
 value of the cell changes, the value of the property is automatically
-updated to reflect the value of the cell.
+updated to reflect the value of the cell. Similarly, when the value of
+the property changes due to user interaction, the value of the cell is
+updated to reflect the state of the widget.
 
-```dart title="CellText example"
-CellWidget.builder((c) {
-    final content = MutableCell('');
-    
-    return Column(
-        children: [
-            CellText(data: content),
-            ElevatedButton(
-                child: Text('Say Hi'),
-                onPressed: () => content.value = 'Hi!'
-            )
-        ]
-    );
-});
-```
+For example the `LiveSwitch` widget is a `Switch` which takes a cell
+for its `value`.
 
-In the example above a `CellText` is created with its data property bound to the
-cell `content`, which initially holds the empty string. The button
-below sets the value of `content` to the string "Hi!". This value is
-then displayed in the `CellText` widget.
-
-Every widget provided by live cells also provides a `bind`
-method. This method creates a copy of the widget with the properties
-bound to different cells.
-
-```dart title="bind method"
-final text = CellText()
-    .bind(data: content) // Copy CellText with `data` bound to `content`
-    .bind(style: style); // Copy CellText with a new binding for `style`
-```
-
-## User input
-
-Cells can be used for more than just setting and automatically
-updating the values of widget properties. They can also be used to
-retrieve and observe the values of widget properties.
-
-Widgets which are used for retrieving input from the user, take
-mutable cells for the properties which represent the user input. For
-example `CellSwitch`, the Live Cells equivalent of Flutter's `Switch`
-takes a mutable cell for its `value` property, which represents the
-state of the switch. Setting the value of the cell updates the state
-of the switch, similarly when the user changes the state of
-the switch, the value of the cell is changed to reflect the state.
-
-```dart title="CellSwitch example"
+```dart title="LiveSwitch example"
 CellWidget.builder((c) {
     final state = MutableCell(false);
     
     return Column(
         children: [
-            CellText(
-                data: state.select(
-                    'The switch is on'.cell,
-                    'The switch is off'.cell
-                )
+            Text(state() ? 'On' : 'Off'),
+            LiveSwitch(
+                value: state
             ),
-            CellSwitch(value: state),
+            ElevatedButton(
+                child: Text('Reset'),
+                onPressed: () => state.value = false
+            )
         ]
     );
 });
@@ -91,37 +47,53 @@ CellWidget.builder((c) {
 
 In this example:
 
-* The state (`value`) of the switch is bound to cell `state`. 
-* The content (`data`) of the `CellText` widget is bound to a cell
-  that selects between two strings describing the state of the switch
-  based on the value of the `state` cell.
+1. A `LiveSwitch` is created with its `value` property bound to the
+   cell `state`.
+   
+2. The initial value of the `state` cell is `false` hence the switch
+   is initially in the *off* position.
+   
+3. The state of the switch, initially "Off" is displayed in a `Text`
+   widget above the switch.
+   
+4. When the switch is turned to on by the user, the value of the
+   `state` cell is updated to `true` and "On" is displayed in the
+   `Text` widget.
+   
+5. Likewise, when the switch is turned off the value of the `state`
+   cell is updated to `false` and "Off" is displayed in the `Text`
+   widget.
 
-Toggling the switch automatically changes the value of the `state`
-cell and hence changes the text that is displayed in the `CellText`
-widget.
+The "Reset" button below the switch sets the value of the `state` cell
+to `false`, which results in the switch widget resetting to the *off*
+position and "Off" being displayed.
 
-Notice how user input was handled in a declarative manner entirely
-using cells. There was no need for `onChanged` callbacks, in-fact
-`CellSwitch` doesn't even take an `onChanged` argument.
+Notice that user input was handled entirely in a declarative
+manner. There was no need to provide an `onChanged` callback, nor any
+need to call `setState`.
 
-`CellTextField` is another widget which uses cells to handle user
-input. Unlike `TextField` which takes a `TextEditingController`,
-`CelltextField` takes a `content` cell which is bound to the content
-of the field. It also takes an optional `selection` cell which is
-bound to the selection.
+## Text Fields
+
+`LiveTextField` is another widget provided by this library that allows
+user input to be observed and handled using cells. Unlike `TextField`
+which takes a `TextEditingController`, `LiveTextField` takes a
+`content` cell which is bound to the content of the field. It also
+takes an optional `selection` cell which is bound to the selection.
 
 The `content` cell can be used both to observe and set the content of
 the field. Here's a simple example that echoes whatever is written in
-the field to a `CellText` widget.
+the field to a `Text` widget.
 
-```dart title="CellTextField example"
+```dart title="LiveTextField example"
 CellWidget.builder((c) {
     final content = MutableCell('');
     
     return Column(
         children: [
-            CellText(data: content),
-            CellTextField(content: content),
+            Text(content()),
+            LiveTextField(
+                content: content
+            ),
             ElevatedButton(
                 child: Text('Clear'),
                 onPressed: () => content.value = ''
@@ -131,20 +103,12 @@ CellWidget.builder((c) {
 });
 ```
 
-Like the `CellSwitch` example, we didn't need an `onChanged` callback
+Like the `LiveSwitch` example, we didn't need an `onChanged` callback
 nor did we need to add a listener to a `TextEditingController`
-object. This example also adds a "Clear" button which clears the
-content of the text field by setting the value of the `content` cell
-to the empty string.
-
-:::tip
-The approach used to clear the content of the `CellTextField` in this
-example, setting the value of the content cell, can also be used to
-reset the state of a `CellSwitch` and any other widget property which
-is bound to a mutable cell.
-:::
+object. The "Clear" button clears the content of the text field by
+setting the value of the `content` cell to the empty string.
 
 :::caution
-If you provide a cell for the `selection` property of `CellTextField`,
+If you provide a cell for the `selection` property of `LiveTextField`,
 it has to be reset as well as the content cell when clearing the text field.
 :::

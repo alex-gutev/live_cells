@@ -644,23 +644,21 @@ CellWidget.builder((_) {
     
   return Column(
     children: [
-      CellTextField(
+      LiveTextField(
         content: content
       ),
       Text('You wrote:'),
-      CellText(
-        data: debounced
-      )
+      Text(debounced())
     ]
   );
 });
 ```
 
 In this example, we've bound a cell to the content of a
-`CellTextField`. We've *debounced* the cell with
+`LiveTextField`. We've *debounced* the cell with
 `delayed(...).waitLast` and bound the debounced cell to the data of a
-`CellText`. Whatever you write in the text field is echoed in the
-`CellText` below it but only after a three second delay after you
+`Text` widget. Whatever you write in the text field is echoed in the
+`Text` below it but only after a three second delay after you
 stop typing.
 
 Practically, to implement a search as you type functionality, you'd
@@ -686,7 +684,7 @@ This would be used with a UI definition similar to the following:
 Column(
   children: [
     // A text field for the search term
-    CellTextField(content: search),
+    LiveTextField(content: search),
     
     // Display results
     CellWidget.builder((_) {

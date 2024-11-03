@@ -346,7 +346,7 @@ class Counter extends CellWidget {
     
     @override
     Widget build(BuildContext context) {
-        return CellTextField(
+        return LiveTextField(
             content: count.mutableString()
         );
     }
@@ -355,7 +355,7 @@ class Counter extends CellWidget {
 
 :::info
 
-`CellTextField` is a widget provided by the **Live Cell Widgets** library
+`LiveTextField` is a widget provided by the **Live Cell Widgets** library
 that binds the content of a `TextField` to the cell provided
 in the `content` parameter of the constructor. 
 
@@ -613,27 +613,25 @@ close as possible to working with raw values.
 Live Cells also comes with a widgets library, _which you can read more
 about [here](/docs/basics/live-cell-widgets)_, that allows you to bind
 cells directly to widget properties. We've already seen one such
-example `CellTextField`:
+example `LiveTextField`:
 
 ```dart
 final contentCell = MutableCell('');
 
-CellTextField(
+LiveTextField(
     content: contentCell
 )
 ```
 
-`CellTextField` is a the Live Cells equivalent of Flutter's
+`LiveTextField` is a the Live Cells equivalent of Flutter's
 `TextField`, which allows you to bind its properties directly to
 cells. In the example above, the content of the field is bound to
 `contentCell`. This means whenever the content of the field changes,
 the value of `contentCell` is updated. Likewise whenever the value of
 `contentCell` changes, the content of the field is updated.
 
-Besides `CellTextField`, this library also provides `CellSwitch`,
-`CellCheckbox`, `CellRadio` and many other widgets. This is not
-limited to widgets for acquiring user input but also widgets which are
-used purely for presenting data such as `CellText`.
+Besides `LiveTextField`, this library also provides `LiveSwitch`,
+`LiveCheckbox`, `LiveRadio` and many other widgets.
 
 :::info
 
@@ -641,20 +639,6 @@ These are not reimplementations of Flutter's widgets but wrappers over
 them.
 
 :::
-
-For example the `data` property of a `CellText` (Live Cells equivalent
-of Flutter's `Text`) can be bound to the same `contentCell` from the
-previous example:
-
-```dart
-CellText(
-    data: contentCell
-)
-```
-
-The effect of this binding is that whatever text is entered in the
-text field, from the previous example, will be echoed in the
-`CellText` widget.
 
 No other library, to the best of my knowledge, offers anything
 remotely similar to this.

@@ -113,7 +113,7 @@ final e = list[index];`}
 Column(
   children: [
     // Cell content bound to TextField content
-    CellTextField(
+    LiveTextField(
       content: content
     ),
     CellWidget.builder((_) =>
