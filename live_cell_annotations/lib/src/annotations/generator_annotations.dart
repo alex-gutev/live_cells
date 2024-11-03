@@ -23,6 +23,9 @@ class WidgetSpec<T extends Object> {
   /// List of property names which to exclude from the generated class
   final List<Symbol> excludeProperties;
 
+  /// If non-null only these properties are generated as cells
+  final List<Symbol>? cellProperties;
+
   /// Map from property names to code which computes the property values.
   ///
   /// If a property is a key in this map, the code in the corresponding value
@@ -71,6 +74,9 @@ class WidgetSpec<T extends Object> {
   /// [StatelessWidget]
   final List<Symbol> stateMixins;
 
+  /// Deprecation notice to add to generated class. If null no notice is added.
+  final String? deprecationNotice;
+
   const WidgetSpec({
     this.as,
     this.typeArguments = const [],
@@ -86,7 +92,9 @@ class WidgetSpec<T extends Object> {
     this.baseClass = #CellWidget,
     this.buildMethod = #build,
     this.documentation,
-    this.stateMixins = const []
+    this.stateMixins = const [],
+    this.cellProperties,
+    this.deprecationNotice
   });
 }
 
