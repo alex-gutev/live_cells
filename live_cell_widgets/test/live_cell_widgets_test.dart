@@ -1,8 +1,7 @@
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:live_cell_widgets/live_cell_widgets.dart';
 import 'package:live_cell_widgets/live_cell_widgets_base.dart';
+import 'package:live_cell_widgets/live_cells_ui.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cells_core/live_cells_internals.dart';
 import 'package:mockito/mockito.dart';
@@ -1965,61 +1964,12 @@ void main() {
 
   // The following tests will test some of the generated widget wrappers
 
-  // Writing unit tests for every single wrapper is an insurmountable task,
-  // so the tests will focus on those Widgets with customizations to the
-  // generated code, such as CellSwitch, CellRadio, CellTextField
-  // (which is written by hand), and those which are likely to be problematic
-  // such as Row and Column.
-
-  group('CellText', () {
-    testWidgets('Data updated when cell value changed', (tester) async {
-      final data = MutableCell('hello');
-
-      await tester.pumpWidget(TestApp(
-        child: CellText(data: data),
-      ));
-
-      expect(find.text('hello'), findsOneWidget);
-
-      data.value = 'bye';
-      await tester.pump();
-      expect(find.text('bye'), findsOneWidget);
-    });
-
-    testWidgets('All properties updated when cell values change', (tester) async {
-      final data = MutableCell('hello');
-      final align = MutableCell(TextAlign.left);
-
-      await tester.pumpWidget(TestApp(
-        child: CellText(
-          data: data,
-          textAlign: align,
-        ),
-      ));
-
-      findText(String data, TextAlign align) => find.byWidgetPredicate((widget) => widget is Text &&
-          widget.data == data &&
-          widget.textAlign == align
-      );
-
-      expect(findText('hello', TextAlign.left), findsOneWidget);
-
-      MutableCell.batch(() {
-        data.value = 'bye';
-        align.value = TextAlign.center;
-      });
-
-      await tester.pump();
-      expect(findText('bye', TextAlign.center), findsOneWidget);
-    });
-  });
-
-  group('CellSwitch', () {
+  group('LiveSwitch', () {
     testWidgets('Switch initialized to on', (tester) async {
       final state = MutableCell(true);
 
       await tester.pumpWidget(TestApp(
-        child: CellSwitch(value: state),
+        child: LiveSwitch(value: state),
       ));
 
       final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
@@ -2033,7 +1983,7 @@ void main() {
       final state = MutableCell(false);
 
       await tester.pumpWidget(TestApp(
-        child: CellSwitch(value: state),
+        child: LiveSwitch(value: state),
       ));
 
       final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
@@ -2047,7 +1997,7 @@ void main() {
       final state = MutableCell(true);
 
       await tester.pumpWidget(TestApp(
-        child: CellSwitch(value: state),
+        child: LiveSwitch(value: state),
       ));
 
       final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
@@ -2069,7 +2019,7 @@ void main() {
       final state = MutableCell(true);
 
       await tester.pumpWidget(TestApp(
-        child: CellSwitch(value: state),
+        child: LiveSwitch(value: state),
       ));
 
       final onFinder = find.byWidgetPredicate((widget) => widget is Switch && widget.value);
@@ -2086,22 +2036,22 @@ void main() {
     });
   });
 
-  group('CellRadioListTile', () {
+  group('LiveRadioListTile', () {
     testWidgets('group value initialized correctly', (tester) async {
       final groupValue = MutableCell<RadioTestValue?>(RadioTestValue.value1);
 
       await tester.pumpWidget(TestApp(
         child: Column(
           children: [
-            CellRadioListTile(
-              value: RadioTestValue.value1.cell,
+            LiveRadioListTile(
+              value: RadioTestValue.value1,
               groupValue: groupValue,
-              title: const Text('value1').cell,
+              title: const Text('value1'),
             ),
-            CellRadioListTile(
-              value: RadioTestValue.value2.cell,
+            LiveRadioListTile(
+              value: RadioTestValue.value2,
               groupValue: groupValue,
-              title: const Text('value2').cell,
+              title: const Text('value2'),
             )
           ],
         )
@@ -2127,15 +2077,15 @@ void main() {
       await tester.pumpWidget(TestApp(
           child: Column(
             children: [
-              CellRadioListTile(
-                value: RadioTestValue.value1.cell,
+              LiveRadioListTile(
+                value: RadioTestValue.value1,
                 groupValue: groupValue,
-                title: const Text('value1').cell,
+                title: const Text('value1'),
               ),
-              CellRadioListTile(
-                value: RadioTestValue.value2.cell,
+              LiveRadioListTile(
+                value: RadioTestValue.value2,
                 groupValue: groupValue,
-                title: const Text('value2').cell,
+                title: const Text('value2'),
               )
             ],
           )
@@ -2161,15 +2111,15 @@ void main() {
       await tester.pumpWidget(TestApp(
           child: Column(
             children: [
-              CellRadioListTile(
-                value: RadioTestValue.value1.cell,
+              LiveRadioListTile(
+                value: RadioTestValue.value1,
                 groupValue: groupValue,
-                title: const Text('value1').cell,
+                title: const Text('value1'),
               ),
-              CellRadioListTile(
-                value: RadioTestValue.value2.cell,
+              LiveRadioListTile(
+                value: RadioTestValue.value2,
                 groupValue: groupValue,
-                title: const Text('value2').cell,
+                title: const Text('value2'),
               )
             ],
           )
@@ -2198,15 +2148,15 @@ void main() {
       await tester.pumpWidget(TestApp(
           child: Column(
             children: [
-              CellRadioListTile(
-                value: RadioTestValue.value1.cell,
+              LiveRadioListTile(
+                value: RadioTestValue.value1,
                 groupValue: groupValue,
-                title: const Text('value1').cell,
+                title: const Text('value1'),
               ),
-              CellRadioListTile(
-                value: RadioTestValue.value2.cell,
+              LiveRadioListTile(
+                value: RadioTestValue.value2,
                 groupValue: groupValue,
-                title: const Text('value2').cell,
+                title: const Text('value2'),
               )
             ],
           )
@@ -2231,172 +2181,12 @@ void main() {
     });
   });
 
-  group('CellColumn', () {
-    testWidgets('All children rendered correctly', (tester) async {
-      final children = MutableCell(const [
-        Text('Child 1'),
-        Expanded(child: Text('Child 2'))
-      ]);
-
-      await tester.pumpWidget(TestApp(
-        child: CellColumn(children: children),
-      ));
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-
-      // Change the first child
-      children[0] = const Text('New Child');
-      await tester.pump();
-
-      expect(find.text('New Child'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 1'), findsNothing);
-    });
-
-    testWidgets('Children added to list are rendered correctly', (tester) async {
-      final children = MutableCell(const [
-        Text('Child 1'),
-        Expanded(child: Text('Child 2'))
-      ]);
-
-      await tester.pumpWidget(TestApp(
-        child: CellColumn(children: children),
-      ));
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsNothing);
-
-      // Add a widget to the list
-      children.value = const [
-        Text('Child 1'),
-        Text('Child 2'),
-        Text('Child 3')
-      ];
-
-      await tester.pump();
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsOneWidget);
-    });
-
-    testWidgets('Children rendered correctly when widgets removed from list', (tester) async {
-      final children = MutableCell(const [
-        Text('Child 1'),
-        Expanded(child: Text('Child 2')),
-        Text('Child 3')
-      ]);
-
-      await tester.pumpWidget(TestApp(
-        child: CellColumn(children: children),
-      ));
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsOneWidget);
-
-      // Add a widget to the list
-      children.value = const [
-        Expanded(child: Text('Child 2')),
-        Text('Child 3')
-      ];
-
-      await tester.pump();
-
-      expect(find.text('Child 1'), findsNothing);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsOneWidget);
-    });
-  });
-
-  group('CellRow', () {
-    testWidgets('All children rendered correctly', (tester) async {
-      final children = MutableCell(const [
-        Text('Child 1'),
-        Expanded(child: Text('Child 2'))
-      ]);
-
-      await tester.pumpWidget(TestApp(
-        child: CellRow(children: children),
-      ));
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-
-      // Change the first child
-      children[0] = const Text('New Child');
-      await tester.pump();
-
-      expect(find.text('New Child'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 1'), findsNothing);
-    });
-
-    testWidgets('Children added to list are rendered correctly', (tester) async {
-      final children = MutableCell(const [
-        Text('Child 1'),
-        Expanded(child: Text('Child 2'))
-      ]);
-
-      await tester.pumpWidget(TestApp(
-        child: CellRow(children: children),
-      ));
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsNothing);
-
-      // Add a widget to the list
-      children.value = const [
-        Text('Child 1'),
-        Text('Child 2'),
-        Text('Child 3')
-      ];
-
-      await tester.pump();
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsOneWidget);
-    });
-
-    testWidgets('Children rendered correctly when widgets removed from list', (tester) async {
-      final children = MutableCell(const [
-        Text('Child 1'),
-        Expanded(child: Text('Child 2')),
-        Text('Child 3')
-      ]);
-
-      await tester.pumpWidget(TestApp(
-        child: CellRow(children: children),
-      ));
-
-      expect(find.text('Child 1'), findsOneWidget);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsOneWidget);
-
-      // Add a widget to the list
-      children.value = const [
-        Expanded(child: Text('Child 2')),
-        Text('Child 3')
-      ];
-
-      await tester.pump();
-
-      expect(find.text('Child 1'), findsNothing);
-      expect(find.text('Child 2'), findsOneWidget);
-      expect(find.text('Child 3'), findsOneWidget);
-    });
-  });
-
-  group('CellTextField', () {
+  group('LiveTextField', () {
     testWidgets('Content of field reflects value of content cell', (tester) async {
       final content = MutableCell('init');
 
       await tester.pumpWidget(TestApp(
-        child: CellTextField(content: content),
+        child: LiveTextField(content: content),
       ));
 
       finder(String text) => find.byWidgetPredicate((widget) => widget is TextField &&
@@ -2418,7 +2208,7 @@ void main() {
       final content = MutableCell('init');
 
       await tester.pumpWidget(TestApp(
-        child: CellTextField(content: content),
+        child: LiveTextField(content: content),
       ));
 
       finder(String text) => find.byWidgetPredicate((widget) => widget is TextField &&
@@ -2438,7 +2228,7 @@ void main() {
     });
   });
 
-  group('CellElevatedButton', () {
+  group('LiveElevatedButton', () {
     testWidgets('onPressed observers notified when button is tapped.', (tester) async {
       final onPressed = MetaCell<void>();
       final listener = MockSimpleListener();
@@ -2447,9 +2237,9 @@ void main() {
       addTearDown(() => onPressed.listenable.removeListener(listener));
 
       await tester.pumpWidget(TestApp(
-        child: CellElevatedButton(
+        child: LiveElevatedButton(
             press: onPressed,
-            child: const Text('Click Me').cell
+            child: const Text('Click Me')
         ),
       ));
 
@@ -2465,9 +2255,9 @@ void main() {
       verify(listener()).called(2);
 
       await tester.pumpWidget(TestApp(
-        child: CellElevatedButton(
+        child: LiveElevatedButton(
             press: onPressed,
-            child: const Text('Click Me').cell
+            child: const Text('Click Me')
         ),
       ));
 
@@ -2484,9 +2274,9 @@ void main() {
       addTearDown(() => onLongPress.listenable.removeListener(listener));
 
       await tester.pumpWidget(TestApp(
-        child: CellElevatedButton(
+        child: LiveElevatedButton(
             longPress: onLongPress,
-            child: const Text('Click Me').cell
+            child: const Text('Click Me')
         ),
       ));
 
@@ -2501,9 +2291,9 @@ void main() {
       verify(listener()).called(2);
 
       await tester.pumpWidget(TestApp(
-        child: CellElevatedButton(
+        child: LiveElevatedButton(
             longPress: onLongPress,
-            child: const Text('Click Me').cell
+            child: const Text('Click Me')
         ),
       ));
 
@@ -2515,18 +2305,18 @@ void main() {
     });
   });
 
-  group('CellPageView', () {
+  group('LivePageView', () {
     testWidgets('Current page reflects value of page cell', (tester) async {
       final page = MutableCell(0);
 
       await tester.pumpWidget(TestApp(
-        child: CellPageView(
+        child: LivePageView(
           page: page,
           children: const [
             Text('Page 1'),
             Text('Page 2'),
             Text('Page 3')
-          ].cell,
+          ],
         ),
       ));
 
@@ -2545,13 +2335,13 @@ void main() {
       final page = MutableCell(0);
 
       await tester.pumpWidget(TestApp(
-        child: CellPageView(
+        child: LivePageView(
           page: page,
           children: const [
             Text('Page 1'),
             Text('Page 2'),
             Text('Page 3')
-          ].cell,
+          ],
         ),
       ));
 
@@ -2581,7 +2371,7 @@ void main() {
       final duration = MutableCell(const Duration(seconds: 100));
 
       await tester.pumpWidget(TestApp(
-        child: CellPageView(
+        child: LivePageView(
           page: page,
           animate: animate,
           duration: duration,
@@ -2591,7 +2381,7 @@ void main() {
             Text('Page 1'),
             Text('Page 2'),
             Text('Page 3')
-          ].cell,
+          ],
         ),
       ));
 
@@ -2630,7 +2420,7 @@ void main() {
       final next = ActionCell();
 
       await tester.pumpWidget(TestApp(
-        child: CellPageView(
+        child: LivePageView(
           page: page,
           nextPage: next,
           duration: const Duration(seconds: 100).cell,
@@ -2639,7 +2429,7 @@ void main() {
             Text('Page 1'),
             Text('Page 2'),
             Text('Page 3')
-          ].cell,
+          ],
         ),
       ));
 
@@ -2659,7 +2449,7 @@ void main() {
       final prev = ActionCell();
 
       await tester.pumpWidget(TestApp(
-        child: CellPageView(
+        child: LivePageView(
           page: page,
           previousPage: prev,
           duration: const Duration(seconds: 100).cell,
@@ -2668,7 +2458,7 @@ void main() {
             Text('Page 1'),
             Text('Page 2'),
             Text('Page 3')
-          ].cell,
+          ],
         ),
       ));
 
@@ -2698,7 +2488,7 @@ void main() {
       addTearDown(() => isAnimating.listenable.removeListener(listener));
 
       await tester.pumpWidget(TestApp(
-        child: CellPageView(
+        child: LivePageView(
           page: page,
           animate: animate,
           duration: duration,
@@ -2711,7 +2501,7 @@ void main() {
             Text('Page 1'),
             Text('Page 2'),
             Text('Page 3')
-          ].cell,
+          ],
         ),
       ));
 
