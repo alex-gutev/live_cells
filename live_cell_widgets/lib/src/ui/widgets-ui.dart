@@ -1,6 +1,10 @@
+import 'dart:ui' as ui;
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:live_cell_annotations/live_cell_annotations.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cells_core/live_cells_internals.dart';
@@ -10,6 +14,7 @@ import '../../live_cell_widgets_base.dart';
 part 'mixins.dart';
 part 'wrapper_interface.dart';
 part 'cell_page_view_mixin.dart';
+part 'cell_text_field_mixin.dart';
 
 @GenerateCellWidgets([
   WidgetSpec<Checkbox>(
@@ -816,5 +821,50 @@ triggered when the button is pressed and long pressed respectively. Similarly,
 [bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
 '''
   ),
+
+  WidgetSpec<TextField>(
+    as: #LiveTextField,
+
+    baseClass: #_TextFieldInterface,
+    stateMixins: [#_CellTextFieldMixin],
+
+    cellProperties: [#enabled],
+
+    excludeProperties: [
+      #controller, #contextMenuBuilder
+    ],
+
+    addProperties: [
+      WidgetPropertySpec<String>(
+          name: #content,
+          defaultValue: null,
+          optional: false,
+          mutable: true,
+
+          documentation: 'Cell holding the content of the field'
+      ),
+
+      WidgetPropertySpec<TextSelection>(
+          name: #selection,
+          defaultValue: null,
+          optional: true,
+          mutable: true,
+
+          documentation: 'Cell holding the text selection'
+      )
+    ],
+
+    propertyValues: {
+      #controller: '_controller',
+    },
+
+    documentation: '''A text field widget, similar to [TextField], with content controlled by a [ValueCell].
+
+The content of the text field is controlled by a [MutableCell] which is passed on
+construction. Whenever the value of the cell changes, the content of the text
+field is updated to reflect the value of the cell. Similarly, whenever the content
+of the text field changes, the value of the cell is updated to reflect the field
+content.'''
+  )
 ])
 part 'widgets-ui.g.dart';
