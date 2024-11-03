@@ -13,6 +13,7 @@ import 'package:live_cells_core/live_cells_core.dart';
 /// field is updated to reflect the value of the cell. Similarly, whenever the content
 /// of the text field changes, the value of the cell is updated to reflect the field
 /// content.
+@Deprecated('Use LiveTextField from live_cells_ui instead.')
 class CellTextField extends StatefulWidget {
   /// Content cell
   final MutableCell<String> content;
