@@ -1,3 +1,9 @@
+## 0.4.4
+
+This release doesn't bring any new user-facing features.
+
+* Add `cellProperties` and `deprecationNotice` to `WidgetSpec` annotation.
+
 ## 0.4.3
 
 This release doesn't bring any new user-facing features.
