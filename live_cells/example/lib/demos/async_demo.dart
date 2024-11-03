@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 /// Demonstrates asynchronous cells
 class AsyncDemo extends CellWidget {
+  const AsyncDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     /// Text field content cell
@@ -48,7 +50,7 @@ class AsyncDemo extends CellWidget {
             children: [
               const SizedBox(height: 10),
               // A text field with its content controlled by cell `input`
-              CellTextField(content: content),
+              LiveTextField(content: content),
               const SizedBox(height: 10),
               const Text(
                 'Whatever you write will show up below after a delay of 3 seconds.'
@@ -63,9 +65,7 @@ class AsyncDemo extends CellWidget {
               ),
               const SizedBox(height: 10),
               // The content of the text field is retrieved using the `input` cell
-              CellText(
-                data: delayed,
-              ),
+              Text(delayed()),
               const Text(
                   'Debounced:',
                   style: TextStyle(
@@ -75,9 +75,7 @@ class AsyncDemo extends CellWidget {
               ),
               const SizedBox(height: 10),
               // The content of the text field is retrieved using the `input` cell
-              CellText(
-                data: debounced,
-              ),
+              Text(debounced()),
             ],
           ),
         ),

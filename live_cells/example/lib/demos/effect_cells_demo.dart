@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 /// Demonstrates handling button press events using meta cells and effect cells
 class EffectCellDemo extends CellWidget with CellHooks {
+  const EffectCellDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     /// A meta cell for an ActionCell that is triggered when the button is
@@ -99,12 +101,12 @@ class EffectCellDemo extends CellWidget with CellHooks {
                   const SizedBox(height: 5),
 
                   /// Button which simulates a network request when pressed.
-                  CellElevatedButton(
+                  LiveElevatedButton(
                     /// `onPress` is the meta cell, which will be set to point
                     /// to an action cell that is triggered when the button is
                     /// pressed.
                     press: onPress,
-                    child: const Text('Simulate Submit').cell,
+                    child: const Text('Simulate Submit'),
                   )
                 ],
               ),

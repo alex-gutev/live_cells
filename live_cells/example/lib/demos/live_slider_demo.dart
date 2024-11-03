@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
-/// Example showing usage of [CellSlider]
-class CellSliderDemo extends CellWidget {
+/// Example showing usage of [LiveSlider]
+class LiveSliderDemo extends CellWidget {
+  const LiveSliderDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the slider value
@@ -11,7 +13,7 @@ class CellSliderDemo extends CellWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CellSlider Demo'),
+        title: const Text('LiveSlider Demo'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -28,10 +30,10 @@ class CellSliderDemo extends CellWidget {
               ),
               const SizedBox(height: 10),
               // A slider with a value controlled by the `n` cell.
-              CellSlider(
+              LiveSlider(
                 value: n,
-                min: 0.0.cell,
-                max: 5.0.cell,
+                min: 0.0,
+                max: 5.0,
               ),
               CellWidget.builder((_) => Text('Slider value is: ${n().toStringAsFixed(2)}')),
               // The following button resets the value of the slider to 2

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 // Example of cell state restoration using [RestorableCellWidget]:
 //
@@ -97,23 +97,23 @@ class CellRestorationDemo extends CellWidget {
                 children: [
                   CellWidget.builder((context) => Text(sliderValue().toStringAsFixed(2))),
                   Expanded(
-                      child: CellSlider(
-                          min: 0.0.cell,
-                          max: 10.0.cell,
+                      child: LiveSlider(
+                          min: 0.0,
+                          max: 10.0,
                           value: sliderValue
                       ),
                   )
                 ],
               ),
               const SizedBox(height: 5),
-              CellSwitchListTile(
+              LiveSwitchListTile(
                 value: switchValue,
-                title: const Text('A Switch').cell,
+                title: const Text('A Switch'),
               ),
               const SizedBox(height: 5),
-              CellCheckboxListTile(
+              LiveSwitchListTile(
                 value: checkboxValue,
-                title: const Text('A checkbox').cell,
+                title: const Text('A checkbox'),
               ),
               const SizedBox(height: 5),
               const Text(
@@ -126,37 +126,37 @@ class CellRestorationDemo extends CellWidget {
               CellWidget.builder((context) => Text('Selected option: ${radioValue()?.name}')),
               Column(
                 children: [
-                  CellRadioListTile(
+                  LiveRadioListTile(
                     groupValue: radioValue,
-                    value: RadioValue.value1.cell,
-                    title: const Text('value1').cell,
+                    value: RadioValue.value1,
+                    title: const Text('value1'),
                   ),
-                  CellRadioListTile(
+                  LiveRadioListTile(
                     groupValue: radioValue,
-                    value: RadioValue.value2.cell,
-                    title: const Text('value2').cell,
+                    value: RadioValue.value2,
+                    title: const Text('value2'),
                   ),
-                  CellRadioListTile(
+                  LiveRadioListTile(
                     groupValue: radioValue,
-                    value: RadioValue.value3.cell,
-                    title: const Text('value3').cell,
+                    value: RadioValue.value3,
+                    title: const Text('value3'),
                   ),
                 ],
               ),
               const SizedBox(height: 10),
               const Text('Enter some text:'),
-              CellTextField(content: textValue),
+              LiveTextField(content: textValue),
               const SizedBox(height: 10),
               CellWidget.builder((context) => Text('You wrote: ${textValue()}')),
               const SizedBox(height: 10),
               const Text('Text field for numeric input:'),
-              CellTextField(
+              LiveTextField(
                 content: numMaybe.mutableString().restore(),
-                decoration: ValueCell.computed(() => InputDecoration(
+                decoration: InputDecoration(
                   errorText: numError() != null
                       ? 'Not a valid number'
                       : null
-                )),
+                ),
               ),
               const SizedBox(height: 10),
 

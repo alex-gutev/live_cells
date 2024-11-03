@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 /// Example showing usage of a [CellTextField] with both a content and selection cell provided.
-class CellTextFieldDemo2 extends CellWidget {
+class LiveTextFieldDemo2 extends CellWidget {
+  const LiveTextFieldDemo2({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the content of the text field
@@ -16,7 +18,7 @@ class CellTextFieldDemo2 extends CellWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User input using CellTextField 2'),
+        title: const Text('User input using LiveTextField 2'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -34,12 +36,12 @@ class CellTextFieldDemo2 extends CellWidget {
 
                       // A text field with its content and selection controlled
                       // by cells `input` and `selection`.
-                      child: CellTextField(
+                      child: LiveTextField(
                         content: input,
                         selection: selection,
-                        maxLines: null.cell,
-                        expands: true.cell,
-                        decoration: const InputDecoration(border: OutlineInputBorder()).cell,
+                        maxLines: null,
+                        expands: true,
+                        decoration: const InputDecoration(border: OutlineInputBorder()),
                       ),
                     ),
                     const SizedBox(height: 10),

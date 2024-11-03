@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
-/// Example showing usage of [CellCheckbox]
-class CellCheckboxDemo extends CellWidget {
+/// Example showing usage of [LiveCheckox]
+class LiveCheckboxDemo extends CellWidget {
+  const LiveCheckboxDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the state of the checkbox.
@@ -11,7 +13,7 @@ class CellCheckboxDemo extends CellWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CellCheckbox Demo'),
+        title: const Text('LiveCheckbox Demo'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -28,9 +30,9 @@ class CellCheckboxDemo extends CellWidget {
               ),
               const SizedBox(height: 10),
               // A checkbox with its state controlled by the cell `state`
-              CellCheckbox(
+              LiveCheckbox(
                 value: state,
-                tristate: true.cell,
+                tristate: true,
               ),
               CellWidget.builder((_) {
                 if (state() != null) {

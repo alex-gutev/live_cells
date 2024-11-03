@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'demos/async_demo.dart';
 import 'demos/action_cell_demo1.dart';
 import 'demos/action_cell_demo2.dart';
-import 'demos/cell_text_field_demo1.dart';
-import 'demos/cell_text_field_demo2.dart';
+import 'demos/live_text_field_demo1.dart';
+import 'demos/live_text_field_demo2.dart';
 import 'demos/counter_demo.dart';
 import 'demos/effect_cells_demo.dart';
 import 'demos/mutable_computed_cell_demo.dart';
@@ -12,11 +12,11 @@ import 'demos/mutable_computed_cell_demo2.dart';
 import 'demos/error_handling_demo1.dart';
 import 'demos/error_handling_demo2.dart';
 import 'demos/sum_demo.dart';
-import 'demos/cell_checkbox_demo.dart';
-import 'demos/cell_radio_demo.dart';
+import 'demos/live_checkbox_demo.dart';
+import 'demos/live_radio_demo.dart';
 import 'demos/cell_restoration_demo.dart';
-import 'demos/cell_slider_demo.dart';
-import 'demos/cell_switch_demo.dart';
+import 'demos/live_slider_demo.dart';
+import 'demos/live_switch_demo.dart';
 import 'demos/previous_value_demo.dart';
 import 'demos/subclass_demo1.dart';
 import 'demos/subclass_demo2.dart';
@@ -103,7 +103,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Counter'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CounterDemo())
+                              builder: (context) => const CounterDemo())
                           );
                         },
                       ),
@@ -111,7 +111,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Computed Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => SumDemo())
+                              builder: (context) => const SumDemo())
                           );
                         },
                       ),
@@ -119,23 +119,23 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Previous Values'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => PreviousValueDemo())
+                              builder: (context) => const PreviousValueDemo())
                           );
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('CellTextField'),
+                        child: const Text('LiveTextField'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellTextFieldDemo1())
+                              builder: (context) => const LiveTextFieldDemo1())
                           );
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('CellTextField 2'),
+                        child: const Text('LiveTextField 2'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellTextFieldDemo2())
+                              builder: (context) => const LiveTextFieldDemo2())
                           );
                         },
                       ),
@@ -143,7 +143,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Mutable Computed Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => MutableComputedCellDemo())
+                              builder: (context) => const MutableComputedCellDemo())
                           );
                         },
                       ),
@@ -151,7 +151,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Mutable Computed Cells 2'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => MutableComputedCellDemo2())
+                              builder: (context) => const MutableComputedCellDemo2())
                           );
                         },
                       ),
@@ -159,7 +159,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Error handling 1'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ErrorHandlingDemo1())
+                              builder: (context) => const ErrorHandlingDemo1())
                           );
                         },
                       ),
@@ -167,7 +167,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Error handling 2'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ErrorHandlingDemo2())
+                              builder: (context) => const ErrorHandlingDemo2())
                           );
                         },
                       ),
@@ -175,7 +175,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Watching Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => WatchDemo()
+                              builder: (context) => const WatchDemo()
                           ));
                         },
                       ),
@@ -183,7 +183,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('CellSlider'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellSliderDemo()
+                              builder: (context) => const LiveSliderDemo()
                           ));
                         },
                       ),
@@ -191,7 +191,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('CellCheckbox'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellCheckboxDemo()
+                              builder: (context) => const LiveCheckboxDemo()
                           ));
                         },
                       ),
@@ -199,7 +199,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('CellSwitch'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellSwitchDemo()
+                              builder: (context) => const LiveSwitchDemo()
                           ));
                         },
                       ),
@@ -207,7 +207,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('CellRadio'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CellRadioDemo()
+                              builder: (context) => const LiveRadioDemo()
                           ));
                         },
                       ),
@@ -221,7 +221,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Asynchronous Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => AsyncDemo()
+                              builder: (context) => const AsyncDemo()
                           ));
                         },
                       ),
@@ -229,7 +229,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Action Cells 1'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ActionCellDemo1()
+                              builder: (context) => const ActionCellDemo1()
                           ));
                         },
                       ),
@@ -237,7 +237,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Action Cells 2'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => ActionCellDemo2()
+                              builder: (context) => const ActionCellDemo2()
                           ));
                         },
                       ),
@@ -245,7 +245,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('Effect Cells'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => EffectCellDemo()
+                              builder: (context) => const EffectCellDemo()
                           ));
                         },
                       ),
@@ -253,7 +253,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('ValueCell Subclass 1'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => SubclassDemo1()
+                              builder: (context) => const SubclassDemo1()
                           ));
                         },
                       ),
@@ -261,7 +261,7 @@ class MyHomePage extends StatelessWidget {
                         child: const Text('ValueCell Subclass 2'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => SubclassDemo2()
+                              builder: (context) => const SubclassDemo2()
                           ));
                         },
                       ),
@@ -278,6 +278,6 @@ class MyHomePage extends StatelessWidget {
 
   @pragma('vm:entry-point')
   static Route _makeStateRestorationDemo(BuildContext context, Object? args) {
-    return MaterialPageRoute(builder: (context) => CellRestorationDemo());
+    return MaterialPageRoute(builder: (context) => const CellRestorationDemo());
   }
 }

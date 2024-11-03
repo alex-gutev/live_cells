@@ -76,6 +76,8 @@ class CountCellState extends CellState<CountCell> {
 }
 
 class SubclassDemo2 extends CellWidget {
+  const SubclassDemo2({super.key});
+
   @override
   Widget build(BuildContext context) {
     final counter = CountCell(10, interval: const Duration(seconds: 1));

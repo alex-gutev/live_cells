@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
-/// Example usage of [CellSwitch]
-class CellSwitchDemo extends CellWidget {
+/// Example usage of [LiveSwitch]
+class LiveSwitchDemo extends CellWidget {
+  const LiveSwitchDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the switch state
@@ -11,7 +13,7 @@ class CellSwitchDemo extends CellWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CellSwitch Demo'),
+        title: const Text('LiveSwitch Demo'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -28,7 +30,7 @@ class CellSwitchDemo extends CellWidget {
               ),
               const SizedBox(height: 10),
               // A switch with its state controlled by cell `state`
-              CellSwitch(
+              LiveSwitch(
                 value: state,
               ),
               CellWidget.builder((_) => Text('The switch is ${state() ? 'on' : 'off'}')),

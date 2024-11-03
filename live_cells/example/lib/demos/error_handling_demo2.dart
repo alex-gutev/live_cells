@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 /// Example showing usage of *maybe cells* for handling errors in two-way data
 /// flow.
@@ -11,6 +11,8 @@ import 'package:live_cells/live_cells.dart';
 /// The purpose of this example is to demonstrate how the text field validation
 /// functionality can be packaged in a reusable function.
 class ErrorHandlingDemo2 extends CellWidget {
+  const ErrorHandlingDemo2({super.key});
+
   @override
   Widget build(BuildContext context) {
     final a = MutableCell<num>(0);
@@ -75,7 +77,7 @@ class ErrorHandlingDemo2 extends CellWidget {
 ///
 /// The field also displays an error message if it is empty or the entered
 /// text is not a valid number
-class NumberField extends StaticWidget {
+class NumberField extends CellWidget {
   /// The `num` cell to which the content of the field is bound
   final MutableCell<num> n;
 
@@ -98,16 +100,16 @@ class NumberField extends StaticWidget {
 
     final isEmpty = ValueCell.computed(() => content().isEmpty);
 
-    return CellTextField(
+    return LiveTextField(
       content: content,
-      keyboardType: TextInputType.number.cell,
-      decoration: ValueCell.computed(() => InputDecoration(
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
           errorText: isEmpty()
               ? 'Cannot be empty'
               : error() != null
               ? 'Not a valid number'
               : null
-      )),
+      ),
     );
   }
 }

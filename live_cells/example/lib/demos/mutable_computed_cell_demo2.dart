@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 /// Example showing a user defined multi-argument mutable computed cell
 class MutableComputedCellDemo2 extends CellWidget {
+  const MutableComputedCellDemo2({super.key});
+
   @override
   Widget build(BuildContext context) {
     final a = MutableCell<num>(0);
@@ -36,9 +38,9 @@ class MutableComputedCellDemo2 extends CellWidget {
                   Expanded(
                     // Text field for a, note the `mutableString` to convert
                     // the `num` to a `string` and vice versa
-                    child: CellTextField(
+                    child: LiveTextField(
                       content: a.mutableString(),
-                      keyboardType: TextInputType.number.cell,
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 5),
@@ -47,9 +49,9 @@ class MutableComputedCellDemo2 extends CellWidget {
                   Expanded(
                     // Text field for b, note the `mutableString` to convert
                     // the `num` to a `string` and vice versa
-                    child: CellTextField(
+                    child: LiveTextField(
                       content: b.mutableString(),
-                      keyboardType: TextInputType.number.cell,
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 5),
@@ -63,9 +65,9 @@ class MutableComputedCellDemo2 extends CellWidget {
                     // the sum using this field. Doing so updates the values
                     // in the fields for a and b to 1/2 the value entered in
                     // this field
-                    child: CellTextField(
+                    child: LiveTextField(
                       content: sum.mutableString(),
-                      keyboardType: TextInputType.number.cell,
+                      keyboardType: TextInputType.number,
                     ),
                   )
                 ],

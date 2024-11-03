@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 /// Example showing a CellTextField for numeric input.
 ///
 /// The example demonstrates using `mutableString` to convert a `num` value to
 /// a `string` and vice versa.
 class MutableComputedCellDemo extends CellWidget {
+  const MutableComputedCellDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cells holding the parsed `num` values from fields `a` and `b`
@@ -44,18 +46,18 @@ class MutableComputedCellDemo extends CellWidget {
               Row(
                 children: [
                   Expanded(
-                    child: CellTextField(
+                    child: LiveTextField(
                       content: strA,
-                      keyboardType: TextInputType.number.cell,
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 5),
                   const Text('+'),
                   const SizedBox(width: 5),
                   Expanded(
-                    child: CellTextField(
+                    child: LiveTextField(
                       content: strB,
-                      keyboardType: TextInputType.number.cell,
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                 ],

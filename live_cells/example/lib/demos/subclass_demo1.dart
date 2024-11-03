@@ -18,6 +18,8 @@ class ClampCell<T extends num> extends DependentCell<T> {
 }
 
 class SubclassDemo1 extends CellWidget {
+  const SubclassDemo1({super.key});
+
   @override
   Widget build(BuildContext context) {
     final a = MutableCell(5);

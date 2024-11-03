@@ -6,6 +6,8 @@ import 'package:live_cells/live_cells.dart';
 /// NOTE: This example uses CellWidget and the watch method instead of
 /// ValueCell.watch.
 class WatchDemo extends StatelessWidget {
+  const WatchDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

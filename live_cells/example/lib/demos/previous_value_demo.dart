@@ -5,6 +5,8 @@ import 'package:live_cells/live_cells.dart';
 ///
 /// This example also demonstrates exception handling using `onError`.
 class PreviousValueDemo extends CellWidget {
+  const PreviousValueDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the counter value

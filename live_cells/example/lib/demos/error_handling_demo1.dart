@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 /// Example showing usage of *maybe cells* for handling errors in two-way data
 /// flow.
@@ -9,6 +9,8 @@ import 'package:live_cells/live_cells.dart';
 /// retrieve numeric input from a text field whilst handling invalid input by
 /// displaying and error message under the field.
 class ErrorHandlingDemo1 extends CellWidget {
+  const ErrorHandlingDemo1({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cells holding the parsed `num` values from fields `a` and `b`
@@ -58,28 +60,28 @@ class ErrorHandlingDemo1 extends CellWidget {
               Row(
                 children: [
                   Expanded(
-                    child: CellTextField(
+                    child: LiveTextField(
                       content: strA,
-                      keyboardType: TextInputType.number.cell,
-                      decoration: ValueCell.computed(() => InputDecoration(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
                         errorText: errorA() != null
                             ? 'Please enter a valid number'
                             : null
-                      )),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 5),
                   const Text('+'),
                   const SizedBox(width: 5),
                   Expanded(
-                    child: CellTextField(
+                    child: LiveTextField(
                       content: strB,
-                      keyboardType: TextInputType.number.cell,
-                      decoration: ValueCell.computed(() => InputDecoration(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
                           errorText: errorB() != null
                               ? 'Please enter a valid number'
                               : null
-                      )),
+                      ),
                     ),
                   ),
                 ],

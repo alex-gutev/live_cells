@@ -4,6 +4,8 @@ import 'package:live_cells/live_cells.dart';
 // Basic example demonstrating how `CellWidget` rebuilds when the values of
 // cells referenced within it change.
 class CounterDemo extends CellWidget {
+  const CounterDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the counter value

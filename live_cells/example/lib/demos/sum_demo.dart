@@ -3,6 +3,8 @@ import 'package:live_cells/live_cells.dart';
 
 /// Example showing computed cells
 class SumDemo extends CellWidget {
+  const SumDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     final a = MutableCell(0);

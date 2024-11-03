@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
 enum RadioOption {
   optionA,
@@ -23,8 +23,10 @@ extension RadioOptionExtension on RadioOption {
   }
 }
 
-/// Example showing usage of [CellRadio]
-class CellRadioDemo extends CellWidget {
+/// Example showing usage of [LiveRadio]
+class LiveRadioDemo extends CellWidget {
+  const LiveRadioDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the group value - the value of the selected radio button
@@ -32,7 +34,7 @@ class CellRadioDemo extends CellWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CellRadio Demo'),
+        title: const Text('LiveRadio Demo'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -50,20 +52,20 @@ class CellRadioDemo extends CellWidget {
               const SizedBox(height: 10),
               // Three radio buttons with the group value controlled by the
               // `option` cell
-              CellRadioListTile(
-                value: RadioOption.optionA.cell,
+              LiveRadioListTile(
+                value: RadioOption.optionA,
                 groupValue: option,
-                title: const Text('Option A').cell,
+                title: const Text('Option A'),
               ),
-              CellRadioListTile(
-                value: RadioOption.optionB.cell,
+              LiveRadioListTile(
+                value: RadioOption.optionB,
                 groupValue: option,
-                title: const Text('Option B').cell,
+                title: const Text('Option B'),
               ),
-              CellRadioListTile(
-                value: RadioOption.optionC.cell,
+              LiveRadioListTile(
+                value: RadioOption.optionC,
                 groupValue: option,
-                title: const Text('Option C').cell,
+                title: const Text('Option C'),
               ),
               CellWidget.builder((_) => Text('Selected option: ${option()?.prettyName ?? 'None'}')),
               // The following buttons change the selected radio button by

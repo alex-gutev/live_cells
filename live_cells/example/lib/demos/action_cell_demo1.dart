@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_cells/live_cells.dart';
 
@@ -32,6 +31,8 @@ class ActionCellDemo1 extends CellWidget {
   // is placed in a static final variable to ensure the same list is always
   // passed to initialValue.
   static final _loadingData = List.filled(5, const Country.blank());
+
+  const ActionCellDemo1({super.key});
 
   /// Cell that retrieves the list of countries.
   ///

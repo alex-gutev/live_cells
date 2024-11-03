@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
 
 import 'package:dio/dio.dart';
@@ -34,7 +32,7 @@ class Country {
 /// Demonstrates network requests and action cells.
 ///
 /// This is the same as ActionCellDemo1 but also demonstrates data binding with
-/// live_cell_widgets and live_cell_extension.
+/// live_cells_ui and live_cell_extension.
 class ActionCellDemo2 extends CellWidget {
   // Placeholder data to display while loading for "shimmer" effect
   //
@@ -42,6 +40,8 @@ class ActionCellDemo2 extends CellWidget {
   // is placed in a static final variable to ensure the same list is always
   // passed to initialValue.
   static final _loadingData = List.filled(5, const Country.blank());
+
+  const ActionCellDemo2({super.key});
 
   /// Cell that retrieves the list of countries.
   ///
@@ -114,10 +114,10 @@ class ActionCellDemo2 extends CellWidget {
                           /// accessed the name property, of the [Country] at [index]
                           /// within the list in [data]. This widget will only rebuild
                           /// if the name has actually changed.
-                          itemBuilder: (_, index) => CellText(
-                            data: data[index.cell].name,
-                            textAlign: TextAlign.center.cell,
-                          ),
+                          itemBuilder: (_, index) => CellWidget.builder((_) =>Text(
+                            data[index.cell].name(),
+                            textAlign: TextAlign.center,
+                          )),
                       ),
                     ),
                   ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:live_cells/live_cell_widgets.dart';
 import 'package:live_cells/live_cells.dart';
+import 'package:live_cells/live_cells_ui.dart';
 
-/// Example showing using of [CellTextField]
-class CellTextFieldDemo1 extends CellWidget {
+/// Example showing using of [LiveTextField]
+class LiveTextFieldDemo1 extends CellWidget {
+  const LiveTextFieldDemo1({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Cell holding the content of the field
@@ -11,7 +13,7 @@ class CellTextFieldDemo1 extends CellWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User input using CellTextField'),
+        title: const Text('User input using LiveTextField'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -21,7 +23,7 @@ class CellTextFieldDemo1 extends CellWidget {
             children: [
               const SizedBox(height: 10),
               // A text field with its content controlled by cell `input`
-              CellTextField(content: input),
+              LiveTextField(content: input),
               const SizedBox(height: 10),
               const Text(
                   'You wrote:',
@@ -32,7 +34,7 @@ class CellTextFieldDemo1 extends CellWidget {
               ),
               const SizedBox(height: 10),
               // The content of the text field is retrieved using the `input` cell
-              CellText(data: input),
+              Text(input()),
               // This button clears the text field by assigning the empty string
               // to the `input` cell
               ElevatedButton(
