@@ -1,3 +1,26 @@
+# 0.25.1
+
+Add missing Changelog entry for 0.25.0.
+
+# 0.25.0
+
+Breaking changes:
+
+* The minimum Flutter version has been increased to 3.24.3.
+* The `live_cells_widgets` library is deprecated. Use the `live_cells_ui` library.
+* The `live_cells_ui` library provides the same functionality as `live_cells_widgets`
+  with the following differences:
+
+  * The widgets are prefixed with `Live` instead of `Cell`, e.g. `LiveTextField` from `live_cells_ui`
+    is the equivalent to `CellTextField` from `live_cell_widgets`
+
+  * Only those properties which represent user input are cells, the rest are regular values. For example
+    in `LiveSwitch` only the `value` and `enabled` properties are cells.
+
+  * `live_cells_ui` does not provide wrappers for widgets which do not take input from the user,
+    for example there is no `LiveText` equivalent to `CellText`. Wrap a regular `Text` widget in a
+    `CellWidget.builder` or a `CellWidget` subclass for reactivity.
+
 # 0.24.1
 
 New features:
