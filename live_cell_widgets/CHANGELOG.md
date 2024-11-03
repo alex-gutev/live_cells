@@ -1,3 +1,7 @@
+## 0.12.1
+
+* Fix typos in changelog.
+
 ## 0.12.0
 
 Breaking changes:
@@ -10,7 +14,7 @@ Breaking changes:
   * The widgets are prefixed with `Live` instead of `Cell`, e.g. `LiveTextField` from `live_cells_ui`
     is the equivalent to `CellTextField` from `live_cell_widgets`
 
-  * Only those properties which user input are cells, the reset are regular values. For example
+  * Only those properties which represent user input are cells, the rest are regular values. For example
     in `LiveSwitch` only the `value` and `enabled` properties are cells.
   
   * `live_cells_ui` does not provide wrappers for widgets which do not take input from the user,
