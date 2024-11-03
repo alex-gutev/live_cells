@@ -8,12 +8,12 @@ documentation and examples.
 * This library allows you to write this:
 
   ```dart
-  final content = MutableCell('');
-
   @override
   Widget build(BuildContext context) {
+    final content = MutableCell('');
+    
     return Column([
-      CellText(data: content),
+      Text(content()),
       ElevatedButton(
         child: Text('Say Hi!'),
         onPressed: () => content.value = 'Hi!'
@@ -51,12 +51,13 @@ documentation and examples.
 * Data can flow in both ways, which allows you to write this:
 
   ```dart
-  final switchState = MutableCell(true);
 
   @override
   Widget build(BuildContext context) {
+    final switchState = MutableCell(true);
+
     return Column([
-      CellSwitch(
+      LiveSwitch(
         value: switchState
       )
     ]);
@@ -97,32 +98,9 @@ documentation and examples.
 ## Usage
 
 The provided wrapper classes are named the same as their corresponding Flutter widget classes but 
-prefixed with `Cell`, e.g. `CellText` is the wrapper for Flutter's `Text`, `CellSwitch` is the 
-wrapper for Flutter's `Switch`.
-
-Each wrapper class provides a constructor which accepts the same arguments (with a few exceptions)
-as the constructor of the equivalent Flutter widget, but instead of taking raw values each argument
-takes a `ValueCell`. The only exception is the `key` argument which is not a `ValueCell`.
-
-Every wrapper class also provides a `bind` method which creates a copy of the widget but with
-different values (`ValueCell`'s) for some of the properties. 
-
-For example, the following:
-
-```dart
-final text = CellText(data: 'hello'.cell) // Initialize with a const 'hello'
-  .bind(data: content)    // Bind the data property to the cell `content`
-  .bind(style: textStyle); // Bind the style property to the cell `textStyle`
-```
-
-is equivalent to:
-
-```dart
-final text = CellText(
-  data: content,
-  style: textStyle
-);
-```
+prefixed with `Live`, e.g. `LiveTextFIeld` is the wrapper for Flutter's `TextField`, `LiveSwitch` 
+is the wrapper for Flutter's `Switch`. Each wrapper class provides a constructor which accepts the 
+same arguments (with a few exceptions) as the constructor of the equivalent Flutter widget.
 
 ## Additional information
 
