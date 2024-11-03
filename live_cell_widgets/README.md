@@ -98,7 +98,7 @@ documentation and examples.
 ## Usage
 
 The provided wrapper classes are named the same as their corresponding Flutter widget classes but 
-prefixed with `Live`, e.g. `LiveTextFIeld` is the wrapper for Flutter's `TextField`, `LiveSwitch` 
+prefixed with `Live`, e.g. `LiveTextField` is the wrapper for Flutter's `TextField`, `LiveSwitch` 
 is the wrapper for Flutter's `Switch`. Each wrapper class provides a constructor which accepts the 
 same arguments (with a few exceptions) as the constructor of the equivalent Flutter widget.
 

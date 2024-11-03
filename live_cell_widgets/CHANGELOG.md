@@ -1,3 +1,7 @@
+## 0.12.3
+
+* Fix typos in README.
+
 ## 0.12.2
 
 * Update README.
