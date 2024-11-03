@@ -1,3 +1,7 @@
+# 0.25.2
+
+Update examples in readme.
+
 # 0.25.1
 
 Add missing Changelog entry for 0.25.0.

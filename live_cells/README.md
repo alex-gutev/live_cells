@@ -170,7 +170,7 @@ print(sum.value);  // Prints 6
 This package also provides a collection of widgets, which allow their properties to be controlled
 and observed by cells:
 
-For example `CellSwitch` is this library's equivalent of `Switch`:
+For example `LiveSwitch` is this library's equivalent of `Switch`:
 
 ```dart
 final state = MutableCell(false);
@@ -178,7 +178,7 @@ final state = MutableCell(false);
 return Column(
   children: [
     // This binds the value of the switch to `state`
-    CellSwitch(
+    LiveSwitch(
       value: state
     );
     // This widget is rebuilt whenever the switch is toggled
@@ -201,10 +201,10 @@ code:
 ```dart
 final n = MutableCell<num>(0);
 
-// CellTextField is a Live Cells TextField
+// LiveTextField is a Live Cells TextField
 //
 // This binds the content of the field to `n`
-return CellTextField(
+return LiveTextField(
   // Example of two-way data flow:
   //
   // When the value of `n` is set, `mutableString()` converts it to
