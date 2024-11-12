@@ -1,3 +1,7 @@
+## 0.12.4
+
+* Fix issue with cell state restoration.
+
 ## 0.12.3
 
 * Fix typos in README.
