@@ -1,3 +1,7 @@
+# 0.25.3
+
+* Fix issue with cell state restoration in widgets.
+
 # 0.25.2
 
 Update examples in readme.
