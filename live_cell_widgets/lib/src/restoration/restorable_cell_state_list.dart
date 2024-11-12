@@ -35,7 +35,7 @@ class RestorableCellStateList extends RestorableProperty<List>{
 
   @override
   List fromPrimitives(Object? data) {
-    return data as List;
+    return List.from(data as List);
   }
 
   @override
