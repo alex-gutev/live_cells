@@ -103,6 +103,10 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
 
   /// Set the value of element [index] to [elem] in the [List] held in this cell.
   ///
+  /// [index] may either be less than the length of the list or equal to the
+  /// length of the list, in which case [elem] is appended to the end of the
+  /// list.
+  ///
   /// **NOTE**: The actual list is not modified but a new list is created.
   void operator[]=(int index, T elem) {
     value = _updatedList(value, index, elem);
@@ -164,8 +168,16 @@ class _MutableListIndexKey extends CellKey2<MutableCell, ValueCell> {
 /// This is not the most efficient way of doing this. Eventually the underlying
 /// array should be replaced by a different data structure.
 List<T> _updatedList<T>(List<T> list, int index, T newValue) {
-  final newList = List<T>.from(list, growable: false);
-  newList[index] = newValue;
+  assert(index <= list.length);
+
+  final newList = List<T>.from(list, growable: index == list.length);
+
+  if (index == list.length) {
+    newList.add(newValue);
+  }
+  else {
+    newList[index] = newValue;
+  }
 
   return UnmodifiableListView(newList);
 }
