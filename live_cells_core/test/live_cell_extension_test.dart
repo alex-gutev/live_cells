@@ -39,21 +39,24 @@ class Person {
 @CellExtension(mutable: true)
 class Student extends Person {
   final int studentNo;
+  final int? courseId;
 
   const Student({
     required super.firstName,
     required super.lastName,
     required super.age,
-    required this.studentNo
+    required this.studentNo,
+    this.courseId
   });
 
   @override
   bool operator ==(Object other) => other is Student &&
     super == other &&
-    studentNo == other.studentNo;
+    studentNo == other.studentNo &&
+    courseId == other.courseId;
 
   @override
-  int get hashCode => Object.hash(super.hashCode, studentNo);
+  int get hashCode => Object.hash(super.hashCode, studentNo, courseId);
 
 }
 
@@ -277,6 +280,15 @@ void main() {
       expect(oFullName.values, equals(['Bob Smith', 'Jane Doe', 'Eric Jones']));
       expect(oAge.values, equals([30, 35, 27]));
       expect(oStudentNo.values, equals([11, 100, 15]));
+
+      final oCourseId = addObserver(person.courseId, MockValueObserver());
+
+      person.courseId.value = 100;
+      person.courseId.value = 4;
+      person.courseId.value = null;
+      person.courseId.value = 1;
+
+      expect(oCourseId.values, equals([100, 4, null, 1]));
     });
 
     test('Property cells compare == when same object cell', () {
