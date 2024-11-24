@@ -12,7 +12,7 @@ environment:
 dependencies:
   meta: ">=1.10.0 <2.0.0"
   collection: ">=1.16.0 <2.0.0"
-  live_cell_annotations: ^0.4.2
+  live_cell_annotations: ^0.4.4
   record_extender_annotations: ^0.1.0
 
 dev_dependencies:
@@ -23,7 +23,7 @@ dev_dependencies:
   build_runner: ^2.4.8
   record_extender: ^0.1.0
 
-  live_cell_extension: ^0.5.7
+  live_cell_extension: ^0.5.10
 
 topics:
   - reactive
