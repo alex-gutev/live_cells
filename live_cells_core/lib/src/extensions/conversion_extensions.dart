@@ -210,6 +210,15 @@ extension MutableNullCheckExtension<T> on MutableCell<T?> {
   MutableCell<T> get notNull => (this as ValueCell<T?>).notNull.mutableApply((p0) => p0, (p0) {
     value = p0;
   }, key: _MutableNullCheckExtensionKey(this));
+
+  /// Mutable version of [NullCheckExtension.coalesce].
+  ///
+  /// Setting the value of the returned cell sets the value of [this] cell.
+  MutableCell<T> coalesce(ValueCell<T> ifNull) => (this as ValueCell<T?>)
+      .coalesce(ifNull)
+      .mutableApply((p0) => p0, (p0) {
+        value = p0;
+      }, key: _MutableNullCheckCoalesceKey(this, ifNull));
 }
 
 /// Key identifying a cell created with [NullCheckExtension.notNull].
@@ -225,4 +234,9 @@ class _MutableNullCheckExtensionKey<T> extends CellKey1<MutableCell<T>> {
 /// Key identifying a cell created with [NullCheckExtension.coalesce].
 class _NullCheckCoalesceKey<T> extends CellKey2<ValueCell<T?>, ValueCell<T>> {
   _NullCheckCoalesceKey(super.value1, super.value2);
+}
+
+/// Key identifying a cell created with [MutableNullCheckExtension.coalesce].
+class _MutableNullCheckCoalesceKey<T> extends CellKey2<MutableCell<T?>, ValueCell<T>> {
+  _MutableNullCheckCoalesceKey(super.value1, super.value2);
 }
