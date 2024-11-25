@@ -1125,8 +1125,10 @@ void main() {
     group('.coalesce', () {
       test('Returns value of cell when not null', () {
         final a = MutableCell<int?>(0);
+        final ValueCell<int?> cell = a;
+
         final n = MutableCell(-1);
-        final b = a.coalesce(n);
+        final b = cell.coalesce(n);
 
         final observer = addObserver(b, MockValueObserver());
         expect(b.value, 0);
@@ -1140,8 +1142,10 @@ void main() {
 
       test('Returns value of coalesce when null.', () {
         final a = MutableCell<int?>(null);
+        final ValueCell<int?> cell = a;
+
         final n = MutableCell(-1);
-        final b = a.coalesce(n);
+        final b = cell.coalesce(n);
 
         final observer = addObserver(b, MockValueObserver());
 
@@ -1160,7 +1164,9 @@ void main() {
 
       test('Only evaluates coalesce when value is null', () {
         final a = MutableCell<int?>(null);
-        final b = a.coalesce(ValueCell.computed(() => throw ArgumentError()));
+        final ValueCell<int?> cell = a;
+
+        final b = cell.coalesce(ValueCell.computed(() => throw ArgumentError()));
 
         observeCell(b);
         expect(() => b.value, throwsArgumentError);
@@ -1176,8 +1182,8 @@ void main() {
         final a = MutableCell<int?>(0);
         final n = MutableCell<int>(-1);
 
-        final c1 = a.coalesce(n);
-        final c2 = a.coalesce(n);
+        final c1 = (a as ValueCell<int?>).coalesce(n);
+        final c2 = (a as ValueCell<int?>).coalesce(n);
 
         expect(c1 == c2, isTrue);
         expect(c1.hashCode == c2.hashCode, isTrue);
@@ -1188,8 +1194,8 @@ void main() {
         final b = MutableCell<int?>(0);
         final n = MutableCell<int>(-1);
 
-        final c1 = a.coalesce(n);
-        final c2 = b.coalesce(n);
+        final c1 = (a as ValueCell<int?>).coalesce(n);
+        final c2 = (b as ValueCell<int?>).coalesce(n);
         final c3 = a.coalesce((-1).cell);
 
         expect(c1 == c1, isTrue);
