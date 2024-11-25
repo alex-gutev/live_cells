@@ -1204,6 +1204,110 @@ void main() {
         expect(c2 != c3, isTrue);
       });
     });
+
+    group('Mutable .coalesce', () {
+      test('Returns value of cell when not null', () {
+        final a = MutableCell<int?>(0);
+        final n = MutableCell(-1);
+        final b = a.coalesce(n);
+
+        final observer = addObserver(b, MockValueObserver());
+        expect(b.value, 0);
+
+        a.value = 1;
+        a.value = 2;
+        a.value = 3;
+
+        expect(observer.values, equals([1, 2, 3]));
+      });
+
+      test('Returns value of coalesce when null.', () {
+        final a = MutableCell<int?>(null);
+        final n = MutableCell(-1);
+        final b = a.coalesce(n);
+
+        final observer = addObserver(b, MockValueObserver());
+
+        expect(b.value, -1);
+
+        a.value = 1;
+        a.value = null;
+        n.value = -2;
+        a.value = 3;
+        n.value = -10;
+        a.value = 4;
+        a.value = null;
+
+        expect(observer.values, equals([1, -1, -2, 3, 4, -10]));
+      });
+
+      test('Only evaluates coalesce when value is null', () {
+        final a = MutableCell<int?>(null);
+        final b = a.coalesce(ValueCell.computed(() => throw ArgumentError()));
+
+        observeCell(b);
+        expect(() => b.value, throwsArgumentError);
+
+        a.value = 1;
+        expect(b.value, 1);
+
+        a.value = null;
+        expect(() => b.value, throwsArgumentError);
+      });
+
+      test('Passes assigned value to original cell', () {
+        final a = MutableCell<int?>(null);
+        final n = MutableCell(-1);
+        final b = a.coalesce(n);
+
+        final observerB = addObserver(b, MockValueObserver());
+        final observerA = addObserver(a, MockValueObserver());
+
+        expect(a.value, isNull);
+        expect(b.value, -1);
+
+        n.value = 1;
+        n.value = 2;
+
+        b.value = 5;
+        b.value = 6;
+
+        n.value = 3;
+        n.value = 4;
+
+        a.value = null;
+        n.value = 100;
+
+        expect(observerA.values, equals([5, 6, null]));
+        expect(observerB.values, equals([1, 2, 5, 6, 4, 100]));
+      });
+
+      test('Compares == when same cells', () {
+        final a = MutableCell<int?>(0);
+        final n = MutableCell<int>(-1);
+
+        final c1 = a.coalesce(n);
+        final c2 = a.coalesce(n);
+
+        expect(c1 == c2, isTrue);
+        expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        final a = MutableCell<int?>(0);
+        final b = MutableCell<int?>(0);
+        final n = MutableCell<int>(-1);
+
+        final c1 = a.coalesce(n);
+        final c2 = b.coalesce(n);
+        final c3 = a.coalesce((-1).cell);
+
+        expect(c1 == c1, isTrue);
+        expect(c1 != c2, isTrue);
+        expect(c1 != c3, isTrue);
+        expect(c2 != c3, isTrue);
+      });
+    });
   });
 
   group('Duration extensions', () {
