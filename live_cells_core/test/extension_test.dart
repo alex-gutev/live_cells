@@ -1100,6 +1100,29 @@ void main() {
         expect(b.value, 2);
       });
 
+      test('Passes assigned value to original cell', () {
+        final a = MutableCell<int?>(null);
+        final b = a.notNull;
+
+        final observerA = addObserver(a, MockValueObserver());
+        final observerB = addObserver(b, MockValueObserver());
+
+        expect(a.value, isNull);
+        expect(() => b.value, throwsA(isA<NullCellError>()));
+
+        a.value = 1;
+        a.value = 2;
+
+        b.value = 3;
+        b.value = 4;
+
+        a.value = 5;
+        b.value = 6;
+
+        expect(observerA.values, equals([1, 2, 3, 4, 5, 6]));
+        expect(observerB.values, equals([1, 2, 3, 4, 5, 6]));
+      });
+
       test('Compares == when same cell', () {
         final a = MutableCell<int?>(0);
 
