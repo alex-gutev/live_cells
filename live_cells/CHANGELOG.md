@@ -1,3 +1,38 @@
+# 0.25.4
+
+New features:
+
+* `coalesce` extension method on `MutableCell`s.
+
+  When `coalesce` is called on a `MutableCell`, a `MutableCell` is now returned. This allows
+  assigning the value of the cell on which the method is called via the cell returned by `coalesce`.
+
+  Example:
+
+  ```dart
+  final a = MutableCell<int?>(null);
+  final b = MutableCell(-1);
+  
+  // c is a MutableCell
+  final c = a.coalesce(b);
+  
+  ValueCell.watch(() {
+    print('A = ${a()}');
+  });
+  
+  ValueCell.watch(() {
+    print('C = ${c()}');
+  });
+  
+  b.value = 1; // Prints 'A = 1' and 'C = 1'
+  
+  // Assigning value of 'c' assigns value of 'a'
+  c.value = 2; // Prints 'A = 2' and 'C = 2'
+  
+  // Doesn't print anything since the value of 'a' is not null
+  b.value = 3;
+  ```
+
 # 0.25.3
 
 * Fix issue with cell state restoration in widgets.
