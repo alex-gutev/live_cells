@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -1007,6 +1008,251 @@ void main() {
     });
   });
 
+  group('Type Conversions with NumberFormat', () {
+    final germanIntFormat = NumberFormat("#,##0", "de_DE");
+    final germanDoubleFormat = NumberFormat("#,##0.00", "de_DE");
+
+    test('ParseIntExtension.mutableString() converts argument cell to string',
+        () {
+      final a = MutableCell(1);
+      final strA = a.mutableString(format: germanIntFormat);
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      a.value = 5;
+
+      expect(strA.value, equals('5'));
+    });
+
+    test(
+        'ParseIntExtension.mutableString() sets argument cell to parsed integer',
+        () {
+      final a = MutableCell(1);
+      final strA = a.mutableString(format: germanIntFormat);
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      strA.value = '32';
+
+      expect(a.value, equals(32));
+    });
+
+    test(
+        'ParseIntExtension.mutableString() sets cell to errorValue on errors during parsing integer',
+        () {
+      final a = MutableCell(1);
+
+      final strA = a.mutableString(errorValue: 7.cell, format: germanIntFormat);
+
+      strA.value = '25';
+      expect(a.value, equals(25));
+
+      strA.value = '12djdjdjdj';
+      expect(a.value, equals(7));
+
+      strA.value = '16';
+      expect(a.value, equals(16));
+    });
+
+    test(
+        'ParseMaybeIntExtension.mutableString() forwards errors to argument cell',
+        () {
+      final a = MutableCell(1);
+      final maybe = a.maybe();
+      final error = maybe.error;
+
+      final strA = maybe.mutableString(format: germanIntFormat);
+
+      strA.value = '25';
+
+      expect(a.value, equals(25));
+      expect(error.value, isNull);
+
+      strA.value = '12djdjdjdj';
+
+      expect(a.value, equals(25));
+      expect(error.value, isNotNull);
+
+      strA.value = '16';
+
+      expect(a.value, equals(16));
+      expect(error.value, isNull);
+    });
+
+    test(
+        'ParseDoubleExtension.mutableString() converts argument cell to string',
+        () {
+      final a = MutableCell(1.0);
+      final strA = a.mutableString(format: germanDoubleFormat);
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      a.value = 7.5;
+
+      expect(strA.value, equals('7,50'));
+    });
+
+    test(
+        'ParseDoubleExtension.mutableString() sets argument cell to parsed double',
+        () {
+      final a = MutableCell(1.0);
+      final strA = a.mutableString(format: germanDoubleFormat);
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      strA.value = '3,5';
+
+      expect(a.value, equals(3.5));
+    });
+
+    test(
+        'ParseDoubleExtension.mutableString() sets cell to errorValue on errors during parsing double',
+        () {
+      final a = MutableCell(1.0);
+
+      final strA = a.mutableString(
+        errorValue: 2.5.cell,
+        format: germanDoubleFormat,
+      );
+
+      strA.value = '7,5';
+      expect(a.value, equals(7.5));
+
+      strA.value = '3.4djdjdjdj';
+      expect(a.value, equals(2.5));
+
+      strA.value = '9,0';
+      expect(a.value, equals(9.0));
+    });
+
+    test(
+        'ParseMaybeDoubleExtension.mutableString() forwards errors to argument cell',
+        () {
+      final a = MutableCell(1.0);
+      final maybe = a.maybe();
+      final error = maybe.error;
+
+      final strA = maybe.mutableString(format: germanDoubleFormat);
+
+      strA.value = '7,5';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNull);
+
+      strA.value = '3.4djdjdjdj';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNotNull);
+
+      strA.value = '9,0';
+
+      expect(a.value, equals(9.0));
+      expect(error.value, isNull);
+    });
+
+    test('ParseNumExtension.mutableString() converts argument cell to string',
+        () {
+      final a = MutableCell<num>(1);
+      final strA = a.mutableString(format: germanDoubleFormat);
+
+      final observer = MockValueObserver();
+      strA.addObserver(observer);
+
+      a.value = 7.5;
+      a.value = 3;
+
+      expect(observer.values, equals(['7,50', '3,00']));
+    });
+
+    test('ParseNumExtension.mutableString() sets argument cell to parsed num',
+        () {
+      final a = MutableCell<num>(1);
+      final strA = a.mutableString(format: germanDoubleFormat);
+
+      final observer = MockValueObserver();
+      a.addObserver(observer);
+
+      strA.value = '3,5';
+      strA.value = '100';
+
+      expect(observer.values, equals([3.5, 100]));
+    });
+
+    test(
+        'ParseNumExtension.mutableString() sets cell to errorValue on errors during parsing num',
+        () {
+      final a = MutableCell<num>(0);
+
+      final strA =
+          a.mutableString(errorValue: 8.cell, format: germanDoubleFormat);
+
+      strA.value = '7,5';
+      expect(a.value, equals(7.5));
+
+      strA.value = '3.4djdjdjdj';
+      expect(a.value, equals(8));
+
+      strA.value = '5';
+      expect(a.value, equals(5));
+    });
+
+    test('ParseNumExtension.mutableString() forwards errors to argument cell',
+        () {
+      final a = MutableCell<num>(0);
+      final maybe = a.maybe();
+      final error = maybe.error;
+
+      final strA = maybe.mutableString(format: germanDoubleFormat);
+
+      strA.value = '7,5';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNull);
+
+      strA.value = '3.4djdjdjdj';
+
+      expect(a.value, equals(7.5));
+      expect(error.value, isNotNull);
+
+      strA.value = '5';
+
+      expect(a.value, equals(5));
+      expect(error.value, isNull);
+    });
+
+    test(
+        'ConvertStringExtension.mutableString() converts argument cell to string',
+        () {
+      final a = MutableCell('');
+      final strA = a.mutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      a.value = 'hello';
+
+      expect(strA.value, equals('hello'));
+    });
+
+    test(
+        'ConvertStringExtension.mutableString() simply sets argument cell value',
+        () {
+      final a = MutableCell('');
+      final strA = a.mutableString();
+
+      final observer = MockSimpleObserver();
+      strA.addObserver(observer);
+
+      strA.value = '3.5';
+
+      expect(a.value, equals('3.5'));
+    });
+  });
+
   group('NullCheckExtension', () {
     group('.notNull', () {
       test('Returns value of cell when not null', () {
@@ -1189,7 +1435,8 @@ void main() {
         final a = MutableCell<int?>(null);
         final ValueCell<int?> cell = a;
 
-        final b = cell.coalesce(ValueCell.computed(() => throw ArgumentError()));
+        final b =
+            cell.coalesce(ValueCell.computed(() => throw ArgumentError()));
 
         observeCell(b);
         expect(() => b.value, throwsArgumentError);
@@ -3686,10 +3933,7 @@ void main() {
     });
 
     test('ValueCell.transform compares == when same cell and type', () {
-      final value = TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      );
+      final value = TestInheritedClass(testValue: 'test', testValueTwo: 1);
 
       final base = ValueCell<TestBaseClass>.value(value);
 
@@ -3701,15 +3945,11 @@ void main() {
     });
 
     test('ValueCell.transform compares != when different cell', () {
-      final base1 = ValueCell<TestBaseClass>.value(TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      ));
+      final base1 = ValueCell<TestBaseClass>.value(
+          TestInheritedClass(testValue: 'test', testValueTwo: 1));
 
-      final base2 = ValueCell<TestBaseClass>.value(TestInheritedClass(
-        testValue: 'test2',
-        testValueTwo: 2
-      ));
+      final base2 = ValueCell<TestBaseClass>.value(
+          TestInheritedClass(testValue: 'test2', testValueTwo: 2));
 
       final a = base1.transform<TestInheritedClass>();
       final b = base2.transform<TestInheritedClass>();
@@ -3719,15 +3959,11 @@ void main() {
     });
 
     test('ValueCell.transform compares != when different cell', () {
-      final base1 = ValueCell<TestBaseClass>.value(TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      ));
+      final base1 = ValueCell<TestBaseClass>.value(
+          TestInheritedClass(testValue: 'test', testValueTwo: 1));
 
-      final base2 = ValueCell<TestBaseClass>.value(TestInheritedClass(
-          testValue: 'test2',
-          testValueTwo: 2
-      ));
+      final base2 = ValueCell<TestBaseClass>.value(
+          TestInheritedClass(testValue: 'test2', testValueTwo: 2));
 
       final a = base1.transform<TestInheritedClass>();
       final b = base2.transform<TestInheritedClass>();
@@ -3737,10 +3973,7 @@ void main() {
     });
 
     test('ValueCell.transform compares != when different type', () {
-      final value = TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      );
+      final value = TestInheritedClass(testValue: 'test', testValueTwo: 1);
 
       final base = ValueCell<TestBaseClass>.value(value);
 
@@ -3755,10 +3988,7 @@ void main() {
     });
 
     test('Mutable.transform compares == when same cell and type', () {
-      final value = TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      );
+      final value = TestInheritedClass(testValue: 'test', testValueTwo: 1);
 
       final base = MutableCell<TestBaseClass>(value);
 
@@ -3770,15 +4000,11 @@ void main() {
     });
 
     test('MutableCell.transform compares != when different cell', () {
-      final base1 = MutableCell<TestBaseClass>(TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      ));
+      final base1 = MutableCell<TestBaseClass>(
+          TestInheritedClass(testValue: 'test', testValueTwo: 1));
 
-      final base2 = MutableCell<TestBaseClass>(TestInheritedClass(
-          testValue: 'test2',
-          testValueTwo: 2
-      ));
+      final base2 = MutableCell<TestBaseClass>(
+          TestInheritedClass(testValue: 'test2', testValueTwo: 2));
 
       final a = base1.transform<TestInheritedClass>();
       final b = base2.transform<TestInheritedClass>();
@@ -3788,15 +4014,11 @@ void main() {
     });
 
     test('MutableCell.transform compares != when different cell', () {
-      final base1 = MutableCell<TestBaseClass>(TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      ));
+      final base1 = MutableCell<TestBaseClass>(
+          TestInheritedClass(testValue: 'test', testValueTwo: 1));
 
-      final base2 = MutableCell<TestBaseClass>(TestInheritedClass(
-          testValue: 'test2',
-          testValueTwo: 2
-      ));
+      final base2 = MutableCell<TestBaseClass>(
+          TestInheritedClass(testValue: 'test2', testValueTwo: 2));
 
       final a = base1.transform<TestInheritedClass>();
       final b = base2.transform<TestInheritedClass>();
@@ -3806,10 +4028,7 @@ void main() {
     });
 
     test('MutableCell.transform compares != when different type', () {
-      final value = TestInheritedClass(
-          testValue: 'test',
-          testValueTwo: 1
-      );
+      final value = TestInheritedClass(testValue: 'test', testValueTwo: 1);
 
       final base = MutableCell<TestBaseClass>(value);
 
