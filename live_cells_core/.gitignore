@@ -30,3 +30,6 @@ build/
 
 # FVM Version Cache
 .fvm/
+
+test/*.g.dart
+test/*.mocks.dart
