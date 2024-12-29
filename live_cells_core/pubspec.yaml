@@ -14,7 +14,7 @@ dependencies:
   collection: ">=1.16.0 <2.0.0"
   live_cell_annotations: ^0.4.4
   record_extender_annotations: ^0.1.0
-  intl: ^0.20.1
+  intl: ^0.19.0
 
 dev_dependencies:
   test: ^1.25.2
