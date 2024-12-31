@@ -158,7 +158,7 @@ extension ParseMaybeIntExtension on MaybeCell<int> {
               format?.format(value.unwrap) ?? value.unwrap.toString(),
           reverseCompute: (value) {
             this.value = Maybe.wrap(
-                () => format?.tryParse(value)?.toInt() ?? int.parse(value));
+                () => format?.parse(value).toInt() ?? int.parse(value));
           });
 }
 
@@ -179,7 +179,7 @@ extension ParseMaybeDoubleExtension on MaybeCell<double> {
               format?.format(value.unwrap) ?? value.unwrap.toString(),
           reverseCompute: (value) {
             this.value = Maybe.wrap(() =>
-                format?.tryParse(value)?.toDouble() ?? double.parse(value));
+                format?.parse(value).toDouble() ?? double.parse(value));
           });
 }
 
@@ -200,7 +200,7 @@ extension ParseMaybeNumExtension on MaybeCell<num> {
               format?.format(value.unwrap) ?? value.unwrap.toString(),
           reverseCompute: (value) {
             this.value =
-                Maybe.wrap(() => format?.tryParse(value) ?? num.parse(value));
+                Maybe.wrap(() => format?.parse(value) ?? num.parse(value));
           });
 }
 
