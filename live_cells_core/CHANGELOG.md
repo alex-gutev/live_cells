@@ -1,3 +1,24 @@
+# 0.25.0
+
+New features:
+
+* New `format` argument on `mutableString()` extension methods.
+
+  Example:
+
+  ```dart
+  final germanFormat = NumberFormat("#,##0.00", "de_DE");
+  
+  final a = MutableCell(1.0);
+  final strA = a.mutableString(format: germanFormat);
+  
+  a.value = 2.5;
+  print(strA.value); // 2,50
+  
+  strA.value = '12,30';
+  print(a.value); // 12.3
+  ```
+
 # 0.24.2
 
 New features:
