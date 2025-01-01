@@ -280,6 +280,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.19.0"
   io:
     dependency: transitive
     description:
@@ -356,25 +364,25 @@ packages:
     dependency: transitive
     description:
       name: live_cell_widgets
-      sha256: c5caeaa8eb8003b406c80659fb95718b1c45508e07ddd180368759cb2745d1d8
+      sha256: "2f0c5bc8e679c017e18252d48dc68af9973a65a834e9ecfb39a5eb9f6269de1a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.4"
+    version: "0.12.5"
   live_cells:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.25.4"
+    version: "0.26.0"
   live_cells_core:
     dependency: transitive
     description:
       name: live_cells_core
-      sha256: "7519d6af03ca9de286d4b46a5ee009e4b03926a49f8f550783adf7fd540eea22"
+      sha256: e5034eef70d121a40a6fe955c1339e9eb04376a91ed4c6576e47cf86a92e35bc
       url: "https://pub.dev"
     source: hosted
-    version: "0.24.2"
+    version: "0.25.0"
   logging:
     dependency: transitive
     description:
