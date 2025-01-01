@@ -1,3 +1,7 @@
+## 0.12.5
+
+Increase `live_cells_core` version to `0.25.0`.
+
 ## 0.12.4
 
 * Fix issue with cell state restoration.
