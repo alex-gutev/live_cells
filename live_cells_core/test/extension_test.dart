@@ -4042,4 +4042,44 @@ void main() {
       expect(a == a, isTrue);
     });
   });
+
+  group('Exception Cell', () {
+    test('Throws object held in cell', () {
+      final exception = TestException().cell;
+      final cell = exception.exception();
+
+      expect(() => cell.value, throwsA(isA<TestException>()));
+    });
+
+    test('Throws object held in mutable cell', () {
+      final exception = MutableCell(Exception('A test exception'));
+      final cell = exception.exception();
+
+      expect(() => cell.value, throwsA(isA<Exception>()));
+
+      exception.value = TestException();
+      expect(() => cell.value, throwsA(isA<TestException>()));
+    });
+
+    test('Compares == when same cell', () {
+      final e = MutableCell(TestException());
+
+      final c1 = e.exception();
+      final c2 = e.exception();
+
+      expect(c1 == c2, isTrue);
+      expect(c1.hashCode == c2.hashCode, isTrue);
+    });
+
+    test('Compares != when different cells', () {
+      final e1 = MutableCell(TestException());
+      final e2 = MutableCell(TestException());
+
+      final c1 = e1.exception();
+      final c2 = e2.exception();
+
+      expect(c1 != c2, isTrue);
+      expect(c1 == c1, isTrue);
+    });
+  });
 }
