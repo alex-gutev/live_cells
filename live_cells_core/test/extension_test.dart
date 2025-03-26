@@ -2717,13 +2717,13 @@ void main() {
       });
     });
 
-    group('.delete', () {
-      test('.delete removes item from list', () {
+    group('.removeAt', () {
+      test('.removeAt removes item from list', () {
         final l = MutableCell([1, 2, 3]);
         final observer = addObserver(l, MockValueObserver());
 
-        l.delete(1);
-        l.delete(0);
+        l.removeAt(1);
+        l.removeAt(0);
 
         expect(
             observer.values,

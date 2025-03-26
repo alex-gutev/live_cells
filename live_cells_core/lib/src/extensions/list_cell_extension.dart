@@ -116,7 +116,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   ///
   /// **NOTE**: This method does not modify the underlying list but creates
   /// a new list with the element at the given index removed.
-  void delete(int index) {
+  void removeAt(int index) {
     final elements = List<T>.from(value);
     assert(index < elements.length);
 
