@@ -2717,6 +2717,23 @@ void main() {
       });
     });
 
+    group('.delete', () {
+      test('.delete removes item from list', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l, MockValueObserver());
+
+        l.delete(1);
+        l.delete(0);
+
+        expect(
+            observer.values,
+            equals([
+              [1, 3],
+              [3]
+            ]));
+      });
+    });
+
     group('.cellList', () {
       test('ValueCell.cells returns list of cells observing each element', () {
         final list = ['a', 'b', 'c'].cell;

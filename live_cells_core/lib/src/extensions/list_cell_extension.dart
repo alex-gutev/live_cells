@@ -111,6 +111,18 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   void operator[]=(int index, T elem) {
     value = _updatedList(value, index, elem);
   }
+
+  /// Remove the element at [index] from the [List] held in this cell.
+  ///
+  /// **NOTE**: This method does not modify the underlying list but creates
+  /// a new list with the element at the given index removed.
+  void delete(int index) {
+    final elements = List<T>.from(value);
+    assert(index < elements.length);
+
+    elements.removeAt(index);
+    value = elements;
+  }
 }
 
 /// Key identifying a [ValueCell], which accesses a [List] property.
