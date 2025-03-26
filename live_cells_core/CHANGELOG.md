@@ -1,3 +1,66 @@
+# 1.0.0
+
+New features:
+
+* `.exception()` method for creating a cell that throws the exception held in its value:
+
+  ```dart
+  final e = MutableCell(Exception('An exception!'));
+  final exceptionCell = e.exception();
+  
+  // Throws Exception('An exception!')
+  e();
+  ```
+
+* Mutable variants of `.contains()` and `.containsAll()` extension methods
+
+  `.contains()` and `.containsAll()` now return mutable cells when called on
+  mutable cells containing sets. 
+
+  When the value of the `contains(...)` cell is set to true the item is added to the set, and
+  when set to false the item is removed from the set:
+
+  ```dart
+  final set = MutableCell({1, 2, 3, 4});
+  
+  // contains1 is now a MutableCell
+  final contains1 = set.contains(1.cell);
+  
+  // Setting its value to false removes 1 from [set].
+  contains1.value = false;
+  
+  print(contains1.value); // Prints 2, 3, 4
+  
+  // Setting its value to true adds the element to the [set].
+  contains1.value = true;
+  
+  print(contains1.value); // Prints 1, 2, 3, 4
+  ```
+
+  Similarly when the value of the `.containsAll` cell is set, the items in the iterable passed to
+  it are added/removed from the set.
+
+* `.removeAt()` method on cells holding lists:
+
+  ```dart
+  final l = MutableCell([1, 2, 3, 4]);
+  
+  // Remove the element at index 2
+  l.removeAt(2);
+  
+  print(l.value); // Prints 1, 2, 4
+  
+  l.removeAt(0);
+  print(l.value); // 2, 4 
+  ```
+
+* `UniqueCellKey`, which can be used as a cell key to specify that a cell is not functionally 
+  equivalent to any other cell.
+
+  This is useful to prevent a cell from being assigned a key contexts, such as within the build
+  method of a `CellWidget`, where a key is automatically assigned to a cell if it isn't explicitly 
+  provided during the construction of the cell.
+
 # 0.25.0
 
 New features:
