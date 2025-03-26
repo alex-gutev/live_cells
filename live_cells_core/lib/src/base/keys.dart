@@ -120,3 +120,12 @@ class CellKey5<T1, T2, T3, T4, T5> {
   @override
   int get hashCode => Object.hash(runtimeType, value1, value2, value3, value4, value5);
 }
+
+/// A cell key identifying a single cell.
+///
+/// A cell with a key that is a [UniqueCellKey] is not functionally equivalent
+/// to any other cell.
+///
+/// This key should not be created with the const constructor.
+class UniqueCellKey {
+}
