@@ -348,6 +348,16 @@ void main() {
 
       expect(obs.values, equals([2, 5]));
     });
+
+    test('Cells with UniqueCellKeys are not equal to each other', () {
+      final m = MutableCell(0);
+
+      final a = m.apply((m) => m + 1, key: UniqueCellKey());
+      final b = m.apply((m) => m + 1, key: UniqueCellKey());
+
+      expect(a != b, isTrue);
+      expect(a == a, isTrue);
+    });
   });
 
   group('Equality Comparisons', () {
