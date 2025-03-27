@@ -364,10 +364,10 @@ packages:
     dependency: transitive
     description:
       name: live_cell_widgets
-      sha256: "2f0c5bc8e679c017e18252d48dc68af9973a65a834e9ecfb39a5eb9f6269de1a"
+      sha256: b477d8e6d27aae6bad66b225581f36f1ced969b3820aff6f413c322ea8e69eb5
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.5"
+    version: "0.13.0"
   live_cells:
     dependency: "direct main"
     description:
@@ -379,10 +379,10 @@ packages:
     dependency: transitive
     description:
       name: live_cells_core
-      sha256: e5034eef70d121a40a6fe955c1339e9eb04376a91ed4c6576e47cf86a92e35bc
+      sha256: a5b0ad28290f0a57da84f1c24eb85a8eec1de996530d3a8ca1018adfc05973d3
       url: "https://pub.dev"
     source: hosted
-    version: "0.25.0"
+    version: "1.0.0"
   logging:
     dependency: transitive
     description:
