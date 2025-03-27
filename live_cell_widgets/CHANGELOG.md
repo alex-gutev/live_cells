@@ -1,3 +1,8 @@
+## 0.13.0
+
+* Remove deprecated widgets library.
+* Increase `live_cells_core` version to `1.0.0`.
+
 ## 0.12.5
 
 Increase `live_cells_core` version to `0.25.0`.
