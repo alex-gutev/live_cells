@@ -9,6 +9,13 @@ class TestBaseClass {
   const TestBaseClass({
     required this.testValue,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      _$TestBaseClassEquals(this, other);
+
+  @override
+  int get hashCode => _$TestBaseClassHashCode(this);
 }
 
 @CellExtension(mutable: true)
@@ -29,4 +36,14 @@ class TestInheritedClass extends TestBaseClass {
       testValueTwo: testValueTwo ?? this.testValueTwo,
     );
   }
+
+  // **NOTE**: Both the generated comparator and the superclass == method
+  // have to be called since the generated comparator does not call the
+  // superclass == method automatically
+  @override
+  bool operator ==(Object other) => super == other &&
+    _$TestInheritedClassEquals(this, other);
+
+  @override
+  int get hashCode => super.hashCode ^ _$TestInheritedClassHashCode(this);
 }
