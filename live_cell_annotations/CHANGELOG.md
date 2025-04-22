@@ -1,3 +1,8 @@
+## 0.5.0
+
+* Add `DataClass` and `DataField` annotations
+* Add `generateEquals` option to `CellExtension` annotation
+
 ## 0.4.4
 
 This release doesn't bring any new user-facing features.
