@@ -1,3 +1,33 @@
+# 0.28.0
+
+New features:
+
+* `CellExtension` now also generates comparator and hash functions for an annotated class:
+
+  ```dart
+  @CellExtension()
+  class Point {
+    final int x;
+    final int y;
+  
+    ...
+  
+    @override
+    bool operator ==(Object other) =>
+      _$PointEquals(this, other);
+  
+    @override
+    int get hashCode => _$PointHash(this); 
+  }
+  ```
+
+  Additionally the `DataClass` annotation can be used to generate comparator and hash functions
+  for a class without generating a cell extension.
+
+Breaking Changes:
+
+* The live_cells_ui library now requires at least Flutter 32.29.2
+
 # 0.27.0
 
 Breaking Changes:
