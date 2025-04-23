@@ -82,14 +82,6 @@ class NumberField extends CellWidget {
   final MutableCell<num> n;
 
   /// Create text field with its content bound to the `num` cell `n`
-  ///
-  /// NOTE: Given that the field is defined using a [StaticWidget], which is only
-  /// built once when it is added to the tree, this cannot be changed while the
-  /// widget is in the tree, i.e. you cannot do the following:
-  ///
-  /// ```dart
-  /// NumberField(cond ? n : m);
-  /// ```
   const NumberField(this.n, { super.key });
 
   @override

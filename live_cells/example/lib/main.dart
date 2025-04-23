@@ -52,6 +52,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+@pragma('vm:entry-point')
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
 

@@ -123,7 +123,7 @@ class EffectCellDemo extends CellWidget with CellHooks {
         if (!effect.isCompleted())
           Positioned.fill(
             child: Container(
-              color: Colors.grey.withOpacity(0.7),
+              color: Colors.grey.withValues(alpha: 0.7),
               child: const Center(
                 child: CircularProgressIndicator(),
               ),

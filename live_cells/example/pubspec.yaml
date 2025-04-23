@@ -54,8 +54,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
-  build_runner: ^2.4.8
-  live_cell_extension: ^0.5.5
+  build_runner: ^2.4.15
+  live_cell_extension: ^0.6.1
 
 
 # For information on the generic Dart part of this file, see the

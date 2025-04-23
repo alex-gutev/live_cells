@@ -27,6 +27,12 @@ class Country {
 
   Country.fromJson(Map<String, dynamic> json) :
       name = json['name'];
+
+  @override
+  bool operator ==(Object other) => _$CountryEquals(this, other);
+
+  @override
+  int get hashCode => _$CountryHashCode(this);
 }
 
 /// Demonstrates network requests and action cells.
