@@ -12,8 +12,8 @@ environment:
 
 dependencies:
   collection: ^1.18.0
-  live_cell_annotations: ^0.4.4
-  live_cells_core: ^1.0.0
+  live_cell_annotations: ^0.5.1
+  live_cells_core: ^1.1.0
 
   flutter:
     sdk: flutter
@@ -23,5 +23,5 @@ dev_dependencies:
     sdk: flutter
   mockito: ^5.4.4
   flutter_lints: ^3.0.1
-  build_runner: ^2.4.8
-  live_cell_extension: ^0.5.9
+  build_runner: ^2.4.15
+  live_cell_extension: ^0.6.1
