@@ -1,3 +1,8 @@
+## 0.13.1
+
+* Increase `live_cells_core` version to `1.1.0`.
+* Deprecate `StaticWidget`.
+
 ## 0.13.0
 
 * Remove deprecated widgets library.
