@@ -1,3 +1,7 @@
+## 0.14.0
+
+* Bump major version since widgets library now requires Flutter 3.29.2
+
 ## 0.13.1
 
 * Increase `live_cells_core` version to `1.1.0`.
