@@ -25,6 +25,7 @@ import '../restoration/cell_restoration_manager.dart';
 ///   }
 /// }
 /// ```
+@Deprecated('Use CellWidget instead.')
 abstract class StaticWidget extends StatelessWidget {
   /// Restoration ID to use for restoring the cell state
   ///
