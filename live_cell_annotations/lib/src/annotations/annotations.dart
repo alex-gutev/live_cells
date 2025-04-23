@@ -184,6 +184,7 @@ class DataClass {
 ///
 /// Example:
 ///
+/// ```dart
 /// @DataClass()
 /// class Point {
 ///   // Use `listEquals` from `flutter:foundation.dart` as the comparator and
@@ -202,6 +203,7 @@ class DataClass {
 ///   @override
 ///   int get hashCode => _$PointHashCode(this);
 /// }
+/// ```
 class DataField {
   final Function? equals;
   final Function? hash;

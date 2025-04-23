@@ -1,3 +1,7 @@
+## 0.5.1
+
+* Fix examples in documentation comments.
+
 ## 0.5.0
 
 * Add `DataClass` and `DataField` annotations
