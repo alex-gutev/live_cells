@@ -1,3 +1,7 @@
+## 0.14.1
+
+* Fix issue with widgets not updating if triggered by cell changes during build phase.
+
 ## 0.14.0
 
 * Bump major version since widgets library now requires Flutter 3.29.2
