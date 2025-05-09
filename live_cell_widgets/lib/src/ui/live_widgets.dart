@@ -211,7 +211,7 @@ user, the value of the cell is updated to reflect the state.
         #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
       },
 
-      mixins: [#_onPressMixin],
+      mixins: [#_OnPressMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 

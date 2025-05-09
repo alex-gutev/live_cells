@@ -109,7 +109,7 @@ mixin _OnTapCellMixin on _WrapperInterface {
 }
 
 /// Provides the [press] cell
-mixin _onPressMixin on _WrapperInterface {
+mixin _OnPressMixin on _WrapperInterface {
   /// Meta cell for an on pressed event action cell
   MetaCell<void>? get press;
 
