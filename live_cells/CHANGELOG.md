@@ -1,3 +1,7 @@
+# 0.28.1
+
+* Fix issue with widgets not updating if triggered by cell changes during build phase.
+
 # 0.28.0
 
 New features:
@@ -17,7 +21,7 @@ New features:
       _$PointEquals(this, other);
   
     @override
-    int get hashCode => _$PointHash(this); 
+    int get hashCode => _$PointHashCode(this); 
   }
   ```
 
