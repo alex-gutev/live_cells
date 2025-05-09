@@ -6,7 +6,6 @@ import 'package:live_cell_widgets/src/restoration/cell_restoration_manager.dart'
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cells_core/live_cells_internals.dart';
 
-part 'cell_hooks.dart';
 part 'cell_observer_state.dart';
 
 /// A widget which is rebuilt in response to changes in the values of [ValueCell]'s.
@@ -40,7 +39,7 @@ part 'cell_observer_state.dart';
 /// between builds. For this to happen the following rules have to be
 /// observed:
 ///
-/// 1. Cells should not be defined in conditionals or loops.
+/// 1. Cells should not be defined conditionally or in loops.
 /// 2. Cells should not be defined in callback or builder functions of widgets
 ///    nested in this widget.
 ///
@@ -61,7 +60,7 @@ part 'cell_observer_state.dart';
 /// @override
 /// Widget build (BuildContext context) {
 ///   if (...) {
-///     // This is bad because the definition appears within a conditional
+///     // This is bad because the cell is defined conditionally
 ///     final count = MutableCell(0);
 ///   }
 ///
@@ -78,7 +77,7 @@ part 'cell_observer_state.dart';
 ///   });
 /// }
 /// ```
-abstract class CellWidget extends StatelessWidget {
+abstract class CellWidget extends StatefulWidget {
   /// Restoration ID to use for restoring the cell state
   ///
   /// If null state restoration is not performed.
@@ -94,9 +93,10 @@ abstract class CellWidget extends StatelessWidget {
   /// This allows a widget, which is dependent on the values of one or more cells,
   /// to be defined without subclassing.
   ///
-  /// [builder] is provided a [CellHookContext], instead of a [BuildContext],
-  /// which allows cells to be defined within the builder using [CellHookContext.cell],
-  /// and watch functions to be defined using [CellHookContext.watch].
+  /// Cells defined directly within [builder] will have their state restored
+  /// between builds. The same rules must be observed when defining cells in
+  /// [builder] that must be observed when defining cells in the [build]
+  /// method of a [CellWidget] subclass.
   ///
   /// If [restorationId] is non-null it is used as the restoration ID for
   /// restoring the state of the cells created within [builder].
@@ -106,45 +106,37 @@ abstract class CellWidget extends StatelessWidget {
   /// ```dart
   /// WidgetCell.builder((context) => Text('The value of cell a is ${a()}'))
   /// ```
-  factory CellWidget.builder(Widget Function(CellHookContext context) builder, {
+  factory CellWidget.builder(Widget Function(BuildContext context) builder, {
     Key? key,
     String? restorationId
-  }) => _WidgetCellBuilder(builder,
+  }) => _CellWidgetBuilder(builder,
     key: key,
     restorationId: restorationId,
   );
 
+  /// Build the widget underneath this widget in the tree
+  Widget build(BuildContext context);
+  
   @override
-  StatelessElement createElement() => restorationId != null
-      ? _RestorableCellWidgetElement(this, restorationId!)
-      : _CellWidgetElement(this);
+  State<CellWidget> createState() => _RestorableCellWidgetState();
 }
 
 /// [CellWidget] with the [build] method defined by [builder].
-class _WidgetCellBuilder extends CellWidget with CellHooks {
+class _CellWidgetBuilder extends CellWidget {
   /// Widget builder function
-  final Widget Function(CellHookContext context) builder;
+  final Widget Function(BuildContext context) builder;
 
   /// Create a [CellWidget] with [build] defined by [builder].
-  _WidgetCellBuilder(this.builder, {
+  const _CellWidgetBuilder(this.builder, {
     super.key,
     super.restorationId
   });
 
   @override
-  Widget build(BuildContext context) => builder(context as CellHookContext);
+  Widget build(BuildContext context) => builder(context);
 }
 
-/// Element for [CellWidget].
-///
-/// Keeps track of cells that were referenced during the [build] method and
-/// automatically marks the widget for rebuilding if the value of a referenced
-/// cell changes.
-class _CellWidgetElement extends StatelessElement {
-  _CellWidgetElement(super.widget) {
-    _observer = _WidgetCellObserver(_rebuild);
-  }
-
+class _CellWidgetState extends State<CellWidget> {
   Set<ValueCell> _arguments = HashSet();
   late _WidgetCellObserver _observer;
 
@@ -159,7 +151,13 @@ class _CellWidgetElement extends StatelessElement {
 
   /// The number of watch functions registered in the [build] method.
   var _numWatchers = 0;
-
+  
+  @override
+  void initState() {
+    super.initState();
+    _observer = _WidgetCellObserver(_rebuild);
+  }
+  
   /// Generate a key for the cell at index [index].
   _WidgetCellKey _generateCellKey(ValueCell cell, int index) {
     if (_firstBuild) {
@@ -210,19 +208,19 @@ class _CellWidgetElement extends StatelessElement {
     switch (SchedulerBinding.instance.schedulerPhase) {
       case SchedulerPhase.idle:
       case SchedulerPhase.postFrameCallbacks:
-        markNeedsBuild();
+        setState(() {});
 
       case SchedulerPhase.transientCallbacks:
       case SchedulerPhase.midFrameMicrotasks:
       case SchedulerPhase.persistentCallbacks:
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          markNeedsBuild();
+          setState(() {});
         });
     }
   }
 
   @override
-  Widget build() {
+  Widget build(BuildContext context) {
     final Set<ValueCell> newArguments = HashSet();
 
     var keyIndex = 0;
@@ -246,7 +244,7 @@ class _CellWidgetElement extends StatelessElement {
     try {
       AutoKey.withAutoWatchKeys(generateWatchKey, () {
         AutoKey.withAutoKeys(generateKey, () {
-          widget = ComputeArgumentsTracker.computeWithTracker(() => super.build(), (cell) {
+          widget = ComputeArgumentsTracker.computeWithTracker(() => this.widget.build(context), (cell) {
             newArguments.add(cell);
 
             if (!_arguments.contains(cell)) {
@@ -279,7 +277,7 @@ class _CellWidgetElement extends StatelessElement {
   }
 
   @override
-  void unmount() {
+  void dispose() {
     for (final cell in _arguments) {
       cell.removeObserver(_observer);
     }
@@ -289,7 +287,7 @@ class _CellWidgetElement extends StatelessElement {
     _disposeCells();
     _stopWatchFunctions();
 
-    super.unmount();
+    super.dispose();
   }
 
   /// Dispose the state of all cells defined during the build method.
@@ -312,16 +310,13 @@ class _CellWidgetElement extends StatelessElement {
   }
 }
 
-class _RestorableCellWidgetElement extends _CellWidgetElement {
-  final String _restorationId;
-
-  _RestorableCellWidgetElement(super.widget, this._restorationId);
-
+class _RestorableCellWidgetState extends _CellWidgetState {
   @override
-  Widget build() => CellRestorationManager(
-      builder: super.build,
-      restorationId: _restorationId
-  );
+  Widget build(BuildContext context) => 
+      widget.restorationId != null ? CellRestorationManager(
+          builder: () => super.build(context), 
+          restorationId: widget.restorationId!
+      ) : super.build(context);
 }
 
 /// [CellObserver] that calls a callback when all argument cells have updated
@@ -369,6 +364,6 @@ class _HoldCellObserver extends CellObserver {
 }
 
 /// Key identifying a cell defined within CellWidget.build.
-class _WidgetCellKey extends CellKey2<BuildContext, int> {
+class _WidgetCellKey extends CellKey2<State, int> {
   _WidgetCellKey(super.value1, super.value2);
 }

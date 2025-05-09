@@ -10,9 +10,6 @@ export 'src/extensions/cell_listenable_extension.dart'
 export 'src/cell_widget/cell_widget.dart'
     show
         CellWidget,
-        CreateCell,
-        CellHooks,
-        CellHookContext,
         CellObserverState;
 
 export 'src/cell_widget/static_widget.dart' show StaticWidget;
