@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:live_cell_widgets/src/restoration/cell_restoration_manager.dart';
 import 'package:live_cells_core/live_cells_core.dart';
 import 'package:live_cells_core/live_cells_internals.dart';
@@ -141,7 +142,7 @@ class _WidgetCellBuilder extends CellWidget with CellHooks {
 /// cell changes.
 class _CellWidgetElement extends StatelessElement {
   _CellWidgetElement(super.widget) {
-    _observer = _WidgetCellObserver(markNeedsBuild);
+    _observer = _WidgetCellObserver(_rebuild);
   }
 
   Set<ValueCell> _arguments = HashSet();
@@ -199,6 +200,25 @@ class _CellWidgetElement extends StatelessElement {
 
   _WidgetCellKey _cellKeyForIndex(int index) {
     return _WidgetCellKey(this, index);
+  }
+
+  /// Trigger a rebuild of the widget
+  ///
+  /// If the widget tree is currently in the build phase, the build is scheduled
+  /// using [addPostFrameCallback].
+  void _rebuild() {
+    switch (SchedulerBinding.instance.schedulerPhase) {
+      case SchedulerPhase.idle:
+      case SchedulerPhase.postFrameCallbacks:
+        markNeedsBuild();
+
+      case SchedulerPhase.transientCallbacks:
+      case SchedulerPhase.midFrameMicrotasks:
+      case SchedulerPhase.persistentCallbacks:
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          markNeedsBuild();
+        });
+    }
   }
 
   @override
