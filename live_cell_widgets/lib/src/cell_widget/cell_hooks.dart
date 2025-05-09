@@ -56,6 +56,7 @@ typedef CreateCell<T extends ValueCell> = T Function();
 /// 1. Calls to [cell] must not appear within conditionals or loops.
 /// 2. Calls to [cell] must not appear within widget builder functions, such as
 ///    those used with [Builder] or [ValueListenableBuilder].
+@Deprecated('Create cells and watch functions directly in build method of CellWidget.')
 mixin CellHooks on CellWidget {
   /// Return an instance of a [ValueCell] that is kept between builds of the widget.
   ///
