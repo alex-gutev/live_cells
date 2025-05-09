@@ -1,4 +1,4 @@
-part of 'widgets-ui.dart';
+part of 'live_widgets.dart';
 
 /// Defines the properties holding the cells for controlling a [TextField].
 abstract class _TextFieldInterface extends StatefulWidget {

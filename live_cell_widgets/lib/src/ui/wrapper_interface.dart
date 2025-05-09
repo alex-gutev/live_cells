@@ -1,4 +1,4 @@
-part of 'widgets-ui.dart';
+part of 'live_widgets.dart';
 
 /// Generated widget wrapper interface
 ///

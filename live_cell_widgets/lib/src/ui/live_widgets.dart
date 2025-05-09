@@ -867,4 +867,4 @@ of the text field changes, the value of the cell is updated to reflect the field
 content.'''
   )
 ])
-part 'widgets-ui.g.dart';
+part 'live_widgets.g.dart';
