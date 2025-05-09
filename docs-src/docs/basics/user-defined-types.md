@@ -91,10 +91,8 @@ indistinguishable, as much as is possible, from the values they hold.
 To make this work you'll need to add the `live_cell_extension` package
 to the `dev_dependencies` of your `pubspec.yaml`:
 
-```yaml
-dev_dependencies:
-    live_cell_extension: 0.6.1
-    ...
+```sh
+dart pub add --dev live_cell_extension
 ```
 
 Then annotate the classes, for which you want accessors to be
