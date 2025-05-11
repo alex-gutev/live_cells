@@ -125,21 +125,16 @@ See [LiveCheckbox] for a more detailed explanation.
       },
 
       propertyValues: {
-        #onTap: 'tap != null ? () => _onTapCell(context).trigger() : null'
+        #onTap: 'tap?.trigger'
       },
-
-      mixins: [#_OnTapCellMixin],
-      baseClass: #_WrapperInterface,
-      buildMethod: #_buildWrappedWidget,
 
       addProperties: [
         WidgetPropertySpec<void>(
             name: #tap,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an action cell that is triggered when the '
-                'item is tapped.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the item is tapped.'
         )
       ],
 
@@ -201,31 +196,20 @@ user, the value of the cell is updated to reflect the state.
             name: #press,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the '
-                'button is pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is pressed.'
         ),
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
+        #onPressed: 'enabled() ? press?.trigger : null',
       },
-
-      mixins: [#_OnPressMixin],
-      baseClass: #_WrapperInterface,
-      buildMethod: #_buildWrappedWidget,
 
       documentation: '''A [CloseButton] widget with its properties controlled by [ValueCell]'s.
 
 The constructor takes mostly same arguments as the unnamed constructor of [CloseButton],
-but as [ValueCell]'s. This binds each property value to the [ValueCell] given
-in the constructor. If the cell value is changed, the value of the corresponding
-property to which it is bound is automatically updated to reflect the value of
-the cell.
-
-Instead of taking a callback function for [onPressed], the
-constructor accepts a [MetaCell] that is set to an [ActionCell] which is
-triggered when the button is pressed.
+but as [ValueCell]'s. Instead of taking a callback function for [onPressed], the
+constructor accepts an [ActionCell] that is triggered when the button is pressed.
 '''
   ),
 
@@ -311,55 +295,53 @@ user, the value of the cell is updated to reflect the state.
             name: #press,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
             name: #longPress,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is long pressed.'
         ),
         WidgetPropertySpec<bool>(
             name: #onHover,
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the hover state of the button changes.'
         ),
         WidgetPropertySpec<bool>(
             name: #onFocusChange,
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the focus state of the button changes.'
         )
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() ? press?.trigger : null',
+        #onLongPress: 'enabled() ? longPress?.trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_MaterialButtonMixin],
+      mixins: [#_HoverFocusChangeCellMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''An [ElevatedButton] widget with its properties controlled by [ValueCell]'s.
 
-The constructor takes mostly same arguments as the unnamed constructor of [ElevatedButton],
-but as [ValueCell]'s. This binds each property value to the [ValueCell] given
-in the constructor. If the cell value is changed, the value of the corresponding
-property to which it is bound is automatically updated to reflect the value of
-the cell.
+The constructor takes mostly same arguments as the unnamed constructor of 
+[ElevatedButton], but as [ValueCell]'s. Instead of taking a callback function 
+for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
+the button is pressed.
 
-Instead of taking callback functions for [onPressed] and [onLongPress], the
-constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
-triggered when the button is pressed and long pressed respectively. Similarly,
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
+the hover and focus state of the widget to be observed by observing the [MetaCells]
+passed to the constructor.
 '''
   ),
 
@@ -385,55 +367,53 @@ triggered when the button is pressed and long pressed respectively. Similarly,
             name: #press,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
             name: #longPress,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is long pressed.'
         ),
         WidgetPropertySpec<bool>(
             name: #onHover,
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the hover state of the button changes.'
         ),
         WidgetPropertySpec<bool>(
             name: #onFocusChange,
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the focus state of the button changes.'
         )
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() ? press?.trigger : null',
+        #onLongPress: 'enabled() ? longPress?.trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_MaterialButtonMixin],
+      mixins: [#_HoverFocusChangeCellMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''A [FilledButton] widget with its properties controlled by [ValueCell]'s.
 
 The constructor takes mostly same arguments as the unnamed constructor of [FilledButton],
-but as [ValueCell]'s. This binds each property value to the [ValueCell] given
-in the constructor. If the cell value is changed, the value of the corresponding
-property to which it is bound is automatically updated to reflect the value of
-the cell.
+but as [ValueCell]'s.  Instead of taking a callback function 
+for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
+the button is pressed.
 
-Instead of taking callback functions for [onPressed] and [onLongPress], the
-constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
-triggered when the button is pressed and long pressed respectively. Similarly,
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
+the hover and focus state of the widget to be observed by observing the [MetaCells]
+passed to the constructor.
 '''
   ),
 
@@ -696,55 +676,53 @@ See [LiveRadio] for a more detailed explanation.
             name: #press,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
             name: #longPress,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is long pressed.'
         ),
         WidgetPropertySpec<bool>(
             name: #onHover,
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the hover state of the button changes.'
         ),
         WidgetPropertySpec<bool>(
             name: #onFocusChange,
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the focus state of the button changes.'
         )
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() ? press?.trigger : null',
+        #onLongPress: 'enabled() ? longPress?.trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_MaterialButtonMixin],
+      mixins: [#_HoverFocusChangeCellMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''An [OutlinedButton] widget with its properties controlled by [ValueCell]'s.
 
 The constructor takes mostly same arguments as the unnamed constructor of [OutlinedButton],
-but as [ValueCell]'s. This binds each property value to the [ValueCell] given
-in the constructor. If the cell value is changed, the value of the corresponding
-property to which it is bound is automatically updated to reflect the value of
-the cell.
+but as [ValueCell]'s. Instead of taking a callback function 
+for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
+the button is pressed.
 
-Instead of taking callback functions for [onPressed] and [onLongPress], the
-constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
-triggered when the button is pressed and long pressed respectively. Similarly,
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
+the hover and focus state of the widget to be observed by observing the [MetaCells]
+passed to the constructor.
 '''
   ),
 
@@ -770,15 +748,15 @@ triggered when the button is pressed and long pressed respectively. Similarly,
             name: #press,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is pressed.'
         ),
         WidgetPropertySpec<void>(
             name: #longPress,
             defaultValue: null,
             optional: true,
-            meta: true,
-            documentation: 'MetaCell for an ActionCell that is triggered when the button is long pressed.'
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is pressed.'
         ),
         WidgetPropertySpec<bool>(
             name: #onHover,
@@ -797,28 +775,26 @@ triggered when the button is pressed and long pressed respectively. Similarly,
       ],
 
       propertyValues: {
-        #onPressed: 'enabled() && press != null ? _pressActionCell(context).trigger : null',
-        #onLongPress: 'enabled() && longPress != null ? _longPressActionCell(context).trigger : null',
+        #onPressed: 'enabled() ? press?.trigger : null',
+        #onLongPress: 'enabled() ? longPress?.trigger : null',
         #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_MaterialButtonMixin],
+      mixins: [#_HoverFocusChangeCellMixin],
       baseClass: #_WrapperInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''A [TextButton] widget with its properties controlled by [ValueCell]'s.
 
 The constructor takes mostly same arguments as the unnamed constructor of [TextButton],
-but as [ValueCell]'s. This binds each property value to the [ValueCell] given
-in the constructor. If the cell value is changed, the value of the corresponding
-property to which it is bound is automatically updated to reflect the value of
-the cell.
+but as [ValueCell]'s. Instead of taking a callback function 
+for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
+the button is pressed.
 
-Instead of taking callback functions for [onPressed] and [onLongPress], the
-constructor accepts [MetaCell]'s that are set to [ActionCell]s which are
-triggered when the button is pressed and long pressed respectively. Similarly,
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange].
+[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
+the hover and focus state of the widget to be observed by observing the [MetaCells]
+passed to the constructor.
 '''
   ),
 

@@ -1422,7 +1422,7 @@ void main() {
 
   group('LiveElevatedButton', () {
     testWidgets('onPressed observers notified when button is tapped.', (tester) async {
-      final onPressed = MetaCell<void>();
+      final onPressed = ActionCell();
       final listener = MockSimpleListener();
 
       onPressed.listenable.addListener(listener);
@@ -1459,7 +1459,7 @@ void main() {
     });
 
     testWidgets('onLongPress observers notified when button is long pressed.', (tester) async {
-      final onLongPress = MetaCell<void>();
+      final onLongPress = ActionCell();
       final listener = MockSimpleListener();
 
       onLongPress.listenable.addListener(listener);
