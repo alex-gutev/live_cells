@@ -1,3 +1,9 @@
+# 1.2.0
+
+Minor breaking change:
+
+* Rename `InactiveMetaCelLError` to `InactiveMetaCellError`.
+
 # 1.1.0
 
 New features:
