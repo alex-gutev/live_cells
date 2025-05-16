@@ -7,20 +7,21 @@ sidebar_position: 14
 # Self Cells
 
 A *self cell* is a computed cell that can access its own value within
-its compute value function. 
+its value computation function. 
 
 ## Defining Self Cells
 
 Self cells are created with the
 [SelfCell](https://pub.dev/documentation/live_cells/latest/live_cells/SelfCell-class.html)
-constructor, which takes the compute value function just like
+constructor, which takes the value computation function just like
 `ValueCell.computed`. However, unlike `ValueCell.computed`, the
-compute value function is passed a `self` argument. The `self`
+value computation function is passed a `self` argument. The `self`
 argument is a function which when called returns the current value of
 the cell.
 
 ```dart title="Self Cell Example"
 final increment = ActionCell();
+
 final count = SelfCell((self) {
     increment.observe();
     return self() + 1;
@@ -113,7 +114,7 @@ decrement.trigger(); // Prints: 2
 This is achieved by defining `increment` and `decrement` as chained
 action cells, which trigger the `recompute` cell and set the value of
 `delta` to `1` and `-1`, respectively. It is necessary to trigger the
-`recompute`, because assigning `1` to `delta` while its value is
+`recompute` cell, because assigning `1` to `delta` while its value is
 already `1` will not cause `count` to be recomputed. The same applies
 when assigning `-1` to `delta` while its value is already `-1`.
 

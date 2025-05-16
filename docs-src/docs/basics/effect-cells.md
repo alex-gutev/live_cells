@@ -16,8 +16,8 @@ triggered, and only once per trigger.
 
 Effect cells are created using the
 [`.effect`](https://pub.dev/documentation/live_cells/latest/live_cells/ActionCellEffectExtension/effect.html)
-method provided by action cells (`ValueCell<void>`). The side effect
-is defined in the function provided to `effect`.
+method provided by action cells (`ValueCell<void>`), with the side
+effect defined in the function provided to `effect`.
 
 ```dart title="Creating an effect cell"
 final ValueCell<void> action;
@@ -34,7 +34,7 @@ In the example above, an effect cell (`effect`) is created that is
 tied to an `action` cell. The side effect, defined by `effect` is a
 form submission effected by the (hypothetical) `submitForm()`
 function. The `submitForm` function is run whenever `action` is
-triggered. Notice the value of `submitForm()` is returned in the
+triggered. Notice that the value of `submitForm()` is returned in the
 effect function. This becomes the value of the effect cell which
 allows us to observe the result/status of the effect by observing the
 `effect` cell.
@@ -49,11 +49,12 @@ This is different from `ValueCell.watch` in the following ways:
   is defined in order to discover its dependencies.
 
 The difference between an effect cell and a regular computed cell is
-that the effect cell guarantees that the compute value function will
-only be run once per trigger of the action to which it is tied. On the
-other hand a computed cells is intended to be used with a pure function
-that computes a value, and thus makes no guarantees about how many times
-its compute function is called.
+that the effect cell guarantees that the effect defined in the value
+computation function will only be run once per trigger of the action
+to which it is tied. On the other hand a computed cell is intended to
+be used with a pure function that computes a value but has no side
+effect, and thus makes no guarantees about how many times its compute
+function is called.
 
 :::important
 
@@ -79,8 +80,8 @@ class Example extends CellWidget {
   Widget build(BuildContext context) {
     final submit = ActionCell();
     
-    return ElevatedButton(
-      onPressed: submit.trigger
+    return LiveFilledButton(
+      press: submit
       child: Text('Submit')
     );
   }
@@ -126,16 +127,23 @@ Widget build(BuildContext context) {
   
   final isLoading = !submission.isComplete();
   
-  return ElevatedButton(
-    onPressed: isLoading ? null : submit.trigger
+  return LiveFilledButton(
+    press: submit,
+    enabled: submission.isComplete,
     child: isLoading ? CircularProgressIndicator() : Text('Submit')
   );
 }
 ```
 
+:::note
+
+`LiveFilledButton` accepts an `enabled` argument, which takes a
+boolean cell that controls whether the button is enabled or disabled.
+
+:::
+
 When `submission.isComplete()` is false, a progress indicator is
-displayed in the button and the `onPressed` callback is `null`, which
-disables the button while the submission is in progress.
+displayed in the button and the button is disabled.
 
 When the `submission` effect cell is accessed before the effect has
 run for the first time, an `UninitializedCellError` exception is
@@ -150,7 +158,7 @@ until the `Future` held in `submission` completes, which in this
 ### Performing Actions
 
 To show the dialog we can observe the `submission` effect cell in a
-cell watch function:
+watch function:
 
 ```dart
 Widget build(BuildContext context) {
@@ -182,6 +190,8 @@ Widget build(BuildContext context) {
       );
     }
   });
+  
+  ...
 }
 ```
 
@@ -204,10 +214,10 @@ the console when running in debug mode. These are expected because
 `submission.awaited` throws an exception until it has a result, and
 these are not handled inside the watch function. To silence the
 `UninitializedCellError` and `PendingAsyncValueError` exceptions, use
-`.whenReady`. This has the same effect of terminating the watch
-function, but prevents unhandled `UninitializedCellError` and
-`PendingAsyncValueError` exception notices from being printed to the
-console.
+[`.whenReady`](https://pub.dev/documentation/live_cells/latest/live_cells/ErrorCellExtension/whenReady.html). This
+has the same effect of terminating the watch function, but prevents
+unhandled `UninitializedCellError` and `PendingAsyncValueError`
+exception notices from being printed to the console.
 
 ```dart title="Silencing unhandled exception notices with .whenReady"
 ValueCell.watch(() {
@@ -248,7 +258,7 @@ run again. The effect function is only run when the action cell, to
 which it is tied to, is triggered.
 
 Let's add some data to the submission. We'll add a switch, which when
-it is on the submission succeeds and when it is off the submission
+on, the submission succeeds and when it is off the submission
 fails. We'll use `LiveSwitch` to bind the state of the switch directly
 to a cell.
 
@@ -272,12 +282,11 @@ Widget build(BuildContext context) {
           value: succeed,
           enabled: submission.isComplete;
       ),
-      ElevatedButton(
-          onPressed: isLoading ? null : submit.trigger
-          child: isLoading 
-             ? CircularProgressIndicator() 
-             : Text('Submit')
-      )
+      LiveFilledButton(
+          press: submit,
+          enabled: submission.isComplete,
+          child: isLoading ? CircularProgressIndicator() : Text('Submit')
+      );
     ]
   );
 }
@@ -290,61 +299,6 @@ pressed. Additionally, `submission.isComplete` is bound to the
 `enabled` property of the `LiveSwitch`. As a result, the switch is
 disabled while the submission is still in progress.
 
-## Cell Buttons
-
-So far we've used a callback function to handle the button press
-events, which does nothing other than trigger an action cell. This
-library provides a
-[`LiveElevatedButton`](https://pub.dev/documentation/live_cell_widgets/latest/live_cells_ui/LiveElevatedButton-class.html)
-which allows you to directly specify an action cell that is triggered
-by button press events without having to provide a callback.
-
-`LiveElevatedButton` takes a `press` argument rather than an
-`onPressed` argument, which takes a `MetaCell<void>` rather than a
-callback. When the button is constructed an action cell is injected
-into the meta cell passed to `press` and is triggered whenever the
-button is pressed.
-
-:::note
-
-The action button takes a `MetaCell` rather than an `ActionCell` since
-triggering the action outside the button will not result in any
-changes to the button. This is different from `LiveSwitch` which takes
-a `MutableCell`. When the cell is set from outside the switch, the
-state of the switch changes.
-
-:::
-
-To replace `ElevatedButton` with `LiveElevatedButton` we first have to
-change the definition of `submit` to the following:
-
-```dart
-final submit = MetaCell<void>();
-...
-LiveElevatedButton(
-    press: submit,
-    enabled: submission.isComplete,
-    child: isLoading 
-        ? CircularProgressIndicator()
-        : Text('Submit')
-)
-```
-
-Note, the `submit` cell is passed to the `press` argument of
-`LiveElevatedButton`. This button also takes an `enabled` argument,
-unlike `ElevatedButton`, for which we've supplied
-`submission.isComplete`. As a result the button is enabled before the
-effect has run and after it has completed, but is disabled while the
-result is still pending.
-
-:::tip
-
-`LiveElevatedButton` also accepts meta cells for `longPress`,
-`onHover` and `onFocusChange` for handling long press, hover and focus
-change events.
-
-:::
-
 ## Code Organization
 
 So far not much thought has been given to the organization of our
@@ -355,34 +309,34 @@ from the UI.
 
 A recommended approach for achieving separation of concerns is to use
 cell factory functions. This is a fancy term for a function which
-creates a cell. For example, the `submit` action cell and `submission`
-effect cell can be defined in a factory function:
+creates a cell. For example, the `submission` effect cell can be
+defined in a factory function that takes the action cell (`action`),
+for triggering the effect, and the cell holding the result
+(`succeed`):
 
 ```dart title="Cell Factory Function"
-final (ActionCell, ValueCell<bool>) submissionCells(ValueCell<bool> succeed) {
-  final submit = ActionCell();
-
-  final submission = submit.effect(() async {
+final FutureCell<bool> submissionCell({
+    required ValueCell<void> action,
+    required ValueCell<bool> succeed
+}) => submit.effect(() async {
     final result = succeed();
-    
     return await Future.delayed(Duration(seconds: 3), () => result);
-  });
-  
-  return (submit, submission);
-}
+});
 ```
 
-The `submissionCells` function creates the `submit` and `submission`
-cells and returns them in a record containing the action cell in the
-first element, and the effect cell in the second element. The factory
-function can then be used in the widget build method as follows:
+The factory function can then be used in the widget build method as
+follows:
 
 ```dart
 @override
 Widget build(BuildContext context) {
+  final submit = ActionCell();
   final succeed = MutableCell(true);
   
-  final (submit, submission) = submissionCells(succeed);
+  final submission = submissionCell(
+    action: submit,
+    succeed: succeed
+  );
   
   ...
 }
@@ -390,56 +344,6 @@ Widget build(BuildContext context) {
 
 The significance of this is that the code defining the cells is now
 moved out of the widget body, and can be reused throughout the app.
-
-For more than two related cells, it is better to opt for a more
-structured return type such as class that holds all the related cells:
-
-```dart
-@immutable
-class Submission {
-  final ActionCell action;
-  final ValueCell<bool> result;
-    
-  factory Submission(ValueCell<bool> succeed) {
-    final submit = ActionCell();
-
-    final submission = submit.effect(() async {
-      final result = succeed();
-    
-      return await Future.delayed(Duration(seconds: 3), () => result);
-    });
-  
-    return Submission._internal(
-      action: submit,
-      result: submission
-    );
-  }
-    
-  const Submission._internal({
-    this.action,
-    this.result
-  });
-}
-```
-
-:::note
-
-The `@immutable` annotation is not required but is recommended so that
-a warning is emitted if you end up storing state directly in the
-`Submission` class rather than inside the cells.
-
-:::
-
-This class can then be used in the build method as follows:
-
-```dart
-@override
-Widget build(BuildContext context) {
-  final succeed = MutableCell(true);
-  final submission = Submission(succeed);
-  ...
-}
-```
 
 ## Why use Effect Cells?
 
@@ -456,7 +360,7 @@ For example you would need to do something similar to the following:
 ```dart
 final isLoading = MutableCell(false);
 
-ElevatedButton(
+FilledButton(
     onPressed: isLoading() ? null : () async {
         isLoading.value = true;
         await submitForm();
