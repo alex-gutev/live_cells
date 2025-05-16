@@ -7,19 +7,17 @@ sidebar_position: 1
 # Cells
 
 A cell, denoted by the base type `ValueCell`, is an object with a
-value and a set of observers that react to changes in its value,
-you'll see exactly what that means in a moment.
+value and a set of observers that react to changes in its value.
 
-```dart title="Creating cells"
+The simplest cell is the constant cell which holds a constant
+value. These are created with the `.cell` property, added to all
+objects, or the `ValueCell.value` constructor.
+
+```dart title="Constant cells"
 final a = 1.cell;
 final b = 'hello world'.cell;
 final c = ValueCell.value(someValue);
 ```
-
-The above is an example of *constant cells*, which can be created
-either using the `.cell` property or the `ValueCell.value` constructor
-which takes a value and wraps it in a `ValueCell`. A constant cell has
-a value that does not change throughout its lifetime.
 
 The value of a cell is accessed using the `value` property.
 
@@ -48,7 +46,7 @@ print(a.value); // Prints: 3
 
 When the value of a cell changes, its observers are notified of the
 change. The simplest way to demonstrate this is to set up a *watch
-function* using `ValueCell.watch`:
+function* using [`ValueCell.watch`](https://pub.dev/documentation/live_cells/latest/live_cells/ValueCell/watch.html):
 
 ```dart title="Observing cells"
 final a = MutableCell(0);
@@ -71,11 +69,28 @@ changes.
 
 :::important
 
-the value of a cell is referenced using the function call
-syntax, within a watch function, rather than accessing the value
-property directly.
+Within watch functions, the value of a cell is referenced using the
+function call operator rather than accessing the value property
+directly.
 
 :::
+
+There are a couple of important points to keep in mind when using
+`ValueCell.watch`:
+
+* The watch function is called once immediately when `ValueCell.watch`
+  is called, to determine which cells are referenced within it.
+  
+* `ValueCell.watch` automatically tracks which cells are referenced
+  within the watch function, and registers it to be called when the
+  values of the referenced cells change. This works even when the
+  cells are referenced conditionally.
+
+* Within the watch function, the values of cells have to be referenced
+  with the function call operator rather than the `value`
+  property. The difference between the two is that `.value` only
+  references the value, whereas the function call operator also tracks
+  the cell as a referenced cell.
 
 Every call to `ValueCell.watch` adds a new watch function, for
 example:
@@ -98,8 +113,11 @@ watch function being called, since the second watch function is not
 observing `b`.
 
 :::tip
-When you no longer need the watch function to be called, call `stop`
+
+When you no longer need the watch function to be called, call
+[`stop`](https://pub.dev/documentation/live_cells/latest/live_cells/CellWatcher/stop.html)
 on the `CellWatcher` object returned by `ValueCell.watch`.
+
 :::
 
 The
@@ -152,16 +170,16 @@ Watch((handle) {
 });
 ```
 
-In this example the value of `a` is only printed, when it changes
+In this example the value of `a` is only printed when it changes
 **after** the watch function is defined with `Watch`. It is not
 printed when the watch function is called for the first time to
 determine its dependencies.
 
 :::important
 
-The watch function must observe at least one cell, by the function
-call syntax, before the `afterInit()` call. Otherwise, the watch
-function will not observe any cells and will never be called.
+The watch function must observe at least one cell, using the function
+call operator, before the `afterInit()` call. Otherwise, the watch
+function will not be observing any cells and will never be called.
 
 :::
 
@@ -178,9 +196,9 @@ final b = MutableCell(2);
 final sum = ValueCell.computed(() => a() + b());
 ```
 
-In the above example, `sum` is a computed cell with the value defined
+In the above example, `sum` is a computed cell with its value defined
 as the sum of cells `a` and `b`. The value of `sum` is recomputed
-whenever the values of either `a` or `b` change. This is demonstrated
+whenever the value of either `a` or `b` changes. This is demonstrated
 below:
 
 ```dart title="Computed cells"
@@ -201,13 +219,16 @@ In this example:
 3. The value of `b` is set to `4`, which likewise also results in the
    sum being recomputed and the watch function being called.
 
-The `ValueCell.computed` constructor takes an optional `changesOnly`
-keyword argument, which allows you to control whether the computed
-cell notifies its observers if its value hasn't changed after a
-recomputation. By default this is `false`, which means the computed
-cell notifies its observers whenever it's value is recomputed. If
-`changeOnly` is `true`, the cell only notifies its observers if the
-new value of the cell is not equal to its previous value.
+By default, computed cells notify their observers whenever their value
+is recomputed, which happens when the value of at least one of the
+referenced argument cells changes. This means that even if the new
+value of the computed cell is equal to its previous value, the
+observers of the cell are still notified that the cell's value has
+changed.
+
+By providing `changesOnly: true` to `ValueCell.computed`, the computed
+cell will not notify its observers if its new value is equal, by `==`,
+to its previous value.
 
 This is demonstrated with the following example:
 
@@ -252,6 +273,149 @@ Notice that a new line is printed to the console whenever the value of
 notifies its observers whenever the value of its argument `a` has
 changed even when `b`'s new value is equal to its previous value.
 
+:::important
+
+By default computed cells are evaluated lazily. This means the
+computation function of a computed cell is not run unless its value is
+actually referenced. However, providing `changesOnly: true` to
+`ValueCell.computed` makes the cell eager, which means the
+computation function is run regardless of whether the cell's value is
+referenced or not.
+
+:::
+
+## Lightweight Computed Cells
+
+Another way to create computed cells is with the
+[`apply`](https://pub.dev/documentation/live_cells/latest/live_cells/ComputeExtension/apply.html)
+extension method on a record containing the arguments of the cell. The
+computation function, provided to `apply`, is passed the values of the
+argument cells that are listed in the record on which `apply` is
+called.
+
+The `sum` cell from the previous example can also be defined as:
+
+```dart
+final a = MutableCell(0);
+final b = MutableCell(1);
+
+final sum = (a, b).apply((a, b) => a + b);
+```
+
+This definition is functionally equivalent to the previous
+definition. It computes the same value, which is recomputed whenever
+the value of either `a` or `b` changes. However this definition is
+different in that:
+
+* The argument cells `a` and `b` are specified explicitly in the
+  record on which `apply` is called.
+  
+* The argument cells are known at compile-time rather than determined
+  at run-time. Thus this definition has less run time overhead.
+  
+* The value of the `sum` cell is not cached. Instead it is recomputed
+  whenever the value of the cell is accessed.
+
+:::tip
+
+To create a lightweight computed cell taking a single argument, call
+`apply` on the argument cell:
+
+```dart
+final b = a.apply((a) => a + 1);
+```
+
+:::
+
+This definition is more lightweight than the previous definition of
+`sum`, since it doesn't have the overhead of determining the cell
+arguments at run time or the overhead of caching the cell
+value. However it is less convenient since the argument cells have to
+be listed beforehand, whereas with the previous definition, the
+arguments cells are determined automatically.
+
+For cells consisting of a simple computation, such as the `sum` cell,
+there is no need to cache the value since the overhead of the caching
+logic will likely increase the computational time. However, for more
+expensive value computation functions it may be beneficial to only run
+the computation function once and cache the result until the values of
+the argument cells change. The
+[`store()`](https://pub.dev/documentation/live_cells/latest/live_cells/StoreCellExtension/store.html)
+method of `ValueCell` creates a cell that adds caching to another
+cell.
+
+Caching can be added to the `sum` cell as follows:
+
+```dart
+final sum = (a, b).apply((a, b) => a + b);
+final cached_sum = sum.store();
+```
+
+The cell `cached_sum` evaluates to the same value as the `sum` cell
+but caches it until the values of the argument cells `a` and `b`
+change. The best way to demonstrate the difference is to change the
+definition of sum to the following:
+
+```dart
+final sum = (a, b).apply((a, b) {
+    print('Computing sum');
+    return a + b;
+});
+```
+
+The following watch function:
+
+```dart
+ValueCell.watch(() {
+    print('a + b = ${sum()}');
+    print('The sum is ${sum()}');
+});
+```
+
+Results in the following being printed to the console:
+
+```
+Computing sum
+a + b = 1
+Computing sum
+The sum is 1
+```
+
+Notice that the computation function of `sum` is called whenever the
+value of the cell is referenced.
+
+The following watch function references the value of `cached_sum`,
+which caches the value of `sum` using `.store()`:
+
+```dart
+ValueCell.watch(() {
+    print('a + b = ${cached_sum()}');
+    print('The sum is ${cached_sum()}');
+});
+```
+
+This results in the following being printed to the console:
+
+```
+Computing sum
+a + b = 1
+The sum is 1
+```
+
+Notice that the computation function of `sum` is now called only the
+first time the value of `cached_sum` is referenced.
+
+`.store()` also accepts a `changesOnly` argument like
+`ValueCell.computed`. When given `changesOnly: true`, the cell
+returned by `.store()` only notifies its observers when the new value
+of the argument cell is not equal to its previous value.
+
+Example:
+
+```dart
+final cached_sum = sum.store(changesOnly: true);
+```
+
 ## Batch Updates
 
 The `MutableCell.batch` function allows the values of multiple mutable
@@ -276,9 +440,9 @@ MutableCell.batch(() {
 ```
 
 In the example above, the values of `a` and `b` are set to `15` and
-`3` respectively, within a `MutableCell.batch`. The watch function,
-which observes both `a` and `b`, is only called once after the value
-of both `a` and `b` is set within `MutableCell.batch`.
+`3` respectively, within `MutableCell.batch`. The watch function,
+which observes both `a` and `b`, is only called once after the values
+of both `a` and `b` are set.
 
 As a result the following is printed to the console:
 

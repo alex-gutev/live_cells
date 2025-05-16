@@ -16,7 +16,7 @@ The arithmetic and relational (`<`, `<=`, `>`, `>=`) operators, when
 applied to cells holding numeric values, return cells which compute the
 result of the expression.
 
-This allows a computation to be defined directly as an expression of
+This allows a computed cell to be defined directly as an expression of
 cells. For example the following cell computes the sum of two cells:
 
 ```dart title="Arithmetic Expressions"
@@ -26,10 +26,18 @@ final b = MutableCell(2);
 final sum = a + b;
 ```
 
-:::info
+:::info 
+
 This definition of the sum cell is not only simpler than the
 definition using `ValueCell.computed` but is also more efficient since
-the argument cells are determined at compile-time.
+the argument cells are determined at compile-time. In-fact it is
+equivalent to the definition seen in [Lightweight Computed
+Cells](./cells#lightweight-computed-cells):
+
+```dart
+final sum = (a, b).apply((a, b) => a + b);
+```
+
 :::
 
 The `sum` cell is a cell like any other, and can be observed by a
@@ -73,11 +81,11 @@ Cells holding `bool` values are extended with the following methods:
 
 <dl>
 <dt>`and`</dt>
-<dd>Creates a cell with a value that is the logical and of two cells</dd>
+<dd>Creates a cell with a value that is the *logical and* of two cells</dd>
 <dt>`or`</dt>
-<dd>Creates a cell with a value that is the logical or of two cells</dd>
+<dd>Creates a cell with a value that is the *logical or* of two cells</dd>
 <dt>`not`</dt>
-<dd>Creates a cell with a value which is the logical not of a cell</dd>
+<dd>Creates a cell with a value which is the *logical not* of a cell</dd>
 <dt>`select`</dt>
 <dd>Creates a cell which selects between the values of two cells based on a condition</dd>
 </dl>
@@ -153,9 +161,10 @@ value.
 
 ## Exception Handling
 
-If an exception is thrown during the computation of a cell's value, it will be propagated to all 
-points where the value is referenced. This allows exceptions to be handled using `try` and `catch`
-inside computed cells:
+If an exception is thrown during the computation of a cell's value, it
+is rethrown when the cell's value is referenced. This allows
+exceptions to be handled using `try` and `catch` inside computed
+cells:
 
 ```dart title="Exception handling in computed cells"
 final str = MutableCell('0');
@@ -225,20 +234,33 @@ the values `0` and `false`, respectively.
 The `previous` property can be used to retrieve the previous values of cells:
 
 ```dart title="Retrieving previous cell values"
-final a = MutableCell(0);
+final a = MutableCell(1);
 final prev = a.previous;
 
 final sum = ValueCell.computed(() => a() + prev());
 
-a.value = 1;
-print(a.value);    // Prints 1
-print(prev.value); // Prints 0
-print(sum.value);  // Prints 1
+ValueCell.watch(() {
+    final prev_value = prev();
+    
+    print('\nA = ${a()}');
+    print('Prev = ${prev_value()}');
+    print('Sum = ${sum()}');
+});
 
+a.value = 2;
 a.value = 5;
-print(a.value);    // Prints 5
-print(prev.value); // Prints 1
-print(sum.value);  // Prints 6
+```
+
+This results in the following being printed to the console:
+
+```
+A = 2
+Prev = 1
+Sum = 3
+ 
+A = 5
+Prev = 2
+Sum = 7
 ```
 
 :::info
@@ -275,11 +297,11 @@ b.value = 5; // Doesn't print anything
 a.value = 7; // Prints: 13
 ```
 
-In the above example cell `c` is a computed cell referencing the value
+In the example above, cell `c` is a computed cell that references the value
 of `a` and *peeks* the value of `b`. Changing the value of `a`
 triggers a recomputation of `c`, and hence triggers the watch function
-which prints to the console, but changing the value of `b` doesn't
-trigger a recomputation of `c`.
+which prints to the console. However, changing the value of `b` doesn't
+trigger a recomputation of `c`, and hence the watch function is not called.
 
 :::note
 `peek` returns a cell.

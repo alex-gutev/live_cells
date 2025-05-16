@@ -39,29 +39,35 @@ changed dynamically.
 
 This error handling strategy might be sufficient for some cases but
 usually, we want to detect and handle the error rather than assigning
-a default value. This can be done with `Maybe` cells. A `Maybe` object
-either holds a value or an exception that was thrown while computing a
-value.
+a default value. This can be done with `Maybe` cells. A
+[`Maybe`](https://pub.dev/documentation/live_cells/latest/live_cells/Maybe-class.html)
+object either holds a value or an exception that was thrown while
+computing a value.
 
 A `Maybe` cell can easily be created from a`MutableCell` with the
-`maybe()` method. The resulting `Maybe` cell is a mutable computed
-cell with the following behaviour:
+[`maybe()`](https://pub.dev/documentation/live_cells/latest/live_cells/CellMaybeExtension/maybe.html)
+method. The resulting `Maybe` cell is a mutable computed cell with the
+following behaviour:
 
 * Its computed value is the value of the argument cell wrapped in a
   `Maybe`.
 * When the cell's value is set, it sets the value of the argument cell
   to the value wrapped in the `Maybe` if it is holding a value.
 
-The `Maybe` cell provides an `error` property which retrieves a
-`ValueCell` that evaluates to the exception held in the `Maybe` or
-`null` if the `Maybe` is holding a value. This can be used to
-determine whether an error occurred while computing a value.
+The `Maybe` cell provides an
+[`error`](https://pub.dev/documentation/live_cells/latest/live_cells/MaybeCellExtension/error.html)
+property which retrieves a `ValueCell` that evaluates to the exception
+held in the `Maybe` or `null` if the `Maybe` is holding a value. This
+can be used to determine whether an error occurred while computing a
+value.
 
 :::tip
 
-`Maybe` is a sealed union of the classes `MaybeValue` and
-`MaybeError`. This allows you to handle errors using `switch` and
-pattern matching:
+`Maybe` is a sealed union of the classes
+[`MaybeValue`](https://pub.dev/documentation/live_cells/latest/live_cells/MaybeValue-class.html)
+and
+[`MaybeError`](https://pub.dev/documentation/live_cells/latest/live_cells/MaybeError-class.html). This
+allows you to handle errors using `switch` and pattern matching:
 
 ```dart
 switch (maybe) {
@@ -77,8 +83,8 @@ switch (maybe) {
 
 To handle errors while parsing a number, `mutableString` should be
 called on a cell containing a `Maybe<num>` rather than a `num`. We can
-then check whether the `error` cell is non-null to check if an error
-occurred.
+then check whether the `error` cell is non-null to determine if an
+error occurred.
 
 Putting it all together a text field for numeric input, which displays
 an error message when an invalid value is entered, can be implemented
@@ -128,7 +134,7 @@ whether the field is empty, or not:
 class NumberField extends CellWidget {
   final MutableCell<num> n;
   
-  NumberField(this.n);
+  const NumberField(this.n);
   
   @override
   Widget build(BuildContext context) {
@@ -150,8 +156,8 @@ class NumberField extends CellWidget {
 }
 ```
 
-Now that we have a reusable numeric input text field with error
-handling, let's use it to reimplement the sum example from earlier.
+Now that we have a reusable numeric input field with error handling,
+let's use it to reimplement the sum example from earlier.
 
 ```dart title="Sum example using numberField()"
 CellWidget.builder((_) {
@@ -172,7 +178,7 @@ CellWidget.builder((_) {
         ],
       ),
       Text('${a()} + ${b()} = ${sum()}'),
-      ElevatedButton(
+      FilledButton(
         child: Text('Reset'),
         onPressed: () => MutableCell.batch(() {
           a.value = 0;

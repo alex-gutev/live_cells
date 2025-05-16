@@ -147,11 +147,11 @@ retrieved using the generated accessors, to the appropriate widgets.
 class PersonForm extends CellWidget {
     final MutableCell<Person> person;
     
-    PersonForm(this.person);
+    const PersonForm(this.person);
     
     @override
     Widget build(BuildContext context) => Column(
-    children: [
+      children: [
         Text('First Name:'),
         LiveTextField(
             content: person.firstName
@@ -162,12 +162,12 @@ class PersonForm extends CellWidget {
         ),
         Text('Age:'),
         Numberfield(person.age)
-    ]
-)
+      ]
+    );
 ```
 
-We used the `Numberfield` widget, defined [earlier](error-handling), for the `age`
-property.
+We used the `Numberfield` widget, defined [earlier](error-handling),
+for entering the `age` property.
 
 :::info
 
@@ -197,7 +197,7 @@ CellWidget.builder((_) {
         // A hypothetical savePerson function
         onPressed: () => savePerson(person.value)
       ),
-      ElevatedButton(
+      FilledButton(
         child: Text('Reset'),
         onPressed: () => person.value = Person(
           firstName: 'John',
@@ -210,14 +210,14 @@ CellWidget.builder((_) {
 });
 ```
 
-In this example we used the `personForm` widget defined earlier. 
+In this example we used the `PersonForm` widget defined earlier. 
 
-* The details of the person are displayed in a `Text`, which is
+* The details of the person are displayed in a `Text` widget, which is
   automatically updated when the person's details are changed.
 * The "Save" button saves the entered details, which are held in the
   `person` cell.
 * The "Reset" button resets the form fields to their defaults by
-  directly assigning a default `Person` to the `person` cell.
+  directly assigning a *default* `Person` to the `person` cell.
   
 The benefits of this, as opposed to using the tools already available
 in Flutter, are:

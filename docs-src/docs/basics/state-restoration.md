@@ -8,15 +8,18 @@ sidebar_position: 7
 
 A mobile application may be terminated at any point when the user is
 not interacting with it. When it is resumed, due to the user
-navigating back to it, it should restore its state to the point where
-it was when terminated.
+navigating back to it, it should restore its state to the point it was
+at when it was terminated.
 
 ## Restoration ID
 
 For the most part all you need to do to restore the state of your
-cells is to provide a `restorationId` when creating the `CellWidget`,
-and call `.restore()` on your cells. The `restorationId` associates
-the saved state with the widget, See
+cells is to provide a
+[`restorationId`](https://pub.dev/documentation/live_cells/latest/live_cells/CellWidget/restorationId.html)
+when creating the `CellWidget`, and call
+[`.restore()`](https://pub.dev/documentation/live_cells/latest/live_cells/CellRestorationExtension/restore.html)
+on your cells. The `restorationId` associates the saved state with the
+widget, See
 [`RestorationMixin.restorationId`](https://api.flutter.dev/flutter/widgets/RestorationMixin/restorationId.html),
 for more information.
 
@@ -71,14 +74,25 @@ function.
 :::tip
 When subclassing `CellWidget`, provide the `restorationId` in the
 call to the super class constructor.
+
+```dart
+class Example extends CellWidget {
+    const Example({
+      super.key,
+      ...
+    }) : super(restorationId: 'example_restoration_id');
+    
+    ...
+}
+```
 :::
 
 The `build` method defines four widgets, a slider, a switch, a
-checkbox and a text field as well as four cells, created using `cell`
-for holding the state of the widgets. The code defining the cells is
-almost the same as it would be without state restoration, however
-when the app is resumed the state of the cells, and likewise the
-widgets which are dependent on the cells, is restored.
+checkbox and a text field as well as four cells for holding the state
+of the widgets. The code defining the cells is almost the same as it
+would be without state restoration, however when the app is resumed
+the state of the cells, and likewise the widgets which are dependent
+on the cells, is restored.
 
 :::info
 
@@ -87,9 +101,9 @@ widgets which are dependent on the cells, is restored.
   `Slider`, `SwitchListTile` and `CheckboxListTile` which allow their
   state to be controlled by a `ValueCell`.
 * You can use any widgets not just those provided by
-  `live_cells_ui`. The state of the cells within `CellWidget` on
-  which `restore()` is called will be restored regardless of the widgets
-  you use.
+  [`live_cells_ui`](https://pub.dev/documentation/live_cells/latest/live_cells_ui/). The
+  state of the cells within `CellWidget` on which `restore()` is
+  called will be restored regardless of the widgets you use.
   
 :::
 
@@ -106,7 +120,9 @@ In order for cell state restoration to be successful, the following has to be ta
   values (`num`, `bool`, `null`, `String`, `List`, `Map`) can have
   their state saved and restored.
 * To support state restoration of cells holding values not supported
-  by `StandardMessageCodec`, a `CellValueCoder` has to be provided.
+  by `StandardMessageCodec`, a
+  [`CellValueCoder`](https://pub.dev/documentation/live_cells/latest/live_cells/CellValueCoder-class.html)
+  has to be provided.
 
 ## User-Defined Types
 
@@ -143,9 +159,6 @@ class RadioValueCoder implements CellValueCoder {
     return value?.name;
   }
 }
-```
-
-```dart title="Example of state restoration with user-defined CellValueCode"
 
 CellWidget.builder((ctx) => {
   final radioValue = MutableCell<RadioValue?>(RadioValue.value1)
@@ -222,10 +235,10 @@ CellWidget.builder((_) {
       ),
       const SizedBox(height: 10),
       CellWidget.builder((context) {
-        final a1 = context.cell(() => numValue + 1.cell);
+        final a1 = numValue + 1.cell;
         return Text('${numValue()} + 1 = ${a1()}');
       }),
-      ElevatedButton(
+      FilledButton(
         child: const Text('Reset'),
         onPressed: () => numValue.value = 1
       )
@@ -256,6 +269,6 @@ Some points to note from this example:
   state is recomputed on launch) nevertheless.
 
 As a general rule of thumb only mutable cells which are either set
-directly, such as `numValue` which has its value set in the "Reset"
+directly, such as `numValue`, which has its value set in the "Reset"
 button, or hold user input from widgets, such as the content cells of
 text fields, are required to have their state saved.

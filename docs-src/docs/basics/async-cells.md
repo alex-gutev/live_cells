@@ -51,8 +51,8 @@ the argument cells should all be referenced before the first `await`
 expression. Argument cells that are only referenced after the first
 `await` expression will not be observed by the computed cell.
 
-Multiple asynchronous argument cells should either be referenced first
-and then awaited, such as in the following example:
+Multiple asynchronous argument cells should be referenced first and
+then awaited, such as in the following example:
 
 ```dart title="An asynchronous computed cell with multiple arguments"
 final arg1 = MutableCell(Future.value(0));
@@ -66,7 +66,7 @@ final sum = ValueCell.computed(() async {
 });
 ```
 
-Or awaited at once using the following:
+or awaited at once with the following:
 
 ```dart
 final arg1 = MutableCell(Future.value(0));
@@ -114,20 +114,22 @@ A *wait cell* waits for a `Future`, held in another cell, to complete
 before notifying its observers. Once the `Future` completes, the value
 of the *wait cell* is updated to the completed value of the
 `Future`. A wait cell is created from a cell holding a `Future` using
-the `.wait` property:
+the
+[`.wait`](https://pub.dev/documentation/live_cells/latest/live_cells/WaitCellExtension/wait.html)
+property:
 
 ```dart title="Using .wait cells"
-final asyncN = MutableCell(Future.value(1));
-final n = asyncN.wait;
+final n = MutableCell(Future.value(1));
+final waitN = asyncN.wait;
 
-final next = ValueCell.computed(() => n() + 1);
+final next = ValueCell.computed(() => waitN() + 1);
 ```
 
 Notice in this definition of `next`, the computation function is not
-an `async` function and the value of `n` is not `awaited`. Since
-`wait` is a property it returns a keyed cell, like all properties
-that return cells. This means the `n` variable above can be omitted
-and the above example can be simplified to the following:
+an `async` function and the value of `n` is not `awaited`. Like all
+properties that return cells, `wait` returns a keyed cell. This means
+`waitN` can be omitted and the example can be simplified to the
+following:
 
 
 ```dart
@@ -135,12 +137,6 @@ final n = MutableCell(Future.value(1));
 
 final next = ValueCell.computed(() => n.wait() + 1);
 ```
-
-:::note
-
-`asyncN` has been renamed to `n`.
-
-:::
 
 When a value is assigned to `n`, the value of `next` is not updated
 immediately. Instead it is only updated when the `Future` held in `n`
@@ -157,7 +153,7 @@ exception being thrown. This can be handled with `onError` to give an
 initial value to a wait cell:
 
 ```dart
-final waitN = n.wait.onError<PendingAsyncValueError(0.cell);
+final waitN = n.wait.onError<PendingAsyncValueError>(0.cell);
 print(waitN.value); // Prints: 0
 
 final next = ValueCell.computed(() => waitN() + 1);
@@ -214,7 +210,7 @@ The second and third lines will both be printed after the second
 If a `Future` that never completes is assigned to a cell, the value of
 the `.wait` cell will never be updated again. If there's a chance of
 that happening, add a *timeout* on the `Future` before assigning it to
-a cell or use `.waitLast`, more on this later.
+a cell or use `.waitLast`.
 
 :::
 
@@ -289,7 +285,7 @@ assigned to `arg1` and `arg2`:
 
 This is probably what you expect.
 
-With the first definition the following will be printed:
+With the second definition the following will be printed:
 
 ```
 22
@@ -325,14 +321,14 @@ final sum = ValueCell.computed(() async => await a() + b).wait;
 
 ## Latest Futures Only
 
-The `.waitLast` property is like `.wait` however with one important
-difference. If the value of the cell is updated before the `Future`
-that was previously held in the cell completes, the previous `Future`
-is ignored and the value of `.waitLast` is not updated when it
-completes.
+The
+[`.waitLast`](https://pub.dev/documentation/live_cells/latest/live_cells/WaitCellExtension/waitLast.html)
+property is like `.wait` however with one important difference. If the
+value of the cell is updated before the `Future` that was previously
+held in the cell completes, the previous `Future` is ignored and the
+value of `.waitLast` is not updated when it completes.
 
 ```dart title="Example of .waitLast"
-
 final n = MutableCell(Future.value(1));
 
 ValueCell.watch(() {
@@ -364,15 +360,16 @@ This is useful in two scenarios:
 The `.awaited` cell is similar to `.waitLast`, however it does not
 retain the completed value of the previous `Future`. If the current
 `Future` has completed, the value of the `.awaited` cell is the
-completed value of the `Future`. If the `Future` has not completed, an
+completed value of the `Future`. If the `Future` has not completed, a
 `PendingAsyncValueError` exception is thrown when accessing the value
 of `.awaited`.
 
 :::tip
 
-The `.initialValue(...)` method, on all cells can be used to handle
-`UninitializedCellError` and `PendingAsyncValueError`, by returning
-the value of another cell:
+The
+[`.initialValue(...)`](https://pub.dev/documentation/live_cells/latest/live_cells/ErrorCellExtension/initialValue.html)
+method, on all cells can be used to handle `UninitializedCellError`
+and `PendingAsyncValueError`, by returning the value of another cell:
 
 ```dart
 final f = Future.delayed(Duration(seconds: 10), 1)
@@ -386,7 +383,8 @@ print(f.value) // Prints: 0
 ```
 
 If you only want to handle `PendingAsyncValueError`, use
-`loadingValue` instead.
+[`loadingValue`](https://pub.dev/documentation/live_cells/latest/live_cells/ErrorCellExtension/loadingValue.html)
+instead.
 
 :::
 
@@ -472,11 +470,12 @@ When the `Future` completes, the following is printed:
 
 ## Checking if Complete
 
-All cells holding a `Future` provide an `isCompleted` property which
-returns a cell that is `true` when the `Future` is complete, and
-`false` while it is still pending.
+All cells holding a `Future` provide an
+[`isCompleted`](https://pub.dev/documentation/live_cells/latest/live_cells/WaitCellExtension/isCompleted.html)
+property which returns a cell that is `true` when the `Future` is
+complete, and `false` while it is still pending.
 
-This allows other cells to check if, and be notified of, an
+This allows other cells to check if, and be notified when, an
 asynchronous operation has completed or whether its still in
 progress.
 
@@ -527,8 +526,7 @@ following classes, each of which represents a different state of the
   This represents the state of a `Future` that has completed with an
   error. The exception thrown is accessible via the `.error` property.
 
-This allows you to handle the different states using a `switch` state
-and pattern matching.
+This allows you to handle the different states with pattern matching.
 
 ```dart
 CellWidget.builder((_) {
@@ -547,15 +545,15 @@ The `AsyncState` class also provides the following properties:
 
 * `isData`
   
-  Does the state represent a `Future` which has completed to a `value`.
+  Does the state represent a `Future` which has completed to a `value`?
   
 * `isError`
 
-  Does the state represent a `Future` which completed with an `error`.
+  Does the state represent a `Future` which completed with an `error`?
   
 * `isLoading`
 
-  Does the state represent a `Future` that is still pending.
+  Does the state represent a `Future` that is still pending?
   
 * `lastValue`
 
@@ -571,8 +569,8 @@ The `AsyncState` class also provides the following properties:
   
   :::important
   
-  If you replace a `Future` `a` held in the cell with another `Future`
-  `b` while `a` is still pending, `lastValue` will never be equal to
+  If you replace a `Future`, `a`, held in the cell with another `Future`,
+  `b`, while `a` is still pending, `lastValue` will never be equal to
   the completed value of `a` even if it completes successfully and `b`
   completes with an error.
   
@@ -581,10 +579,11 @@ The `AsyncState` class also provides the following properties:
 
 ## Delays and Debouncing
 
-Live Cells provides a `delayed(...)` method on cells. This method
-returns a cell that holds a `Future` that completes with the same
-value as the value of the cell, on which `delayed` was called, but
-after a given delay.
+Live Cells provides a
+[`delayed(...)`](https://pub.dev/documentation/live_cells/latest/live_cells/DelayCellExtension/delayed.html)
+method on cells. This method returns a cell that holds a `Future` that
+completes with the same value as the value of the cell, on which
+`delayed` was called, but after a given delay.
 
 ```dart title="Example of .delayed(...)"
 final n = MutableCell(0);
@@ -654,12 +653,12 @@ CellWidget.builder((_) {
 });
 ```
 
-In this example, we've bound a cell to the content of a
-`LiveTextField`. We've *debounced* the cell with
-`delayed(...).waitLast` and bound the debounced cell to the data of a
+In this example, a cell is bound to the content of a
+`LiveTextField`. The cell is then *debounced* with
+`delayed(...).waitLast` and its value is displayed in the data of a
 `Text` widget. Whatever you write in the text field is echoed in the
-`Text` below it but only after a three second delay after you
-stop typing.
+`Text` below it but only after a three second delay after you stop
+typing.
 
 Practically, to implement a search as you type functionality, you'd
 reference the `debounced` cell in an asynchronous computed cell which
@@ -691,10 +690,11 @@ Column(
       items = results.waitLast
             .initialValue(const [].cell);
             
-      Column(
-        children: items()
-            .map((e) => ItemWidget(e))
-            .toList()
+      ListView.builder(
+        itemCount: items.length()
+        
+        itemBuilder: (_, index) => 
+           ItemWidget(items[index.cell])
       );
     });
   ]

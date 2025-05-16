@@ -43,7 +43,7 @@ print(m.value)
 The cell to which a meta cell points to is set with the
 [`inject`](https://pub.dev/documentation/live_cells/latest/live_cells/MetaCell/inject.html)
 method, which takes the cell as an argument. Once a cell has been
-*injected* in a meta cell, accessing the meta cell's value returns the
+*injected* into a meta cell, accessing the meta cell's value returns the
 value of the injected cell.
 
 The `inject` method can be called multiple times. If the meta cell,
@@ -87,7 +87,7 @@ to is changed with `.inject`.
 
 A meta cell has to be observed before `.inject` can be called. If
 `.inject` is called before the cell is observed
-`InactiveMetaCelLError` is thrown. You will have noticed the cell
+`InactiveMetaCellError` is thrown. You will have noticed that the cell
 watch function is defined before `.inject` is called.
 
 :::

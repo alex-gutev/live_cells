@@ -24,7 +24,7 @@ the property changes due to user interaction, the value of the cell is
 updated to reflect the state of the widget.
 
 For example the `LiveSwitch` widget is a `Switch` which takes a cell
-for its `value`.
+for its `value` property.
 
 ```dart title="LiveSwitch example"
 CellWidget.builder((c) {
@@ -36,7 +36,7 @@ CellWidget.builder((c) {
             LiveSwitch(
                 value: state
             ),
-            ElevatedButton(
+            FilledButton(
                 child: Text('Reset'),
                 onPressed: () => state.value = false
             )
@@ -94,7 +94,7 @@ CellWidget.builder((c) {
             LiveTextField(
                 content: content
             ),
-            ElevatedButton(
+            FilledButton(
                 child: Text('Clear'),
                 onPressed: () => content.value = ''
             )

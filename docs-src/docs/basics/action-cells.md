@@ -11,8 +11,11 @@ type of an action cell is `ValueCell<void>`. The purpose of an action
 cell is to notify its observers when an event, such as a button press,
 has taken place.
 
-Action cells are created using the `ActionCell` constructor, and the
-observers of the cell are notified with the `.trigger()` method.
+Action cells are created using the
+[`ActionCell`](https://pub.dev/documentation/live_cells/latest/live_cells/ActionCell/ActionCell.html)
+constructor, and the observers of the cell are notified with the
+[`.trigger()`](https://pub.dev/documentation/live_cells/latest/live_cells/ActionCell/trigger.html)
+method.
 
 ```dart
 final action = ActionCell();
@@ -33,10 +36,10 @@ not actually return a value, since the value type of the cell is
 
 :::tip
 
-You can use the `.observe()` method instead of calling the cell
-directly, e.g. `action.observe()`. There is no difference between the
-two but using `observe`, in this case, makes the code more
-self-documenting.
+You can use the
+[`.observe()`](https://pub.dev/documentation/live_cells/latest/live_cells/ValueCell/observe.html)
+method instead of calling the cell directly, e.g. `action.observe()`,
+which makes the code more self-documenting.
 
 :::
 
@@ -82,12 +85,12 @@ HTTP requests.
 
 :::
 
-As the cell is defined in the example above, there is no way to retry
-the network request if it fails for some reason e.g. the Internet
-connection is down, the server is down, the request times
-out. Observers of the cell will observe the error and can handle it by
-displaying an error notice, but there is no way to offer a retry
-functionality to the user.
+With this cell definition there is no way to retry the network request
+if it fails for some reason e.g. the Internet connection is down, the
+server is overloaded, the request times out. Observers of the cell
+will observe the error and can handle it by displaying an error
+notice, but there is no way to offer a retry functionality to the
+user.
 
 This is where `ActionCell`s come in handy. All we need to do to add
 retry functionality is to define an `ActionCell`, which will serve to
@@ -116,8 +119,8 @@ is trigger the retry cell with:
 retry.trigger();
 ```
 
-This will cause the compute value function of the `countries` cell to
-be run again, because `retry` is observed by `countries`.
+This will cause the value computation function of the `countries` cell
+to be run again, because `retry` is observed by `countries`.
 
 :::tip
 
@@ -126,11 +129,70 @@ be run again, because `retry` is observed by `countries`.
 
 :::
 
+## Live Buttons
+
+The
+[`live_cells_ui`](https://pub.dev/documentation/live_cells/latest/live_cells_ui/)
+library, which was introduced in [Live Cell Widgets](./cell-widgets),
+provides variants of the buttons provided by the Flutter framework
+which take an `ActionCell` instead of an `onPressed` callback
+function. Like the remaining widgets, provided by the library, the
+button widget variants are named `Live` followed by the name of the
+Flutter widget class.
+
+For example the
+[`LiveFilledButton`](https://pub.dev/documentation/live_cells/latest/live_cells_ui/LiveFilledButton-class.html),
+which is a wrapper over Flutter's `FilledButton`, triggers the
+`ActionCell` provided in the `press` argument when the button is
+pressed by the user.
+
+A button for retrying the network request, in the previous example,
+can be added with the following:
+
+```dart
+LiveFilledButton(
+    press: retry,
+    child: Text('Retry')
+)
+```
+
+where `retry` is the `ActionCell` for retrying the request.
+
+:::tip
+
+`LiveFilledButton` triggers the action cell provided in the
+    `longPress` argument, if given, when the button is *long-pressed* by
+the user.
+
+:::
+
+To run an arbitrary function, when the button is pressed, define a
+watch function that observes the `press` action cell.
+
+```dart
+final press = ActionCell()
+
+// Show a snackbar when the button is pressed
+Watch((state) {
+    press.observe();
+    state.afterInit();
+    
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Hello');
+    ));
+});
+
+return LiveFilledButton(
+    press: press,
+    child: Text('Say hello')
+);
+```
+
 ## Practical Example
 
-This is very handy for implementing a reusable error handling widget
-that displays the result of a request when it is successful and an
-error notice with a button to retry the request, when it fails.
+Action cells are very handy for implementing a reusable error handling
+widget that displays the result of a request when it is successful and
+an error notice with a button to retry the request, when it fails.
 
 To achieve this we'll need to define a widget that takes a `child`
 widget as a cell, and an `ActionCell` for retrying the action.
@@ -155,8 +217,8 @@ class ErrorHandler extends CellWidget {
       return Column(
         children: [
           const Text('Something went wrong!'),
-          ElevatedButton(
-            onPressed: retry.trigger,
+          LiveFilledButton(
+            press: retry,
             child: const Text('Retry')
           )
         ]
@@ -174,8 +236,9 @@ A couple of things to note from this definition:
   returned if the child widget is created successfully.
 * If an error occurred while computing the `child` widget, an error
   notice with a retry button is displayed.
-* The `onPressed` handler of the retry button calls `retry.trigger()`
-  which triggers the retry action.
+* The retry button is a `LiveFilledButton` that triggers the `retry`
+  action cell, provided in the `press` argument, when the button is
+  pressed.
 
 Before we update the definition of the `countries` cell let's define a
 simple data model:
@@ -233,7 +296,7 @@ The `ErrorHandler` widget can now be used as follows
 
 ```dart
 class Countries extends CellWidget {
-  static final _loadingData = <Country>[];
+  static const _loadingData = <Country>[];
   
   @override
   Widget build(BuildContext context) {
@@ -281,7 +344,7 @@ reusable components:
 
 1. The *countries* cell, which is only concerned with performing the
    HTTP request that loads the data, and doesn't care how that data is
-   presented, how errors are handled nor how the operation is retried.
+   presented nor how errors are handled.
    
 2. The `child` widget, which is only concerned with presenting the data to
    the user when the request is successful, and not handling errors.
@@ -298,8 +361,10 @@ We've glossed over styling and UI design in these examples, since
 that's beyond the scope of this library, but we can make this example
 more user friendly by providing a loading indication while the data is
 loading, rather than showing an empty list. We can do this easily
-using, the `.isCompleted` property of cells holding a `Future`, and
-the [skeletonizer](https://pub.dev/packages/skeletonizer) package.
+using, the
+[`.isCompleted`](https://pub.dev/documentation/live_cells/latest/live_cells/WaitCellExtension/isCompleted.html)
+property of cells holding `Future`s, and the
+[skeletonizer](https://pub.dev/packages/skeletonizer) package.
 
 To do that we'll first update `_loadingData` to a list of five
 *placeholder* items. These wont be displayed but are required by
@@ -410,7 +475,7 @@ final chained = action.chain(() async {
 The original action is only triggered if `showConfirmPrompt()` returns
 true.
 
-This allows you to package the "confirmation" functionality in an
+This allows you to package the *confirmation* functionality in an
 extension on `ActionCell`:
 
 ```dart

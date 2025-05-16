@@ -12,8 +12,8 @@ interfaces to be accessed directly on cells.
 
 ## Indexing
 
-For example the `[]` operator is overloaded for cells holding `Lists`,
-which allows a list element to be retrieved.
+The `[]` operator is overloaded for cells holding `Lists`, which
+allows a list element to be retrieved.
 
 ```dart title="List cell operator[] example"
 final list = MutableCell([1, 2, 3, 4]);
@@ -60,7 +60,8 @@ The underlying `List` is not modified but a new `List` is created and
 assigned to the `list` cell.
 :::
 
-You can also update the `list` element directly using `[]=`:
+You can also update the `list` element directly using the `[]=`
+operator:
 
 ```dart
 list[1] = 100;
@@ -88,7 +89,7 @@ methods:
 Each property/method returns a cell which applies the property
 getter/method on the `Iterable` held in the cell. This allows you, for
 example, to retrieve the first value in an `Iterable`, be it a `List`,
-`Set`, etc., held in a cell, using:
+`Set`, etc., that is held in a cell, using:
 
 
 ```dart
@@ -127,10 +128,10 @@ final cellList = list.cellList;
 ```
 
 `cellList` is reactive, like any other cell, and its value will
-likewise change whenever the value of `list` changes. So what's the
-point? Unlike `list`, `cellList` only reacts to changes in the
-`length` of the list, i.e. when the number of elements in the list
-change, and not the values of the elements themselves.
+likewise change whenever the value of `list` changes. However,
+`cellList` only reacts to changes in the `length` of the `list`,
+i.e. when the number of elements in the list change, and not the
+values of the elements themselves.
 
 You can test this out using `ValueCell.watch`:
 
@@ -164,41 +165,6 @@ list.value = [];
 list.value = [1, 2, 3, 4, 5, 6, 7];
 ```
 
-This is particularly useful for constructing a `Column` or `Row`
-widget using a list of child widgets held in a cell:
-
-```dart
-ValueCell<List<Widget>> children;
-
-CellWidget.builder((_) => Column(
-  children: children.cellList()
-      .map((c) => c.widget())
-      .toList()
-);
-```
-
-:::info
-The `ValueCell.widget()`, available on cells holding `Widget`s,
-returns the `Widget` held in the cell. Unlike retrieving the `Widget`
-directly with `.value`, the returned widget is rebuilt whenever the
-value of the cell changes.
-:::
-
-Here's what's going on in the example above:
-
-1. `children` is a cell holding the list of child `Widgets`
-2. `cellList` is used to retrieve a cell that is only recomputed when
-   the `length` of `children`.
-3. As a result the `CellWidget`, holding the `Column`, is only
-   rebuilt, when the size of `children` changes.
-4. The list (`Iterable`) of cells held in `cellList` is converted to a
-   list of `Widgets` by applying the `widget()` method on each cell in the
-   list.
-
-As a result modifying an element of the `children` list, will only
-result in that child widget of the `Column` being rebuilt and not the
-entire widget hierarchy rooted at the `Column`. 
-
 ## Map and Set Properties
 
 The following properties and methods are provided by cells holding
@@ -213,9 +179,9 @@ The following properties and methods are provided by cells holding
 * `containsKey()`
 * `containsValue()`
 
-Much like the with cells holding `List` values, these properties and
-methods return cells which apply the property getter/method on the
-`List` held in the cell.
+Like with cells holding `List` values, these properties and methods
+return cells which apply the property getter/method on the `List` held
+in the cell.
 
 The indexing operator `[]` is also provided, which takes a cell for the key:
 
@@ -250,6 +216,23 @@ The following methods are provided by cells holding `Set` values:
 
 * `contains`
 * `containsAll`
+
+Both `contains` and `containsAll` return mutable cells, if the `Set`
+cell on which they are called is mutable. This allows elements to be
+added and removed from the set with the following:
+
+```dart
+final set = MutableCell({1, 2, 3});
+final item = MutableCell(4);
+
+final contains = set.contains(item);
+
+// Add `4` to the set
+contains.value = true;
+
+// Remove `4` from the set
+contains.value = false;
+```
 
 Given that a `Set` is an `Iterable`, all the properties provided by
 cells holding `Iterables` are also provided by cells holding `Sets`.

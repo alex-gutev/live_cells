@@ -14,13 +14,13 @@ data to flow in both directions between a pair of cells.
 
 A *Mutable computed cell* is a cell which ordinarily functions like a
 normal computed cell, created with `ValueCell.computed`, but can also
-have its value changed by setting its `value` property as though it is
-a `MutableCell`. When the value of a mutable computed cell is set, it
-*reverses* the computation by setting the argument cells to a value
-such that when the mutable computed cell is recomputed, the same value
-will be produced as the value that was set. Thus mutable computed
-cells support two-way data flow, which is what sets **Live Cells**
-apart from other reactive state management libraries.
+have its value set directly as though it is a `MutableCell`. When the
+value of a mutable computed cell is set, it *reverses* the computation
+by setting the argument cells to a value such that if the mutable
+computed cell were to be recomputed, the same value would be produced
+as the value that was set. This allows data to flow in two directions,
+whereas `ValueCell.computed()` only allows data to flow in a single
+direction.
 
 Mutable computed cells are created using `MutableCell.computed`, which
 takes the computation function and reverse computation function. The
@@ -53,8 +53,10 @@ print(a.value + 1); // Prints: 101
 
 This definition will prove useful when implementing a text field for
 numeric input. In-fact, this library already provides a definition for
-this cell with the `mutableString` extension method on `MutableCell`'s
-holding `int`, `double` and `num` values.
+this cell with the
+[`mutableString`](https://pub.dev/documentation/live_cells/latest/live_cells/ParseNumExtension/mutableString.html)
+extension method on `MutableCell`'s holding `int`, `double` and `num`
+values.
 
 ```dart title="Example of mutableString()"
 final a = MutableCell<num>(0);
@@ -83,7 +85,7 @@ CellWidget.builder((_) {
 ```
 
 An integer is parsed from the `LiveTextField`, it's square is computed
-and displayed in a `Text` below it.
+and displayed in a `Text` widget below the field.
 
 :::info
 An explicit generic type parameter is given to `MutableCell` to allow
@@ -120,7 +122,7 @@ CellWidget.builder((_) {
         ],
       ),
       Text('${a()} + ${b()} = ${sum()}'),
-      ElevatedButton(
+      FilledButton(
         child: Text('Reset'),
         onPressed: () => MutableCell.batch(() {
           a.value = 0;
@@ -139,11 +141,11 @@ fields as numbers rather than strings.
 
 The `sum` computed cell, defined by a cell expression, computes the
 sum of `a` and `b`. The values of cells `a`, `b` and `sum` are
-displayed in a `Text` below the fields.
+displayed in a `Text` widget below the fields.
 
 The "Reset" button resets both fields by setting the value of `a` and
 `b` to `0`. Consequently, this also resets the sum and the value
-displayed in the `Text`.
+displayed in the `Text` widget.
 
 :::info
 `MutableCell.batch` was used when resetting the fields, in order to
@@ -163,14 +165,18 @@ The benefits of using `LiveTextField` and mutable computed cells are:
 * No need to use `StatefulWidget` or make ugly empty calls to `setState(() {})` to force the widget
   to update when the `text` property of the `TextEditingController` is updated.
 
-## Fun with Mutable Computed Cells
+## Multiple Arguments
 
-Let's say we want the user to be able to enter the result of the addition and have the values for
-`a` and `b` automatically computed and displayed in the corresponding fields:
-
-We can do this with another mutable computed cell, this time with two arguments:
+Mutable computed cells can be defined as a function of more than one
+argument cell. For example we can define a `sum` cell, that ordinarily
+computes the sum of two numbers held in cells `a` and `b`. When `sum`
+is assigned a value, `a` and `b` are set to one half of the sum that
+was assigned.
 
 ```dart title="Multi-argument mutable computed cell"
+final a = MutableCell<num>(0);
+final b = MutableCell<num>(1);
+
 final sum = MutableCell.computed(() => a() + b(), (sum) {
   final half = sum / 2;
 
@@ -194,6 +200,7 @@ CellWidget.builder((_) {
     
   final sum = MutableCell.computed(() => a() + b(), (sum) {
     final half = sum / 2;
+    
     a.value = half;
     b.value = half;
   });
