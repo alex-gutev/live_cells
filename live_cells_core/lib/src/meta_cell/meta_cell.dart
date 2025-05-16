@@ -18,7 +18,7 @@ class EmptyMetaCellError implements Exception {
 /// Thrown when accessing the value of a MetaCell that is inactive.
 ///
 /// A meta cell is inactive when it has no observers.
-class InactiveMetaCelLError implements Exception {
+class InactiveMetaCellError implements Exception {
   @override
   String toString() => 'A MetaCell was used while it is inactive (has no observers).';
 }
@@ -86,7 +86,7 @@ class MetaCell<T> extends StatefulCell<T> {
   /// observers of [this] are notified when the value of [cell] changes.
   ///
   /// **NOTE**: This cell must have at least one observer before calling this
-  /// method, otherwise [InactiveMetaCelLError] is thrown.
+  /// method, otherwise [InactiveMetaCellError] is thrown.
   void setCell(ValueCell<T> cell) {
     _ensureState.refCell = cell;
   }
@@ -115,7 +115,7 @@ class MetaCell<T> extends StatefulCell<T> {
 
   MetaCellState<T> get _ensureState => state != null
       ? (state as MetaCellState<T>)
-      : throw InactiveMetaCelLError();
+      : throw InactiveMetaCellError();
 }
 
 class MetaCellState<T> extends CellState<MetaCell<T>> with ObserverCellState<MetaCell<T>> {

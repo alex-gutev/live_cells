@@ -10,7 +10,7 @@ class MutableMetaCell<T> extends MetaCell<T> implements MutableCell<T> {
   /// Get/Set the value of the referenced [MutableCell].
   ///
   /// **NOTE**: This cell must have at least one observer before setting this
-  /// property, otherwise [InactiveMetaCelLError] is thrown.
+  /// property, otherwise [InactiveMetaCellError] is thrown.
   ///
   /// **NOTE**: If this property is set before the referenced cell is set
   /// an [EmptyMetaCellError] exception is thrown.

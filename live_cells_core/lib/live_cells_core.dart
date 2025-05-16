@@ -33,7 +33,7 @@ export 'src/meta_cell/meta_cell.dart'
         MetaCell,
         MutableMetaCell,
         ActionMetaCell,
-        InactiveMetaCelLError,
+        InactiveMetaCellError,
         EmptyMetaCellError;
 
 export 'src/maybe_cell/maybe.dart'

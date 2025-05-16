@@ -10,7 +10,7 @@ class ActionMetaCell extends MetaCell<void> implements ActionCell {
   /// Trigger the referenced [ActionCell].
   ///
   /// **NOTE**: This cell must have at least one observer before calling this
-  /// method, otherwise [InactiveMetaCelLError] is thrown.
+  /// method, otherwise [InactiveMetaCellError] is thrown.
   ///
   /// **NOTE**: If this method is called before the referenced cell is set
   /// an [EmptyMetaCellError] exception is thrown.
