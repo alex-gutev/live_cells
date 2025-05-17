@@ -1,3 +1,55 @@
+# 0.29.0
+
+### New Features
+
+* Live widget wrappers now provide every constructor that is provided by the wrapped Flutter
+  widgets.
+
+  For example, the `LiveFilledButton` widget, which is a wrapper over Flutter's `FilledButton`
+  now also provides the `.icon` and `.tonal` constructors in addition to the default constructor:
+
+  ```dart
+  LiveFilledButton.icon(
+    icon: Icon(...),
+    label: Text(...),
+  
+    press: pressActionCell
+  )
+  ```
+
+### Breaking Changes
+
+* Removed `StaticWidget`
+
+  **Reason**: Doesn't interact well with inherited widgets
+
+  **Replacement**: `CellWidget`
+
+* Removed `CellHooks` mixin
+
+  **Reason**:: It's obsolete since cells can be defined directly in the build method of a
+  `CellWidget`
+
+  **Replacement**: Define cells and watch functions directly in the build method/function of a
+  `CellWidget`
+
+* Removed `bind` methods provided by *Live* widgets
+
+  **Reason**: There are few use cases for it and it is difficult to implement for widgets that
+  provide multiple constructors
+
+  **Replacement**: Create a new widget constructor
+
+* Live button widgets (`LiveFilledButton`, `LiveElevatedButton`, etc.) now take `ActionCell`s
+  for the `press` and `longPress` arguments instead of `MetaCell<void>`.
+
+  **Reason**: This makes the button widgets easier to use
+
+* Renamed `InactiveMetaCelLError` to `InactiveMetaCellError`.
+
+* Minimum required Flutter version is now 3.29.3
+
+
 # 0.28.1
 
 * Fix issue with widgets not updating if triggered by cell changes during build phase.
