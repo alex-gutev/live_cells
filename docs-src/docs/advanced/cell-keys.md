@@ -7,18 +7,19 @@ sidebar_position: 1
 # Cell Keys
 
 We stated a couple of times in the documentation that a certain
-property returns a keyed cell. Now we'll explain what that actually
-means.
+property returns a keyed cell. In this section we'll explain what that
+actually means.
 
 ## Keyed cells
 
 A keyed cell is a cell with a key that identifies the cell. If two
 distinct `ValueCell` instances have the same key, under `==`, then the
-two cells compare `==`. In-effect, this allows them to function as
-though they are the same cell despite being two separate objects.
+two cells compare equal under `==`. In-effect, this allows them to
+function as though they are the same cell despite being two separate
+objects.
 
-Great, so how's that useful? Consider the following code which creates
-a `CellWidget` that observes a cell `a`:
+Consider the following code which creates a `CellWidget` that observes
+a cell `a`:
 
 ```dart
 CellWidget.builder((_) {
@@ -43,11 +44,10 @@ same state (and hence the same value) as the previous `a`. In-effect
 it is the same cell, just referenced by a different object.
 
 Remember we said `CellWidget` automatically generates a key for cells
-defined within its build method. That's how the magic works, it's not
-really magic now is it, and how the state of cells can be persisted
-across builds. `CellWidget` automatically generates a key for each
-cell defined in its build function/method that does not already have a
-key.
+defined within its build method. That's how the magic works and how
+the state of cells is persisted across builds. `CellWidget`
+automatically generates a key for each cell defined in its build
+function/method that does not already have a key.
 
 Keys are not only useful in widgets, but also in computed cells:
 
@@ -133,7 +133,7 @@ final cell = ValueCell.computed(() => a() + b(),
 );
 ```
 
-Any object which overloads `==` and `hashCode` can serve as a cell
+Any object that overloads `==` and `hashCode` can serve as a cell
 key. For your own keys, you're generally encouraged to do the following:
 
 * Use a class per key type. For example if you have a function which
@@ -165,7 +165,7 @@ The
 [`live_cells_internals`](https://pub.dev/documentation/live_cells_core/latest/live_cells_internals/live_cells_internals-library.html)
 library provides the key base classes `CellKey1`, `CellKey2` up to
 `CellKey5`, which allow you to quickly create a key that is identified
-by 1, 2 up to 5 values. These cells already implement `==` and
+by 1, 2 up to 5 values. These classes already implement `==` and
 `hashCode`.
 
 :::important
@@ -214,7 +214,8 @@ cell's value may not be read or written while it is inactive,
 i.e. while it has no observers. This restriction applies to cells
 created with `MutableCell` and `MutableCell.computed`. If the value of
 a keyed mutable cell is read before an observer is added an
-`InactivePersistentStatefulCellError` exception is thrown.
+[`InactivePersistentStatefulCellError`](https://pub.dev/documentation/live_cells_core/latest/live_cells_internals/InactivePersistentStatefulCellError-class.html)
+exception is thrown.
 
 ```dart
 final a = MutableCell(0, key: MyKey(...));

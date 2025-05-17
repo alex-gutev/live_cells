@@ -53,10 +53,10 @@ random integer. Note, a new random integer is returned whenever the
 value of the cell is accessed.
 
 The `addObserver` and `removeObserver` methods are overridden, since
-these methods are not defined by the base `ValueCell` class, with
-empty methods. These methods are left empty since the cell never
-notifies its observers that its value has changed and thus there is no
-need to track the observers.
+these methods are not defined by the base `ValueCell` class. These
+methods are left empty since the cell never notifies its observers
+that its value has changed and thus there is no need to keep track of
+observers.
 
 ## Custom Cells with Arguments
 
@@ -66,8 +66,8 @@ other cells, extend the
 class. This class provides a constructor which accepts the set of
 argument cells on which the value of the cell depends. Whenever the
 value of at least one of the cells in this set changes, the observers
-of the `DependentCell` are informed. Only the `value` property has to
-be overridden by a subclasses, since `DependentCell` provides
+of the `DependentCell` are notified. Only the `value` property has to
+be overridden by subclasses, since `DependentCell` provides
 implementations of `addObserver` and `removeObserver`.
 
 Here's an example of the previous `RandomCell` however with the
