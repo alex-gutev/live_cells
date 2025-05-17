@@ -43,7 +43,7 @@ class LiveRadioDemo extends CellWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Demonstration of CellRadio widget which binds group value state to a cell.',
+                'Demonstration of LiveRadio widget which binds group value state to a cell.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold

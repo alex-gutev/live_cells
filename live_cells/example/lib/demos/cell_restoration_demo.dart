@@ -111,7 +111,7 @@ class CellRestorationDemo extends CellWidget {
                 title: const Text('A Switch'),
               ),
               const SizedBox(height: 5),
-              LiveSwitchListTile(
+              LiveCheckboxListTile(
                 value: checkboxValue,
                 title: const Text('A checkbox'),
               ),
@@ -163,7 +163,7 @@ class CellRestorationDemo extends CellWidget {
               // The state of the a1 cell defined below is not saved. However,
               // it's state is restored because it is recomputed from `numValue`.
               CellWidget.builder((context) {
-                final a1 = context.cell(() => numValue + 1.cell);
+                final a1 = numValue + 1.cell;
                 return Text('${numValue()} + 1 = ${a1()}');
               }),
             ],

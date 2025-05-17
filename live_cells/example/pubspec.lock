@@ -364,33 +364,33 @@ packages:
     dependency: "direct dev"
     description:
       name: live_cell_extension
-      sha256: "82ae550e06ebdce9f0f53ca43bb44181892dd0b21cd01c4d77fd7d948d86e931"
+      sha256: "93cc7af2090a228fc07695b1765c62f1dc82dfb2c225979a7e1059ac1a89a7af"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.1"
+    version: "0.6.2"
   live_cell_widgets:
     dependency: transitive
     description:
       name: live_cell_widgets
-      sha256: "0dea9bf7c8b15d1deba8d990f0e7af2230065fb36fb996103341f7e3a786cee6"
+      sha256: "819f8f0ab73d0450fe9ee0819f699fd5eaed2529d06b0645937dec51a89e0764"
       url: "https://pub.dev"
     source: hosted
-    version: "0.14.0"
+    version: "0.15.0"
   live_cells:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.28.0"
+    version: "0.28.1"
   live_cells_core:
     dependency: transitive
     description:
       name: live_cells_core
-      sha256: "56b3a38ae4789c122cdf57dc085d8e1967fc897bc7c55b9cbb3a44452152bd23"
+      sha256: d9da8a92dd76319fd77af45fbbe6c692c8fd909b1f3e33da36cf6befa2066bed
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   logging:
     dependency: transitive
     description:
@@ -654,4 +654,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.7.0-0 <4.0.0"
-  flutter: ">=3.24.3"
+  flutter: ">=3.29.3"

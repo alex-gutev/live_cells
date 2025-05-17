@@ -22,7 +22,7 @@ class LiveSwitchDemo extends CellWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Demonstration of CellSwitch widget which binds switch state to a cell.',
+                'Demonstration of LiveSwitch widget which binds switch state to a cell.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold

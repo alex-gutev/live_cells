@@ -181,7 +181,7 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('CellSlider'),
+                        child: const Text('LiveSlider'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => const LiveSliderDemo()
@@ -189,7 +189,7 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('CellCheckbox'),
+                        child: const Text('LiveCheckbox'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => const LiveCheckboxDemo()
@@ -197,7 +197,7 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('CellSwitch'),
+                        child: const Text('LiveSwitch'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => const LiveSwitchDemo()
@@ -205,7 +205,7 @@ class MyHomePage extends StatelessWidget {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('CellRadio'),
+                        child: const Text('LiveRadio'),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => const LiveRadioDemo()

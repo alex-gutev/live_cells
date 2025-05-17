@@ -3,18 +3,13 @@ import 'package:live_cells/live_cells.dart';
 import 'package:live_cells/live_cells_ui.dart';
 
 /// Demonstrates handling button press events using meta cells and effect cells
-class EffectCellDemo extends CellWidget with CellHooks {
+class EffectCellDemo extends CellWidget {
   const EffectCellDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
-    /// A meta cell for an ActionCell that is triggered when the button is
-    /// pressed.
-    ///
-    /// A meta cell is a cell that points to another cell. Initially the meta
-    /// cell is empty but when passed to the button it is initialized to
-    /// point to the button's action cell.
-    final onPress = MetaCell<void>();
+    /// ActionCell that is triggered when the button is pressed.
+    final onPress = ActionCell();
 
     /// An effect cell which is triggered when the `onPress` cell is triggered.
     ///
@@ -34,7 +29,7 @@ class EffectCellDemo extends CellWidget with CellHooks {
     });
 
     /// Display a dialog when the result completes.
-    watch(() {
+    ValueCell.watch(() {
       /// Here we observe the result of the 'side effect', defined in the `effect`
       /// cell.
       ///

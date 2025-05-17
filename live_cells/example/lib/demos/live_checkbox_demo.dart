@@ -22,7 +22,7 @@ class LiveCheckboxDemo extends CellWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Demonstration of CellCheckbox widget which binds checkbox state to a cell.',
+                'Demonstration of LiveCheckbox widget which binds checkbox state to a cell.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold

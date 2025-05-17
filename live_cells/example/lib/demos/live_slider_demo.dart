@@ -22,7 +22,7 @@ class LiveSliderDemo extends CellWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Demonstration of CellSlider widget which binds slider value to a cell.',
+                'Demonstration of LiveSlider widget which binds slider value to a cell.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold
