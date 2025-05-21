@@ -1,3 +1,9 @@
+# 1.2.1
+
+Fixes:
+
+* Add key to `.combined` extension property on `List<ValueCell<void>>`
+
 # 1.2.0
 
 Minor breaking change:
