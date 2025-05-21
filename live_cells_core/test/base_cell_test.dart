@@ -585,8 +585,10 @@ void main() {
 
       expect(observer.values, equals([1, 12]));
     });
+  });
 
-    test('List.combined notifies observers when any action triggers', () {
+  group('CombineActionCellExtension.combined', () {
+    test('Notifies observers when any action triggers', () {
       final a1 = ActionCell();
       final a2 = ActionCell();
       final a3 = ActionCell();
@@ -603,6 +605,46 @@ void main() {
       a2.trigger();
 
       verify(listener()).called(5);
+    });
+
+    test('Compares == with same argument cells', () {
+      final a1 = ActionCell();
+      final a2 = ActionCell();
+      final a3 = ActionCell();
+
+      final b1 = [a1, a2, a3].combined;
+      final b2 = [a1, a2, a3].combined;
+      final b3 = [a2, a1, a3].combined;
+
+      expect(b1 == b2, isTrue);
+      expect(b2 == b3, isTrue);
+      expect(b1 == b3, isTrue);
+
+      expect(b1.hashCode == b2.hashCode, isTrue);
+      expect(b2.hashCode == b3.hashCode, isTrue);
+      expect(b1.hashCode == b3.hashCode, isTrue);
+    });
+
+    test('Compares != with different argument cells', () {
+      final a1 = ActionCell();
+      final a2 = ActionCell();
+      final a3 = ActionCell();
+
+      final b1 = [a1, a2].combined;
+      final b2 = [a1, a3].combined;
+      final b3 = [a1, a2, a3].combined;
+
+      expect(b1 == b1, isTrue);
+      expect(b1 != b2, isTrue);
+      expect(b1 != b3, isTrue);
+
+      expect(b2 == b2, isTrue);
+      expect(b2 != b1, isTrue);
+      expect(b2 != b3, isTrue);
+
+      expect(b3 == b3, isTrue);
+      expect(b3 != b1, isTrue);
+      expect(b3 != b2, isTrue);
     });
   });
 

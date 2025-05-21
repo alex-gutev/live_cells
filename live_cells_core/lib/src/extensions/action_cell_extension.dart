@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 import '../compute_cell/compute_cell.dart';
 import '../compute_cell/store_cell.dart';
 import '../mutable_cell/action_cell.dart';
@@ -43,8 +45,28 @@ extension ActionCellExtension on ValueCell<void> {
 /// Provides the [combined] property for combining multiple action cells into one cell.
 extension CombineActionCellExtension on List<ValueCell<void>> {
   /// Return an action cell that notifies its observers when any of the cells in [this] is triggered.
-  ValueCell<void> get combined => ComputeCell(
-    compute: () {},
-    arguments: toSet()
-  );
+  ValueCell<void> get combined {
+    final args = toSet();
+    
+    return ComputeCell(
+      compute: () {},
+      arguments: args,
+      key: _CombinedActionCellKey(args)
+    );
+  }
+}
+
+/// Key identifying cells created with [CombineActionCellExtension.combined]
+class _CombinedActionCellKey {
+  final Set<ValueCell<void>> args;
+
+  _CombinedActionCellKey(this.args);
+  
+  @override
+  bool operator ==(Object other) => identical(this, other) || (
+      other is _CombinedActionCellKey &&
+      const SetEquality().equals(args, other.args));
+  
+  @override
+  int get hashCode => const SetEquality().hash(args);
 }
