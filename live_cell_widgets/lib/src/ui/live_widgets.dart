@@ -13,6 +13,7 @@ import '../../live_cell_widgets_base.dart';
 
 part 'mixins.dart';
 part 'wrapper_interface.dart';
+part 'button_interface.dart';
 part 'cell_page_view_mixin.dart';
 part 'cell_text_field_mixin.dart';
 
@@ -328,8 +329,7 @@ user, the value of the cell is updated to reflect the state.
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_HoverFocusChangeCellMixin],
-      baseClass: #_WrapperInterface,
+      baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''An [ElevatedButton] widget with its properties controlled by [ValueCell]'s.
@@ -400,8 +400,7 @@ passed to the constructor.
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_HoverFocusChangeCellMixin],
-      baseClass: #_WrapperInterface,
+      baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''A [FilledButton] widget with its properties controlled by [ValueCell]'s.
@@ -413,6 +412,63 @@ the button is pressed.
 
 [bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
 the hover and focus state of the widget to be observed by observing the [MetaCells]
+passed to the constructor.
+'''
+  ),
+
+  WidgetSpec<IconButton>(
+    as: #LiveIconButton,
+
+    excludeProperties: [#onHover],
+
+    addProperties: [
+      WidgetPropertySpec<bool>(
+          name: #enabled,
+          defaultValue: 'true',
+          optional: false,
+          documentation: 'Is the widget enabled for user input?'
+      ),
+      WidgetPropertySpec<void>(
+          name: #press,
+          defaultValue: null,
+          optional: true,
+          mutable: true,
+          documentation: '[ActionCell] to trigger when the button is pressed.'
+      ),
+      WidgetPropertySpec<void>(
+          name: #longPress,
+          defaultValue: null,
+          optional: true,
+          mutable: true,
+          documentation: '[ActionCell] to trigger when the button is long pressed.'
+      ),
+      WidgetPropertySpec<bool>(
+          name: #onHover,
+          defaultValue: null,
+          optional: true,
+          meta: true,
+          documentation: 'MetaCell for a cell that is updated whenever the hover state of the button changes.'
+      ),
+    ],
+
+    propertyValues: {
+      #onPressed: 'enabled() ? press?.trigger : null',
+      #onLongPress: 'enabled() ? longPress?.trigger : null',
+      #onHover: 'onHover != null ? (v) => _onHoverCell(context).value = v : null',
+    },
+
+    baseClass: #_ButtonInterface,
+    buildMethod: #_buildWrappedWidget,
+
+
+    documentation: '''An [IconButton] widget with its properties controlled by [ValueCell]'s.
+
+The constructor takes mostly same arguments as the unnamed constructor of [IconButton].
+Instead of taking a callback function for [onPressed], the constructor accepts 
+an [ActionCell] that is triggered when the button is pressed.
+
+A [bool] [MetaCell] is accepted for [onHover]. This allows
+the hover state of the widget to be observed by observing the [MetaCells]
 passed to the constructor.
 '''
   ),
@@ -709,8 +765,7 @@ See [LiveRadio] for a more detailed explanation.
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_HoverFocusChangeCellMixin],
-      baseClass: #_WrapperInterface,
+      baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''An [OutlinedButton] widget with its properties controlled by [ValueCell]'s.
@@ -781,8 +836,7 @@ passed to the constructor.
         #onFocusChange: 'onFocusChange != null ? (v) => _onFocusChangeCell(context).value = v : null',
       },
 
-      mixins: [#_HoverFocusChangeCellMixin],
-      baseClass: #_WrapperInterface,
+      baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
       documentation: '''A [TextButton] widget with its properties controlled by [ValueCell]'s.
