@@ -658,7 +658,7 @@ passed to the constructor.
     baseClass: #_InkInterface,
     buildMethod: #_buildWrappedWidget,
 
-    documentation: '''An [InkWell] that triggers [ActionCell]s on gestures/
+    documentation: '''An [InkWell] that triggers [ActionCell]s on gestures.
     
 Rather than calling a callback function when a gesture is detected, an
 [ActionCell] is triggered. The arguments [tap], [doubleTap], [longPress], 
@@ -685,6 +685,165 @@ argument of [InkWell]'s default constructor.
 [focussed] is a [MetaCell] that holds the value true when the widget is
 in focus and false otherwise. This corresponds to the [onFocus]
 argument of [InkWell]'s default constructor.
+'''
+  ),
+
+  WidgetSpec<InkResponse>(
+      as: #LiveInkResponse,
+
+      excludeProperties: [
+        #onTap,
+        #onTapDown,
+        #onTapUp,
+        #onTapCancel,
+        #onDoubleTap,
+        #onLongPress,
+        #onSecondaryTap,
+        #onSecondaryTapUp,
+        #onSecondaryTapDown,
+        #onSecondaryTapCancel,
+        #onHighlightChanged,
+        #onHover,
+        #onFocusChange
+      ],
+
+      cellProperties: [],
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            defaultValue: 'true',
+            optional: false,
+            documentation: 'Is the widget enabled for user input?'
+        ),
+        WidgetPropertySpec<void>(
+            name: #tap,
+            defaultValue: null,
+            optional: true,
+            mutable: true
+        ),
+        WidgetPropertySpec<void>(
+            name: #doubleTap,
+            defaultValue: null,
+            optional: true,
+            mutable: true
+        ),
+        WidgetPropertySpec<void>(
+            name: #longPress,
+            defaultValue: null,
+            optional: true,
+            mutable: true
+        ),
+        WidgetPropertySpec<void>(
+            name: #tapCancel,
+            defaultValue: null,
+            optional: true,
+            mutable: true
+        ),
+        WidgetPropertySpec<TapDownDetails>(
+            name: #tapDown,
+            defaultValue: null,
+            optional: true,
+            meta: true
+        ),
+        WidgetPropertySpec<TapUpDetails>(
+            name: #tapUp,
+            defaultValue: null,
+            optional: true,
+            meta: true
+        ),
+        WidgetPropertySpec<void>(
+            name: #secondaryTap,
+            defaultValue: null,
+            optional: true,
+            mutable: true
+        ),
+        WidgetPropertySpec<void>(
+            name: #secondaryTapCancel,
+            defaultValue: null,
+            optional: true,
+            mutable: true
+        ),
+        WidgetPropertySpec<TapDownDetails>(
+            name: #secondaryTapDown,
+            defaultValue: null,
+            optional: true,
+            meta: true
+        ),
+        WidgetPropertySpec<TapUpDetails>(
+            name: #secondaryTapUp,
+            defaultValue: null,
+            optional: true,
+            meta: true
+        ),
+        WidgetPropertySpec<bool>(
+            name: #highlighted,
+            defaultValue: null,
+            optional: true,
+            meta: true
+        ),
+        WidgetPropertySpec<bool>(
+            name: #hovered,
+            defaultValue: null,
+            optional: true,
+            meta: true
+        ),
+        WidgetPropertySpec<bool>(
+            name: #focussed,
+            defaultValue: null,
+            optional: true,
+            meta: true
+        ),
+      ],
+
+      propertyValues: {
+        #onTap: 'enabled() ? tap?.trigger : null',
+        #onDoubleTap: 'enabled() ? doubleTap?.trigger : null',
+        #onLongPress: 'enabled() ? longPress?.trigger : null',
+        #onTapDown: 'tapDown != null ? (v) => _tapDownCell(context).value = v : null',
+        #onTapUp: 'tapUp != null ? (v) => _tapUpCell(context).value = v : null',
+        #onTapCancel: 'enabled() ? tapCancel?.trigger : null',
+
+        #onSecondaryTap: 'enabled() ? secondaryTap?.trigger : null',
+        #onSecondaryTapDown: 'secondaryTapDown != null ? (v) => _secondaryTapDownCell(context).value = v : null',
+        #onSecondaryTapUp: 'secondaryTapUp != null ? (v) => _secondaryTapUpCell(context).value = v : null',
+        #onSecondaryTapCancel: 'enabled() ? secondaryTapCancel?.trigger : null',
+
+        #onHighlight: 'highlighted != null ? (v) => _highlightedCell(context).value = v : null',
+        #onHover: 'hovered != null ? (v) => _hoveredCell(context).value = v : null',
+        #onFocusChange: 'focussed != null ? (v) => _focussedCell(context).value = v : null',
+      },
+
+      baseClass: #_InkInterface,
+      buildMethod: #_buildWrappedWidget,
+
+      documentation: '''An [InkResponse] that triggers [ActionCell]s on gestures.
+    
+Rather than calling a callback function when a gesture is detected, an
+[ActionCell] is triggered. The arguments [tap], [doubleTap], [longPress], 
+[tapCancel], [secondaryTap], [secondaryTapCancel] correspond to the `onTap`, 
+`onDoubleTap`, `onLongPress`, `onTapCancel`, `onSecondaryTap` and 
+`onSecondaryTapCancel` arguments of the default constructor of [InkResponse].
+
+The arguments [tapUp], [tapDown], [secondaryTapUp], [secondaryTapDown] 
+take [MetaCell]s that hold the details of the last tap up/tap down event. These
+correspond to the `onTapUp`, `onTapDown`, `onSecondaryTapUp`,
+`onSecondaryTapDown` arguments of the default constructor of [InkResponse].
+
+The [enabled] cell controls whether the widget can be tapped (true) or not 
+(false).
+
+[highlighted] is a [MetaCell] that holds the value true when the widget is
+being highlighted and false otherwise. This corresponds to the [onHighlight]
+argument of [InkResponse]'s default constructor.
+
+[hovered] is a [MetaCell] that holds the value true when the widget is
+being hovered over and false otherwise. This corresponds to the [onHover]
+argument of [InkResponse]'s default constructor.
+
+[focussed] is a [MetaCell] that holds the value true when the widget is
+in focus and false otherwise. This corresponds to the [onFocus]
+argument of [InkResponse]'s default constructor.
 '''
   ),
 
