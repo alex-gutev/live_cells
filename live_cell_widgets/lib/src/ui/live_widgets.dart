@@ -17,6 +17,7 @@ part 'button_interface.dart';
 part 'cell_page_view_mixin.dart';
 part 'cell_text_field_mixin.dart';
 part 'ink_interface.dart';
+part 'live_interactive_viewer_mixin.dart';
 
 @GenerateCellWidgets([
   WidgetSpec<Checkbox>(
@@ -844,6 +845,51 @@ argument of [InkResponse]'s default constructor.
 [focussed] is a [MetaCell] that holds the value true when the widget is
 in focus and false otherwise. This corresponds to the [onFocus]
 argument of [InkResponse]'s default constructor.
+'''
+  ),
+
+  WidgetSpec<InteractiveViewer>(
+    as: #LiveInteractiveViewer,
+
+    baseClass: #_InteractiveViewerInterface,
+    stateMixins: [#_LiveInteractiveViewerMixin],
+
+    excludeProperties: [
+      #transformationController
+    ],
+
+    cellProperties: [],
+
+    addProperties: [
+      WidgetPropertySpec<Matrix4>(
+          name: #transformation,
+          defaultValue: null,
+          optional: true,
+          mutable: true
+      )
+    ],
+
+    propertyValues: {
+      #transformationController: '_controller'
+    },
+
+    propertyDefaultValues: {
+      // The value for the constant _kDrag was copied from
+      // interactive_viewer.dart
+      #interactionEndFrictionCoefficient: '0.0000135'
+    },
+
+    propertyTypes: {
+      #builder: 'InteractiveViewerWidgetBuilder'
+    },
+
+    documentation: '''An [InteractiveViewer] where the [transformation] is exposed as a cell.
+
+The value of the [transformation] cell is updated whenever the user
+scrolls, pans or zooms the widget.
+
+Setting the value of [transformation] results in the widget being scrolled,
+zoomed and panned to the position represented by the transformation matrix.
 '''
   ),
 
