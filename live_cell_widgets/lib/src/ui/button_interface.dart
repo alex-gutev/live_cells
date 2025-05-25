@@ -1,15 +1,25 @@
 part of 'live_widgets.dart';
 
-/// Defines the interface for a button widget controlled by [ValueCell]s.
-abstract class _ButtonInterface extends _WrapperInterface {
+abstract class _BaseButtonInterface extends _WrapperInterface {
   /// [ActionCell] to trigger when the button is pressed.
   ActionCell? get press;
 
-  /// [ActionCell] to trigger when the button is long pressed.
-  ActionCell? get longPress;
-
   /// Is the button enabled for user input?
   ValueCell<bool> get enabled;
+
+  const _BaseButtonInterface({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildWrappedWidget(context);
+  }
+}
+
+/// Defines the interface for a button widget controlled by [ValueCell]s.
+abstract class _ButtonInterface extends _BaseButtonInterface {
+
+  /// [ActionCell] to trigger when the button is long pressed.
+  ActionCell? get longPress;
 
   /// Meta cell that is updated whenever the hover state of the button changes.
   ///

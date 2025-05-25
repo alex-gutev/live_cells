@@ -416,6 +416,49 @@ passed to the constructor.
 '''
   ),
 
+  WidgetSpec<FloatingActionButton>(
+      as: #LiveFloatingActionButton,
+
+      cellProperties: [],
+
+      addProperties: [
+        WidgetPropertySpec<bool>(
+            name: #enabled,
+            defaultValue: 'true',
+            optional: false,
+            documentation: 'Is the widget enabled for user input?'
+        ),
+        WidgetPropertySpec<void>(
+            name: #press,
+            defaultValue: null,
+            optional: true,
+            mutable: true,
+            documentation: '[ActionCell] to trigger when the button is pressed.'
+        ),
+      ],
+
+      propertyDefaultValues: {
+        #heroTag: 'null'
+      },
+
+      propertyValues: {
+        #onPressed: 'enabled() ? press?.trigger : null',
+      },
+
+      baseClass: #_BaseButtonInterface,
+      buildMethod: #_buildWrappedWidget,
+
+      documentation: '''A [FloatingActionButton] that triggers an [ActionCell] when pressed.
+
+Rather than taking an `onPressed` callback function, the constructors take an
+action cell in the [press] argument, which is triggered when the button is
+pressed.
+
+The [enabled] cell controls whether the button can be tapped (true) or not 
+(false).
+'''
+  ),
+
   WidgetSpec<IconButton>(
     as: #LiveIconButton,
 
