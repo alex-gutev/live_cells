@@ -438,6 +438,10 @@ passed to the constructor.
         ),
       ],
 
+      excludeProperties: [
+        #onPressed
+      ],
+
       propertyDefaultValues: {
         #heroTag: 'null'
       },
@@ -463,7 +467,11 @@ The [enabled] cell controls whether the button can be tapped (true) or not
   WidgetSpec<IconButton>(
     as: #LiveIconButton,
 
-    excludeProperties: [#onHover],
+    excludeProperties: [
+      #onHover,
+      #onPressed,
+      #onLongPress
+    ],
 
     addProperties: [
       WidgetPropertySpec<bool>(
