@@ -1,3 +1,12 @@
+## 0.16.0
+
+* New widgets:
+
+  * `LiveFloatingActionButton`
+  * `LiveIconButton`
+  * `LiveInkWell`
+  * `LiveInteractiveViewer`
+
 ## 0.15.0
 
 ### New Features
