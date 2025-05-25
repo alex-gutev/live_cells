@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:live_cell_widgets/live_cell_widgets_base.dart';
@@ -1494,6 +1495,168 @@ void main() {
 
       await tester.tap(finder);
       verifyNoMoreInteractions(listener);
+    });
+  });
+
+  group('LiveInkWell', () {
+    testWidgets('tap observers notified when widget is tapped.', (tester) async {
+      final onTap = ActionCell();
+      final listener = MockSimpleListener();
+
+      onTap.listenable.addListener(listener);
+      addTearDown(() => onTap.listenable.removeListener(listener));
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          tap: onTap,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      verifyNever(listener());
+
+      final finder = find.text('Click Me');
+
+      expect(finder, findsOneWidget);
+
+      await tester.tap(finder);
+      await tester.tap(finder);
+
+      verify(listener()).called(2);
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          tap: onTap,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      await tester.tap(finder);
+
+      verify(listener()).called(1);
+    });
+
+    testWidgets('longPress observers notified when widget is long pressed.', (tester) async {
+      final onLongPress = ActionCell();
+      final listener = MockSimpleListener();
+
+      onLongPress.listenable.addListener(listener);
+      addTearDown(() => onLongPress.listenable.removeListener(listener));
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          longPress: onLongPress,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      verifyNever(listener());
+
+      final finder = find.text('Click Me');
+
+      expect(finder, findsOneWidget);
+
+      await tester.longPress(finder);
+      await tester.longPress(finder);
+
+      verify(listener()).called(2);
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          longPress: onLongPress,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      await tester.longPress(finder);
+      verify(listener()).called(1);
+
+      await tester.tap(finder);
+      verifyNoMoreInteractions(listener);
+    });
+
+    testWidgets('doubleTap observers notified when widget is tapped.', (tester) async {
+      final onDoubleTap = ActionCell();
+      final listener = MockSimpleListener();
+
+      onDoubleTap.listenable.addListener(listener);
+      addTearDown(() => onDoubleTap.listenable.removeListener(listener));
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          doubleTap: onDoubleTap,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      verifyNever(listener());
+
+      final finder = find.text('Click Me');
+
+      expect(finder, findsOneWidget);
+
+      await tester.tap(finder);
+      await tester.pump(kDoubleTapMinTime);
+      await tester.tap(finder);
+      await tester.pumpAndSettle();
+
+      verify(listener()).called(1);
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          doubleTap: onDoubleTap,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      await tester.tap(finder);
+      await tester.pump(kDoubleTapMinTime);
+      await tester.tap(finder);
+      await tester.pumpAndSettle();
+
+      verify(listener()).called(1);
+
+      await tester.tap(finder);
+      await tester.pumpAndSettle();
+      verifyNoMoreInteractions(listener);
+    });
+
+    testWidgets('secondaryTap observers notified when widget is tapped.', (tester) async {
+      final onTap = ActionCell();
+      final listener = MockSimpleListener();
+
+      onTap.listenable.addListener(listener);
+      addTearDown(() => onTap.listenable.removeListener(listener));
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          secondaryTap: onTap,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      verifyNever(listener());
+
+      final finder = find.text('Click Me');
+
+      expect(finder, findsOneWidget);
+
+      await tester.tap(finder, buttons: kSecondaryButton);
+      await tester.tap(finder, buttons: kSecondaryButton);
+      await tester.tap(finder);
+
+      verify(listener()).called(2);
+
+      await tester.pumpWidget(TestApp(
+        child: LiveInkWell(
+          secondaryTap: onTap,
+          child: const Text('Click Me'),
+        ),
+      ));
+
+      await tester.tap(finder, buttons: kSecondaryButton);
+
+      verify(listener()).called(1);
     });
   });
 
