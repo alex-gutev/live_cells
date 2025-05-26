@@ -1,3 +1,9 @@
+## 0.16.1
+
+* Improve documentation of live widgets.
+
+* Fix issue with `setState` being called after the widget is unmounted.
+
 ## 0.16.0
 
 * New widgets:
