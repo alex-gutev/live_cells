@@ -214,7 +214,9 @@ class _CellWidgetState extends State<CellWidget> {
       case SchedulerPhase.midFrameMicrotasks:
       case SchedulerPhase.persistentCallbacks:
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
         });
     }
   }
