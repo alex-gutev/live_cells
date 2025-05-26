@@ -38,12 +38,16 @@ part 'live_interactive_viewer_mixin.dart';
         )
       ],
 
-      documentation: '''A [Checkbox] widget with the [value] controlled by a [ValueCell].
+      documentation: '''A [Checkbox] widget with the [value] controlled by a [MutableCell].
 
 The [value] is controlled by a [MutableCell] which is passed on construction.
 When the value of the cell changes, the checkbox state is updated to reflect the
 value of the cell. Similarly when the state of the checkbox is changed by the
 user, the value of the cell is updated to reflect the state.
+
+The cell provided for [enabled] controls whether the widget is enabled for user
+interaction, when the value of the cell is true, or disabled, when the value
+of the cell is false.
 '''
   ),
 
@@ -90,20 +94,25 @@ See [LiveCheckbox] for a more detailed explanation.
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the hover state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the hover state of the button changes.'
         ),
         WidgetPropertySpec<bool>(
             name: #onFocusChange,
             defaultValue: null,
             optional: true,
             meta: true,
-            documentation: 'MetaCell for an cell that is updated whenever the focus state of the button changes.'
+            documentation: 'MetaCell for a cell that is updated whenever the focus state of the button changes.'
         )
       ],
 
       documentation: '''A menu item with a [LiveCheckbox], akin to [CheckboxMenuButton].
   
-  See [LiveCheckbox] for a more detailed explanation.'''
+[MetaCell]s can be provided for the [onHover] and [onFocusChange] properties.
+The value of the [onHover] [MetaCell] is set to true, while hovering over the
+widget and false otherwise. Similarly the value of the [onFocusChange] [MetaCell]
+is set to true, while the widget is focussed.
+  
+See [LiveCheckbox] for a more detailed explanation.'''
   ),
 
   WidgetSpec<CheckedPopupMenuItem>(
@@ -141,12 +150,15 @@ See [LiveCheckbox] for a more detailed explanation.
         )
       ],
 
-      documentation: '''A [CheckedPopupMenuItem] widget with the [value] controlled by a [ValueCell].
+      documentation: '''A [CheckedPopupMenuItem] widget with the [value] controlled by a [MutableCell].
 
 The [value] is controlled by a [MutableCell] which is passed on construction.
 When the value of the cell changes, the checkbox state is updated to reflect the
 value of the cell. Similarly when the state of the widget is changed by the
 user, the value of the cell is updated to reflect the state.
+
+The [ActionCell] provided in [tap], if not null, is triggered when the item
+is tapped.
 '''
   ),
 
@@ -175,6 +187,10 @@ The [selected] state is controlled by a [MutableCell] which is passed on constru
 When the value of the cell changes, the widget is updated to reflect the
 value of the cell. Similarly when the state of the widget is changed by the
 user, the value of the cell is updated to reflect the state.
+
+The cell provided for [enabled] controls whether the widget is enabled for user
+interaction, when the value of the cell is true, or disabled, when the value
+of the cell is false.
 '''
   ),
 
@@ -208,11 +224,14 @@ user, the value of the cell is updated to reflect the state.
         #onPressed: 'enabled() ? press?.trigger : null',
       },
 
-      documentation: '''A [CloseButton] widget with its properties controlled by [ValueCell]'s.
+      documentation: '''A [CloseButton] that triggers an action cell when pressed.
 
-The constructor takes mostly same arguments as the unnamed constructor of [CloseButton],
-but as [ValueCell]'s. Instead of taking a callback function for [onPressed], the
-constructor accepts an [ActionCell] that is triggered when the button is pressed.
+Rather than taking an `onPressed` callback function, the constructors take an
+action cell in the [press] argument, which is triggered when the button is
+pressed.
+
+The [enabled] cell controls whether the button can be tapped (true) or not 
+(false).
 '''
   ),
 
@@ -237,12 +256,17 @@ constructor accepts an [ActionCell] that is triggered when the button is pressed
         #onChanged: 'enabled() ? (v) => value.value = v : null'
       },
 
-      documentation: '''A [CupertinoSlider] with its [value] controlled by a [ValueCell].
+      documentation: '''A [CupertinoSlider] with its [value] controlled by a [MutableCell].
 
 The [value] is controlled by a [MutableCell] which is passed on construction. 
 When the value of the cell changes, the slider position is updated to reflect 
 the value of the cell. Similarly when the slider is moved by the user, the 
-value of the cell is updated to reflect the slider position.'''
+value of the cell is updated to reflect the slider position.
+
+The cell provided for [enabled] controls whether the widget is enabled for user
+interaction, when the value of the cell is true, or disabled, when the value
+of the cell is false.
+'''
   ),
 
   WidgetSpec<CupertinoSwitch>(
@@ -271,8 +295,11 @@ The [value] is controlled by a [MutableCell] which is passed on construction.
 When the value of the cell changes, the switch state is updated to reflect the
 value of the cell. Similarly when the state of the switch is changed by the
 user, the value of the cell is updated to reflect the state.
-'''
 
+The cell provided for [enabled] controls whether the widget is enabled for user
+interaction, when the value of the cell is true, or disabled, when the value
+of the cell is false.
+'''
   ),
 
   WidgetSpec<ElevatedButton>(
@@ -334,16 +361,20 @@ user, the value of the cell is updated to reflect the state.
       baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
-      documentation: '''An [ElevatedButton] widget with its properties controlled by [ValueCell]'s.
+      documentation: '''An [ElevatedButton] that triggers an action cell when pressed.
 
-The constructor takes mostly same arguments as the unnamed constructor of 
-[ElevatedButton], but as [ValueCell]'s. Instead of taking a callback function 
-for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
-the button is pressed.
+Rather than taking an `onPressed` callback function, the constructors take an
+action cell in the [press] argument, which is triggered when the button is
+pressed. Similarly, when the button is long-pressed, the action cell
+provided in [longPress] is triggered, if it is not null.
 
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
-the hover and focus state of the widget to be observed by observing the [MetaCells]
-passed to the constructor.
+The [enabled] cell controls whether the button can be tapped (true) or not 
+(false).
+
+[MetaCell]s can be provided for the [onHover] and [onFocusChange] properties.
+The value of the [onHover] [MetaCell] is set to true, while hovering over the
+widget and false otherwise. Similarly the value of the [onFocusChange] [MetaCell]
+is set to true, while the widget is focussed.
 '''
   ),
 
@@ -405,16 +436,20 @@ passed to the constructor.
       baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
-      documentation: '''A [FilledButton] widget with its properties controlled by [ValueCell]'s.
+      documentation: '''A [FilledButton] that triggers an action cell when pressed.
 
-The constructor takes mostly same arguments as the unnamed constructor of [FilledButton],
-but as [ValueCell]'s.  Instead of taking a callback function 
-for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
-the button is pressed.
+Rather than taking an `onPressed` callback function, the constructors take an
+action cell in the [press] argument, which is triggered when the button is
+pressed. Similarly, when the button is long-pressed, the action cell
+provided in [longPress] is triggered, if it is not null.
 
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
-the hover and focus state of the widget to be observed by observing the [MetaCells]
-passed to the constructor.
+The [enabled] cell controls whether the button can be tapped (true) or not 
+(false).
+
+[MetaCell]s can be provided for the [onHover] and [onFocusChange] properties.
+The value of the [onHover] [MetaCell] is set to true, while hovering over the
+widget and false otherwise. Similarly the value of the [onFocusChange] [MetaCell]
+is set to true, while the widget is focussed.
 '''
   ),
 
@@ -513,16 +548,18 @@ The [enabled] cell controls whether the button can be tapped (true) or not
     baseClass: #_ButtonInterface,
     buildMethod: #_buildWrappedWidget,
 
+    documentation: '''An [IconButton] that triggers an action cell when pressed.
 
-    documentation: '''An [IconButton] widget with its properties controlled by [ValueCell]'s.
+Rather than taking an `onPressed` callback function, the constructors take an
+action cell in the [press] argument, which is triggered when the button is
+pressed. Similarly, when the button is long-pressed, the action cell
+provided in [longPress] is triggered, if it is not null.
 
-The constructor takes mostly same arguments as the unnamed constructor of [IconButton].
-Instead of taking a callback function for [onPressed], the constructor accepts 
-an [ActionCell] that is triggered when the button is pressed.
+The [enabled] cell controls whether the button can be tapped (true) or not 
+(false).
 
-A [bool] [MetaCell] is accepted for [onHover]. This allows
-the hover state of the widget to be observed by observing the [MetaCells]
-passed to the constructor.
+A [MetaCell] can be provided for the [onHover] property. The value of the 
+[MetaCell] is set to true, while hovering over the widget and false otherwise.
 '''
   ),
 
@@ -978,7 +1015,7 @@ When this cell is triggered, the view's page is changed to the previous page.
             documentation: '''[MetaCell] injected with a cell that is true while a page transition is in progress.
         
 NOTE: This cell is only updated if the page change is triggered either by changing
-the value of the [page] cell or trigger [nextPage]/[previousPage].'''
+the value of the [page] cell or triggering [nextPage]/[previousPage].'''
         )
       ],
 
@@ -988,7 +1025,30 @@ the value of the [page] cell or trigger [nextPage]/[previousPage].'''
         #onPageChanged: '''(index) => _withSuppressed(() {
         widget.page.value = index;
       })'''
-      }
+      },
+
+      documentation: '''A [PageView] with the page controlled by a [MutableCell].
+
+The [page] cell holds the page that is currently shown. When the value of the
+[page] cell is set, the page is changed. When the current page is changed by
+some other means, such as swiping to the left or right, [page] is updated to
+reflect the actual page of the [PageView].
+
+An [ActionCell] can be provided for [nextPage]. When it is triggered, the
+current page is advanced to next page. Similarly, when the cell provided
+for [previousPage] is triggered, the page is changed to the previous page.
+
+[animate] controls whether page changes via [nextPage] and [previousPage]
+are animated (true) or not (false). 
+
+**NOTE**: If [nextPage] or [previousPage] are triggered, while [animated] is
+true, a [curve] and [duration] must also be provided.
+
+A [MetaCell] can be provided for [isAnimating]. The value of this cell is
+set to true while an animated page transition is in progress.
+**NOTE**: The value of this cell is only updated if the page change
+is triggered by [page], [nextPage] or [prevPage]. 
+'''
   ),
 
   WidgetSpec<Slider>(
@@ -1009,6 +1069,18 @@ the value of the [page] cell or trigger [nextPage]/[previousPage].'''
           documentation: 'Is the widget enabled for user input?'
       )
     ],
+
+    documentation: '''A [Slider] with its [value] controlled by a [MutableCell].
+
+The [value] is controlled by a [MutableCell] which is passed on construction. 
+When the value of the cell changes, the slider position is updated to reflect 
+the value of the cell. Similarly when the slider is moved by the user, the 
+value of the cell is updated to reflect the slider position.
+
+The cell provided for [enabled] controls whether the widget is enabled for user
+interaction, when the value of the cell is true, or disabled, when the value
+of the cell is false.
+'''
   ),
 
   WidgetSpec<Switch>(
@@ -1029,12 +1101,16 @@ the value of the [page] cell or trigger [nextPage]/[previousPage].'''
       )
     ],
 
-    documentation: '''A [Switch] widget with the [value] controlled by a [ValueCell].
+    documentation: '''A [Switch] widget with its [value] controlled by a [ValueCell].
 
 The [value] is controlled by a [MutableCell] which is passed on construction.
-When the value of the cell changes, the checkbox state is updated to reflect the
-value of the cell. Similarly when the state of the checkbox is changed by the
+When the value of the cell changes, the switch state is updated to reflect the
+value of the cell. Similarly when the state of the switch is changed by the
 user, the value of the cell is updated to reflect the state.
+
+The cell provided for [enabled] controls whether the widget is enabled for user
+interaction, when the value of the cell is true, or disabled, when the value
+of the cell is false.
 '''
   ),
 
@@ -1088,13 +1164,16 @@ See [LiveSwitch] for a more detailed explanation.
       )
     ],
 
-
-    documentation: '''A [Radio] widget with the [groupValue] controlled by a [ValueCell].
+    documentation: '''A [Radio] widget with the [groupValue] controlled by a [MutableCell].
 
 The [groupValue] is controlled by a [MutableCell] which is passed on construction.
 When the value of the cell changes, the state of the widget is updated to reflect the
 value of the cell. Similarly when the state of the widget is changed by the
 user, the value of the cell is updated to reflect the state.
+
+The cell provided for [enabled] controls whether the widget is enabled for user
+interaction, when the value of the cell is true, or disabled, when the value
+of the cell is false.
 '''
   ),
 
@@ -1188,16 +1267,20 @@ See [LiveRadio] for a more detailed explanation.
       baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
-      documentation: '''An [OutlinedButton] widget with its properties controlled by [ValueCell]'s.
+      documentation: '''An [OutlinedButton] that triggers an action cell when pressed.
 
-The constructor takes mostly same arguments as the unnamed constructor of [OutlinedButton],
-but as [ValueCell]'s. Instead of taking a callback function 
-for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
-the button is pressed.
+Rather than taking an `onPressed` callback function, the constructors take an
+action cell in the [press] argument, which is triggered when the button is
+pressed. Similarly, when the button is long-pressed, the action cell
+provided in [longPress] is triggered, if it is not null.
 
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
-the hover and focus state of the widget to be observed by observing the [MetaCells]
-passed to the constructor.
+The [enabled] cell controls whether the button can be tapped (true) or not 
+(false).
+
+[MetaCell]s can be provided for the [onHover] and [onFocusChange] properties.
+The value of the [onHover] [MetaCell] is set to true, while hovering over the
+widget and false otherwise. Similarly the value of the [onFocusChange] [MetaCell]
+is set to true, while the widget is focussed.
 '''
   ),
 
@@ -1259,16 +1342,20 @@ passed to the constructor.
       baseClass: #_FocusButtonInterface,
       buildMethod: #_buildWrappedWidget,
 
-      documentation: '''A [TextButton] widget with its properties controlled by [ValueCell]'s.
+      documentation: '''A [TextButton] that triggers an action cell when pressed.
 
-The constructor takes mostly same arguments as the unnamed constructor of [TextButton],
-but as [ValueCell]'s. Instead of taking a callback function 
-for [onPressed], the constructor accepts an [ActionCell] that is triggered when 
-the button is pressed.
+Rather than taking an `onPressed` callback function, the constructors take an
+action cell in the [press] argument, which is triggered when the button is
+pressed. Similarly, when the button is long-pressed, the action cell
+provided in [longPress] is triggered, if it is not null.
 
-[bool] [MetaCell]s are accepted for [onHover] and [onFocusChange]. This allows
-the hover and focus state of the widget to be observed by observing the [MetaCells]
-passed to the constructor.
+The [enabled] cell controls whether the button can be tapped (true) or not 
+(false).
+
+[MetaCell]s can be provided for the [onHover] and [onFocusChange] properties.
+The value of the [onHover] [MetaCell] is set to true, while hovering over the
+widget and false otherwise. Similarly the value of the [onFocusChange] [MetaCell]
+is set to true, while the widget is focussed.
 '''
   ),
 
@@ -1308,13 +1395,18 @@ passed to the constructor.
       #controller: '_controller',
     },
 
-    documentation: '''A text field widget, similar to [TextField], with content controlled by a [ValueCell].
+    documentation: '''A text field widget, similar to [TextField], with content controlled by a [MutableCell].
 
 The content of the text field is controlled by a [MutableCell] which is passed on
 construction. Whenever the value of the cell changes, the content of the text
 field is updated to reflect the value of the cell. Similarly, whenever the content
 of the text field changes, the value of the cell is updated to reflect the field
-content.'''
+content.
+
+Similar to the [content] cell, the cell provided for [selection] is synchronized 
+with the text selection of the field.
+
+'''
   )
 ])
 part 'live_widgets.g.dart';
