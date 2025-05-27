@@ -1,3 +1,19 @@
+# 0.30.0
+
+## New features:
+
+* New widgets:
+
+  * `LiveFloatingActionButton`
+  * `LiveIconButton`
+  * `LiveInkWell`
+  * `LiveInteractiveViewer`
+
+## Fixes
+
+* Fix issue with `setState` being called after the `CellWidget` is unmounted
+* Add key to `.combined` extension property on `List<ValueCell<void>>`
+
 # 0.29.0
 
 ### New Features
