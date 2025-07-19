@@ -2734,6 +2734,75 @@ void main() {
       });
     });
 
+    group('.add', () {
+      test('.add adds item to end of list', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l, MockValueObserver());
+
+        l.add(4);
+        l.add(5);
+
+        expect(
+            observer.values,
+            equals([
+              [1, 2, 3, 4],
+              [1, 2, 3, 4, 5]
+            ]));
+      });
+
+      test('.add creates new list instance', () {
+        final l = MutableCell([1, 2, 3]);
+        final originalList = l.value;
+
+        l.add(4);
+
+        expect(l.value, equals([1, 2, 3, 4]));
+        expect(l.value, isNot(same(originalList)));
+      });
+    });
+
+    group('.insert', () {
+      test('.insert inserts item at specified index', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l, MockValueObserver());
+
+        l.insert(1, 10);
+        l.insert(0, 0);
+        l.insert(3, 20);
+
+        expect(
+            observer.values,
+            equals([
+              [1, 10, 2, 3],
+              [0, 1, 10, 2, 3],
+              [0, 1, 10, 20, 2, 3]
+            ]));
+      });
+
+      test('.insert at end of list works like add', () {
+        final l = MutableCell([1, 2, 3]);
+        final observer = addObserver(l, MockValueObserver());
+
+        l.insert(3, 4);
+
+        expect(
+            observer.values,
+            equals([
+              [1, 2, 3, 4]
+            ]));
+      });
+
+      test('.insert creates new list instance', () {
+        final l = MutableCell([1, 2, 3]);
+        final originalList = l.value;
+
+        l.insert(1, 10);
+
+        expect(l.value, equals([1, 10, 2, 3]));
+        expect(l.value, isNot(same(originalList)));
+      });
+    });
+
     group('.cellList', () {
       test('ValueCell.cells returns list of cells observing each element', () {
         final list = ['a', 'b', 'c'].cell;
@@ -3018,6 +3087,80 @@ void main() {
 
         expect(c1 == c2, isTrue);
         expect(c1.hashCode == c2.hashCode, isTrue);
+      });
+    });
+
+    group('.mapIndexed()', () {
+      test('Returns correct value with index and element', () {
+        final it = [1, 2, 3].cell;
+        final map = it.mapIndexed((index, element) => index * 10 + element);
+
+        expect(map.value.toList(), equals([1, 12, 23]));
+      });
+
+      test('Reacts to changes in list', () {
+        final it = MutableCell([1, 2, 3]);
+        final map = it.mapIndexed((index, element) => index * 10 + element);
+
+        final listener = addListener(map, MockSimpleListener());
+
+        expect(map.value.toList(), equals([1, 12, 23]));
+
+        it.value = [4, 5, 6];
+        expect(map.value.toList(), equals([4, 15, 26]));
+
+        verify(listener()).called(1);
+
+        it.value = [7, 8];
+        expect(map.value.toList(), equals([7, 18]));
+
+        verify(listener()).called(1);
+      });
+
+      test('Compares == when same cell and same function', () {
+        f(int index, int element) => index * 10 + element;
+
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapIndexed(f);
+        final map2 = l.mapIndexed(f);
+
+        expect(map1 == map2, isTrue);
+        expect(map1.hashCode == map2.hashCode, isTrue);
+      });
+
+      test('Compares != when same cell and different function', () {
+        final l = MutableCell([1, 2, 3, 4]);
+        final map1 = l.mapIndexed((index, element) => index * 10 + element);
+        final map2 = l.mapIndexed((index, element) => index + element);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        f(int index, int element) => index * 10 + element;
+
+        final l1 = MutableCell([1, 2, 3, 4]);
+        final l2 = MutableCell([1, 2, 3, 4]);
+        final map1 = l1.mapIndexed(f);
+        final map2 = l2.mapIndexed(f);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Works with different types', () {
+        final it = ['a', 'b', 'c'].cell;
+        final map = it.mapIndexed((index, element) => '$index: $element');
+
+        expect(map.value.toList(), equals(['0: a', '1: b', '2: c']));
+      });
+
+      test('Works with empty list', () {
+        final it = <int>[].cell;
+        final map = it.mapIndexed((index, element) => index * 10 + element);
+
+        expect(map.value.toList(), equals([]));
       });
     });
   });
@@ -3914,12 +4057,14 @@ void main() {
         c5.value = true;
         c2.value = true;
 
-        expect(obs.values, equals([
-          {1, 3, 4, 5},
-          {1, 3, 4},
-          {1, 3, 4, 5},
-          {1, 2, 3, 4, 5}
-        ]));
+        expect(
+            obs.values,
+            equals([
+              {1, 3, 4, 5},
+              {1, 3, 4},
+              {1, 3, 4, 5},
+              {1, 2, 3, 4, 5}
+            ]));
       });
 
       test('compares == when same set and key cells', () {
@@ -3979,12 +4124,14 @@ void main() {
         c13.value = true;
         c25.value = true;
 
-        expect(obs.values, equals([
-          {1, 3, 4},
-          {4},
-          {1, 3, 4},
-          {1, 2, 3, 4, 5}
-        ]));
+        expect(
+            obs.values,
+            equals([
+              {1, 3, 4},
+              {4},
+              {1, 3, 4},
+              {1, 2, 3, 4, 5}
+            ]));
       });
 
       test('compares == when same set and key cells', () {
