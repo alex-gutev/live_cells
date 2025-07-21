@@ -29,7 +29,7 @@ final next = ValueCell.computed(() async => await n() + 1);
   computation on the `Future` value held in `n`.
 
 When a `Future` is assigned to the value of `n`, the value of `next`
-is updated with the new `Future` held in `n`.
+is recomputed.
 
 It's important to note that the values of asynchronous cells, which
 remember are `Future`s, are updated synchronously as soon as a value
