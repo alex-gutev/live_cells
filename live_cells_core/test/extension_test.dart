@@ -3327,7 +3327,7 @@ void main() {
         expect(map.value.toList(), equals([1, 2, 3, 4, 5]));
       });
 
-      test('Reacts to changes in iterable', () {
+      test('Reacts to changes in the Iterable', () {
         final it = MutableCell(Iterable.generate(5, (e) => e));
 
         final map = it.map((e) => e * 2);
@@ -3335,6 +3335,128 @@ void main() {
 
         it.value = Iterable.generate(3, (e) => 10 + e);
         expect(map.value.toList(), equals([20, 22, 24]));
+      });
+
+      test('Compares == when same cell and same function', () {
+        f(int element) => element * 10;
+
+        final l = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final map1 = l.map(f);
+        final map2 = l.map(f);
+
+        expect(map1 == map2, isTrue);
+        expect(map1.hashCode == map2.hashCode, isTrue);
+      });
+
+      test('Compares != when same cell and different function', () {
+        final l = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final map1 = l.map((element) => element * 10 + element);
+        final map2 = l.map((element) => element + element);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        f(int element) => element * 10;
+
+        final l1 = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final l2 = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final map1 = l1.map(f);
+        final map2 = l2.map(f);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Works with different types', () {
+        // The .map() converts the List to an Iterable
+        final it = ['a', 'b', 'c'].map((e) => e).cell;
+        final map = it.map((element) => '$element: $element');
+
+        expect(map.value.toList(), equals(['a: a', 'b: b', 'c: c']));
+      });
+
+      test('Works with empty Iterable', () {
+        final it = Iterable.empty().cell;
+        final map = it.mapIndexed((index, element) => index * 10 + element);
+
+        expect(map.value.toList(), equals([]));
+      });
+    });
+
+    group('.mapIndexed()', () {
+      test('Returns correct value with index and element', () {
+        final it = Iterable.generate(3, (i) => i + 1).cell;
+        final map = it.mapIndexed((index, element) => index * 10 + element);
+
+        expect(map.value.toList(), equals([1, 12, 23]));
+      });
+
+      test('Reacts to changes in list', () {
+        final it = MutableCell(Iterable.generate(3, (i) => i + 1));
+        final map = it.mapIndexed((index, element) => index * 10 + element);
+
+        final listener = addListener(map, MockSimpleListener());
+
+        expect(map.value.toList(), equals([1, 12, 23]));
+
+        it.value = [4, 5, 6];
+        expect(map.value.toList(), equals([4, 15, 26]));
+
+        verify(listener()).called(1);
+
+        it.value = [7, 8];
+        expect(map.value.toList(), equals([7, 18]));
+
+        verify(listener()).called(1);
+      });
+
+      test('Compares == when same cell and same function', () {
+        f(int index, int element) => index * 10 + element;
+
+        final l = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final map1 = l.mapIndexed(f);
+        final map2 = l.mapIndexed(f);
+
+        expect(map1 == map2, isTrue);
+        expect(map1.hashCode == map2.hashCode, isTrue);
+      });
+
+      test('Compares != when same cell and different function', () {
+        final l = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final map1 = l.mapIndexed((index, element) => index * 10 + element);
+        final map2 = l.mapIndexed((index, element) => index + element);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Compares != when different cells', () {
+        f(int index, int element) => index * 10 + element;
+
+        final l1 = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final l2 = MutableCell(Iterable.generate(4, (i) => i + 1));
+        final map1 = l1.mapIndexed(f);
+        final map2 = l2.mapIndexed(f);
+
+        expect(map1 != map2, isTrue);
+        expect(map1 == map1, isTrue);
+      });
+
+      test('Works with different types', () {
+        // .map() is required to convert the List to an Iterable
+        final it = ['a', 'b', 'c'].map((e) => e).cell;
+        final map = it.mapIndexed((index, element) => '$index: $element');
+
+        expect(map.value.toList(), equals(['0: a', '1: b', '2: c']));
+      });
+
+      test('Works with empty Iterable', () {
+        final it = Iterable.empty().cell;
+        final map = it.mapIndexed((index, element) => index * 10 + element);
+
+        expect(map.value.toList(), equals([]));
       });
     });
   });

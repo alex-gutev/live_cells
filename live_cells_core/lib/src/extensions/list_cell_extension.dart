@@ -51,17 +51,6 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
           (value) => value.map((e) => e.apply(fn, key: _ElementMapKey(e, fn))),
           key: _ListMapKey(this, fn))
       .store();
-
-  /// Returns a cell which evaluates to [List.mapIndexed] applied on the value in this cell.
-  ///
-  /// The [fn] function is called with the index and element of each item in the list.
-  /// The returned cell is recomputed whenever the value of this cell changes.
-  ValueCell<Iterable<E>> mapIndexed<E>(E Function(int index, T element) fn) =>
-      apply(
-        (list) =>
-            list.asMap().entries.map((entry) => fn(entry.key, entry.value)),
-        key: _ListMapKey(this, fn),
-      ).store();
 }
 
 /// Provides variants which return [MutableCell] of the methods provided by [ListCellExtension].

@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 import '../base/keys.dart';
 import '../compute_cell/store_cell.dart';
 import 'compute_extension.dart';
@@ -50,16 +52,24 @@ extension IterableCellExtension<T> on ValueCell<Iterable<T>> {
       key: _IterableTypedPropKey<R>(this, #cast)
   ).store();
 
-  /// Returns a cell which evaluates to [Iterable.map()] applied on the value in this cell.
+  /// Returns a cell which evaluates to [Iterable.map] applied on the value in this cell.
+  ValueCell<Iterable<E>> map<E>(E Function(T e) convert) =>
+      apply((value) => value.map(convert),
+        key: _IterablePropKey(this, (#map, convert))
+      ).store();
+
+  /// Returns a cell which evaluates to [Iterable.mapIndexed] applied on the value in this cell.
   ///
-  /// Unlike the other extension properties and method, the returned cell does
-  /// not have a key.
-  ValueCell<Iterable<E>> map<E>(E Function(T e) toElement) =>
-      apply((value) => value.map(toElement)).store();
+  /// The [convert] function is called with the index and element of each item in the list.
+  /// The returned cell is recomputed whenever the value of this cell changes.
+  ValueCell<Iterable<E>> mapIndexed<E>(E Function(int i, T e) convert) =>
+      apply((value) => value.mapIndexed(convert),
+        key: _IterablePropKey(this, (#mapIndexed, convert))
+      ).store();
 }
 
 /// Key identifying a [ValueCell], which accesses an [Iterable] property.
-class _IterablePropKey extends CellKey2<ValueCell, Symbol> {
+class _IterablePropKey extends CellKey2<ValueCell, Object> {
   /// Create the key.
   ///
   /// [value1] is a [ValueCell] holding an [Iterable] and [value2] is the property
