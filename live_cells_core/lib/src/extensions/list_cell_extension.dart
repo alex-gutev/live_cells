@@ -11,14 +11,16 @@ import '../value_cell.dart';
 /// Provides [List] methods directly on cells holding [List]s.
 extension ListCellExtension<T> on ValueCell<List<T>> {
   /// Returns a cell which evaluates to [List.reversed] applied on the [value] in this cell.
-  ValueCell<Iterable<T>> get reversed => apply((value) => value.reversed,
-    key: _ListPropKey(this, #reversed)
-  );
+  ValueCell<Iterable<T>> get reversed =>
+      apply((value) => value.reversed, key: _ListPropKey(this, #reversed));
 
   /// Returns a cell with a value equal to the element at [index] in the [List] held in this cell.
-  ValueCell<T> operator[](ValueCell<int> index) => (this, index).apply((l, i) => l[i],
-    key: _ListIndexKey(this, index),
-  ).store(changesOnly: true);
+  ValueCell<T> operator [](ValueCell<int> index) => (this, index)
+      .apply(
+        (l, i) => l[i],
+        key: _ListIndexKey(this, index),
+      )
+      .store(changesOnly: true);
 
   /// Returns a cell which wraps the elements of the [List] held in this cell in [ValueCell]s.
   ///
@@ -33,21 +35,32 @@ extension ListCellExtension<T> on ValueCell<List<T>> {
   /// [List] cell, will return an equivalent cell.
   ValueCell<Iterable<ValueCell<T>>> get cellList =>
       length.apply((length) => Iterable.generate(length, (i) => this[i.cell]),
-        key: _ListPropKey(this, #cells)
-      );
+          key: _ListPropKey(this, #cells));
 
   /// Returns a cell which evaluates to [List.cast<R>()] applied on the value in this cell.
-  ValueCell<List<R>> cast<R>() => apply((value) => value.cast<R>(),
-      key: _ListTypedPropKey<R>(this, #cast)
-  ).store();
+  ValueCell<List<R>> cast<R>() =>
+      apply((value) => value.cast<R>(), key: _ListTypedPropKey<R>(this, #cast))
+          .store();
 
   /// Apply a function on the value of every cell in [cellList].
   ///
   /// Returns an [Iterable], where every element is a computed cell with [fn]
   /// applied on the cell, at the corresponding index, in [cellList].
-  ValueCell<Iterable<ValueCell<E>>> mapCells<E>(E Function(T e) fn) =>
-      cellList.apply((value) => value.map((e) => e.apply(fn, key: _ElementMapKey(e, fn))),
-        key: _ListMapKey(this, fn)
+  ValueCell<Iterable<ValueCell<E>>> mapCells<E>(E Function(T e) fn) => cellList
+      .apply(
+          (value) => value.map((e) => e.apply(fn, key: _ElementMapKey(e, fn))),
+          key: _ListMapKey(this, fn))
+      .store();
+
+  /// Returns a cell which evaluates to [List.mapIndexed] applied on the value in this cell.
+  ///
+  /// The [fn] function is called with the index and element of each item in the list.
+  /// The returned cell is recomputed whenever the value of this cell changes.
+  ValueCell<Iterable<E>> mapIndexed<E>(E Function(int index, T element) fn) =>
+      apply(
+        (list) =>
+            list.asMap().entries.map((entry) => fn(entry.key, entry.value)),
+        key: _ListMapKey(this, fn),
       ).store();
 }
 
@@ -59,11 +72,9 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// element of the [List] held in this cell.
   ///
   /// **NOTE**: The actual list is not modified but a new list is created.
-  MutableCell<T> get first => mutableApply((value) => value.first,
-      (v) => value = _updatedList(value, 0, v),
-      key: _MutableListPropKey(this, #first),
-      changesOnly: true
-  );
+  MutableCell<T> get first => mutableApply(
+      (value) => value.first, (v) => value = _updatedList(value, 0, v),
+      key: _MutableListPropKey(this, #first), changesOnly: true);
 
   /// Returns a cell which evaluates to [List.last] applied on the [value] in this cell.
   ///
@@ -71,11 +82,9 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// element of the [List] held in this cell.
   ///
   /// **NOTE**: The actual list is not modified but a new list is created.
-  MutableCell<T> get last => mutableApply((value) => value.last,
-      (v) => value = _updateListLast(value, v),
-      changesOnly: true,
-      key: _MutableListPropKey(this, #last)
-  );
+  MutableCell<T> get last => mutableApply(
+      (value) => value.last, (v) => value = _updateListLast(value, v),
+      changesOnly: true, key: _MutableListPropKey(this, #last));
 
   /// Returns a cell which evaluates to [List.length] applied on the [value] in this cell.
   ///
@@ -83,11 +92,9 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// held in this cell.
   ///
   /// **NOTE**: The actual list is not modified but a new list is created.
-  MutableCell<int> get length => mutableApply((value) => value.length,
-      (v) => value = _updateListLength(value, v),
-      changesOnly: true,
-      key: _MutableListPropKey(this, #length)
-  );
+  MutableCell<int> get length => mutableApply(
+      (value) => value.length, (v) => value = _updateListLength(value, v),
+      changesOnly: true, key: _MutableListPropKey(this, #length));
 
   /// Returns a cell with a value equal to the element at [index] in the [List] held in this cell.
   ///
@@ -95,11 +102,13 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// at [index] in the [List] held in this cell.
   ///
   /// **NOTE**: The actual list is not modified but a new list is created.
-  MutableCell<T> operator[](ValueCell<int> index) => (this, index).mutableApply((l, i) => l[i],
-      (v) => value = _updatedList(value, index.value, v),
-      key: _MutableListIndexKey(this, index),
-      changesOnly: true,
-  );
+  MutableCell<T> operator [](ValueCell<int> index) =>
+      (this, index).mutableApply(
+        (l, i) => l[i],
+        (v) => value = _updatedList(value, index.value, v),
+        key: _MutableListIndexKey(this, index),
+        changesOnly: true,
+      );
 
   /// Set the value of element [index] to [elem] in the [List] held in this cell.
   ///
@@ -108,7 +117,7 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
   /// list.
   ///
   /// **NOTE**: The actual list is not modified but a new list is created.
-  void operator[]=(int index, T elem) {
+  void operator []=(int index, T elem) {
     value = _updatedList(value, index, elem);
   }
 
@@ -123,6 +132,26 @@ extension MutableListCellExtension<T> on MutableCell<List<T>> {
     elements.removeAt(index);
     value = elements;
   }
+
+  /// Add an element at the end of the [List] held in this cell.
+  ///
+  /// **NOTE**: This method does not modify the underlying list but creates
+  /// a new list with the element added at the end.
+  void add(T elem) {
+    final elements = List<T>.from(value);
+    elements.add(elem);
+    value = elements;
+  }
+
+  /// Insert an element at the given [index] in the [List] held in this cell.
+  ///
+  /// **NOTE**: This method does not modify the underlying list but creates
+  /// a new list with the element inserted at the given index.
+  void insert(int index, T elem) {
+    final elements = List<T>.from(value);
+    elements.insert(index, elem);
+    value = elements;
+  }
 }
 
 /// Key identifying a [ValueCell], which accesses a [List] property.
@@ -133,6 +162,7 @@ class _ListPropKey extends CellKey2<ValueCell, Symbol> {
   /// being accessed.
   _ListPropKey(super.value1, super.value2);
 }
+
 /// Key identifying a [ValueCell], which access a [List] property with a type parameter.
 class _ListTypedPropKey<T> extends CellKey2<ValueCell, Symbol> {
   _ListTypedPropKey(super.value1, super.value2);
@@ -186,8 +216,7 @@ List<T> _updatedList<T>(List<T> list, int index, T newValue) {
 
   if (index == list.length) {
     newList.add(newValue);
-  }
-  else {
+  } else {
     newList[index] = newValue;
   }
 
