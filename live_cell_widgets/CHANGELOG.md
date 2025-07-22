@@ -1,3 +1,9 @@
+## 0.17.0
+
+Changes:
+
+* Upgrade minimum Flutter version to 3.32.0.
+
 ## 0.16.1
 
 * Improve documentation of live widgets.
