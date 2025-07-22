@@ -1,3 +1,18 @@
+# 1.3.0
+
+New features:
+
+* New extension methods on cells holding Lists:
+
+  * `add` - Adds an item to the end of the list
+  * `insert` - Inserts an item at a given index
+
+* `mapIndexed` extension method on cells holding `Iterable`s.
+
+Changes:
+
+* `intl` dependency upgraded to 0.20.2 for compatibility with new Flutter versions.
+
 # 1.2.1
 
 Fixes:
