@@ -1358,7 +1358,63 @@ widget and false otherwise. Similarly the value of the [onFocusChange] [MetaCell
 is set to true, while the widget is focussed.
 '''
   ),
+  
+  WidgetSpec<TextFormField>(
+    as: #LiveTextFormField,
+    
+    baseClass: #_TextFieldInterface,
+    stateMixins: [#_CellTextFieldMixin],
+    
+    cellProperties: [#enabled],
 
+    includeSuperProperties: [
+      #forceErrorText,
+      #onSaved,
+      #validator,
+      #errorBuilder,
+      #restorationId,
+    ],
+    
+    excludeProperties: [
+      #controller,
+      #toolbarOptions,
+      #contextMenuBuilder,
+    ],
+    
+    addProperties: [
+      WidgetPropertySpec<String>(
+        name: #content,
+        defaultValue: null,
+        optional: false,
+        mutable: true,
+
+        documentation: 'Cell holding the content of the field'
+      ),
+      
+      WidgetPropertySpec<TextSelection>(
+        name: #selection,
+        defaultValue: null,
+        optional: true,
+        mutable: true,
+
+        documentation: 'Cell holding the text selection in the field'
+      ),
+    ],
+
+    propertyValues: {
+      #controller: '_controller',
+    },
+    
+    documentation: '''A [TextFormField] widget with Live Cells integration.
+    
+The [content] cell controls the text content of the field.
+The [selection] cell controls the text selection in the field.
+
+All standard [TextFormField] callbacks are supported and will be called in addition to
+updating the corresponding cells.
+'''
+  ),
+  
   WidgetSpec<TextField>(
     as: #LiveTextField,
 

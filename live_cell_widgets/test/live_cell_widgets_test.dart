@@ -1882,4 +1882,108 @@ void main() {
       expect(find.text('Page 3'), findsOneWidget);
     });
   });
+
+  group('LiveTextFormField', () {
+    testWidgets('content cell updates field value', (tester) async {
+      final content = MutableCell('Initial');
+
+      await tester.pumpWidget(TestApp(
+        child: LiveTextFormField(
+          content: content,
+          decoration: const InputDecoration(labelText: 'Test Field'),
+        ),
+      ));
+
+      // Initial value
+      final textField = find.byType(TextFormField);
+      expect(tester.widget<TextFormField>(textField).controller!.text, 'Initial');
+
+      // Update content cell
+      content.value = 'Updated';
+      await tester.pump();
+      
+      expect(tester.widget<TextFormField>(textField).controller!.text, 'Updated');
+    });
+
+    testWidgets('text input updates content cell', (tester) async {
+      final content = MutableCell('');
+
+      await tester.pumpWidget(TestApp(
+        child: LiveTextFormField(
+          content: content,
+          decoration: const InputDecoration(labelText: 'Test Field'),
+        ),
+      ));
+
+      // Enter text
+      await tester.enterText(find.byType(TextFormField), 'Hello');
+      expect(content(), 'Hello');
+    });
+
+    testWidgets('enabled state controls field interaction', (tester) async {
+      final enabled = MutableCell(true);
+      final content = MutableCell('Test');
+
+      await tester.pumpWidget(TestApp(
+        child: LiveTextFormField(
+          content: content,
+          enabled: enabled,
+          decoration: const InputDecoration(labelText: 'Test Field'),
+        ),
+      ));
+
+      // Initially enabled
+      final textField = find.byType(TextFormField);
+      expect(tester.widget<TextFormField>(textField).enabled, isTrue);
+
+      // Disable the field
+      enabled.value = false;
+      await tester.pump();
+      
+      expect(tester.widget<TextFormField>(textField).enabled, isFalse);
+    });
+
+
+    testWidgets('validator shows error message', (tester) async {
+      final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+      final content = MutableCell('');
+      
+      await tester.pumpWidget(TestApp(
+        child: Form(
+          key: formKey,
+          child: LiveTextFormField(
+            content: content,
+            validator: (value) => value!.isEmpty ? 'Field is required' : null,
+            decoration: const InputDecoration(labelText: 'Required Field'),
+          ),
+        ),
+      ));
+
+      // Initially no error
+      final textFieldFinder = find.byType(TextFormField);
+      var inputDecoration = tester.widget<InputDecorator>(
+        find.descendant(
+          of: textFieldFinder,
+          matching: find.byType(InputDecorator),
+        )
+      ).decoration;
+      expect(inputDecoration.errorText, isNull);
+
+      // Trigger validation
+      final result = formKey.currentState!.validate();
+      
+      expect(result, false);
+
+      await tester.pumpAndSettle();
+
+      // Should show error after validation
+      inputDecoration = tester.widget<InputDecorator>(
+        find.descendant(
+          of: textFieldFinder,
+          matching: find.byType(InputDecorator),
+        )
+      ).decoration;
+      expect(inputDecoration.errorText, 'Field is required');
+    });
+  });
 }
