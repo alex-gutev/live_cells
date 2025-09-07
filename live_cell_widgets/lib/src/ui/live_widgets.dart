@@ -1142,27 +1142,18 @@ See [LiveSwitch] for a more detailed explanation.
   WidgetSpec<Radio>(
     as: #LiveRadio,
     typeArguments: ['T'],
-    mutableProperties: [#groupValue],
+    mutableProperties: [#groupValue, #enabled],
     excludeProperties: [#onChanged],
-    cellProperties: [#groupValue],
+    cellProperties: [#groupValue, #enabled],
 
     propertyTypes: {
       #value: 'T',
-      #groupValue: 'T?'
+      #groupValue: 'T?',
+      #groupRegistry: 'RadioGroupRegistry<T>?'
     },
     propertyValues: {
-      #onChanged: 'enabled() ? (v) => groupValue.value = v : null',
+      #onChanged: '(v) => groupValue?.value = v',
     },
-
-    addProperties: [
-      WidgetPropertySpec<bool>(
-          name: #enabled,
-          optional: false,
-          defaultValue: 'true',
-
-          documentation: 'Is the widget enabled for user input?'
-      )
-    ],
 
     documentation: '''A [Radio] widget with the [groupValue] controlled by a [MutableCell].
 
@@ -1180,27 +1171,18 @@ of the cell is false.
   WidgetSpec<RadioListTile>(
     as: #LiveRadioListTile,
     typeArguments: ['T'],
-    mutableProperties: [#groupValue],
-    cellProperties: [#groupValue],
+    mutableProperties: [#groupValue, #enabled],
+    cellProperties: [#groupValue, #enabled],
     excludeProperties: [#onChanged],
 
     propertyTypes: {
       #value: 'T',
-      #groupValue: 'T?'
+      #groupValue: 'T?',
+      #groupRegistry: 'RadioGroupRegistry<T>?'
     },
     propertyValues: {
-      #onChanged: 'enabled() ? (v) => groupValue.value = v : null',
+      #onChanged: '(v) => groupValue?.value = v',
     },
-
-    addProperties: [
-      WidgetPropertySpec<bool>(
-          name: #enabled,
-          optional: false,
-          defaultValue: 'true',
-
-          documentation: 'Is the widget enabled for user input?'
-      )
-    ],
 
 
     documentation: '''A [ListTile] with a [LiveRadio], akin to [RadioListTile].
