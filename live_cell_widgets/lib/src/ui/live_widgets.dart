@@ -1167,6 +1167,30 @@ of the cell is false.
 '''
   ),
 
+  WidgetSpec<RadioGroup>(
+      as: #LiveRadioGroup,
+      typeArguments: ['T'],
+      mutableProperties: [#groupValue],
+      excludeProperties: [#onChanged],
+      cellProperties: [#groupValue],
+
+      propertyValues: {
+        #onChanged: '(v) => groupValue?.value = v',
+      },
+
+      propertyTypes: {
+        #groupValue: 'T?'
+      },
+
+      documentation: '''A [RadioGroup] widget with the [groupValue] controlled by a [MutableCell].
+
+The [groupValue] is controlled by a [MutableCell] which is passed on construction.
+When the value of the cell changes, the state of the RadioGroup is updated to reflect the
+value of the cell. Similarly when the state of the RadioGroup is changed by the
+user, the value of the cell is updated to reflect the state.
+'''
+  ),
+
   WidgetSpec<RadioListTile>(
     as: #LiveRadioListTile,
     typeArguments: ['T'],

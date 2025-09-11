@@ -1374,6 +1374,134 @@ void main() {
     });
   });
 
+  group('LiveRadioGroup', () {
+    testWidgets('group value initialized correctly', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(RadioTestValue.value1);
+
+      await tester.pumpWidget(TestApp(
+          child: LiveRadioGroup(
+            groupValue: groupValue,
+            child: const Column(
+              children: [
+                RadioListTile(
+                  value: RadioTestValue.value1,
+                  title: Text('value1'),
+                ),
+                RadioListTile(
+                  value: RadioTestValue.value2,
+                  title: Text('value2'),
+                )
+              ],
+            ),
+          )
+      ));
+
+      final groupFinder = find.byWidgetPredicate((widget) => widget is RadioGroup &&
+          widget.groupValue == RadioTestValue.value1
+      );
+
+      expect(groupFinder, findsOneWidget);
+    });
+
+    testWidgets('group value initialized correctly when null', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(null);
+
+      await tester.pumpWidget(TestApp(
+          child: LiveRadioGroup(
+            groupValue: groupValue,
+            child: const Column(
+              children: [
+                LiveRadioListTile(
+                  value: RadioTestValue.value1,
+                  title: Text('value1'),
+                ),
+                LiveRadioListTile(
+                  value: RadioTestValue.value2,
+                  title: Text('value2'),
+                )
+              ],
+            ),
+          )
+      ));
+
+      final groupFinder = find.byWidgetPredicate((widget) => widget is RadioGroup &&
+          widget.groupValue == null
+      );
+
+      expect(groupFinder, findsOneWidget);
+    });
+
+    testWidgets('group value reflects value of cell', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(null);
+
+      await tester.pumpWidget(TestApp(
+          child: LiveRadioGroup(
+            groupValue: groupValue,
+            child: const Column(
+              children: [
+                LiveRadioListTile(
+                  value: RadioTestValue.value1,
+                  title: Text('value1'),
+                ),
+                LiveRadioListTile(
+                  value: RadioTestValue.value2,
+                  title: Text('value2'),
+                )
+              ],
+            ),
+          )
+      ));
+
+      finder(RadioTestValue? groupValue) =>
+          find.byWidgetPredicate((widget) => widget is RadioGroup &&
+              widget.groupValue == groupValue);
+
+      expect(finder(null), findsOneWidget);
+
+      groupValue.value = RadioTestValue.value1;
+      await tester.pump();
+
+      // Check that the group value is updated in both radio buttons
+      expect(finder(RadioTestValue.value1), findsOneWidget);
+    });
+
+    testWidgets('value of cell reflects group value', (tester) async {
+      final groupValue = MutableCell<RadioTestValue?>(null);
+
+      await tester.pumpWidget(TestApp(
+          child: LiveRadioGroup(
+            groupValue: groupValue,
+            child: const Column(
+              children: [
+                LiveRadioListTile(
+                  value: RadioTestValue.value1,
+                  title: Text('value1'),
+                ),
+                LiveRadioListTile(
+                  value: RadioTestValue.value2,
+                  title: Text('value2'),
+                )
+              ],
+            ),
+          )
+      ));
+
+      finder(RadioTestValue? groupValue) =>
+          find.byWidgetPredicate((widget) => widget is RadioGroup &&
+              widget.groupValue == groupValue);
+
+      expect(finder(null), findsOneWidget);
+
+      // Tap first radio button
+      await tester.tap(find.text('value1'));
+      expect(groupValue.value, equals(RadioTestValue.value1));
+
+      // Tap second radio button
+      await tester.tap(find.text('value2'));
+      expect(groupValue.value, equals(RadioTestValue.value2));
+    });
+  });
+
   group('LiveTextField', () {
     testWidgets('Content of field reflects value of content cell', (tester) async {
       final content = MutableCell('init');
