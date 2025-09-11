@@ -1,3 +1,14 @@
+# 0.32.0
+
+* New Widgets:
+
+  * `LiveRadioGroup`
+  * `LiveTextFormField`
+
+* Changes
+
+  * Upgraded minimum Flutter version to 3.35.0.
+
 # 0.31.0
 
 New features:
