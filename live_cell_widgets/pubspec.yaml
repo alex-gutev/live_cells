@@ -2,13 +2,13 @@ name: live_cell_widgets
 description: >
   Provides wrappers over Flutter widgets which allow the properties of the widgets to be controlled
   by ValueCell's
-version: 0.17.0
+version: 0.18.0
 repository: https://github.com/alex-gutev/live_cells/tree/master/live_cell_widgets
 issue_tracker: https://github.com/alex-gutev/live_cells/issues
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.32.0"
+  flutter: ">=3.35.0"
 
 dependencies:
   collection: ">=1.18.0 <2.0.0"
