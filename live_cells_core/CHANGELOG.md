@@ -1,3 +1,7 @@
+# 1.4.0
+
+* Compatibility with Flutter 3.35.0
+
 # 1.3.0
 
 New features:
