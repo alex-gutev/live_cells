@@ -43,7 +43,7 @@ class LiveRadioDemo extends CellWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Demonstration of LiveRadio widget which binds group value state to a cell.',
+                'Demonstration of LiveRadioGroup widget which binds group value state to a cell.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold
@@ -52,20 +52,24 @@ class LiveRadioDemo extends CellWidget {
               const SizedBox(height: 10),
               // Three radio buttons with the group value controlled by the
               // `option` cell
-              LiveRadioListTile(
-                value: RadioOption.optionA,
+              LiveRadioGroup(
                 groupValue: option,
-                title: const Text('Option A'),
-              ),
-              LiveRadioListTile(
-                value: RadioOption.optionB,
-                groupValue: option,
-                title: const Text('Option B'),
-              ),
-              LiveRadioListTile(
-                value: RadioOption.optionC,
-                groupValue: option,
-                title: const Text('Option C'),
+                child: Column(
+                  children: [
+                    RadioListTile(
+                      value: RadioOption.optionA,
+                      title: const Text('Option A'),
+                    ),
+                    RadioListTile(
+                      value: RadioOption.optionB,
+                      title: const Text('Option B'),
+                    ),
+                    RadioListTile(
+                      value: RadioOption.optionC,
+                      title: const Text('Option C'),
+                    ),
+                  ],
+                ),
               ),
               CellWidget.builder((_) => Text('Selected option: ${option()?.prettyName ?? 'None'}')),
               // The following buttons change the selected radio button by

@@ -55,7 +55,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   build_runner: ^2.4.15
-  live_cell_extension: ^0.6.2
+  live_cell_extension: ^0.7.0
 
 dependency_overrides:
   live_cells_core:

@@ -124,24 +124,24 @@ class CellRestorationDemo extends CellWidget {
               ),
               const SizedBox(height: 5),
               CellWidget.builder((context) => Text('Selected option: ${radioValue()?.name}')),
-              Column(
-                children: [
-                  LiveRadioListTile(
-                    groupValue: radioValue,
-                    value: RadioValue.value1,
-                    title: const Text('value1'),
-                  ),
-                  LiveRadioListTile(
-                    groupValue: radioValue,
-                    value: RadioValue.value2,
-                    title: const Text('value2'),
-                  ),
-                  LiveRadioListTile(
-                    groupValue: radioValue,
-                    value: RadioValue.value3,
-                    title: const Text('value3'),
-                  ),
-                ],
+              LiveRadioGroup(
+                groupValue: radioValue,
+                child: Column(
+                  children: [
+                    RadioListTile(
+                      value: RadioValue.value1,
+                      title: const Text('value1'),
+                    ),
+                    RadioListTile(
+                      value: RadioValue.value2,
+                      title: const Text('value2'),
+                    ),
+                    RadioListTile(
+                      value: RadioValue.value3,
+                      title: const Text('value3'),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 10),
               const Text('Enter some text:'),
