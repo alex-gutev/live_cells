@@ -74,6 +74,7 @@ export 'src/extensions/meta_cell_extension.dart';
 export 'src/extensions/action_cell_extension.dart';
 export 'src/extensions/transform_extension.dart';
 export 'src/extensions/exception_cell.dart';
+export 'src/extensions/watch_extension.dart';
 
 export 'package:live_cell_annotations/live_cell_annotations.dart'
     show CellExtension, DataClass, DataField;

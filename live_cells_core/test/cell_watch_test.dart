@@ -648,6 +648,348 @@ void main() {
     });
   });
 
+  group('WatchCellExtension', () {
+    test('Watch function called once on registration', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final observer = MockValueObserver();
+
+      final watcher = [a, b].watch(() {
+        observer.gotValue(a.value + b.value);
+      });
+
+      addTearDown(() => watcher.stop());
+
+      verify(observer.gotValue(any)).called(1);
+    });
+
+    test('Watch function called with correct cell values on registration', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final observer = MockValueObserver();
+
+      final watcher = [a, b].watch(() {
+        observer.gotValue((a.value, b.value));
+      });
+
+      addTearDown(() => watcher.stop());
+
+      verify(observer.gotValue((1, 2))).called(1);
+    });
+
+    test('Watch function called when referenced cell values change', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final observer = MockValueObserver();
+
+      final watcher = [a, b].watch(() {
+        observer.gotValue(a.value + b.value);
+      });
+
+      addTearDown(() => watcher.stop());
+
+      a.value = 5;
+      b.value = 10;
+
+      verify(observer.gotValue(any)).called(3);
+    });
+
+    test('Cell values updated when function is called', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final observer = MockValueObserver();
+
+      final watcher = [a, b].watch(() {
+        observer.gotValue(a.value + b.value);
+      });
+
+      addTearDown(() => watcher.stop());
+
+      a.value = 5;
+      b.value = 10;
+
+      verifyInOrder([
+        observer.gotValue(3),
+        observer.gotValue(7),
+        observer.gotValue(15)
+      ]);
+    });
+
+    test('Watch function called when referenced cell values change during batch update', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final observer = MockValueObserver();
+
+      final watcher = [a, b].watch(() {
+        observer.gotValue(a.value + b.value);
+      });
+
+      addTearDown(() => watcher.stop());
+
+      MutableCell.batch(() {
+        a.value = 5;
+        b.value = 10;
+      });
+
+      verify(observer.gotValue(any)).called(2);
+    });
+
+    test('Cell values updated when function is called during batch update', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final observer = MockValueObserver();
+
+      final watcher = [a, b].watch(() {
+        observer.gotValue(a.value + b.value);
+      });
+
+      addTearDown(() => watcher.stop());
+
+      MutableCell.batch(() {
+        a.value = 5;
+        b.value = 10;
+      });
+
+      verifyInOrder([
+        observer.gotValue(3),
+        observer.gotValue(15)
+      ]);
+    });
+
+    test('Watch function not called after CellWatcher.stop()', () {
+      final a = MutableCell(1);
+      final b = MutableCell(2);
+
+      final observer = MockValueObserver();
+
+      final watcher = [a, b].watch(() {
+        observer.gotValue(a.value + b.value);
+      });
+
+      addTearDown(() => watcher.stop());
+
+      a.value = 5;
+      b.value = 10;
+      watcher.stop();
+
+      b.value = 100;
+      a.value = 30;
+
+      verify(observer.gotValue(any)).called(3);
+    });
+
+    test('init() called when cell is watched', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+
+      final watcher = [cell].watch(() {
+        // Do nothing
+      });
+
+      addTearDown(() => watcher.stop());
+
+      verify(resource.init()).called(1);
+    });
+
+    test('dispose() called after CellWatcher.stop', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+
+      final watcher = [cell].watch(() {
+        // Do nothing
+      });
+
+      watcher.stop();
+      verify(resource.dispose()).called(1);
+    });
+
+    test('dispose() not called when not all watchers are stopped', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+
+      final watcher1 = [cell].watch(() {});
+      final watcher2 = [cell].watch(() {});
+
+      addTearDown(() {
+        watcher1.stop();
+        watcher2.stop();
+      });
+
+      watcher1.stop();
+      verifyNever(resource.dispose());
+    });
+
+    test('Setting cells in watch function', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+
+      final listener = addListener(b, MockSimpleListener());
+
+      final watch = [a].watch(() {
+        b.value = a.value + 1;
+      });
+
+      addTearDown(() => watch.stop());
+
+      expect(b.value, 1);
+      verify(listener()).called(1);
+
+      a.value = 5;
+      expect(b.value, 6);
+      verify(listener()).called(1);
+    });
+
+    test('Setting cells with MutableCell.batch in watch function', () {
+      final a = MutableCell(0);
+      final b = MutableCell(0);
+      final c = MutableCell(0);
+      final d = (b + c).store();
+
+      final observer = addObserver(d, MockValueObserver());
+
+      final watch = [a].watch(() {
+        MutableCell.batch(() {
+          b.value = a.value + 1;
+          c.value = a.value + 2;
+        });
+      });
+
+      addTearDown(() => watch.stop());
+
+      expect(b.value, 1);
+      expect(c.value, 2);
+      expect(observer.values, equals([3]));
+
+      a.value = 5;
+      expect(b.value, 6);
+      expect(c.value, 7);
+      expect(observer.values, equals([3, 13]));
+    });
+
+    test('Watch with the same key initialized once', () {
+      final cell = MutableCell(1);
+      final listener = MockSimpleListener();
+
+      final w1 = [cell].watch(listener, key: 'watch-function-key1');
+      final w2 = [cell].watch(listener, key: 'watch-function-key1');
+
+      addTearDown(() => w1.stop());
+      addTearDown(() => w2.stop());
+
+      verify(listener()).called(1);
+    });
+
+    test('Watch with the same key share the same state', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+
+      final w1 = [a].watch(listener, key: 'watch-function-key1');
+      final w2 = [a].watch(listener, key: 'watch-function-key1');
+
+      addTearDown(() => w1.stop());
+      addTearDown(() => w2.stop());
+
+      verify(listener()).called(1);
+
+      a.trigger();
+      verify(listener()).called(1);
+
+      a.trigger();
+      verify(listener()).called(1);
+
+      w1.stop();
+
+      a.trigger();
+      a.trigger();
+
+      verifyNever(listener());
+    });
+
+    test('Watch with keys do not leak resources', () {
+      final resource = MockResource();
+      final cell = TestManagedCell(resource, 1);
+      final listener = MockSimpleListener();
+
+      final w1 = [cell].watch(listener, key: 'watch-function-key1');
+
+      addTearDown(() => w1.stop());
+
+      w1.stop();
+      verify(listener()).called(1);
+      verify(resource.init()).called(1);
+      verify(resource.dispose()).called(1);
+
+      final w2 = Watch((_) {
+        cell.observe();
+        listener();
+      }, key: 'watch-function-key1');
+      addTearDown(() => w2.stop());
+
+      w2.stop();
+      verify(listener()).called(1);
+      verify(resource.init()).called(1);
+      verify(resource.dispose()).called(1);
+    });
+
+    test('Watch with different keys do not share the same state', () {
+      final a = ActionCell();
+
+      final listener = MockSimpleListener();
+
+      final w1 = [a].watch(listener, key: 'watch-function-key1');
+      final w2 = [a].watch(listener, key: 'watch-function-key2');
+
+      addTearDown(() => w1.stop());
+      addTearDown(() => w2.stop());
+
+      verify(listener()).called(2);
+
+      a.trigger();
+      verify(listener()).called(2);
+
+      a.trigger();
+      verify(listener()).called(2);
+
+      w1.stop();
+
+      a.trigger();
+      verify(listener()).called(1);
+
+      w2.stop();
+      a.trigger();
+
+      verifyNever(listener());
+    });
+
+    test('CellWatcher.stopByKey stops keyed watch function', () {
+      final cell = ActionCell();
+      final listener = MockSimpleListener();
+
+      final w = [cell].watch(listener, key: 'watch-function-key1');
+
+      addTearDown(() => w.stop());
+
+      verify(listener()).called(1);
+
+      cell.trigger();
+      verify(listener()).called(1);
+
+      CellWatcher.stopByKey('watch-function-key1');
+
+      cell.trigger();
+      cell.trigger();
+
+      verifyNever(listener());
+    });
+  });
+
   group('changesOnly cell option', () {
     test('Observer.update() called with didChange = false, when value unchanged.', () {
       final a = MutableCell([1, 2, 3]);

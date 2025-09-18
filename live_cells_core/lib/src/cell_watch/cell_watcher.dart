@@ -9,6 +9,7 @@ import '../stateful_cell/cell_update_manager.dart';
 import '../value_cell.dart';
 
 part 'cell_watch_table.dart';
+part 'cell_watch_observer.dart';
 
 /// Maintains the state of a *cell watcher*.
 ///
@@ -25,7 +26,7 @@ class CellWatcher {
   /// references the same watch function.
   CellWatcher({key}) {
     this.key = key ?? AutoKey.autoWatchKey(this);
-    _observer = _CellWatchTable.getObserver(this.key, _CellWatchObserver.new);
+    _observer = _CellWatchTable.getObserver(this.key, _makeObserver);
   }
 
   /// Initialize the *cell watcher*
@@ -84,6 +85,10 @@ class CellWatcher {
 
   /// Key identifying watch function
   late final dynamic key;
+
+  /// Create the observer for the watch function
+  _CellWatchObserver _makeObserver() => 
+      _CellWatchObserver();
 }
 
 /// Watch (with handle argument) callback function signature.
@@ -112,88 +117,20 @@ class Watch extends CellWatcher {
   }
 }
 
-/// Cell observer which calls a *cell watcher* function
-class _CellWatchObserver implements CellObserver {
-  /// The cell watcher function
-  late final WatchCallback watch;
-
-  /// Set of cells referenced within [watch]
-  final Set<ValueCell> _arguments = HashSet();
-
-  /// Are the referenced cells in the process of updating their values
-  var _isUpdating = false;
-
-  /// Is the observer waiting for [update] to be called with didChange equal to true.
-  var _waitingForChange = false;
-
-  /// Has the watch function never been called?
-  var _initialCall = true;
-
-  /// Has the watch function been stopped?
-  var _stopped = false;
-
-  /// Initialize the observer with a [watch] function.
-  void init(WatchCallback watch) {
-    if (_initialCall) {
-      this.watch = watch;
-      _callWatchFn();
-      _initialCall = false;
-    }
-  }
-
-  /// Remove the observer from the referenced cells
-  void stop() {
-    for (final cell in _arguments) {
-      cell.removeObserver(this);
-    }
-
-    _arguments.clear();
-    _stopped = true;
-  }
-
-  /// Call [watch] and track referenced cells
-  void _callWatchFn() {
-    try {
-      ComputeArgumentsTracker.computeWithTracker(watch, (cell) {
-        if (!_stopped && !_arguments.contains(cell)) {
-          _arguments.add(cell);
-          cell.addObserver(this);
-        }
-      });
-    }
-    on StopComputeException {
-      // Stop execution of watch function
-    }
-    catch (e, st) {
-      debugPrint('Unhandled exception in ValueCell.watch(): $e\n$st');
-    }
-  }
-
-  /// Schedule the watch function to be called.
-  void _scheduleWatchFn() {
-    CellUpdateManager.addPostUpdateCallback(_callWatchFn);
-  }
-
+/// A cell watcher with [arguments] that are specified at construction
+///
+/// Unlike [CellWatcher] and [Watch], this cell watcher does not track the cells
+/// referenced in the watch function.
+class StaticCellWatcher extends CellWatcher {
+  /// The argument cells observed by the watch function
+  final Iterable<ValueCell> arguments;
+  
+  StaticCellWatcher(this.arguments, {
+    super.key
+  });
+  
   @override
-  bool get shouldNotifyAlways => false;
-
-  @override
-  void update(ValueCell cell, bool didChange) {
-    if (_isUpdating || (didChange && _waitingForChange)) {
-      _isUpdating = false;
-      _waitingForChange = !didChange;
-      
-      if (didChange) {
-        _scheduleWatchFn();
-      }
-    }
-  }
-
-  @override
-  void willUpdate(ValueCell cell) {
-    if (!_isUpdating) {
-      _isUpdating = true;
-      _waitingForChange = false;
-    }
+  _CellWatchObserver _makeObserver() {
+    return _StaticCellWatchObserver(arguments);
   }
 }
