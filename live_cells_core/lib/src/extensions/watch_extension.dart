@@ -2,7 +2,7 @@ import '../../live_cells_core.dart';
 import '../cell_watch/cell_watcher.dart';
 
 /// Provides the [watch] extension method
-extension WatchCellExtension on List<ValueCell> {
+extension WatchCellExtension on Iterable<ValueCell> {
   /// Create a cell watcher that observes the cells in this list.
   ///
   /// Unlike the cell watch functions created with [ValueCell.watch] and [Watch],
