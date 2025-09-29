@@ -28,8 +28,8 @@ class CellUpdateManager {
     );
 
     if (!wasUpdating) {
-      _isUpdating = false;
       _runPostUpdateCallbacks();
+      _isUpdating = false;
     }
   }
 
