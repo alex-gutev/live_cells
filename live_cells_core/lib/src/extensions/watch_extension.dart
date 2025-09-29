@@ -13,6 +13,25 @@ extension WatchCellExtension on Iterable<ValueCell> {
   /// rather than the function call syntax.callback
   ///
   /// The watch function is identified by [key] if it is not null.
-  CellWatcher watch(WatchCallback callback, {key}) =>
-      StaticCellWatcher(this, key: key)..init(callback);
+  ///
+  /// If [deferred] is true, the watch function is created but it is not
+  /// started. The watch function has to be started manually by calling
+  /// [CellWatcher.start]. If [deferred] is false (the default), the watch
+  /// function is started immediately.
+  CellWatcher watch(WatchCallback callback, {
+    key,
+    bool deferred = false
+  }) {
+    final watcher = StaticCellWatcher(
+        arguments: this,
+        callback: callback,
+        key: key
+    );
+
+    if (!deferred) {
+      watcher.start();
+    }
+
+    return watcher;
+  }
 }

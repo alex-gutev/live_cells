@@ -64,8 +64,14 @@ abstract class ValueCell<T> {
   ///
   /// **NOTE**: [CellWatcher.stop] must be called on the returned object when the
   /// watch function should no longer be called.
+  ///
+  /// **NOTE**: The watch function is started automatically, thus there is no
+  /// need to call [CellWatcher.start].
   static CellWatcher watch(WatchCallback watch, {key}) =>
-      CellWatcher(key: key)..init(watch);
+      DynamicCellWatcher(
+          callback: watch,
+          key: key
+      )..start();
 
   /// Stop computation of the current cell's value.
   ///

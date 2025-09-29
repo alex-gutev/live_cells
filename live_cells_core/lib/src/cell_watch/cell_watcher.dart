@@ -15,7 +15,10 @@ part 'cell_watch_observer.dart';
 ///
 /// A *cell watcher* is a function which is called whenever the values of the
 /// cells referenced within it change.
-class CellWatcher {
+abstract class CellWatcher {
+  /// The watch callback function
+  WatchCallback get callback;
+
   /// Has the watch function been called once to initialize its dependencies.
   bool get isInitialized => !_observer._initialCall;
 
@@ -29,14 +32,14 @@ class CellWatcher {
     _observer = _CellWatchTable.getObserver(this.key, _makeObserver);
   }
 
-  /// Initialize the *cell watcher*
+  /// Start the *cell watcher*
   ///
   /// The [watch] function is called immediately to determine the argument cells
   /// referenced within it.
   ///
   /// **NOTE**: This method should be called at most once.
-  void init(WatchCallback watch) {
-    _observer.init(watch);
+  void start() {
+    _observer.init(callback);
   }
 
   /// Stop watching the referenced cells.
@@ -91,6 +94,17 @@ class CellWatcher {
       _CellWatchObserver();
 }
 
+/// A [CellWatcher] which determines the argument cells at run time.
+class DynamicCellWatcher extends CellWatcher {
+  @override
+  final WatchCallback callback;
+
+  DynamicCellWatcher({
+    super.key,
+    required this.callback
+  });
+}
+
 /// Watch (with handle argument) callback function signature.
 ///
 /// This signatures adds a [CellWatcher] argument to the signature, which is
@@ -99,6 +113,9 @@ typedef WatchStateCallback = void Function(CellWatcher state);
 
 /// A cell watch function which receives the watch state as an argument.
 class Watch extends CellWatcher {
+  /// The watch callback function
+  final WatchStateCallback watch;
+
   /// Register [watch] to be called whenever the values of the cells referenced within it change.
   ///
   /// The function [watch] is called, with the created [Watch] object passed to
@@ -112,8 +129,17 @@ class Watch extends CellWatcher {
   /// If [key] is not null and a [CellWatcher] identified by [key] has already
   /// been created, and has not been stopped, this [CellWatcher] object
   /// references the same watch function.
-  Watch(WatchStateCallback watch, {super.key}) {
-    init(() => watch(this));
+  ///
+  /// **NOTE**: The watch function is started automatically.
+  Watch(this.watch, {super.key}) {
+    start();
+  }
+
+  @override
+  WatchCallback get callback =>_watchCallback;
+
+  void _watchCallback() {
+    watch(this);
   }
 }
 
@@ -122,11 +148,16 @@ class Watch extends CellWatcher {
 /// Unlike [CellWatcher] and [Watch], this cell watcher does not track the cells
 /// referenced in the watch function.
 class StaticCellWatcher extends CellWatcher {
+  @override
+  final WatchCallback callback;
+
   /// The argument cells observed by the watch function
   final Iterable<ValueCell> arguments;
   
-  StaticCellWatcher(this.arguments, {
-    super.key
+  StaticCellWatcher({
+    super.key,
+    required this.arguments,
+    required this.callback
   });
   
   @override
