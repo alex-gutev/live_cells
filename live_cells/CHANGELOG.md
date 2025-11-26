@@ -1,3 +1,9 @@
+# 0.33.0
+
+* Changes:
+
+  * Upgraded minimum Flutter version to 3.38.0.
+
 # 0.32.0
 
 * New Widgets:
