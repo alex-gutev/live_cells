@@ -22,13 +22,14 @@ as the value that was set. This allows data to flow in two directions,
 whereas `ValueCell.computed()` only allows data to flow in a single
 direction.
 
-Mutable computed cells are created using `MutableCell.computed`, which
-takes the computation function and reverse computation function. The
-computation function computes the cell's value as a function of
-argument cells, like `ValueCell.computed`. The reverse computation
-function *reverses* the computation by assigning a value to the
-argument cells. It is given the value that was assigned to the `value`
-property.
+Mutable computed cells are created using
+[`MutableCell.computed`](https://pub.dev/documentation/live_cells/latest/live_cells/MutableCell/MutableCell.computed.html),
+which takes the computation function and reverse computation
+function. The computation function computes the cell's value as a
+function of argument cells, like `ValueCell.computed`. The reverse
+computation function *reverses* the computation by assigning a value
+to the argument cells. It is given the value that was assigned to the
+`value` property.
 
 Example:
 
@@ -51,12 +52,11 @@ strA.value = '100';
 print(a.value + 1); // Prints: 101
 ```
 
-This definition will prove useful when implementing a text field for
-numeric input. In-fact, this library already provides a definition for
-this cell with the
+This definition is useful for obtaining string input from the user and
+converting it to an integer. In-fact, the
 [`mutableString`](https://pub.dev/documentation/live_cells/latest/live_cells/ParseNumExtension/mutableString.html)
 extension method on `MutableCell`'s holding `int`, `double` and `num`
-values.
+values returns a mutable cell with this behaviour.
 
 ```dart title="Example of mutableString()"
 final a = MutableCell<num>(0);
@@ -84,7 +84,7 @@ CellWidget.builder((_) {
 });
 ```
 
-An integer is parsed from the `LiveTextField`, it's square is computed
+An integer is parsed from the `LiveTextField`, its square is computed
 and displayed in a `Text` widget below the field.
 
 :::info
@@ -94,8 +94,8 @@ deduced type of its initial value `0`.
 :::
 
 Here's a larger example containing two text fields for numeric input,
-a widget that displays the sum of the two numbers entered and a
-"Reset" button:
+a widget that displays the sum of the numbers that were entered in the
+fields and a "Reset" button that resets both fields to `0`:
 
 ```dart title="Text field for numeric input"
 CellWidget.builder((_) {
@@ -235,5 +235,5 @@ CellWidget.builder((_) {
 ```
 * Entering a value in the fields for `a` and `b` will result in the
   `sum` being recomputed and displayed in its field.
-* Entering a value in the field for the `sum` results in the values for
+* Entering a value in the field for the `sum` results in the values of
   `a` and `b` being updated such that their sum equals the value entered.

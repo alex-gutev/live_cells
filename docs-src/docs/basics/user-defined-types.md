@@ -82,9 +82,7 @@ And to update the value of the `firstName` property:
 person.firstName.value = 'Jane';
 ```
 
-That's it, no need to write a `copyWith` method either. This ties in
-with Live Cell's design principle that cells should be
-indistinguishable, as much as is possible, from the values they hold.
+That's it, no need to write a `copyWith` method either.
 
 ### Generating the Code
 
@@ -96,8 +94,10 @@ dart pub add --dev live_cell_extension
 ```
 
 Then annotate the classes, for which you want accessors to be
-generated, with `CellExtension`. If you want mutable cell accessors to
-also be generated, add `mutable: true` to the annotation arguments.
+generated, with
+[`CellExtension`](https://pub.dev/documentation/live_cells/latest/live_cells/CellExtension-class.html). If
+you want mutable cell accessors to also be generated, add `mutable:
+true` to the annotation arguments.
 
 ```dart title="person.dart"
 part 'person.g.dart';

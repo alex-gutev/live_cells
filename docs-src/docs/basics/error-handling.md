@@ -35,31 +35,32 @@ The `errorValue` is a cell, which allows the default value to be
 changed dynamically.
 :::
 
-## Maybe Cells
+## Maybe Values
 
 This error handling strategy might be sufficient for some cases but
 usually, we want to detect and handle the error rather than assigning
-a default value. This can be done with `Maybe` cells. A
+a default value. This can be done with
 [`Maybe`](https://pub.dev/documentation/live_cells/latest/live_cells/Maybe-class.html)
-object either holds a value or an exception that was thrown while
-computing a value.
+values.
 
-A `Maybe` cell can easily be created from a`MutableCell` with the
-[`maybe()`](https://pub.dev/documentation/live_cells/latest/live_cells/CellMaybeExtension/maybe.html)
-method. The resulting `Maybe` cell is a mutable computed cell with the
-following behaviour:
+[`Maybe`](https://pub.dev/documentation/live_cells/latest/live_cells/Maybe-class.html)
+is a container that either contains a value, or an exception that was
+thrown during the computation of a value. This can be used to catch
+exceptions thrown inside the reverse computation function of a mutable
+computed cell.
 
-* Its computed value is the value of the argument cell wrapped in a
-  `Maybe`.
-* When the cell's value is set, it sets the value of the argument cell
-  to the value wrapped in the `Maybe` if it is holding a value.
+The
+[`Maybe.wrap`](https://pub.dev/documentation/live_cells/latest/live_cells/Maybe/Maybe.wrap.html)
+constructor calls the function passed to it and wraps the return
+value, or the exception that was thrown, in a `Maybe` value.
 
-The `Maybe` cell provides an
-[`error`](https://pub.dev/documentation/live_cells/latest/live_cells/MaybeCellExtension/error.html)
-property which retrieves a `ValueCell` that evaluates to the exception
-held in the `Maybe` or `null` if the `Maybe` is holding a value. This
-can be used to determine whether an error occurred while computing a
-value.
+```dart
+// Creates a Maybe holding the integer value 1
+final maybeInt = Maybe.wrap(() => int.parse('1'));
+
+// Creates a Maybe holding a FormatException
+final maybeError = Maybe.wrap(() => int.parse('junk'));
+```
 
 :::tip
 
@@ -71,30 +72,120 @@ allows you to handle errors using `switch` and pattern matching:
 
 ```dart
 switch (maybe) {
-    case MaybeValue(:final value):
-        /// Do something with `value`
+  case MaybeValue(:final value):
+    /// Do something with `value`
         
-    case MaybeError(:final error):
-        /// Handle the `error`
+  case MaybeError(:final error):
+    /// Handle the `error`
 }
 ```
 
 :::
 
-To handle errors while parsing a number, `mutableString` should be
-called on a cell containing a `Maybe<num>` rather than a `num`. We can
-then check whether the `error` cell is non-null to determine if an
-error occurred.
+The
+[`unwrap`](https://pub.dev/documentation/live_cells/latest/live_cells/Maybe/unwrap.html)
+property returns the value held in the `Maybe`. If the `Maybe` holds
+an exception, it is rethrown.
 
-Putting it all together a text field for numeric input, which displays
-an error message when an invalid value is entered, can be implemented
+```dart
+// Creates a Maybe holding the integer value 1
+final maybeInt = Maybe.wrap(() => int.parse('1'));
+
+// Prints 1
+print(maybeInt.unwrap);
+
+// Creates a Maybe holding a FormatException
+final maybeError = Maybe.wrap(() => int.parse('junk'));
+
+// Throws the FormatException held in the Maybe
+print(maybeError.unwrap);
+```
+
+## Maybe Cells
+
+The
+[`maybe()`](https://pub.dev/documentation/live_cells/latest/live_cells/CellMaybeExtension/maybe.html)
+extension method creates a cell that wraps the value of its argument
+cell in a `Maybe`. The resulting `Maybe` cell is a mutable computed
+cell with the following behaviour:
+
+* Its computed value is the value of the argument cell wrapped in a
+  `Maybe`.
+* When the cell's value is set, it sets the value of the argument cell
+  to the value wrapped in the `Maybe` if it is holding a value.
+* When the cell's value is set to a `Maybe` holding an exception, the
+  argument cell's value is not changed.
+
+The following cell definition:
+
+```dart
+final a = MutableCell<num>(0);
+final maybeA = a.maybe();
+```
+
+is equivalent to:
+
+```dart
+final maybeA = MutableCell.computed(
+  () => Maybe.wrap(() => a()), 
+  (maybe) => a.value = maybe.unwrap
+);
+```
+
+`Maybe` cells provide an
+[`error`](https://pub.dev/documentation/live_cells/latest/live_cells/MaybeCellExtension/error.html)
+property which retrieves a `ValueCell` that evaluates to the exception
+held in the `Maybe` or `null` if the `Maybe` is holding a value.
+
+This can be used to determine whether an error occurred while
+assigning a value to a mutable computed cell.
+
+```dart title="Mutable computed cell with error handling"
+final a = MutableCell<num>(0);
+final maybeA = a.maybe();
+
+final strA = MutableCell.computed(() => a().toString(), (value) {
+  maybeA.value = Maybe.wrap(() => num.parse(value));
+}
+
+print(strA.value); // Prints 0
+
+strA.value = '12';
+print(a.value);            // Prints 12
+print(maybeA.error.value); // Prints null
+
+strA.value = 'junk';
+print(a.value);            // Prints 12
+print(maybeA.error.value); // Prints FormatException
+```
+
+In this example `strA` is a mutable computed cell that:
+
+1. Converts the value it is assigned to a `num`
+2. Wraps it in a `Maybe` value
+3. Assigns the `Maybe` value to `maybeA`, which in turns sets the
+   value of `a` to the wrapped value.
+
+When `strA` is assigned a value that is not a valid `num`, `maybeA` is
+assigned a maybe that holds an exception which can be retrieved using
+`maybeA.error`. The value of `a` is not changed in this case.
+
+A cell with this behaviour can be created using the
+[`mutableString`](https://pub.dev/documentation/live_cells/latest/live_cells/ParseMaybeNumExtension/mutableString.html)
+method provided on `Maybe` cells that hold `num`, `int` or `double`
+values.
+
+Putting it all together a text field for numeric input that displays
+an error message when an invalid value is entered can be implemented
 with the following:
 
 ```dart title="Numeric text field with error handling"
 class NumberField extends CellWidget {
   final MutableCell<num> n;
   
-  NumberField(this.n);
+  const NumberField(this.n, {
+    super.key
+  });
   
   @override
   Widget build(BuildContext context) {
@@ -159,7 +250,7 @@ class NumberField extends CellWidget {
 Now that we have a reusable numeric input field with error handling,
 let's use it to reimplement the sum example from earlier.
 
-```dart title="Sum example using numberField()"
+```dart title="Sum example using NumberField"
 CellWidget.builder((_) {
   final a = MutableCell<num>(0);
   final b = MutableCell<num>(0);
@@ -198,8 +289,9 @@ of the cells holding our data.
 
 :::caution
 
-The same cell should be provided to `NumberField` between builds. Do
-not conditionally selected between multiple cells. **Don't do this**:
+The same cell should be provided to `NumberField` between
+builds. Don't conditionally select between multiple cells. **Don't do
+this**:
 
 ```dart
 NumberField(cond ? n1 : n2)
@@ -211,7 +303,7 @@ NumberField(cond ? n1 : n2)
 cond ? NumberField(n1) : NumberField(n2)
 ```
 
-If you need to do this consider adding a key to `NumberField` that
+If you need to do this consider provided a `key` to `NumberField` that
 is changed whenever a different cell is selected.
 
 :::

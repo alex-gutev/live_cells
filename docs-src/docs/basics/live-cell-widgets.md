@@ -6,10 +6,11 @@ sidebar_position: 4
 
 # Live Cell Widgets
 
-Besides the core cell functionality, this package comes with a
-`live_cells_ui` library which provides a collection of widgets that
-extend the stock Flutter widgets with functionality which allows their
-properties to be observed and controlled by cells.
+The
+[`live_cells_ui`](https://pub.dev/documentation/live_cells/latest/live_cells_ui/)
+library provides a collection of widgets that are equivalent to the
+stock Flutter widgets but allow their properties to be observed and
+controlled by cells rather than callback functions.
 
 :::tip
 The name of a Live Cells equivalent of a Flutter widget is `Live`
@@ -20,7 +21,7 @@ When a cell is given as a parameter for a widget property, the
 property is said to be bound to the cell. This means that when the
 value of the cell changes, the value of the property is automatically
 updated to reflect the value of the cell. Similarly, when the value of
-the property changes due to user interaction, the value of the cell is
+the property changes in response to an event, the value of the cell is
 updated to reflect the state of the widget.
 
 For example the `LiveSwitch` widget is a `Switch` which takes a cell
@@ -112,3 +113,6 @@ setting the value of the `content` cell to the empty string.
 If you provide a cell for the `selection` property of `LiveTextField`,
 it has to be reset as well as the content cell when clearing the text field.
 :::
+
+For the full list of widgets, visit the API reference for the
+[`live_cells_ui`](https://pub.dev/documentation/live_cells/latest/live_cells_ui/).

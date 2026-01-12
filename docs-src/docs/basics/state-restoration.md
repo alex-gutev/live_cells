@@ -16,7 +16,7 @@ at when it was terminated.
 For the most part all you need to do to restore the state of your
 cells is to provide a
 [`restorationId`](https://pub.dev/documentation/live_cells/latest/live_cells/CellWidget/restorationId.html)
-when creating the `CellWidget`, and call
+when creating a `CellWidget`, and call
 [`.restore()`](https://pub.dev/documentation/live_cells/latest/live_cells/CellRestorationExtension/restore.html)
 on your cells. The `restorationId` associates the saved state with the
 widget, See
@@ -97,9 +97,10 @@ on the cells, is restored.
 :::info
 
 * `LiveSlider`, `LiveSwitchListTile` and `LiveCheckboxListTile` are
-  the live cell equivalents, provided by `live_cell_ui`, of
-  `Slider`, `SwitchListTile` and `CheckboxListTile` which allow their
-  state to be controlled by a `ValueCell`.
+  the live cell equivalents, provided by
+  [`live_cells_ui`](https://pub.dev/documentation/live_cells/latest/live_cells_ui/),
+  of `Slider`, `SwitchListTile` and `CheckboxListTile` which allow
+  their state to be controlled by a `ValueCell`.
 * You can use any widgets not just those provided by
   [`live_cells_ui`](https://pub.dev/documentation/live_cells/latest/live_cells_ui/). The
   state of the cells within `CellWidget` on which `restore()` is
@@ -113,7 +114,7 @@ In order for cell state restoration to be successful, the following has to be ta
 * Only cells implementing the `RestorableCell` interface can have
   their state restored. All cells provided by **Live Cells** implement
   this interface except:
-  + *Lightweight computed cells*, which do not have a state
+  + *Lightweight computed cells*, which don't not have a state
   + Asynchronous cells
 * The values of the cells must be encodable by
   `StandardMessageCodec`. This means that only cells holding primitive
@@ -168,26 +169,26 @@ CellWidget.builder((ctx) => {
     children: [
       const Text('Radio Buttons:',),
       Text('Selected option: ${radioValue()?.name}'),
-      Column(
-        children: [
-          LiveRadioListTile(
-            groupValue: radioValue,
-            value: RadioValue.value1,
-            title: Text('value1'),
-          ),
-          LiveRadioListTile(
-            groupValue: radioValue,
-            value: RadioValue.value2,
-            title: Text('value2'),
-          ),
-          LiveRadioListTile(
-            groupValue: radioValue,
-            value: RadioValue.value3,
-            title: Text('value3'),
-          ),
-        ],
-      ),
-    ],
+      LiveRadioGroup(
+        groupValue: radioValue,
+        child: Column(
+          children: [
+            RadioListTile(
+              value: RadioValue.value1,
+              title: Text('value1'),
+            ),
+            RadioListTile(
+              value: RadioValue.value2,
+              title: Text('value2'),
+            ),
+            RadioListTile(
+              value: RadioValue.value3,
+              title: Text('value3'),
+            )
+          ]
+        )
+      )
+    ]
   );
 }, restorationId: 'cell_restoration_example');
 ```
@@ -247,13 +248,13 @@ CellWidget.builder((_) {
 }, restorationId: 'cell_restoration_example');
 ```
 
-The above is an example of a text field for numeric input with error
-handling. The only cells which have their state saved are
-`numValue`, the cell holding the numeric value that was entered in the
-field, and `numMaybe.mutableString()` which is the *content* cell for
-the text field. When the state of the app is restored the values of
-the remaining cells are recomputed, which in-effect restores their
-state without it actually being saved.
+This example contains a text field for numeric input with error
+handling. The only cells which have their state saved are `numValue`,
+the cell holding the numeric value that was entered in the field, and
+`numMaybe.mutableString()` which is the *content* cell for the text
+field. When the state of the app is restored the values of the
+remaining cells are recomputed, which in-effect restores their state
+without it actually being saved.
 
 When you leave the app and return to it, you'll see the exact same
 state, including erroneous input and the associated error message, as
@@ -266,7 +267,7 @@ Some points to note from this example:
 
 * Computed cells don't require their state to be saved, e.g. the state
   of the `a1` cell is not saved, however it is *restored* (the same
-  state is recomputed on launch) nevertheless.
+  state is recomputed when the app is resumed) nevertheless.
 
 As a general rule of thumb only mutable cells which are either set
 directly, such as `numValue`, which has its value set in the "Reset"

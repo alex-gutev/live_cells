@@ -62,10 +62,12 @@ b.value = 10; // Prints: 5 + 10 = 15
 ```
 
 
-In the example above, a watch function that prints the values of cells
-`a` and `b` to the console, along with their sum, is defined. This
-function is called automatically when the value of either `a` or `b`
-changes. 
+[`ValueCell.watch`](https://pub.dev/documentation/live_cells/latest/live_cells/ValueCell/watch.html)
+takes a watch function and registers it to be called when the values
+of the cells referenced within it change. In the example above, a
+watch function that prints the values of cells `a` and `b` to the
+console, along with their sum, is defined. This function is called
+automatically when the value of either `a` or `b` changes.
 
 :::important
 
@@ -119,6 +121,13 @@ When you no longer need the watch function to be called, call
 on the `CellWatcher` object returned by `ValueCell.watch`.
 
 :::
+
+`ValueCell.watch` returns a watch handle (`CellWatcher`), which
+provides a
+[`stop`](https://pub.dev/documentation/live_cells/latest/live_cells/CellWatcher/stop.html)
+method that deregisters the watch function. When the `stop` method is
+called, the watch function is no longer called when the values of the
+cells it is observing change.
 
 The
 [`Watch`](https://pub.dev/documentation/live_cells/latest/live_cells/Watch/Watch.html)
@@ -185,10 +194,11 @@ function will not be observing any cells and will never be called.
 
 ## Computed Cells
 
-A *computed cell*, defined using `ValueCell.computed`, is a cell
-with a value that is defined as a function of the values of one or
-more argument cells. Whenever the value of an argument cell changes,
-the value of the computed cell is recomputed.
+A *computed cell*, defined using
+[`ValueCell.computed`](https://pub.dev/documentation/live_cells/latest/live_cells/ValueCell/ValueCell.computed.html),
+is a cell with a value that is defined as a function of the values of
+one or more argument cells. Whenever the value of an argument cell
+changes, the value of the computed cell is recomputed.
 
 ```dart title="Computed cells"
 final a = MutableCell(1);
@@ -418,11 +428,15 @@ final cached_sum = sum.store(changesOnly: true);
 
 ## Batch Updates
 
-The `MutableCell.batch` function allows the values of multiple mutable
-cells to be set simultaneously. The effect of this is that while the
-values of the cells are changed as soon as their `value` properties
-are set, the observers of the cells are only notified after all the
-cell values have been set.
+The values of multiple cells can be set simultaneously in a batch
+update. The effect of this is that while the values of the cells are
+changed as soon as their `value` properties are set, the observers of
+the cells are only notified after all the cell values have been set.
+
+Batch updates are performed with
+[`MutableCell.batch`](https://pub.dev/documentation/live_cells/latest/live_cells/MutableCell/batch.html),
+which takes a function that is called to set the values of one or more
+cells.
 
 ```dart title="Batch updates"
 final a = MutableCell(0);
@@ -439,7 +453,7 @@ MutableCell.batch(() {
 });
 ```
 
-In the example above, the values of `a` and `b` are set to `15` and
+In this example, the values of `a` and `b` are set to `15` and
 `3` respectively, within `MutableCell.batch`. The watch function,
 which observes both `a` and `b`, is only called once after the values
 of both `a` and `b` are set.

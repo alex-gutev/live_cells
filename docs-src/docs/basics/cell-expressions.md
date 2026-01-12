@@ -60,15 +60,15 @@ final y = x < e;
 
 :::tip
 To include a constant in a cell expression, use the `.cell` property
-on the constant if available or wrap it in a cell using
+on the constant or wrap it in a cell using
 `ValueCell.value`.
 :::
 
 ## Equality
 
-Every cell provides the `eq` and `neq` methods which compare whether the cell
-is equal or not equal to another cell, respectively. Like the arithmetic operators, these
-methods return cells which perform the comparison.
+Every cell provides the `eq` and `neq` methods, which return cells
+that compare whether the values of the cells are equal or not equal,
+respectively.
 
 ```dart title="Equality Comparison"
 final eq = a.eq(b);   // eq() == true when a() == b()
@@ -89,6 +89,14 @@ Cells holding `bool` values are extended with the following methods:
 <dt>`select`</dt>
 <dd>Creates a cell which selects between the values of two cells based on a condition</dd>
 </dl>
+
+:::info
+
+`and` and `or` are short-circuiting, which means the value of the
+second operand cell is not referenced if the result of the expression
+is already known without it.
+
+:::
 
 ```dart title="Logic and selection expressions"
 final a = MutableCell(true);
@@ -127,10 +135,11 @@ a.value = 4;        // Prints: 2
 ## Aborting a computation
 
 The computation of a computed cell's value can be aborted using
-`ValueCell.none()`. When `ValueCell.none` is called inside a computed
-cell, the value computation function is exited and the cell's current
-value is preserved. This can be used to prevent a cell's value from
-being recomputed when a condition is not met:
+[`ValueCell.none()`](https://pub.dev/documentation/live_cells/latest/live_cells/ValueCell/none.html). When
+`ValueCell.none` is called inside a computed cell, the value
+computation function is exited and the cell's current value is
+preserved. This can be used to prevent a cell's value from being
+recomputed when a condition is not met:
 
 ```dart title="Example of ValueCell.none()"
 final a = MutableCell(4);
@@ -143,19 +152,26 @@ a.value = 15; // Prints 6
 a.value = 8;  // Prints 8
 ```
 
-If `ValueCell.none()` is called during the computation of the cell's
-first value, the cell's value is assigned to `null` by default. If a
-different default value is desired, `ValueCell.none` takes an optional
-argument which is the default value to assign to the cell in this
-case. For example `ValueCell.none(3)` will assign the value `3` by
-default.
+If `ValueCell.none()` is called while computing the initial value of
+the cell, the cell is initialized to the value provided in the
+argument to `ValueCell.none`, which defaults to `null` if no argument
+is given. For example `ValueCell.none(3)` will assign the value `3` if
+called while computing the initial value of a cell.
+
+:::info
+
+If no argument is given to `ValueCell.none` and it is called while
+computing the initial value of a cell with a value type that is not
+nullable, an `UninitializedCellError` exception is thrown.
+
+:::
 
 :::caution
 The value of a computed cell is only computed if it is actually
 referenced. `ValueCell.none` only preserves the current value of the
 cell, but this might not be the latest value of the cell if the cell's
 value is only referenced conditionally. A good rule of thumb is to use
-`ValueCell.none` only for preventing a cell from holding an invalid
+`ValueCell.none` only to prevent a cell from holding an invalid
 value.
 :::
 
@@ -188,12 +204,14 @@ str.value = 'not a number';
 print(isValid.value); // Prints false
 ```
 
-This library provides two utility methods, `onError` and `error`, for
-handling exceptions thrown in computed cells.
+This library provides two utility methods,
+[`onError`](https://pub.dev/documentation/live_cells/latest/live_cells/ErrorCellExtension/onError.html)
+and
+[`error`](https://pub.dev/documentation/live_cells/latest/live_cells/ErrorCellExtension/error.html),
+for handling exceptions thrown in computed cells.
 
 The `onError` method creates a cell that selects the value of another
-cell when an exception is thrown. The `error` method creates a cell
-which holds the exception thrown or `null` if no exception is thrown.
+cell when an exception is thrown.
 
 ```dart title="Example of onError"
 final str = MutableCell('0');
@@ -229,11 +247,79 @@ We used `0.cell` and `false.cell` to create constant cells that hold
 the values `0` and `false`, respectively.
 :::
 
+The `error` method creates a cell which holds the exception thrown or
+`null` if no exception is thrown.
+
+```dart title="Example of .error()"
+final error = n.error();
+
+ValueCell.watch(() {
+  if (error() != null) {
+    print('Error: ${error()}');
+  }
+});
+```
+
+Like `onError` this method is also a generic method with a type
+argument. When the a type argument is provided, the cell evaluates to
+the exception thrown only if it is of the given exception type.
+
+```dart
+final parseError = n.error<FormatException>();
+```
+
+The `error` method also accepts an `all` argument. When this argument
+is `true`, the value of the *error* cell resets to `null` when the
+value of the cell, on which `error` is called, changes its value such
+that it no longer raises an exception. If `all` is false (the
+default), the value of the *error* cell does not change if the cell on
+which `error` is called does not raise an exception.
+
+The difference between the two is demonstrated with the following example:
+
+```dart
+final text = MutableCell('0');
+
+final n = ValueCell.computed(() {
+  return int.parse(text());
+});
+
+e1 = n.error();
+e2 = n.error(all: true);
+
+ValueCell.watch(() {
+  print('\ntext = "${text()}"');
+  print('error(all: false): ${e1() == null}');
+  print('error(all: true); ${e2() == null}');
+});
+
+text.value = 'not a number';
+text.value = '10';
+```
+
+This results in the following being printed:
+
+```
+text = "0"
+error(all: false): true
+error(all: true): true
+
+text = "not a number"
+error(all: false): false
+error(all: true): false
+
+text = "10"
+error(all: false): false
+error(all: true): true
+```
+
 ## Previous Values
 
-The `previous` property can be used to retrieve the previous values of cells:
+The
+[`previous`](https://pub.dev/documentation/live_cells/latest/live_cells/PrevValueCellExtension/previous.html)
+property can be used to retrieve the previous value of a cell:
 
-```dart title="Retrieving previous cell values"
+```dart title="Retrieving previous value of a cell"
 final a = MutableCell(1);
 final prev = a.previous;
 
@@ -280,9 +366,11 @@ on the same cell, shares the same state.
 
 ## Peeking Cells
 
-What if you want to use the value of a cell in a computed cell but
-don't want changes to that cell's value triggering a
-recomputation. The peek property allows you to do exactly that.
+If you want to use the value of a cell in a computed cell but don’t
+want changes in the cells value triggering a recomputation, access the
+cell via the
+[`peek`](https://pub.dev/documentation/live_cells/latest/live_cells/PeekCellExtension/peek.html)
+property.
 
 ```dart title="Example of .peek"
 final a = MutableCell(0);
@@ -297,28 +385,29 @@ b.value = 5; // Doesn't print anything
 a.value = 7; // Prints: 13
 ```
 
-In the example above, cell `c` is a computed cell that references the value
-of `a` and *peeks* the value of `b`. Changing the value of `a`
-triggers a recomputation of `c`, and hence triggers the watch function
-which prints to the console. However, changing the value of `b` doesn't
-trigger a recomputation of `c`, and hence the watch function is not called.
+In this example, `c` is a computed cell that references the value of
+`a` and *peeks* the value of `b`. Changing the value of `a` causes the
+value of `c` to be recomputed, and hence the watch function is
+called. However, changing the value of `b` does not cause the value of
+`c` to be recomputed due to the value of `b` being accessed via the
+`peek` property, and hence the watch function is not called.
 
 :::note
 `peek` returns a cell.
 :::
 
 You may be asking why do we need `peek` here instead of just accessing
-the value of `b` directly `b.value`. Something we've glossed over till
-this point is the lifecycle of cells. Cells are only active while they
-are actually observed, and are activated when the first observer is
-added. While active, cells react to changes in their argument
-cells. When the last observer is removed, cells are deactivated and
-stop observing their argument cells. When a new observer is added,
-they are reactivated again. Essentially, this means that the value of
-a cell may no longer be current if it doesn't have at least one
-observer. For a computed cell this is not a problem, since when it is
-inactive it computes its value on demand, but it may cause issues with
-other cells, such as `previous` cells. The `peek` property takes
-care of adding an observer to the peeked cell, so that it remains
-active, but at the same time prevents the observers, added through
-`peek`, from being notified of the changes in its value.
+the value of `b` directly using `b.value`. The reason for this is due
+to the cell lifecycle. Cells are only active when they have at least
+one observer.
+
+When a cell is active it recomputes its value in response to changes
+in the values of its argument cells, if any. When a cell is inactive,
+it does not recompute it’s value when the values of its argument cells
+change. This means the value of a cell may no longer be current if it
+doesn’t have at least one observer.
+
+The `peek` property returns a cell that takes care of observing the
+peeked cell, so that it remains active, but at the same prevents the
+observers, added through the cell returned by `peek`, from being
+notified when its value changes.
