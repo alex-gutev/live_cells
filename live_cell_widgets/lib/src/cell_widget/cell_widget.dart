@@ -17,7 +17,7 @@ part 'cell_observer_state.dart';
 /// Example:
 ///
 /// ```dart
-/// class Example extends WidgetCell {
+/// class Example extends CellWidget {
 ///   final ValueCell<int> a;
 ///
 ///   Example({
