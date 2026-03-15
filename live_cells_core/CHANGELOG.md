@@ -1,3 +1,36 @@
+# 1.5.0
+
+New Features:
+
+* Action cell `.watch()` method:
+
+  Allows you to register a watch function on an action cell directly:
+
+  ```dart
+  final action = ActionCell();
+  
+  action.watch(() {
+    print('action was triggered');
+  })
+  ```
+
+* `initial` argument on `MetaCell` constructor:
+
+  This allows you to create a `MetaCell` that points to 
+  an *initial* cell:
+
+  ```dart
+  final m = MetaCell(1.cell);
+  
+  // Prints 'm = 1'
+  ValueCell.watch(() {
+    print('m = ${m()}');
+  });
+  ```
+  
+  The `inital` argument is also available on `MetaCell.mutable` 
+  `MetaCell.action`.
+
 # 1.4.0
 
 * Compatibility with Flutter 3.35.0
