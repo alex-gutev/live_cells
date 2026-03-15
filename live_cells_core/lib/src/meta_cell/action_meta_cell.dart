@@ -5,7 +5,10 @@ part of 'meta_cell.dart';
 /// This class provides the [trigger] method for triggering the referenced
 /// [ActionCell] from this [MetaCell].
 class ActionMetaCell extends MetaCell<void> implements ActionCell {
-  ActionMetaCell({super.key});
+  ActionMetaCell({
+    super.key,
+    ActionCell? initial
+  }) : super(initial: initial);
 
   /// Trigger the referenced [ActionCell].
   ///

@@ -5,7 +5,10 @@ part of 'meta_cell.dart';
 /// This class provides a setter for the [value] property, which allows setting
 /// the value of the referenced cell from this [MetaCell].
 class MutableMetaCell<T> extends MetaCell<T> implements MutableCell<T> {
-  MutableMetaCell({super.key});
+  MutableMetaCell({
+    super.key,
+    MutableCell<T>? initial
+  }) : super(initial: initial);
 
   /// Get/Set the value of the referenced [MutableCell].
   ///

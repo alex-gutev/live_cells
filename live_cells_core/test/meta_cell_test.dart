@@ -303,6 +303,37 @@ void main() {
       expect(() => meta.value = 1, throwsA(isA<EmptyMetaCellError>()));
     });
 
+    test('Points to initial cell until changed', () {
+      final a = MutableCell(1);
+      final b = MutableCell(100);
+
+      final meta = MetaCell.mutable<int>(
+          initial: a
+      );
+
+      observeCell(meta);
+
+      expect(meta.value, 1);
+
+      a.value = 2;
+      expect(meta.value, 2);
+
+      meta.value = 3;
+      expect(a.value, 3);
+      expect(meta.value, 3);
+
+      meta.inject(b);
+      expect(meta.value, 100);
+
+      b.value = 140;
+      expect(meta.value, 140);
+
+      meta.value = 200;
+      expect(b.value, 200);
+      expect(a.value, 3);
+      expect(meta.value, 200);
+    });
+
     test('Compares == when same key', () {
       final a = MetaCell.mutable(key: 'meta-cell-key1');
       final b = MetaCell.mutable(key: 'meta-cell-key1');
@@ -495,6 +526,37 @@ void main() {
       observeCell(meta);
 
       expect(() => meta.trigger(), throwsA(isA<EmptyMetaCellError>()));
+    });
+
+    test('Points to initial cell until changed', () {
+      final a = ActionCell();
+      final b = ActionCell();
+
+      final meta = MetaCell.action(
+          initial: a
+      );
+
+      final listenerA = addListener(a, MockSimpleListener());
+      final listenerB = addListener(b, MockSimpleListener());
+      final listenerM = addListener(meta, MockSimpleListener());
+
+      a.trigger();
+      verify(listenerA()).called(1);
+      verify(listenerM()).called(1);
+
+      meta.trigger();
+      verify(listenerA()).called(1);
+      verify(listenerM()).called(1);
+
+      meta.inject(b);
+      b.trigger();
+      verify(listenerB()).called(1);
+      verify(listenerM()).called(1);
+
+      meta.trigger();
+      verify(listenerB()).called(1);
+      verify(listenerM()).called(1);
+      verifyNever(listenerA());
     });
 
     test('Compares == when same key', () {

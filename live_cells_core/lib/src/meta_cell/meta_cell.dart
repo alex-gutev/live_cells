@@ -83,12 +83,28 @@ class MetaCell<T> extends StatefulCell<T> {
   /// Create a [MetaCell] that points to a [MutableCell].
   ///
   /// The created cell is identified by [key] if it is non-null.
-  static MutableMetaCell<T> mutable<T>({key}) => MutableMetaCell(key: key);
+  ///
+  /// The cell initially points to [initial] if it is not null.
+  static MutableMetaCell<T> mutable<T>({
+    key,
+    MutableCell<T>? initial
+  }) => MutableMetaCell(
+      key: key,
+      initial: initial
+  );
 
   /// Create a [MetaCell] that points to an [ActionCell].
   ///
   /// The created cell is identified by [key] if it is non-null.
-  static ActionMetaCell action({key}) => ActionMetaCell(key: key);
+  ///
+  /// The cell initially points to [initial] if it is not null.
+  static ActionMetaCell action({
+    key,
+    ActionCell? initial
+  }) => ActionMetaCell(
+      key: key,
+      initial: initial
+  );
 
   /// Set the cell to which this cell points to.
   ///
