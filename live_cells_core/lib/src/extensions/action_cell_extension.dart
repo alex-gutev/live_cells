@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 
+import '../cell_watch/cell_watcher.dart';
 import '../compute_cell/compute_cell.dart';
 import '../compute_cell/store_cell.dart';
 import '../mutable_cell/action_cell.dart';
@@ -23,7 +24,7 @@ extension ActionCellEffectExtension on ValueCell<void> {
   ).effectCell;
 }
 
-/// Provides functionality for chaining action cells
+/// Extends action cells with some utility methods.
 extension ActionCellExtension on ValueCell<void> {
   /// Create an action cell that is chained to this cell.
   ///
@@ -40,6 +41,17 @@ extension ActionCellExtension on ValueCell<void> {
       action: action,
       key: key
   );
+
+  /// Register a watch function ([fn]) that is run when [this] cell is triggered.
+  ///
+  /// [fn] is only called when the value of this cell is updated after the
+  /// watch function is registered. That is it is not called immediately on
+  /// registration.
+  CellWatcher watch(void Function() fn) => Watch((state) {
+    observe();
+    state.afterInit();
+    fn();
+  });
 }
 
 /// Provides the [combined] property for combining multiple action cells into one cell.

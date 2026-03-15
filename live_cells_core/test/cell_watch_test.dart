@@ -1933,4 +1933,101 @@ void main() {
       });
     });
   });
+
+  group('ActionCell.watch extension method', () {
+    test('Not called on registration', () {
+      final action = ActionCell();
+
+      final observer = MockSimpleListener();
+      final watcher = action.watch(observer);
+
+      addTearDown(() => watcher.stop());
+
+      verifyNever(observer());
+    });
+
+    test('Called when action cell triggered', () {
+      final action = ActionCell();
+
+      final observer = MockSimpleListener();
+      final watcher = action.watch(observer);
+
+      addTearDown(() => watcher.stop());
+
+      action.trigger();
+      verify(observer()).called(1);
+    });
+
+    test('Called when action cell triggered more than once', () {
+      final action = ActionCell();
+
+      final observer = MockSimpleListener();
+      final watcher = action.watch(observer);
+
+      addTearDown(() => watcher.stop());
+
+      action.trigger();
+      action.trigger();
+      action.trigger();
+
+      verify(observer()).called(3);
+    });
+
+    test('Called when referenced cell values change', () {
+      final action = ActionCell();
+      final a = MutableCell(1);
+
+      final values = [];
+
+      final watcher = action.watch(() {
+        values.add(a());
+      });
+
+      addTearDown(() => watcher.stop());
+
+      action.trigger();
+
+      a.value = 2;
+      a.value = 3;
+      action.trigger();
+
+      expect(values, equals([1, 2, 3, 3]));
+    });
+
+    test('Called when referenced cell values change in batch update', () {
+      final action = ActionCell();
+      final a = MutableCell(1);
+
+      final values = [];
+
+      final watcher = action.watch(() {
+        values.add(a());
+      });
+
+      addTearDown(() => watcher.stop());
+
+      MutableCell.batch(() {
+        action.trigger();
+        a.value = 2;
+      });
+
+      expect(values, equals([2]));
+    });
+
+    test('Not called after .stop() is called', () {
+      final action = ActionCell();
+      final observer = MockSimpleListener();
+
+      final watcher = action.watch(observer);
+      addTearDown(() => watcher.stop());
+
+      action.trigger();
+      action.trigger();
+
+      watcher.stop();
+      action.trigger();
+
+      verify(observer()).called(2);
+    });
+  });
 }
