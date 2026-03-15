@@ -65,10 +65,20 @@ class InactiveMetaCellError implements Exception {
 /// b.value = 12; // Prints: 12
 /// ```
 class MetaCell<T> extends StatefulCell<T> {
+  /// The initial cell that the [MetaCell] points to.
+  ///
+  /// If [null] the [MetaCell] initially doesn't point to any cell.
+  final ValueCell<T>? initial;
+
   /// Create a cell that points to another cell.
   ///
   /// The created cell is identified by [key] if it is non-null.
-  MetaCell({super.key});
+  ///
+  /// The cell initially points to [initial] if it is not null.
+  MetaCell({
+    super.key,
+    this.initial
+  });
 
   /// Create a [MetaCell] that points to a [MutableCell].
   ///
@@ -103,12 +113,13 @@ class MetaCell<T> extends StatefulCell<T> {
   @override
   T get value {
     final state = _ensureState;
+    final refCell = state.refCell;
 
-    if (state.refCell == null) {
+    if (refCell == null) {
       throw EmptyMetaCellError();
     }
 
-    return state.refCell!.value;
+    return refCell.value;
   }
 
   // Private
@@ -148,6 +159,8 @@ class MetaCellState<T> extends CellState<MetaCell<T>> with ObserverCellState<Met
   @override
   void init() {
     super.init();
+
+    _refCell ??= cell.initial;
 
     _refCell?.addObserver(this);
     _refernceValue();
