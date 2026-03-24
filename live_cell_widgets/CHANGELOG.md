@@ -1,3 +1,10 @@
+## 0.20.0
+
+* Fix issues on Flutter 3.41.0
+
+**NOTE**: This version now requires at least
+Flutter 3.41.0 or greater.
+
 ## 0.19.0
 
 Changes:
