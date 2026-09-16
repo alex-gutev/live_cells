@@ -875,6 +875,92 @@ void main() {
     });
   });
 
+  group('CellWidget.listBuilder', () {
+    testWidgets('Rebuilt when condition cell changes', (tester) async {
+      final condition = MutableCell(true);
+
+      await tester.pumpWidget(TestApp(
+        child: Column(
+          children: CellWidget.listBuilder(
+              condition: condition,
+              trueWidgets: const [
+                Text('True 1'),
+                Text('True 2'),
+                Text('True 3')
+              ],
+
+              fallbackWidgets: const [
+                Text('False 1'),
+                Text('False 2'),
+                Text('False 3')
+              ]
+          ),
+        ),
+      ));
+
+      expect(find.text('True 1'), findsOneWidget);
+      expect(find.text('True 2'), findsOneWidget);
+      expect(find.text('True 3'), findsOneWidget);
+
+      condition.value = false;
+      await tester.pump();
+
+      expect(find.text('False 1'), findsOneWidget);
+      expect(find.text('False 2'), findsOneWidget);
+      expect(find.text('False 3'), findsOneWidget);
+
+      expect(find.text('True 1'), findsNothing);
+      expect(find.text('True 2'), findsNothing);
+      expect(find.text('True 3'), findsNothing);
+
+      condition.value = true;
+      await tester.pump();
+
+      expect(find.text('False 1'), findsNothing);
+      expect(find.text('False 2'), findsNothing);
+      expect(find.text('False 3'), findsNothing);
+
+      expect(find.text('True 1'), findsOneWidget);
+      expect(find.text('True 2'), findsOneWidget);
+      expect(find.text('True 3'), findsOneWidget);
+    });
+
+    testWidgets('No fallback widgets', (tester) async {
+      final condition = MutableCell(true);
+
+      await tester.pumpWidget(TestApp(
+        child: Column(
+          children: CellWidget.listBuilder(
+              condition: condition,
+              trueWidgets: const [
+                Text('True 1'),
+                Text('True 2'),
+                Text('True 3')
+              ],
+          ),
+        ),
+      ));
+
+      expect(find.text('True 1'), findsOneWidget);
+      expect(find.text('True 2'), findsOneWidget);
+      expect(find.text('True 3'), findsOneWidget);
+
+      condition.value = false;
+      await tester.pump();
+
+      expect(find.text('True 1'), findsNothing);
+      expect(find.text('True 2'), findsNothing);
+      expect(find.text('True 3'), findsNothing);
+
+      condition.value = true;
+      await tester.pump();
+
+      expect(find.text('True 1'), findsOneWidget);
+      expect(find.text('True 2'), findsOneWidget);
+      expect(find.text('True 3'), findsOneWidget);
+    });
+  });
+
   group('CellWidget subclass', () {
     testWidgets('Rebuilt when referenced cell changes', (tester) async {
       final count = MutableCell(0);

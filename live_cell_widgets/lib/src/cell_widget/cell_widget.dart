@@ -114,6 +114,31 @@ abstract class CellWidget extends StatefulWidget {
     restorationId: restorationId,
   );
 
+  /// Build a list of widgets based on a single [condition] cell.
+  ///
+  /// If the value of the [condition] cell is true, the widgets in [trueWidgets]
+  /// are rendered, otherwise thw widgets in [fallbackWidgets] are rendered if
+  /// it is not null. If [fallbackWidgets] a list of the same length as [trueWidgets],
+  /// filled with ``SizedBox.shrink()`` is rendered instead.
+  ///
+  /// **NOTE**: [trueWidgets] and [fallbackWidgets] must have the same length.
+  static List<Widget> listBuilder({
+    required ValueCell<bool> condition,
+    required List<Widget> trueWidgets,
+    List<Widget>? fallbackWidgets
+  }) {
+    assert(fallbackWidgets == null || trueWidgets.length == fallbackWidgets.length);
+
+    return List.generate(trueWidgets.length, (i) => CellWidget.builder((_) {
+      if (condition()) {
+        return trueWidgets[i];
+      }
+      else {
+        return fallbackWidgets?[i] ?? const SizedBox.shrink();
+      }
+    }));
+  }
+
   /// Build the widget underneath this widget in the tree
   Widget build(BuildContext context);
   
