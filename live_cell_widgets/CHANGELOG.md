@@ -1,3 +1,12 @@
+## 0.20.1
+
+### New features
+
+  * `CellWidget.listBuilder`
+    
+    Conditionally builds a list of widgets based on a
+    condition `ValueCell`.
+
 ## 0.20.0
 
 * Fix issues on Flutter 3.41.0
