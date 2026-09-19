@@ -1,3 +1,12 @@
+## 0.34.1
+
+### New features
+
+* `CellWidget.listBuilder`
+
+  Conditionally builds a list of widgets based on a
+  condition `ValueCell`.
+
 # 0.34.0
 
 New Features:

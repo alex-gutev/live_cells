@@ -353,14 +353,14 @@ packages:
       path: "../../live_cell_widgets"
       relative: true
     source: path
-    version: "0.20.0"
+    version: "0.20.1"
   live_cells:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.33.0"
+    version: "0.34.1"
   live_cells_core:
     dependency: "direct overridden"
     description:
@@ -623,4 +623,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.9.0-0 <4.0.0"
-  flutter: ">=3.38.0"
+  flutter: ">=3.41.0"
